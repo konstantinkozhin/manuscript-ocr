@@ -1,5 +1,5 @@
 import numpy as np
-from numba import njit, float64, int64, boolean
+from numba import njit, float64, int64
 from numba.experimental import jitclass
 from numba.types import Tuple
 

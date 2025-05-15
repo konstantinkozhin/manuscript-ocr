@@ -1,1 +1,13 @@
-cv2
+torch>=2.0.1
+torchvision>=0.15.2
+torchaudio>=2.0.2
+numpy<2
+opencv-python
+Pillow
+shapely
+numba
+tensorboard
+gdown
+pydantic
+scikit-image
+torch_optimizer

@@ -1,180 +1,235 @@
-import numpy as np
 import cv2
-
-# from typing import Optional, List
-
-
-def get_rotate_mat(theta: float) -> np.ndarray:
-    """
-    Возвращает матрицу поворота для заданного угла в радианах.
-
-    Функция вычисляет двумерную матрицу поворота, которая используется для поворота точек в плоскости
-    на угол `theta`.
-
-    Параметры
-    ----------
-    theta : float
-        Угол поворота в радианах.
-
-    Возвращаемое значение
-    ----------------------
-    np.ndarray
-        Матрица поворота размером 2x2, вычисленная по формуле:
-        [[cos(theta), -sin(theta)],
-         [sin(theta),  cos(theta)]].
-
-    Примеры
-    --------
-    >>> import numpy as np
-    >>> get_rotate_mat(0)
-    array([[1., 0.],
-           [0., 1.]])
-    >>> import numpy as np
-    >>> np.set_printoptions(precision=2)
-    >>> get_rotate_mat(np.pi / 2)
-    array([[ 0., -1.],
-           [ 1.,  0.]])
-    """
-    return np.array([[np.cos(theta), -np.sin(theta)], [np.sin(theta), np.cos(theta)]])
+import numpy as np
+import torch
+from .lanms import locality_aware_nms
 
 
-def draw_boxes_on_image(
+def convert_rboxes_to_quad_boxes(rboxes, scores=None):
+    quad_boxes = []
+    if scores is None:
+        scores = np.ones(len(rboxes), dtype=np.float32)
+    for i, r in enumerate(rboxes):
+        cx, cy, w, h, angle = r
+        pts = cv2.boxPoints(((cx, cy), (w, h), angle))
+        quad = np.concatenate([pts.flatten(), [scores[i]]]).astype(np.float32)
+        quad_boxes.append(quad)
+    return np.array(quad_boxes, dtype=np.float32)
+
+
+def quad_to_rbox(quad):
+    pts = quad[:8].reshape(4, 2).astype(np.float32)
+    rect = cv2.minAreaRect(pts)
+    (cx, cy), (w, h), angle = rect
+    return np.array([cx, cy, w, h, angle], dtype=np.float32)
+
+
+def tensor_to_image(tensor):
+    img = tensor.detach().cpu().permute(1, 2, 0).numpy()
+    img = (img * 0.5) + 0.5
+    img = np.clip(img * 255, 0, 255).astype(np.uint8)
+    return img
+
+
+def draw_quads(
     image: np.ndarray,
-    boxes: list[np.ndarray],
-    color: tuple[int, int, int] = (0, 255, 0),
-    thickness: int = 1,
-    alpha: float = 0.8,
+    quads: np.ndarray,
+    style: str = "highlight",
+    color: tuple[int,int,int] = (0, 255, 0),
+    thickness: int = 2,
+    alpha: float = 0.5,
+    dark_alpha: float = 0.5,
+    blur_ksize: int = 11,
 ) -> np.ndarray:
     """
-    Отрисовывает боксы (полигоны) на изображении с возможностью задания прозрачности.
+    Рисует полигоны двумя стилями:
+      - style="border": контур с прозрачностью alpha.
+      - style="highlight": затемняет всю картинку на dark_alpha,
+        при этом внутри каждого полигона показывает оригинал.
+        Для мягких углов маска размывается ядром blur_ksize.
 
-    Parameters
-    ----------
-    image : np.ndarray
-        Исходное изображение в формате RGB (трёхканальный массив NumPy).
-    boxes : list of np.ndarray
-        Список полигонов, представляющих боксы. Каждый полигон — это массив формы (4, 2),
-        содержащий координаты четырёх углов бокса.
-    color : tuple of int, optional
-        Цвет линий бокса в формате (B, G, R). По умолчанию (0, 255, 0) — зелёный.
-    thickness : int, optional
-        Толщина линии боксов. По умолчанию 1.
-    alpha : float, optional
-        Коэффициент прозрачности для боксов (0 - полностью прозрачные, 1 - полностью непрозрачные).
-        По умолчанию 0.8.
-
-    Returns
-    -------
-    np.ndarray
-        Изображение с нанесёнными боксами.
-
-    Examples
-    --------
-    >>> import numpy as np
-    >>> import cv2
-    >>> img = np.zeros((100, 100, 3), dtype=np.uint8)
-    >>> boxes = [np.array([[10, 10], [20, 10], [20, 20], [10, 20]])]
-    >>> result = draw_boxes_on_image(img, boxes)
-    >>> isinstance(result, np.ndarray)
-    True
+    :param blur_ksize: нечётный размер ядра для GaussianBlur.
     """
-    img_out = image.copy()
-    overlay = image.copy()
-    for box in boxes:
-        pts = np.round(box).astype(np.int32).reshape((-1, 1, 2))
-        cv2.polylines(overlay, [pts], isClosed=True, color=color, thickness=thickness)
-    cv2.addWeighted(overlay, alpha, img_out, 1 - alpha, 0, img_out)
-    return img_out
+    img = image.copy()
+    if quads is None or len(quads) == 0:
+        return img
+
+    # Если передали тензор — приводим к numpy
+    if isinstance(quads, torch.Tensor):
+        quads = quads.detach().cpu().numpy()
+
+    if style == "border":
+        overlay = img.copy()
+        for q in quads:
+            pts = q[:8].reshape(4, 2).astype(np.int32)
+            cv2.polylines(overlay, [pts], isClosed=True, color=color, thickness=thickness)
+        return cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
+
+    elif style == "highlight":
+        h, w, _ = img.shape
+        # 1) затемняем весь фон
+        dark_bg = (img.astype(np.float32) * (1 - dark_alpha)).astype(np.uint8)
+
+        # 2) создаём маску: 1 внутри полигонов
+        mask = np.zeros((h, w), dtype=np.float32)
+        for q in quads:
+            pts = q[:8].reshape(4, 2).astype(np.int32)
+            cv2.fillPoly(mask, [pts], 1.0)
+
+        # 3) размываем маску для мягких краёв
+        k = blur_ksize if blur_ksize % 2 == 1 else blur_ksize + 1
+        mask = cv2.GaussianBlur(mask, (k, k), 0)
+        mask = np.clip(mask, 0.0, 1.0)
+
+        # 4) составляем итог: внутри — оригинал, снаружи — тёмный фон
+        mask_3 = mask[:, :, None]
+        out = img.astype(np.float32) * mask_3 + dark_bg.astype(np.float32) * (1 - mask_3)
+        return np.clip(out, 0, 255).astype(np.uint8)
+
+    else:
+        raise ValueError(f"Unknown style {style!r}, expected 'border' or 'highlight'")
 
 
-def shrink_poly(poly, shrink_ratio=0.4):
+def draw_boxes(image, boxes, color=(0, 255, 0), thickness=2, alpha=0.5):
+    if boxes is None or len(boxes) == 0:
+        return image
+    if isinstance(boxes, torch.Tensor):
+        boxes = boxes.detach().cpu().numpy()
+    # detect format by length
+    first = boxes[0]
+    if len(first) in (8, 9):
+        # quad with or without score
+        return draw_quads(image, boxes, color=color, thickness=thickness, alpha=alpha)
+    else:
+        raise ValueError(f"Unsupported box format with length {len(first)}")
+
+
+def create_collage(
+    img_tensor,
+    gt_score_map,
+    gt_geo_map,
+    gt_rboxes,
+    pred_score_map=None,
+    pred_geo_map=None,
+    pred_rboxes=None,
+    cell_size=640,
+):
+    n_rows, n_cols = 2, 10
+    collage = np.full((cell_size * n_rows, cell_size * n_cols, 3), 255, dtype=np.uint8)
+    orig = tensor_to_image(img_tensor)
+
+    # GT
+    gt_img = draw_boxes(orig, gt_rboxes, color=(0, 255, 0))
+    gt_score = (
+        gt_score_map.detach().cpu().numpy().squeeze()
+        if isinstance(gt_score_map, torch.Tensor)
+        else gt_score_map
+    )
+    gt_score_vis = cv2.applyColorMap(
+        (gt_score * 255).astype(np.uint8), cv2.COLORMAP_JET
+    )
+    gt_geo = (
+        gt_geo_map.detach().cpu().numpy()
+        if isinstance(gt_geo_map, torch.Tensor)
+        else gt_geo_map
+    )
+    gt_cells = [gt_img, gt_score_vis]
+    for i in range(gt_geo.shape[2]):
+        ch = gt_geo[:, :, i]
+        norm = cv2.normalize(ch, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+        gt_cells.append(cv2.applyColorMap(norm, cv2.COLORMAP_JET))
+
+    # Pred
+    if pred_score_map is not None and pred_geo_map is not None:
+        pred_img = draw_boxes(orig, pred_rboxes, color=(0, 0, 255))
+        pred_score = (
+            pred_score_map.detach().cpu().numpy().squeeze()
+            if isinstance(pred_score_map, torch.Tensor)
+            else pred_score_map
+        )
+        pred_score_vis = cv2.applyColorMap(
+            (pred_score * 255).astype(np.uint8), cv2.COLORMAP_JET
+        )
+        pred_geo = (
+            pred_geo_map.detach().cpu().numpy()
+            if isinstance(pred_geo_map, torch.Tensor)
+            else pred_geo_map
+        )
+        pred_cells = [pred_img, pred_score_vis]
+        for i in range(pred_geo.shape[2]):
+            ch = pred_geo[:, :, i]
+            norm = cv2.normalize(ch, None, 0, 255, cv2.NORM_MINMAX).astype(np.uint8)
+            pred_cells.append(cv2.applyColorMap(norm, cv2.COLORMAP_JET))
+    else:
+        pred_cells = [np.zeros((cell_size, cell_size, 3), dtype=np.uint8)] * n_cols
+
+    # assemble
+    for r in range(n_rows):
+        cells = gt_cells if r == 0 else pred_cells
+        for c in range(n_cols):
+            cell = cv2.resize(cells[c], (cell_size, cell_size))
+            y0, y1 = r * cell_size, (r + 1) * cell_size
+            x0, x1 = c * cell_size, (c + 1) * cell_size
+            collage[y0:y1, x0:x1] = cell
+
+    return collage
+
+
+def decode_boxes_from_maps(
+    score_map: np.ndarray,
+    geo_map: np.ndarray,
+    score_thresh: float = 0.9,
+    scale: float = 4.0,
+    iou_threshold: float = 0.2,
+    expand_ratio: float = 0.0,
+) -> np.ndarray:
     """
-    Сужает полигон, перемещая его вершины к центру.
+    Декодирует quad-боксы из 8-канальной geo_map, с опциональным расширением (обратным shrink).
 
-    Функция принимает массив координат вершин полигона и сжимает его относительно центра,
-    используя указанный коэффициент сжатия.
+    Параметры:
+      score_map     — карта вероятностей (H, W) или (1, H, W);
+      geo_map       — гео-карта (H, W, 8);
+      score_thresh  — порог для отбора пикселей;
+      scale         — коэффициент восстановления в исходные пиксели (обычно = 1.0/score_geo_scale);
+      iou_threshold — порог IoU для NMS;
+      expand_ratio  — коэффициент обратного расширения (обычно = shrink_ratio).
 
-    Параметры
-    ----------
-    poly : array_like
-        Numpy-массив с координатами вершин полигона. Может быть задан в виде двумерного массива
-        формы (N, 2) или в виде одномерного массива с 8 элементами (при условии, что N = 4).
-    shrink_ratio : float, optional
-        Коэффициент сжатия. Обычно задается равным 0.4.
-
-    Возвращаемое значение
-    ----------------------
-    shrunk_poly : numpy.ndarray
-        Суженный полигон, представленный в виде numpy-массива с формой (N, 2).
-
-    Примеры
-    --------
-    >>> import numpy as np
-    >>> poly = np.array([[0, 0], [2, 0], [2, 2], [0, 2]])
-    >>> shrink_poly(poly, shrink_ratio=0.4)
-    array([[0.4, 0.4],
-           [1.6, 0.4],
-           [1.6, 1.6],
-           [0.4, 1.6]], dtype=float32)
+    Возвращает:
+      quad-боксы (N, 9) — [x0, y0, …, x3, y3, score].
     """
-    poly = np.array(poly).reshape(-1, 2)
-    centroid = np.mean(poly, axis=0)
-    shrunk_poly = centroid + (poly - centroid) * (1 - shrink_ratio)
-    return shrunk_poly.astype(np.float32)
+    # убираем лишнюю первую размерность
+    if score_map.ndim == 3 and score_map.shape[0] == 1:
+        score_map = score_map.squeeze(0)
+    ys, xs = np.where(score_map > score_thresh)
+    quads = []
+    for y, x in zip(ys, xs):
+        offs = geo_map[y, x]
+        verts = []
+        for i in range(4):
+            dx_map, dy_map = offs[2*i], offs[2*i+1]
+            dx = dx_map * scale
+            dy = dy_map * scale
+            vx = x * scale + dx
+            vy = y * scale + dy
+            verts.extend([vx, vy])
+        quads.append(verts + [float(score_map[y, x])])
 
+    if not quads:
+        return np.zeros((0, 9), dtype=np.float32)
 
-def compute_box_angle(poly):
-    """
-    Вычисляет угол поворота текстового блока по заданному полигону.
+    quads = np.array(quads, dtype=np.float32)
 
-    Функция упорядочивает четыре точки (предполагается, что они неупорядочены) полигона
-    в следующем порядке: [верхний левый, верхний правый, нижний правый, нижний левый],
-    а затем вычисляет угол между верхней стороной и горизонтальной осью.
-    Результат возвращается в градусах в диапазоне [-90, 90).
+    # NMS
+    keep = locality_aware_nms(quads, iou_threshold=iou_threshold)
 
-    Параметры
-    ----------
-    poly : array_like
-        Массив координат, представляющих вершины полигона.
-        Может быть представлен либо в виде двумерного массива формы (N, 2),
-        либо в виде одномерного массива формы (8,) (при этом N ожидается равным 4).
+    # обратное расширение shrink_poly (если нужно)
+    if expand_ratio and len(keep) > 0:
+        from .dataset import shrink_poly
+        expanded = []
+        for quad in keep:
+            coords = quad[:8].reshape(4, 2)
+            # применяем shrink с отрицательным коэффициентом
+            exp_poly = shrink_poly(coords, shrink_ratio=-expand_ratio)
+            expanded.append(list(exp_poly.flatten()) + [quad[8]])
+        keep = np.array(expanded, dtype=np.float32)
 
-    Возвращаемое значение
-    ----------------------
-    angle : float
-        Угол поворота текстового блока в градусах, нормализованный в диапазоне [-90, 90).
-
-    Примечания
-    ---------
-    Упорядочивание точек осуществляется следующим образом:
-      - Верхний левый угол выбирается как точка с наименьшей суммой координат.
-      - Нижний правый угол выбирается как точка с наибольшей суммой координат.
-      - Верхний правый угол определяется как точка с наименьшей разностью координат (y - x).
-      - Нижний левый угол определяется как точка с наибольшей разностью координат (y - x).
-
-    Примеры
-    --------
-    >>> import numpy as np
-    >>> poly = np.array([[0, 0], [4, 0], [4, 3], [0, 3]], dtype=np.float32)
-    >>> compute_box_angle(poly)
-    0.0
-    """
-    # Сумма координат для нахождения верхнего левого и нижнего правого
-    s = poly.sum(axis=1)
-    tl = poly[np.argmin(s)]
-    br = poly[np.argmax(s)]
-    # Разность координат для нахождения верхнего правого и нижнего левого
-    diff = np.diff(poly, axis=1)
-    tr = poly[np.argmin(diff)]
-    bl = poly[np.argmax(diff)]
-    # Теперь упорядочим точки
-    ordered = np.array([tl, tr, br, bl], dtype=np.float32)
-    # Верхняя сторона – от tl до tr
-    delta = tr - tl
-    angle = np.degrees(np.arctan2(delta[1], delta[0]))
-    # Приводим угол к диапазону [-90, 90)
-    if angle < -90:
-        angle += 180
-    elif angle >= 90:
-        angle -= 180
-    return angle
+    return keep
