@@ -12,6 +12,7 @@ import os
 
 import gdown
 
+
 class EASTInfer:
     def __init__(
         self,
@@ -35,8 +36,7 @@ class EASTInfer:
                 print(f"Downloading EAST weights from {url} …")
                 gdown.download(url, out, quiet=False)
             weights_path = out
-        print(weights_path)
-        # Загружаем модель с весами
+
         self.model = TextDetectionFCN(
             pretrained_backbone=False,
             pretrained_model_path=str(weights_path),
@@ -49,16 +49,15 @@ class EASTInfer:
         self.score_thresh = score_thresh
         self.iou_threshold = iou_threshold
 
-        self.tf = transforms.Compose([
-            transforms.ToTensor(),
-            transforms.Normalize(mean=(0.5, 0.5, 0.5),
-                                 std=(0.5, 0.5, 0.5)),
-        ])
+        self.tf = transforms.Compose(
+            [
+                transforms.ToTensor(),
+                transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)),
+            ]
+        )
 
     def infer(
-        self,
-        img_or_path: Union[str, Path, np.ndarray],
-        vis: bool = False
+        self, img_or_path: Union[str, Path, np.ndarray], vis: bool = False
     ) -> Union[Page, Tuple[Page, np.ndarray]]:
         """
         :param img_or_path: путь или RGB ndarray
@@ -109,4 +108,5 @@ class EASTInfer:
         if vis:
             vis_img = draw_boxes(resized, quads9)
             return page, vis_img
+
         return page

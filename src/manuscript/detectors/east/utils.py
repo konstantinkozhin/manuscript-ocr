@@ -34,7 +34,7 @@ def draw_quads(
     image: np.ndarray,
     quads: np.ndarray,
     style: str = "highlight",
-    color: tuple[int,int,int] = (0, 255, 0),
+    color: tuple[int, int, int] = (0, 255, 0),
     thickness: int = 2,
     alpha: float = 0.5,
     dark_alpha: float = 0.5,
@@ -61,28 +61,29 @@ def draw_quads(
         overlay = img.copy()
         for q in quads:
             pts = q[:8].reshape(4, 2).astype(np.int32)
-            cv2.polylines(overlay, [pts], isClosed=True, color=color, thickness=thickness)
+            cv2.polylines(
+                overlay, [pts], isClosed=True, color=color, thickness=thickness
+            )
         return cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
 
     elif style == "highlight":
         h, w, _ = img.shape
-        # 1) затемняем весь фон
+
         dark_bg = (img.astype(np.float32) * (1 - dark_alpha)).astype(np.uint8)
 
-        # 2) создаём маску: 1 внутри полигонов
         mask = np.zeros((h, w), dtype=np.float32)
         for q in quads:
             pts = q[:8].reshape(4, 2).astype(np.int32)
             cv2.fillPoly(mask, [pts], 1.0)
 
-        # 3) размываем маску для мягких краёв
         k = blur_ksize if blur_ksize % 2 == 1 else blur_ksize + 1
         mask = cv2.GaussianBlur(mask, (k, k), 0)
         mask = np.clip(mask, 0.0, 1.0)
 
-        # 4) составляем итог: внутри — оригинал, снаружи — тёмный фон
         mask_3 = mask[:, :, None]
-        out = img.astype(np.float32) * mask_3 + dark_bg.astype(np.float32) * (1 - mask_3)
+        out = img.astype(np.float32) * mask_3 + dark_bg.astype(np.float32) * (
+            1 - mask_3
+        )
         return np.clip(out, 0, 255).astype(np.uint8)
 
     else:
@@ -94,10 +95,10 @@ def draw_boxes(image, boxes, color=(0, 255, 0), thickness=2, alpha=0.5):
         return image
     if isinstance(boxes, torch.Tensor):
         boxes = boxes.detach().cpu().numpy()
-    # detect format by length
+
     first = boxes[0]
     if len(first) in (8, 9):
-        # quad with or without score
+
         return draw_quads(image, boxes, color=color, thickness=thickness, alpha=alpha)
     else:
         raise ValueError(f"Unsupported box format with length {len(first)}")
@@ -162,7 +163,6 @@ def create_collage(
     else:
         pred_cells = [np.zeros((cell_size, cell_size, 3), dtype=np.uint8)] * n_cols
 
-    # assemble
     for r in range(n_rows):
         cells = gt_cells if r == 0 else pred_cells
         for c in range(n_cols):
@@ -196,16 +196,17 @@ def decode_boxes_from_maps(
     Возвращает:
       quad-боксы (N, 9) — [x0, y0, …, x3, y3, score].
     """
-    # убираем лишнюю первую размерность
+
     if score_map.ndim == 3 and score_map.shape[0] == 1:
         score_map = score_map.squeeze(0)
+
     ys, xs = np.where(score_map > score_thresh)
     quads = []
     for y, x in zip(ys, xs):
         offs = geo_map[y, x]
         verts = []
         for i in range(4):
-            dx_map, dy_map = offs[2*i], offs[2*i+1]
+            dx_map, dy_map = offs[2 * i], offs[2 * i + 1]
             dx = dx_map * scale
             dy = dy_map * scale
             vx = x * scale + dx
@@ -221,13 +222,12 @@ def decode_boxes_from_maps(
     # NMS
     keep = locality_aware_nms(quads, iou_threshold=iou_threshold)
 
-    # обратное расширение shrink_poly (если нужно)
     if expand_ratio and len(keep) > 0:
         from .dataset import shrink_poly
+
         expanded = []
         for quad in keep:
             coords = quad[:8].reshape(4, 2)
-            # применяем shrink с отрицательным коэффициентом
             exp_poly = shrink_poly(coords, shrink_ratio=-expand_ratio)
             expanded.append(list(exp_poly.flatten()) + [quad[8]])
         keep = np.array(expanded, dtype=np.float32)

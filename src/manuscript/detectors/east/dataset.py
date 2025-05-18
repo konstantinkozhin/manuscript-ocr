@@ -25,7 +25,7 @@ def shrink_poly(poly, shrink_ratio=0.3):
     N = poly.shape[0]
     if N != 4:
         raise ValueError("Expected quadrilateral with 4 vertices")
-    # signed area sign
+
     area = 0.0
     for i in range(N):
         x1, y1 = poly[i]
@@ -64,7 +64,7 @@ class EASTDataset(Dataset):
         self.images_folder = images_folder
         self.target_size = target_size
         self.score_geo_scale = score_geo_scale
-        # transform pipeline
+
         if transform is None:
             self.transform = transforms.Compose(
                 [
@@ -76,6 +76,7 @@ class EASTDataset(Dataset):
             )
         else:
             self.transform = transform
+
         # load COCO annotations
         with open(coco_annotation_file, "r", encoding="utf-8") as f:
             data = json.load(f)
@@ -96,8 +97,10 @@ class EASTDataset(Dataset):
         if img is None:
             raise FileNotFoundError(f"Image not found: {path}")
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
         # resize
         img_resized = cv2.resize(img, (self.target_size, self.target_size))
+
         # scale annotations
         anns = self.annots.get(image_id, [])
         quads = []
@@ -106,20 +109,21 @@ class EASTDataset(Dataset):
                 continue
             seg = ann["segmentation"]
             pts = np.array(seg, dtype=np.float32).reshape(-1, 2)
-            # вот тут — минимальный прямоугольник
+
             rect = cv2.minAreaRect(pts)
             box = cv2.boxPoints(rect)
             quad = order_vertices_clockwise(box)
-            # масштабируем quad под resized
+
             quad[:, 0] *= self.target_size / info["width"]
             quad[:, 1] *= self.target_size / info["height"]
             quads.append(quad)
+
         # generate maps
         score_map, geo_map = self.compute_quad_maps(quads)
         rboxes = np.stack([quad_to_rbox(q.flatten()) for q in quads], axis=0).astype(
             np.float32
         )
-        # transform image
+
         img_tensor = self.transform(img_resized)
         target = {
             "score_map": torch.tensor(score_map).unsqueeze(0),
@@ -138,9 +142,7 @@ class EASTDataset(Dataset):
         score_map = np.zeros((out_h, out_w), dtype=np.float32)
         geo_map = np.zeros((8, out_h, out_w), dtype=np.float32)
         for quad in quads:
-            # shrink & order
             shrunk = shrink_poly(order_vertices_clockwise(quad), shrink_ratio=0.3)
-            # scale to map resolution
             coords = shrunk * self.score_geo_scale
             rr, cc = skimage.draw.polygon(
                 coords[:, 1], coords[:, 0], shape=(out_h, out_w)

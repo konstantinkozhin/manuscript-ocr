@@ -2,11 +2,13 @@ import torch
 
 
 class SAMSolver(torch.optim.Optimizer):
-    def __init__(self, params, base_optimizer_cls, rho=0.05, use_adaptive=False, **kwargs):
+    def __init__(
+        self, params, base_optimizer_cls, rho=0.05, use_adaptive=False, **kwargs
+    ):
         if rho < 0:
             raise ValueError("rho must be non-negative")
 
-        self.use_adaptive = use_adaptive  # ✅ ВАЖНО: сохранить как атрибут
+        self.use_adaptive = use_adaptive
 
         defaults = dict(rho=rho, use_adaptive=use_adaptive, **kwargs)
         super().__init__(params, defaults)
@@ -19,14 +21,12 @@ class SAMSolver(torch.optim.Optimizer):
         assert closure is not None
         closure = torch.enable_grad()(closure)
 
-        # 1-й шаг: считаем loss и градиенты
         loss = closure()
-        loss.backward()                     # ✅ чтобы появились p.grad
+        loss.backward()
         self._ascent_step()
 
-        # 2-й шаг: снова loss + градиенты в новой точке
         loss_2 = closure()
-        loss_2.backward()                   # ✅ нужно снова
+        loss_2.backward()
         self._descent_step()
 
         return loss_2
@@ -37,14 +37,14 @@ class SAMSolver(torch.optim.Optimizer):
             for p in group["params"]:
                 if p.grad is None:
                     continue
-                p.data = self.state[p]["old_p"]  # возвращаемся к w
+                p.data = self.state[p]["old_p"]
 
-        self._optimizer.step()  # делаем обновление
+        self._optimizer.step()
 
     @torch.no_grad()
     def _ascent_step(self):
         grad_norm = self._compute_grad_magnitude()
-        self._last_grad_norm = grad_norm  # 👈 сохраняем для логгера
+        self._last_grad_norm = grad_norm
 
         for group in self.param_groups:
             scale = group["rho"] / (grad_norm + 1e-12)
@@ -53,13 +53,18 @@ class SAMSolver(torch.optim.Optimizer):
                 if p.grad is None:
                     continue
                 self.state[p]["old_p"] = p.data.clone()
-                e_w = (torch.pow(p, 2) if group["use_adaptive"] else 1.0) * p.grad * scale.to(p)
-                p.add_(e_w)  # идём к максимуму
+                e_w = (
+                    (torch.pow(p, 2) if group["use_adaptive"] else 1.0)
+                    * p.grad
+                    * scale.to(p)
+                )
+                p.add_(e_w)
 
     def _compute_grad_magnitude(self):
         norms = [
             ((torch.abs(p) if self.use_adaptive else 1.0) * p.grad).norm(p=2)
-            for group in self.param_groups for p in group["params"]
+            for group in self.param_groups
+            for p in group["params"]
             if p.grad is not None
         ]
         if len(norms) == 0:

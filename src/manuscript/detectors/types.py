@@ -3,25 +3,22 @@ from typing import List, Tuple
 
 
 class Word(BaseModel):
-    """
-    Одна «словесная» область в документе.
-    polygon: список точек (x, y), задающих вершины многоугольника, в порядке обхода.
-    confidence: уверенность детектора.
-    """
     polygon: List[Tuple[float, float]] = Field(
-        ..., description="Список вершин (x, y) многоугольника, задающего область"
+        ..., description="List of vertices (x, y) of the polygon defining the region"
     )
 
 
 class Block(BaseModel):
     """
-    Блок текста, может состоять из нескольких слов (Word).
+    A text block, which may consist of several words (Word).
     """
+
     words: List[Word]
 
 
 class Page(BaseModel):
     """
-    Страница документа, содержит один или несколько текстовых блоков.
+    A document page containing one or multiple text blocks.
     """
+
     blocks: List[Block]

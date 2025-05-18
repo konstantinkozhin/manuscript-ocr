@@ -93,7 +93,7 @@ class TextDetectionFCN(nn.Module):
         self, pretrained_backbone=True, freeze_first=False, pretrained_model_path=None
     ):
         super(TextDetectionFCN, self).__init__()
-        # ResNet50 backbone
+
         self.backbone = ResNetFeatureExtractor(
             pretrained=pretrained_backbone, freeze_first=freeze_first
         )
@@ -102,6 +102,7 @@ class TextDetectionFCN(nn.Module):
         # scales for maps
         self.score_scale = 0.25
         self.geo_scale = 0.25
+
         # load optional pretrained model weights
         if pretrained_model_path:
             state = torch.load(pretrained_model_path, map_location="cpu")
