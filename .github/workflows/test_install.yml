@@ -29,6 +29,9 @@ jobs:
           pip install .
           pip install -r requirements.txt
 
+      - name: Install development dependencies
+        run: pip install pytest
+
       - name: Check for dependency conflicts
         run: pip check
 
@@ -37,5 +40,4 @@ jobs:
           python -c "import pkg_resources; pkg_resources.require('manuscript-ocr'); print('Import successful')"
 
       - name: Run pytest
-        run: |
-          pytest
+        run: pytest
