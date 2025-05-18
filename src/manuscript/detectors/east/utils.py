@@ -2,6 +2,7 @@ import cv2
 import numpy as np
 import torch
 from .lanms import locality_aware_nms
+from typing import Tuple
 
 
 def convert_rboxes_to_quad_boxes(rboxes, scores=None):
@@ -34,7 +35,7 @@ def draw_quads(
     image: np.ndarray,
     quads: np.ndarray,
     style: str = "highlight",
-    color: tuple[int, int, int] = (0, 255, 0),
+    color: Tuple[int, int, int] = (0, 255, 0),
     thickness: int = 2,
     alpha: float = 0.5,
     dark_alpha: float = 0.5,
