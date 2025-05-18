@@ -174,35 +174,44 @@ def standard_nms(polys, scores, iou_threshold):
 
 def locality_aware_nms(boxes, iou_threshold):
     """
-    Вход:
-      boxes — numpy-массив shape (n,9), где каждая строка задается как:
-              [x0, y0, x1, y1, x2, y2, x3, y3, score]
-      iou_threshold — порог для объединения (IoU)
-    Выход:
-      numpy-массив итоговых боксов в формате (m,9)
+    boxes — numpy-массив shape (n,9), где каждая строка:
+            [x0, y0, x1, y1, x2, y2, x3, y3, score]
+    iou_threshold — порог для объединения (IoU)
+    Возвращает итоговый numpy-массив боксов (m,9).
     """
     n = boxes.shape[0]
     polys = []
     scores = []
+
     for i in range(n):
+        # извлекаем полигон и скор
         poly = boxes[i, :8].reshape((4, 2)).astype(np.float64)
         score = boxes[i, 8]
-        if len(polys) > 0:
+
+        if polys:
             last_poly = polys[-1]
+            # проверяем, нужно ли сливать текущий полигон с предыдущим
             if should_merge(poly, last_poly, iou_threshold):
+                # создаём merger и добавляем оба полигона вместе с их скoрами
                 merger = PolygonMerger()
-                merger.add(last_poly, 1.0)
+                merger.add(last_poly, scores[-1])
                 merger.add(poly, score)
+                # получаем объединённый полигон
                 merged_poly = merger.get()
                 polys[-1] = merged_poly
-                scores[-1] += score
+                # считаем средний скор
+                scores[-1] = merger.total_score / merger.count
             else:
                 polys.append(poly)
                 scores.append(score)
         else:
             polys.append(poly)
             scores.append(score)
+
+    # затем стандартный NMS по объединённым полигонам
     kept_polys, kept_scores = standard_nms(polys, scores, iou_threshold)
+
+    # формируем итоговый массив (округлённые координаты + скор)
     final_boxes = []
     for poly, score in zip(kept_polys, kept_scores):
         poly_rounded = np.round(poly).astype(np.int32)
@@ -211,4 +220,5 @@ def locality_aware_nms(boxes, iou_threshold):
                 [poly_rounded.flatten(), np.array([score], dtype=np.float32)]
             )
         )
+
     return np.array(final_boxes)

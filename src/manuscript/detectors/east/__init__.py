@@ -101,7 +101,8 @@ class EASTInfer:
         words: List[Word] = []
         for quad in quads9:
             pts = quad[:8].reshape(4, 2).tolist()
-            words.append(Word(polygon=pts))
+            score = quad[8]
+            words.append(Word(polygon=pts, score=score))
         page = Page(blocks=[Block(words=words)])
 
         # 7) Optional visualization
