@@ -30,7 +30,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Install development dependencies
-        run: pip install pytest
+        run: pip install pytest pytest-cov
 
       - name: Check for dependency conflicts
         run: pip check
@@ -39,5 +39,10 @@ jobs:
         run: |
           python -c "import pkg_resources; pkg_resources.require('manuscript-ocr'); print('Import successful')"
 
-      - name: Run pytest
-        run: pytest
+      - name: Run pytest with coverage
+        run: pytest --cov=src --cov-report=xml
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v3
+        with:
+          files: coverage.xml
