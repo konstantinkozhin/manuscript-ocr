@@ -2,7 +2,6 @@ import cv2
 import numpy as np
 import torch
 from .lanms import locality_aware_nms
-from typing import Tuple
 
 
 def quad_to_rbox(quad):
@@ -23,7 +22,6 @@ def draw_quads(
     image: np.ndarray,
     quads: np.ndarray,
     thickness: int = 1,
-    alpha: float = 0.5,
     dark_alpha: float = 0.5,
     blur_ksize: int = 11,
 ) -> np.ndarray:
