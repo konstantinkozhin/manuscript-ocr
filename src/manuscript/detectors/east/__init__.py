@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Union, Optional, List, Tuple
 
 from .east import TextDetectionFCN
-from .utils import decode_boxes_from_maps, draw_boxes
+from .utils import decode_boxes_from_maps, draw_quads
 from ..types import Word, Block, Page
 import os
 
@@ -107,7 +107,7 @@ class EASTInfer:
 
         # 7) Optional visualization
         if vis:
-            vis_img = draw_boxes(resized, quads9)
+            vis_img = draw_quads(resized, quads9)
             return page, vis_img
 
         return page

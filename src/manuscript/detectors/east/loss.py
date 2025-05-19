@@ -11,7 +11,6 @@ def compute_dice_loss(gt, pred):
 class EASTLoss(nn.Module):
     def __init__(
         self,
-        angle_weight=0.0,  # unused for QUAD
         use_ohem=False,
         ohem_ratio=0.5,
         use_focal_geo=False,

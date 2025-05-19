@@ -25,7 +25,6 @@ def run_training(
     batch_size: int,
     lr: float,
     grad_clip: float,
-    ema_decay: float,
     early_stop: int,
     use_sam: bool,
     sam_type: str,
@@ -81,7 +80,6 @@ def run_training(
     scaler = torch.cuda.amp.GradScaler()
 
     criterion = EASTLoss(
-        angle_weight=0.0,
         use_ohem=use_ohem,
         ohem_ratio=ohem_ratio,
         use_focal_geo=use_focal_geo,
@@ -216,19 +214,17 @@ def run_training(
     writer.close()
     return ema_model
 
+
 def custom_collate_fn(batch):
     images, targets = zip(*batch)
     # 1) стекаем изображения и карты
     images = torch.stack(images, dim=0)
     score_maps = torch.stack([t["score_map"] for t in targets], dim=0)
-    geo_maps   = torch.stack([t["geo_map"]   for t in targets], dim=0)
+    geo_maps = torch.stack([t["geo_map"] for t in targets], dim=0)
     # 2) собираем rboxes в список
     rboxes_list = [t["rboxes"] for t in targets]
-    return images, {
-        "score_map": score_maps,
-        "geo_map":   geo_maps,
-        "rboxes":    rboxes_list
-    }
+    return images, {"score_map": score_maps, "geo_map": geo_maps, "rboxes": rboxes_list}
+
 
 def collage_batch(model, dataset, device, num=4):
     coll_imgs = []
@@ -291,7 +287,6 @@ if __name__ == "__main__":
         batch_size=3,
         lr=1e-3,
         grad_clip=5.0,
-        ema_decay=0.999,
         early_stop=100,
         use_sam=True,
         sam_type="asam",

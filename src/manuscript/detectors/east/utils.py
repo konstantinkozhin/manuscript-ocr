@@ -5,18 +5,6 @@ from .lanms import locality_aware_nms
 from typing import Tuple
 
 
-def convert_rboxes_to_quad_boxes(rboxes, scores=None):
-    quad_boxes = []
-    if scores is None:
-        scores = np.ones(len(rboxes), dtype=np.float32)
-    for i, r in enumerate(rboxes):
-        cx, cy, w, h, angle = r
-        pts = cv2.boxPoints(((cx, cy), (w, h), angle))
-        quad = np.concatenate([pts.flatten(), [scores[i]]]).astype(np.float32)
-        quad_boxes.append(quad)
-    return np.array(quad_boxes, dtype=np.float32)
-
-
 def quad_to_rbox(quad):
     pts = quad[:8].reshape(4, 2).astype(np.float32)
     rect = cv2.minAreaRect(pts)
@@ -34,75 +22,47 @@ def tensor_to_image(tensor):
 def draw_quads(
     image: np.ndarray,
     quads: np.ndarray,
-    style: str = "highlight",
-    color: Tuple[int, int, int] = (0, 255, 0),
-    thickness: int = 2,
+    thickness: int = 1,
     alpha: float = 0.5,
     dark_alpha: float = 0.5,
     blur_ksize: int = 11,
 ) -> np.ndarray:
     """
-    Рисует полигоны двумя стилями:
-      - style="border": контур с прозрачностью alpha.
-      - style="highlight": затемняет всю картинку на dark_alpha,
-        при этом внутри каждого полигона показывает оригинал.
-        Для мягких углов маска размывается ядром blur_ksize.
+    Рисует подсветку найденных полигонами областей:
+      - затемняет фон на dark_alpha,
+      - внутри полигонов оставляет исходное изображение,
+      - по контуру рисует тонкую черную рамку.
 
-    :param blur_ksize: нечётный размер ядра для GaussianBlur.
+    :param blur_ksize: нечётный размер ядра для размытия маски.
     """
     img = image.copy()
     if quads is None or len(quads) == 0:
         return img
 
-    # Если передали тензор — приводим к numpy
     if isinstance(quads, torch.Tensor):
         quads = quads.detach().cpu().numpy()
 
-    if style == "border":
-        overlay = img.copy()
-        for q in quads:
-            pts = q[:8].reshape(4, 2).astype(np.int32)
-            cv2.polylines(
-                overlay, [pts], isClosed=True, color=color, thickness=thickness
-            )
-        return cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
+    h, w, _ = img.shape
+    dark_bg = (img.astype(np.float32) * (1 - dark_alpha)).astype(np.uint8)
 
-    elif style == "highlight":
-        h, w, _ = img.shape
+    mask = np.zeros((h, w), dtype=np.float32)
+    for q in quads:
+        pts = q[:8].reshape(4, 2).astype(np.int32)
+        cv2.fillPoly(mask, [pts], 1.0)
 
-        dark_bg = (img.astype(np.float32) * (1 - dark_alpha)).astype(np.uint8)
+    k = blur_ksize if blur_ksize % 2 == 1 else blur_ksize + 1
+    mask = cv2.GaussianBlur(mask, (k, k), 0)
+    mask = np.clip(mask, 0.0, 1.0)
+    mask_3 = mask[:, :, None]
 
-        mask = np.zeros((h, w), dtype=np.float32)
-        for q in quads:
-            pts = q[:8].reshape(4, 2).astype(np.int32)
-            cv2.fillPoly(mask, [pts], 1.0)
+    out = img.astype(np.float32) * mask_3 + dark_bg.astype(np.float32) * (1 - mask_3)
+    out = np.clip(out, 0, 255).astype(np.uint8)
 
-        k = blur_ksize if blur_ksize % 2 == 1 else blur_ksize + 1
-        mask = cv2.GaussianBlur(mask, (k, k), 0)
-        mask = np.clip(mask, 0.0, 1.0)
+    for q in quads:
+        pts = q[:8].reshape(4, 2).astype(np.int32)
+        cv2.polylines(out, [pts], isClosed=True, color=(0, 0, 0), thickness=thickness)
 
-        mask_3 = mask[:, :, None]
-        out = img.astype(np.float32) * mask_3 + dark_bg.astype(np.float32) * (
-            1 - mask_3
-        )
-        return np.clip(out, 0, 255).astype(np.uint8)
-
-    else:
-        raise ValueError(f"Unknown style {style!r}, expected 'border' or 'highlight'")
-
-
-def draw_boxes(image, boxes, color=(0, 255, 0), thickness=2, alpha=0.5):
-    if boxes is None or len(boxes) == 0:
-        return image
-    if isinstance(boxes, torch.Tensor):
-        boxes = boxes.detach().cpu().numpy()
-
-    first = boxes[0]
-    if len(first) in (8, 9):
-
-        return draw_quads(image, boxes, color=color, thickness=thickness, alpha=alpha)
-    else:
-        raise ValueError(f"Unsupported box format with length {len(first)}")
+    return out
 
 
 def create_collage(
@@ -120,7 +80,7 @@ def create_collage(
     orig = tensor_to_image(img_tensor)
 
     # GT
-    gt_img = draw_boxes(orig, gt_rboxes, color=(0, 255, 0))
+    gt_img = draw_quads(orig, gt_rboxes)
     gt_score = (
         gt_score_map.detach().cpu().numpy().squeeze()
         if isinstance(gt_score_map, torch.Tensor)
@@ -142,7 +102,7 @@ def create_collage(
 
     # Pred
     if pred_score_map is not None and pred_geo_map is not None:
-        pred_img = draw_boxes(orig, pred_rboxes, color=(0, 0, 255))
+        pred_img = draw_quads(orig, pred_rboxes)
         pred_score = (
             pred_score_map.detach().cpu().numpy().squeeze()
             if isinstance(pred_score_map, torch.Tensor)
