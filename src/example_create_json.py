@@ -8,9 +8,9 @@ from manuscript.detectors import EASTInfer
 # ----------------------------------------
 # Укажите в Jupyter свои пути к данным:
 # ----------------------------------------
-INPUT_JSON = r"C:\data0205\ICDAR2015\test.json"
-IMAGES_DIR = r"C:\data0205\ICDAR2015\test_images"
-OUTPUT_JSON = r"C:\Users\pasha\OneDrive\Рабочий стол\ICDAR2015_test.json"
+INPUT_JSON = r"C:\data0205\Archives020525\train.json"
+IMAGES_DIR = r"C:\data0205\Archives020525\train_images"
+OUTPUT_JSON = r"C:\Users\pasha\OneDrive\Рабочий стол\Archives020525_train.json"
 
 # ---------------------------
 # 1) Загрузка шаблона/GT-разметки
@@ -23,7 +23,7 @@ id2fname = {img["id"]: img["file_name"] for img in data.get("images", [])}
 # ---------------------------
 # 2) Инференс и сбор предсказаний
 # ---------------------------
-det = EASTInfer(score_thresh=0.9)
+det = EASTInfer(shrink_ratio=0.0, score_thresh=0.9)
 all_preds = []
 
 # список для хранения времён инференса

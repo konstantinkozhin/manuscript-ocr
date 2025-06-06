@@ -9,8 +9,8 @@ from concurrent.futures import ProcessPoolExecutor, as_completed
 # ----------------------------------------
 # 1) Пути к JSON
 # ----------------------------------------
-GT_JSON = r"C:\data0205\ICDAR2015\test.json"
-PRED_JSON = r"C:\Users\pasha\OneDrive\Рабочий стол\ICDAR2015_test.json"
+GT_JSON = r"C:\data0205\Archives020525\train_100.json"
+PRED_JSON = r"C:\data0205\Archives020525\Archives020525_train_100.json"
 
 
 def load_gt(gt_path):
