@@ -1,6 +1,7 @@
 import cv2
 import numpy as np
 import torch
+from shapely.geometry import Polygon
 from .lanms import locality_aware_nms
 
 
@@ -192,3 +193,35 @@ def decode_boxes_from_maps(
         keep = np.array(expanded, dtype=np.float32)
 
     return keep
+
+
+def poly_iou(segA, segB):
+    A = Polygon(np.array(segA).reshape(-1, 2))
+    B = Polygon(np.array(segB).reshape(-1, 2))
+    if not A.is_valid or not B.is_valid:
+        return 0.0
+    inter = A.intersection(B).area
+    union = A.union(B).area
+    return inter / union if union > 0 else 0.0
+
+def compute_f1(preds, thresh, gt_segs, processed_ids):
+    used = {iid: [False] * len(gt_segs.get(iid, [])) for iid in processed_ids}
+    tp = fp = 0
+    for p in preds:
+        best_iou, bj = 0, -1
+        for j, gt in enumerate(gt_segs.get(p["image_id"], [])):
+            if used[p["image_id"]][j]:
+                continue
+            iou = poly_iou(p["segmentation"], gt)
+            if iou > best_iou:
+                best_iou, bj = iou, j
+        if best_iou >= thresh:
+            tp += 1
+            used[p["image_id"]][bj] = True
+        else:
+            fp += 1
+    total_gt = sum(len(v) for v in gt_segs.values())
+    fn = total_gt - tp
+    prec = tp / (tp + fp) if tp + fp > 0 else 0
+    rec = tp / (tp + fn) if tp + fn > 0 else 0
+    return 2 * prec * rec / (prec + rec) if (prec + rec) > 0 else 0
