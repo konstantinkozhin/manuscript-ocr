@@ -48,22 +48,20 @@ def test_compute_f1_perfect_match():
     gt_segs = {"img1": [[0, 0, 1, 0, 1, 1, 0, 1]]}
     processed_ids = ["img1"]
     preds = [{"image_id": "img1", "segmentation": [0, 0, 1, 0, 1, 1, 0, 1]}]
-    assert compute_f1(preds, 0.5) == 1.0
+    assert compute_f1(preds, 0.5, gt_segs, processed_ids) == 1.0
 
 
 def test_compute_f1_no_match():
-    global gt_segs, processed_ids
     gt_segs = {"img1": [[0, 0, 1, 0, 1, 1, 0, 1]]}
     processed_ids = ["img1"]
     preds = [{"image_id": "img1", "segmentation": [2, 2, 3, 2, 3, 3, 2, 3]}]
-    assert compute_f1(preds, 0.5) == 0.0
+    assert compute_f1(preds, 0.5, gt_segs, processed_ids) == 0.0
 
 
 def test_compute_f1_partial_match():
-    global gt_segs, processed_ids
     gt_segs = {"img1": [[0, 0, 2, 0, 2, 2, 0, 2]]}
     processed_ids = ["img1"]
     preds = [{"image_id": "img1", "segmentation": [1, 1, 3, 1, 3, 3, 1, 3]}]
     iou = poly_iou(preds[0]["segmentation"], gt_segs["img1"][0])
     expected_f1 = 1.0 if iou >= 0.5 else 0.0
-    assert compute_f1(preds, 0.5) == expected_f1
+    assert compute_f1(preds, 0.5, gt_segs, processed_ids) == expected_f1
