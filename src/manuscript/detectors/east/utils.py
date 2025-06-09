@@ -3,6 +3,8 @@ import numpy as np
 import torch
 from shapely.geometry import Polygon
 from .lanms import locality_aware_nms
+import json
+from collections import defaultdict
 
 
 def quad_to_rbox(quad):
@@ -225,3 +227,32 @@ def compute_f1(preds, thresh, gt_segs, processed_ids):
     prec = tp / (tp + fp) if tp + fp > 0 else 0
     rec = tp / (tp + fn) if tp + fn > 0 else 0
     return 2 * prec * rec / (prec + rec) if (prec + rec) > 0 else 0
+
+# def load_gt(gt_path):
+#     with open(gt_path, "r", encoding="utf-8") as f:
+#         gt_coco = json.load(f)
+#     gt_segs = defaultdict(list)
+#     for ann in gt_coco["annotations"]:
+#         seg = ann.get("segmentation", [])
+#         if seg:
+#             gt_segs[ann["image_id"]].append(seg[0])
+#     return gt_segs
+
+
+# def load_preds(pred_path):
+#     with open(pred_path, "r", encoding="utf-8") as f:
+#         data = json.load(f)
+#     preds_list = data.get("annotations", data)
+#     preds = []
+#     for p in preds_list:
+#         seg = p.get("segmentation", [])
+#         if not seg:
+#             continue
+#         preds.append(
+#             {
+#                 "image_id": p["image_id"],
+#                 "segmentation": seg[0],
+#                 "score": p.get("score", 1.0),
+#             }
+#         )
+#     return preds
