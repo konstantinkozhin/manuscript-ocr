@@ -228,31 +228,57 @@ def compute_f1(preds, thresh, gt_segs, processed_ids):
     rec = tp / (tp + fn) if tp + fn > 0 else 0
     return 2 * prec * rec / (prec + rec) if (prec + rec) > 0 else 0
 
-# def load_gt(gt_path):
-#     with open(gt_path, "r", encoding="utf-8") as f:
-#         gt_coco = json.load(f)
-#     gt_segs = defaultdict(list)
-#     for ann in gt_coco["annotations"]:
-#         seg = ann.get("segmentation", [])
-#         if seg:
-#             gt_segs[ann["image_id"]].append(seg[0])
-#     return gt_segs
+def load_gt(gt_path):
+    with open(gt_path, "r", encoding="utf-8") as f:
+        gt_coco = json.load(f)
+    gt_segs = defaultdict(list)
+    for ann in gt_coco["annotations"]:
+        seg = ann.get("segmentation", [])
+        if seg:
+            gt_segs[ann["image_id"]].append(seg[0])
+    return gt_segs
 
 
-# def load_preds(pred_path):
-#     with open(pred_path, "r", encoding="utf-8") as f:
-#         data = json.load(f)
-#     preds_list = data.get("annotations", data)
-#     preds = []
-#     for p in preds_list:
-#         seg = p.get("segmentation", [])
-#         if not seg:
-#             continue
-#         preds.append(
-#             {
-#                 "image_id": p["image_id"],
-#                 "segmentation": seg[0],
-#                 "score": p.get("score", 1.0),
-#             }
-#         )
-#     return preds
+def load_preds(pred_path):
+    with open(pred_path, "r", encoding="utf-8") as f:
+        data = json.load(f)
+    preds_list = data.get("annotations", data)
+    preds = []
+    for p in preds_list:
+        seg = p.get("segmentation", [])
+        if not seg:
+            continue
+        preds.append(
+            {
+                "image_id": p["image_id"],
+                "segmentation": seg[0],
+                "score": p.get("score", 1.0),
+            }
+        )
+    return preds
+
+from tqdm import tqdm
+
+def compute_f1_metrics(preds, gt_segs, processed_ids, avg_range=(0.50, 0.95), avg_step=0.05):
+    """
+    Вычисляет F1@0.5 и F1@0.50-0.95 (по умолчанию), либо по произвольному диапазону avg_range.
+
+    Args:
+        preds (list of dict): Предсказания
+        gt_segs (dict): GT полигоны
+        processed_ids (list): Список image_id
+        avg_range (tuple): (min_iou, max_iou) для среднего F1
+        avg_step (float): шаг по IoU для среднего F1
+
+    Returns:
+        tuple: (f1@0.5, f1_avg)
+    """
+    f1_at_05 = compute_f1(preds, 0.5, gt_segs, processed_ids)
+    
+    iou_vals = np.arange(avg_range[0], avg_range[1] + 1e-9, avg_step)
+    f1_list = []
+    for t in tqdm(iou_vals, desc="F1 по IoU", unit="IoU"):
+        f1_list.append(compute_f1(preds, t, gt_segs, processed_ids))
+    f1_avg = float(np.mean(f1_list))
+    
+    return f1_at_05, f1_avg

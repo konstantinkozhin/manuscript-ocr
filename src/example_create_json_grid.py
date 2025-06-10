@@ -6,7 +6,7 @@ import pandas as pd
 from PIL import Image
 from shapely.geometry import Polygon
 from manuscript.detectors import EASTInfer
-from manuscript.detectors.east.utils import (compute_f1)
+from manuscript.detectors.east.utils import (compute_f1_metrics)
 
 # ----------------------------------------
 # Пути к файлам и параметры
@@ -45,41 +45,7 @@ for ann in annotations:
         gt_segs.setdefault(iid, []).append(ann["segmentation"][0])
 
 
-# (Алина: "теперь в utils")
-# ---------------------------
-# 4) Метрика poly-IoU и F1
-# ---------------------------
-# def poly_iou(segA, segB):
-#     A = Polygon(np.array(segA).reshape(-1, 2))
-#     B = Polygon(np.array(segB).reshape(-1, 2))
-#     if not A.is_valid or not B.is_valid:
-#         return 0.0
-#     inter = A.intersection(B).area
-#     union = A.union(B).area
-#     return inter / union if union > 0 else 0.0
 
-
-# def compute_f1(preds, thresh):
-#     used = {iid: [False] * len(gt_segs.get(iid, [])) for iid in processed_ids}
-#     tp = fp = 0
-#     for p in preds:
-#         best_iou, bj = 0, -1
-#         for j, gt in enumerate(gt_segs.get(p["image_id"], [])):
-#             if used[p["image_id"]][j]:
-#                 continue
-#             iou = poly_iou(p["segmentation"], gt)
-#             if iou > best_iou:
-#                 best_iou, bj = iou, j
-#         if best_iou >= thresh:
-#             tp += 1
-#             used[p["image_id"]][bj] = True
-#         else:
-#             fp += 1
-#     total_gt = sum(len(v) for v in gt_segs.values())
-#     fn = total_gt - tp
-#     prec = tp / (tp + fp) if tp + fp > 0 else 0
-#     rec = tp / (tp + fn) if tp + fn > 0 else 0
-#     return 2 * prec * rec / (prec + rec) if (prec + rec) > 0 else 0
 
 
 # ---------------------------
@@ -136,12 +102,7 @@ for target in target_sizes:
 
                 preds.sort(key=lambda x: x["score"], reverse=True)
 
-                # F1 @ текущий iou_th
-                f1_at_05 = compute_f1(preds, 0.5, gt_segs, processed_ids)
-                # F1 среднее по 0.50–0.95
-                iou_vals = np.arange(0.50, 0.95 + 1e-9, 0.05)
-                f1_list = [compute_f1(preds, t, gt_segs, processed_ids) for t in iou_vals]
-                f1_avg = float(np.mean(f1_list))
+                f1_at_05, f1_avg = compute_f1_metrics(preds, gt_segs, processed_ids)
 
                 print(
                     {
