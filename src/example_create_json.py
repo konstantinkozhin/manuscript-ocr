@@ -3,19 +3,27 @@ import json
 import time
 import numpy as np
 from PIL import Image
+import psutil
 from manuscript.detectors import EASTInfer
 from manuscript.detectors.east.utils import (compute_f1_metrics, load_gt, load_preds)
 from tqdm import tqdm
 
 
 IMAGES_DIRS = [
+    r"C:\Users\USER\Desktop\data02065\TotalText\test_images",
+    r"C:\Users\USER\Desktop\data02065\IAM\test_images",
     r"C:\Users\USER\Desktop\data02065\School\test_images",
-    r"C:\Users\USER\Desktop\data02065\ICDAR2015\test_images"
+    r"C:\Users\USER\Desktop\data02065\ICDAR2015\test_images",
+    r"C:\Users\USER\Desktop\data02065\Archives020525\test_images"
+
 ]
 
 INPUT_JSONS = [
+    r"C:\Users\USER\Desktop\data02065\TotalText\test_cleaned.json",
+    r"C:\Users\USER\Desktop\data02065\IAM\test_corrected.json",
     r"C:\Users\USER\Desktop\data02065\School\test.json",
-    r"C:\Users\USER\Desktop\data02065\ICDAR2015\test.json"
+    r"C:\Users\USER\Desktop\data02065\ICDAR2015\test.json",
+    r"C:\Users\USER\Desktop\data02065\Archives020525\test.json"
 ]
 
 # ---------------------------
@@ -26,6 +34,9 @@ for INPUT_JSON, IMAGES_DIR in zip(INPUT_JSONS, IMAGES_DIRS):
     print(f"\n=== Обработка: {IMAGES_DIR} ===")
     print(f"Загрузка разметки: {INPUT_JSON}")
 
+    process = psutil.Process(os.getpid())
+    peak_mem_mb = 0
+
     # 1) Загрузка разметки
     with open(INPUT_JSON, "r", encoding="utf-8") as f:
         data = json.load(f)
@@ -34,7 +45,7 @@ for INPUT_JSON, IMAGES_DIR in zip(INPUT_JSONS, IMAGES_DIRS):
     print(f"Изображений: {len(id2fname)}")
 
     # 2) Инициализация модели
-    det = EASTInfer()
+    det = EASTInfer(target_size=1280, shrink_ratio=0.6, score_thresh=0.9)
     all_preds = []
     infer_times = []
 
@@ -49,6 +60,10 @@ for INPUT_JSON, IMAGES_DIR in zip(INPUT_JSONS, IMAGES_DIRS):
         page, vis = det.infer(img_path, vis=True)
         t1 = time.perf_counter()
         infer_times.append(t1 - t0)
+
+        mem = process.memory_info().rss / 1024 / 1024
+        if mem > peak_mem_mb:
+            peak_mem_mb = mem
 
         orig_w, orig_h = Image.open(img_path).size
         vis_w, vis_h = (
@@ -79,6 +94,8 @@ for INPUT_JSON, IMAGES_DIR in zip(INPUT_JSONS, IMAGES_DIRS):
         avg_time = sum(infer_times) / len(infer_times)
         print(f"Обработано изображений: {len(infer_times)}")
         print(f"Среднее время инференса: {avg_time:.3f} сек.")
+        
+    print(f"[INFO] Максимальное потребление памяти: {peak_mem_mb:.1f} МБ")
 
     # 5) Сохранение результатов
     OUTPUT_JSON = os.path.join(os.path.dirname(IMAGES_DIR), "test_east.json")
@@ -97,3 +114,4 @@ for INPUT_JSON, IMAGES_DIR in zip(INPUT_JSONS, IMAGES_DIRS):
 
     print(f"[METRICS] F1@0.5: {f1_05:.3f}")
     print(f"[METRICS] F1@[0.5:0.95]: {f1_avg:.3f}")
+    

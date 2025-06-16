@@ -207,22 +207,39 @@ def poly_iou(segA, segB):
     return inter / union if union > 0 else 0.0
 
 def compute_f1(preds, thresh, gt_segs, processed_ids):
-    used = {iid: [False] * len(gt_segs.get(iid, [])) for iid in processed_ids}
+    # Кэшируем полигоны
+    gt_polys = {
+        iid: [Polygon(np.array(seg).reshape(-1, 2)) for seg in gt_segs.get(iid, [])]
+        for iid in processed_ids
+    }
+    pred_polys = [
+        {"image_id": p["image_id"], "polygon": Polygon(np.array(p["segmentation"]).reshape(-1, 2))}
+        for p in preds
+    ]
+
+    used = {iid: [False] * len(gt_polys.get(iid, [])) for iid in processed_ids}
     tp = fp = 0
-    for p in preds:
+    for p, pred_poly in zip(preds, pred_polys):
+        image_id = p["image_id"]
+        pred_polygon = pred_poly["polygon"]
+        if not pred_polygon.is_valid:
+            fp += 1
+            continue
         best_iou, bj = 0, -1
-        for j, gt in enumerate(gt_segs.get(p["image_id"], [])):
-            if used[p["image_id"]][j]:
+        for j, gt_polygon in enumerate(gt_polys.get(image_id, [])):
+            if used[image_id][j] or not gt_polygon.is_valid:
                 continue
-            iou = poly_iou(p["segmentation"], gt)
+            inter = pred_polygon.intersection(gt_polygon).area
+            union = pred_polygon.union(gt_polygon).area
+            iou = inter / union if union > 0 else 0
             if iou > best_iou:
                 best_iou, bj = iou, j
         if best_iou >= thresh:
             tp += 1
-            used[p["image_id"]][bj] = True
+            used[image_id][bj] = True
         else:
             fp += 1
-    total_gt = sum(len(v) for v in gt_segs.values())
+    total_gt = sum(len(v) for v in gt_polys.values())
     fn = total_gt - tp
     prec = tp / (tp + fp) if tp + fp > 0 else 0
     rec = tp / (tp + fn) if tp + fn > 0 else 0
@@ -260,25 +277,12 @@ def load_preds(pred_path):
 from tqdm import tqdm
 
 def compute_f1_metrics(preds, gt_segs, processed_ids, avg_range=(0.50, 0.95), avg_step=0.05):
-    """
-    Вычисляет F1@0.5 и F1@0.50-0.95 (по умолчанию), либо по произвольному диапазону avg_range.
-
-    Args:
-        preds (list of dict): Предсказания
-        gt_segs (dict): GT полигоны
-        processed_ids (list): Список image_id
-        avg_range (tuple): (min_iou, max_iou) для среднего F1
-        avg_step (float): шаг по IoU для среднего F1
-
-    Returns:
-        tuple: (f1@0.5, f1_avg)
-    """
     f1_at_05 = compute_f1(preds, 0.5, gt_segs, processed_ids)
-    
+
     iou_vals = np.arange(avg_range[0], avg_range[1] + 1e-9, avg_step)
     f1_list = []
     for t in tqdm(iou_vals, desc="F1 по IoU", unit="IoU"):
         f1_list.append(compute_f1(preds, t, gt_segs, processed_ids))
+
     f1_avg = float(np.mean(f1_list))
-    
     return f1_at_05, f1_avg
