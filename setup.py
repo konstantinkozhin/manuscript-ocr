@@ -9,7 +9,7 @@ def parse_requirements(fname="requirements.txt"):
 setup(
     # имя для pip install
     name="manuscript-ocr",
-    version="0.1.3",
+    version="0.1.5",
     description="EAST-based OCR detector API",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
