@@ -10,20 +10,19 @@ from tqdm import tqdm
 
 
 IMAGES_DIRS = [
-    r"C:\Users\USER\Desktop\data02065\TotalText\test_images",
     r"C:\Users\USER\Desktop\data02065\IAM\test_images",
+    r"C:\Users\USER\Desktop\data02065\Archives020525\test_images",
+    r"C:\Users\USER\Desktop\data02065\TotalText\test_images",
     r"C:\Users\USER\Desktop\data02065\School\test_images",
-    r"C:\Users\USER\Desktop\data02065\ICDAR2015\test_images",
-    r"C:\Users\USER\Desktop\data02065\Archives020525\test_images"
-
+    r"C:\Users\USER\Desktop\data02065\ICDAR2015\test_images"
 ]
 
 INPUT_JSONS = [
-    r"C:\Users\USER\Desktop\data02065\TotalText\test_cleaned.json",
     r"C:\Users\USER\Desktop\data02065\IAM\test_corrected.json",
+    r"C:\Users\USER\Desktop\data02065\Archives020525\test.json",
+    r"C:\Users\USER\Desktop\data02065\TotalText\test_cleaned.json",
     r"C:\Users\USER\Desktop\data02065\School\test.json",
-    r"C:\Users\USER\Desktop\data02065\ICDAR2015\test.json",
-    r"C:\Users\USER\Desktop\data02065\Archives020525\test.json"
+    r"C:\Users\USER\Desktop\data02065\ICDAR2015\test.json"
 ]
 
 # ---------------------------
@@ -45,7 +44,7 @@ for INPUT_JSON, IMAGES_DIR in zip(INPUT_JSONS, IMAGES_DIRS):
     print(f"Изображений: {len(id2fname)}")
 
     # 2) Инициализация модели
-    det = EASTInfer(target_size=1280, shrink_ratio=0.6, score_thresh=0.9)
+    det = EASTInfer()
     all_preds = []
     infer_times = []
 
@@ -98,7 +97,7 @@ for INPUT_JSON, IMAGES_DIR in zip(INPUT_JSONS, IMAGES_DIRS):
     print(f"[INFO] Максимальное потребление памяти: {peak_mem_mb:.1f} МБ")
 
     # 5) Сохранение результатов
-    OUTPUT_JSON = os.path.join(os.path.dirname(IMAGES_DIR), "test_east.json")
+    OUTPUT_JSON = os.path.join(os.path.dirname(IMAGES_DIR), "test_east_base.json")
     data["annotations"] = all_preds
 
     with open(OUTPUT_JSON, "w", encoding="utf-8") as f:

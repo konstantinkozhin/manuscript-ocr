@@ -7,7 +7,7 @@ from typing import Union, Optional, List, Tuple
 
 from .east import TextDetectionFCN
 from .utils import decode_boxes_from_maps, draw_quads
-from ..types import Word, Block, Page
+from .._types import Word, Block, Page
 import os
 
 import gdown
