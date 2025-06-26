@@ -6,7 +6,7 @@ from pathlib import Path
 from typing import Union, Optional, List, Tuple
 
 from .east import TextDetectionFCN
-from .utils import decode_boxes_from_maps, draw_quads
+from .utils import decode_boxes_from_maps, apply_nms, expand_boxes, draw_quads
 from ..types import Word, Block, Page
 import os
 
@@ -19,10 +19,10 @@ class EASTInfer:
         weights_path: Optional[Union[str, Path]] = None,
         device: Optional[str] = None,
         target_size: int = 1024,
-        score_geo_scale: float = 0.25,
-        shrink_ratio: float = 0.5,
+        shrink_ratio: float = 0.6,
         score_thresh: float = 0.9,
         iou_threshold: float = 0.2,
+        score_geo_scale: float = 0.25,
     ):
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -87,17 +87,24 @@ class EASTInfer:
         score_map = out["score"][0].cpu().numpy().squeeze(0)
         geo_map = out["geometry"][0].cpu().numpy().transpose(1, 2, 0)
 
-        # 5) Decode quads
-        quads9 = decode_boxes_from_maps(
+        # 5) Decode raw quads (до NMS и expand)
+        raw_quads = decode_boxes_from_maps(
             score_map=score_map,
             geo_map=geo_map,
             score_thresh=self.score_thresh,
             scale=1.0 / self.score_geo_scale,
-            iou_threshold=self.iou_threshold,
-            expand_ratio=self.shrink_ratio,
         )
 
-        # 6) Build Page
+        # 6) Expand (inverse shrink)
+        quads_exp = expand_boxes(raw_quads, expand_ratio=self.shrink_ratio)
+
+        # 7) Apply NMS, если включено
+        if self.iou_threshold < 1.0:
+            quads9 = apply_nms(quads_exp, iou_threshold=self.iou_threshold)
+        else:
+            quads9 = quads_exp  # пропустить NMS
+
+        # 8) Build Page
         words: List[Word] = []
         for quad in quads9:
             pts = quad[:8].reshape(4, 2).tolist()
@@ -105,9 +112,9 @@ class EASTInfer:
             words.append(Word(polygon=pts, score=score))
         page = Page(blocks=[Block(words=words)])
 
-        # 7) Optional visualization
+        # 9) Optional visualization
         if vis:
-            vis_img = draw_quads(resized, quads9)
+            vis_img =draw_quads(resized, quads9, draw_scores=True)
             return page, vis_img
 
         return page

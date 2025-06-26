@@ -27,12 +27,16 @@ def draw_quads(
     thickness: int = 1,
     dark_alpha: float = 0.5,
     blur_ksize: int = 11,
+    draw_scores: bool = True,
+    font_scale: float = 0.5,
+    font_thickness: int = 1,
 ) -> np.ndarray:
     """
     Рисует подсветку найденных полигонами областей:
       - затемняет фон на dark_alpha,
       - внутри полигонов оставляет исходное изображение,
-      - по контуру рисует тонкую черную рамку.
+      - по контуру рисует тонкую чёрную рамку,
+      - рядом выводит score (если draw_scores=True).
 
     :param blur_ksize: нечётный размер ядра для размытия маски.
     """
@@ -62,6 +66,31 @@ def draw_quads(
     for q in quads:
         pts = q[:8].reshape(4, 2).astype(np.int32)
         cv2.polylines(out, [pts], isClosed=True, color=(0, 0, 0), thickness=thickness)
+
+        if draw_scores and len(q) >= 9:
+            score = q[8]
+            x, y = pts[0]
+            y = y - 4 if y - 4 > 10 else y + 15
+            text = f"{score:.4f}"
+
+            # Цвет текста по уверенности
+            if score >= 0.9:
+                color = (0, 200, 0)      # Зелёный
+            elif score >= 0.7:
+                color = (0, 200, 200)    # Жёлтый (голубоватый)
+            else:
+                color = (0, 0, 200)      # Красный
+
+            cv2.putText(
+                out,
+                text,
+                (x, y),
+                cv2.FONT_HERSHEY_SIMPLEX,
+                font_scale,
+                color,
+                font_thickness,
+                lineType=cv2.LINE_AA,
+            )
 
     return out
 
@@ -136,29 +165,11 @@ def create_collage(
     return collage
 
 
-def decode_boxes_from_maps(
-    score_map: np.ndarray,
-    geo_map: np.ndarray,
-    score_thresh: float = 0.9,
-    scale: float = 4.0,
-    iou_threshold: float = 0.2,
-    expand_ratio: float = 0.0,
-) -> np.ndarray:
+def decode_boxes_from_maps(score_map: np.ndarray, geo_map: np.ndarray, score_thresh: float = 0.9, scale: float = 4.0) -> np.ndarray:
     """
-    Декодирует quad-боксы из 8-канальной geo_map, с опциональным расширением (обратным shrink).
-
-    Параметры:
-      score_map     — карта вероятностей (H, W) или (1, H, W);
-      geo_map       — гео-карта (H, W, 8);
-      score_thresh  — порог для отбора пикселей;
-      scale         — коэффициент восстановления в исходные пиксели (обычно = 1.0/score_geo_scale);
-      iou_threshold — порог IoU для NMS;
-      expand_ratio  — коэффициент обратного расширения (обычно = shrink_ratio).
-
-    Возвращает:
-      quad-боксы (N, 9) — [x0, y0, …, x3, y3, score].
+    Декодирует quad-боксы из geo_map
+    Возвращает массив (N, 9) — [x0, y0, ..., x3, y3, score].
     """
-
     if score_map.ndim == 3 and score_map.shape[0] == 1:
         score_map = score_map.squeeze(0)
 
@@ -176,26 +187,31 @@ def decode_boxes_from_maps(
             verts.extend([vx, vy])
         quads.append(verts + [float(score_map[y, x])])
 
-    if not quads:
-        return np.zeros((0, 9), dtype=np.float32)
+    return np.array(quads, dtype=np.float32) if quads else np.zeros((0, 9), dtype=np.float32)
 
-    quads = np.array(quads, dtype=np.float32)
+def expand_boxes(quads: np.ndarray, expand_ratio: float) -> np.ndarray:
+    """
+    Расширяет каждый quad обратно с помощью shrink_poly с отрицательным коэффициентом.
+    """
+    if expand_ratio == 0 or len(quads) == 0:
+        return quads
 
-    # NMS
-    keep = locality_aware_nms(quads, iou_threshold=iou_threshold)
+    from .dataset import shrink_poly
 
-    if expand_ratio and len(keep) > 0:
-        from .dataset import shrink_poly
+    expanded = []
+    for quad in quads:
+        coords = quad[:8].reshape(4, 2)
+        exp_poly = shrink_poly(coords, shrink_ratio=-expand_ratio)
+        expanded.append(list(exp_poly.flatten()) + [quad[8]])
+    return np.array(expanded, dtype=np.float32)
 
-        expanded = []
-        for quad in keep:
-            coords = quad[:8].reshape(4, 2)
-            exp_poly = shrink_poly(coords, shrink_ratio=-expand_ratio)
-            expanded.append(list(exp_poly.flatten()) + [quad[8]])
-        keep = np.array(expanded, dtype=np.float32)
-
-    return keep
-
+def apply_nms(quads: np.ndarray, iou_threshold: float = 0.2) -> np.ndarray:
+    """
+    Применяет locality-aware NMS к массиву quad-боксов.
+    """
+    if len(quads) == 0:
+        return quads
+    return locality_aware_nms(quads, iou_threshold=iou_threshold)
 
 def poly_iou(segA, segB):
     A = Polygon(np.array(segA).reshape(-1, 2))
