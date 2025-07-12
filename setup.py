@@ -23,7 +23,7 @@ setup(
     package_dir={"": "src"},
     # setuptools найдёт все папки внутри src, которые содержат __init__.py
     packages=find_packages(where="src"),
-    python_requires=">=3.8",
+    python_requires=">=3.9",
     install_requires=parse_requirements(),
     classifiers=[
         "Programming Language :: Python :: 3",
