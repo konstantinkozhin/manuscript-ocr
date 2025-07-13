@@ -37,3 +37,9 @@ Page(blocks=[Block(words=[Word(polygon=[(874.1005, 909.1005), (966.8995, 909.100
 А визуализация сохранится в файл `example/ocr_example_image_infer.png`:
 
 ![OCR Inference Result](example/ocr_example_image_infer.png)
+
+
+pip install -r requirements-gpu.txt --force-reinstall
+
+
+pip install --pre triton --index-url https://download.pytorch.org/whl/nightly/cu118
