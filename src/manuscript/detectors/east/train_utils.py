@@ -8,15 +8,15 @@ from torch.utils.data import DataLoader
 from torch.utils.tensorboard import SummaryWriter
 from tqdm.auto import tqdm
 
-from dataset import EASTDataset
-from sam import SAMSolver
-from loss import EASTLoss
-from utils import create_collage, decode_boxes_from_maps
-from east import TextDetectionFCN
+from .dataset import EASTDataset
+from .sam import SAMSolver
+from .loss import EASTLoss
+from .utils import create_collage, decode_boxes_from_maps
+from .east import TextDetectionFCN
 
 
-def run_training(
-    stage_name: str,
+def _run_training(
+    experiment_dir: str,
     model: torch.nn.Module,
     train_dataset: torch.utils.data.Dataset,
     val_dataset: torch.utils.data.Dataset,
@@ -35,22 +35,24 @@ def run_training(
     ohem_ratio: float,
     use_focal_geo: bool,
     focal_gamma: float,
-    log_root: str = "./logs",
-    ckpt_root: str = "./checkpoints",
 ):
-    # dirs & writer
-    log_dir = os.path.join(log_root, stage_name)
+    """
+    Core training loop. Saves logs and checkpoints under experiment_dir.
+    """
+    # Setup directories
+    log_dir = os.path.join(experiment_dir, "logs")
+    ckpt_dir = os.path.join(experiment_dir, "checkpoints")
     os.makedirs(log_dir, exist_ok=True)
-    ckpt_dir = os.path.join(ckpt_root, stage_name)
     os.makedirs(ckpt_dir, exist_ok=True)
     writer = SummaryWriter(log_dir)
 
+    # DataLoaders
     train_loader = DataLoader(
         train_dataset,
         batch_size=batch_size,
         shuffle=True,
         num_workers=4,
-        collate_fn=custom_collate_fn,
+        collate_fn=_custom_collate_fn,
         pin_memory=True,
     )
     val_loader = DataLoader(
@@ -58,11 +60,11 @@ def run_training(
         batch_size=batch_size,
         shuffle=False,
         num_workers=4,
-        collate_fn=custom_collate_fn,
+        collate_fn=_custom_collate_fn,
         pin_memory=False,
     )
 
-    # optimizer / scheduler
+    # Optimizer & Scheduler
     if use_sam:
         optimizer = SAMSolver(
             model.parameters(),
@@ -72,10 +74,15 @@ def run_training(
             use_adaptive=(sam_type == "asam"),
         )
     else:
-        base = toptim.RAdam(model.parameters(), lr=lr)
-        optimizer = toptim.Lookahead(base, k=5, alpha=0.5) if use_lookahead else base
+        base_opt = toptim.RAdam(model.parameters(), lr=lr)
+        optimizer = (
+            toptim.Lookahead(base_opt, k=5, alpha=0.5) if use_lookahead else base_opt
+        )
     scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
-        optimizer, T_0=10, T_mult=1, eta_min=lr / 100
+        optimizer,
+        T_0=10,
+        T_mult=1,
+        eta_min=lr / 100,
     )
     scaler = torch.cuda.amp.GradScaler()
 
@@ -86,40 +93,42 @@ def run_training(
         focal_gamma=focal_gamma,
     )
 
-    # EMA model
+    # EMA model copy
     ema_model = model if not use_ema else torch.deepcopy(model)
     if use_ema:
         for p in ema_model.parameters():
             p.requires_grad = False
 
-    best_loss = float("inf")
+    best_val_loss = float("inf")
     patience = 0
 
-    def make_collage(tag, epoch):
-        coll = collage_batch(ema_model if use_ema else model, val_dataset, device)
+    def make_collage(tag: str, epoch: int):
+        coll = _collage_batch(ema_model if use_ema else model, val_dataset, device)
         writer.add_image(f"Val/{tag}", coll, epoch, dataformats="HWC")
 
     make_collage("start", 0)
 
+    # Training epochs
     for epoch in range(1, num_epochs + 1):
         model.train()
-        total_loss = 0
+        train_loss = 0.0
         for imgs, tgt in tqdm(train_loader, desc=f"Train {epoch}"):
             imgs = imgs.to(device)
             gt_s = tgt["score_map"].to(device)
             gt_g = tgt["geo_map"].to(device)
-            # multiscale
+
+            # Optional multiscale
             if use_multiscale:
                 sf = random.uniform(0.8, 1.2)
                 H, W = imgs.shape[-2:]
-                nh, nw = max(32, int(H * sf) // 32 * 32), max(
-                    32, int(W * sf) // 32 * 32
-                )
+                nh = max(32, int(H * sf) // 32 * 32)
+                nw = max(32, int(W * sf) // 32 * 32)
                 imgs_in = F.interpolate(
                     imgs, size=(nh, nw), mode="bilinear", align_corners=False
                 )
             else:
                 imgs_in = imgs
+
             optimizer.zero_grad()
             if use_sam:
 
@@ -161,44 +170,47 @@ def run_training(
                 torch.nn.utils.clip_grad_norm_(model.parameters(), grad_clip)
                 scaler.step(optimizer)
                 scaler.update()
+
             scheduler.step(epoch + imgs.size(0) / len(train_loader))
-            total_loss += loss.item()
-        avg_train = total_loss / len(train_loader)
+            train_loss += loss.item()
+
+        avg_train = train_loss / len(train_loader)
         writer.add_scalar("Loss/Train", avg_train, epoch)
 
-        # validation
+        # Validation
         model.eval()
-        val_loss = 0
+        val_loss = 0.0
         with torch.no_grad():
             for imgs, tgt in val_loader:
                 imgs = imgs.to(device)
                 gt_s = tgt["score_map"].to(device)
                 gt_g = tgt["geo_map"].to(device)
-                out_mod = ema_model if use_ema else model
-                res = out_mod(imgs)
+                eval_model = ema_model if use_ema else model
+                out = eval_model(imgs)
                 ps = F.interpolate(
-                    res["score"],
+                    out["score"],
                     size=gt_s.shape[-2:],
                     mode="bilinear",
                     align_corners=False,
                 )
                 pg = F.interpolate(
-                    res["geometry"],
+                    out["geometry"],
                     size=gt_s.shape[-2:],
                     mode="bilinear",
                     align_corners=False,
                 )
                 val_loss += criterion(gt_s, ps, gt_g, pg).item()
+
         avg_val = val_loss / len(val_loader)
         writer.add_scalar("Loss/Val", avg_val, epoch)
 
-        # checkpoints & early stop
+        # Save checkpoints
         torch.save(
             (ema_model if use_ema else model).state_dict(),
-            os.path.join(ckpt_dir, f"epoch{epoch:02d}.pth"),
+            os.path.join(ckpt_dir, f"epoch{epoch:03d}.pth"),
         )
-        if avg_val < best_loss:
-            best_loss = avg_val
+        if avg_val < best_val_loss:
+            best_val_loss = avg_val
             patience = 0
             torch.save(
                 (ema_model if use_ema else model).state_dict(),
@@ -209,37 +221,35 @@ def run_training(
             if patience >= early_stop:
                 print(f"Early stopping at epoch {epoch}")
                 break
+
         make_collage(f"epoch{epoch}", epoch)
 
     writer.close()
     return ema_model
 
 
-def custom_collate_fn(batch):
+def _custom_collate_fn(batch):
     images, targets = zip(*batch)
-    # 1) стекаем изображения и карты
     images = torch.stack(images, dim=0)
     score_maps = torch.stack([t["score_map"] for t in targets], dim=0)
     geo_maps = torch.stack([t["geo_map"] for t in targets], dim=0)
-    # 2) собираем rboxes в список
     rboxes_list = [t["rboxes"] for t in targets]
     return images, {"score_map": score_maps, "geo_map": geo_maps, "rboxes": rboxes_list}
 
 
-def collage_batch(model, dataset, device, num=4):
+def _collage_batch(model, dataset, device, num: int = 4):
     coll_imgs = []
     for i in range(min(num, len(dataset))):
         img_t, tgt = dataset[i]
         gt_s = tgt["score_map"].squeeze(0).cpu().numpy()
         gt_g = tgt["geo_map"].cpu().numpy().transpose(1, 2, 0)
-        gt_r = tgt["rboxes"].cpu().numpy()  # <- берем из таргета
+        gt_r = tgt["rboxes"].cpu().numpy()
 
         with torch.no_grad():
             out = model(img_t.unsqueeze(0).to(device))
         ps = out["score"][0].cpu().numpy().squeeze(0)
         pg = out["geometry"][0].cpu().numpy().transpose(1, 2, 0)
 
-        # декодим предикшены в rboxes
         pred_r = decode_boxes_from_maps(
             ps, pg, score_thresh=0.9, scale=1 / model.score_scale
         )
@@ -248,10 +258,10 @@ def collage_batch(model, dataset, device, num=4):
             img_tensor=img_t,
             gt_score_map=gt_s,
             gt_geo_map=gt_g,
-            gt_rboxes=gt_r,  # <- подставляем истинные
+            gt_rboxes=gt_r,
             pred_score_map=ps,
             pred_geo_map=pg,
-            pred_rboxes=pred_r,  # <- подставляем предикты
+            pred_rboxes=pred_r,
             cell_size=640,
         )
         coll_imgs.append(coll)
@@ -260,41 +270,147 @@ def collage_batch(model, dataset, device, num=4):
     return np.vstack([top, bot])
 
 
-if __name__ == "__main__":
-    device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
-    print(device)
+def train(
+    train_images: str,
+    train_anns: str,
+    val_images: str,
+    val_anns: str,
+    *,
+    experiment_root: str = "./experiments",
+    model_name: str = "resnet_quad",
+    pretrained_backbone: bool = True,
+    freeze_first: bool = True,
+    target_size: int = 1024,
+    score_geo_scale: float = None,
+    epochs: int = 500,
+    batch_size: int = 3,
+    lr: float = 1e-3,
+    grad_clip: float = 5.0,
+    early_stop: int = 100,
+    use_sam: bool = True,
+    sam_type: str = "asam",
+    use_lookahead: bool = True,
+    use_ema: bool = False,
+    use_multiscale: bool = True,
+    use_ohem: bool = True,
+    ohem_ratio: float = 0.5,
+    use_focal_geo: bool = True,
+    focal_gamma: float = 2.0,
+    device: torch.device = None,
+) -> torch.nn.Module:
+    """
+    High-level training entrypoint.
 
-    model = TextDetectionFCN(pretrained_backbone=True, freeze_first=True).to(device)
+    Creates model, datasets, and runs the training. Logs and checkpoints
+    are stored under `experiment_root/model_name`.
+
+    Parameters
+    ----------
+    train_images : str
+        Path to training images directory.
+    train_anns : str
+        Path to COCO JSON for training annotations.
+    val_images : str
+        Path to validation images directory.
+    val_anns : str
+        Path to COCO JSON for validation annotations.
+    experiment_root : str, optional
+        Root directory for experiments (default "./experiments").
+    model_name : str, optional
+        Subfolder under `experiment_root` for logs/checkpoints.
+        Default "resnet_quad".
+    pretrained_backbone : bool, optional
+        Use pretrained backbone weights. Default True.
+    freeze_first : bool, optional
+        Freeze first layers of backbone. Default True.
+    target_size : int, optional
+        Resize shortest side of images to this size. Default 1024.
+    score_geo_scale : float, optional
+        Scale factor for score/geometry maps. If None, uses model.score_scale.
+    epochs : int, optional
+        Number of training epochs. Default 500.
+    batch_size : int, optional
+        Samples per batch. Default 3.
+    lr : float, optional
+        Initial learning rate. Default 1e-3.
+    grad_clip : float, optional
+        Gradient clipping norm. Default 5.0.
+    early_stop : int, optional
+        Patience for early stopping. Default 100.
+    use_sam : bool, optional
+        Use SAM optimizer. Default True.
+    sam_type : str, optional
+        "sam" or "asam" variant. Default "asam".
+    use_lookahead : bool, optional
+        Wrap optimizer with Lookahead. Default True.
+    use_ema : bool, optional
+        Keep EMA of model weights. Default False.
+    use_multiscale : bool, optional
+        Randomly scale inputs on train. Default True.
+    use_ohem : bool, optional
+        Use Online Hard Example Mining. Default True.
+    ohem_ratio : float, optional
+        Ratio for hard negatives. Default 0.5.
+    use_focal_geo : bool, optional
+        Apply focal loss to geometry. Default True.
+    focal_gamma : float, optional
+        Gamma for focal geometry loss. Default 2.0.
+    device : torch.device, optional
+        Compute device. If None, auto-select. Default None.
+
+    Returns
+    -------
+    torch.nn.Module
+        Trained model (EMA if use_ema else base).
+    """
+    # Device setup
+    if device is None:
+        device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
+
+    # Model
+    model = TextDetectionFCN(
+        pretrained_backbone=pretrained_backbone, freeze_first=freeze_first
+    ).to(device)
+
+    # Determine score_geo_scale
+    if score_geo_scale is None:
+        score_geo_scale = model.score_scale
+
+    # Datasets
     train_ds = EASTDataset(
-        r"C:\data0205\Archives020525\train_images",
-        r"C:\data0205\Archives020525\train.json",
-        target_size=1024,
-        score_geo_scale=model.score_scale,
+        images_folder=train_images,
+        coco_annotation_file=train_anns,
+        target_size=target_size,
+        score_geo_scale=score_geo_scale,
     )
     val_ds = EASTDataset(
-        r"C:\data0205\Archives020525\test_images",
-        r"C:\data0205\Archives020525\test.json",
-        target_size=1024,
-        score_geo_scale=model.score_scale,
+        images_folder=val_images,
+        coco_annotation_file=val_anns,
+        target_size=target_size,
+        score_geo_scale=score_geo_scale,
     )
-    best = run_training(
-        "resnet_quad",
-        model,
-        train_ds,
-        val_ds,
-        device,
-        num_epochs=500,
-        batch_size=3,
-        lr=1e-3,
-        grad_clip=5.0,
-        early_stop=100,
-        use_sam=True,
-        sam_type="asam",
-        use_lookahead=True,
-        use_ema=False,
-        use_multiscale=True,
-        use_ohem=True,
-        ohem_ratio=0.5,
-        use_focal_geo=True,
-        focal_gamma=2.0,
+
+    # Run training
+    experiment_dir = os.path.join(experiment_root, model_name)
+    best_model = _run_training(
+        experiment_dir=experiment_dir,
+        model=model,
+        train_dataset=train_ds,
+        val_dataset=val_ds,
+        device=device,
+        num_epochs=epochs,
+        batch_size=batch_size,
+        lr=lr,
+        grad_clip=grad_clip,
+        early_stop=early_stop,
+        use_sam=use_sam,
+        sam_type=sam_type,
+        use_lookahead=use_lookahead,
+        use_ema=use_ema,
+        use_multiscale=use_multiscale,
+        use_ohem=use_ohem,
+        ohem_ratio=ohem_ratio,
+        use_focal_geo=use_focal_geo,
+        focal_gamma=focal_gamma,
     )
+    return best_model

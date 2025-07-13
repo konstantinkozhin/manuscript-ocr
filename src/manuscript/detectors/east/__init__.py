@@ -7,6 +7,7 @@ from typing import Union, Optional, List, Tuple
 
 from .east import TextDetectionFCN
 from .utils import decode_boxes_from_maps, apply_nms, expand_boxes, draw_quads
+from .train_utils import train
 from .._types import Word, Block, Page
 import os
 
@@ -114,7 +115,7 @@ class EASTInfer:
 
         # 9) Optional visualization
         if vis:
-            vis_img =draw_quads(resized, quads9, draw_scores=True)
+            vis_img = draw_quads(resized, quads9)
             return page, vis_img
 
         return page

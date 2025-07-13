@@ -1,10 +1,23 @@
 import cv2
 import numpy as np
 import torch
-from shapely.geometry import Polygon
 from .lanms import locality_aware_nms
+from tqdm import tqdm
+from shapely.geometry import Polygon
 import json
 from collections import defaultdict
+
+
+def convert_rboxes_to_quad_boxes(rboxes, scores=None):
+    quad_boxes = []
+    if scores is None:
+        scores = np.ones(len(rboxes), dtype=np.float32)
+    for i, r in enumerate(rboxes):
+        cx, cy, w, h, angle = r
+        pts = cv2.boxPoints(((cx, cy), (w, h), angle))
+        quad = np.concatenate([pts.flatten(), [scores[i]]]).astype(np.float32)
+        quad_boxes.append(quad)
+    return np.array(quad_boxes, dtype=np.float32)
 
 
 def quad_to_rbox(quad):
@@ -24,75 +37,94 @@ def tensor_to_image(tensor):
 def draw_quads(
     image: np.ndarray,
     quads: np.ndarray,
+    color: tuple = (0, 0, 0),
     thickness: int = 1,
     dark_alpha: float = 0.5,
     blur_ksize: int = 11,
-    draw_scores: bool = True,
-    font_scale: float = 0.5,
-    font_thickness: int = 1,
 ) -> np.ndarray:
     """
-    Рисует подсветку найденных полигонами областей:
+    Рисует надписи в стиле EAST:
       - затемняет фон на dark_alpha,
       - внутри полигонов оставляет исходное изображение,
-      - по контуру рисует тонкую чёрную рамку,
-      - рядом выводит score (если draw_scores=True).
+      - рисует контуры толщиной thickness и цветом color,
+      - размывает границу полигонов blur_ksize.
 
-    :param blur_ksize: нечётный размер ядра для размытия маски.
+    Args:
+        image: H×W×3, исходный BGR или RGB.
+        quads: N×M, массив, где первые 8 значений каждой строки —
+               это [x1,y1,...,x4,y4].
+        color: кортеж BGR/RGB для контура.
+        thickness: толщина линии контура.
+        dark_alpha: степень затемнения вне полигонов (0–1).
+        blur_ksize: нечётный размер ядра для размывания маски.
     """
     img = image.copy()
     if quads is None or len(quads) == 0:
         return img
 
+    # если Tensor, то в numpy
     if isinstance(quads, torch.Tensor):
         quads = quads.detach().cpu().numpy()
 
-    h, w, _ = img.shape
+    h, w = img.shape[:2]
+    # затемнённый фон
     dark_bg = (img.astype(np.float32) * (1 - dark_alpha)).astype(np.uint8)
 
+    # 1) Создаём маску внутри полигонов
     mask = np.zeros((h, w), dtype=np.float32)
     for q in quads:
         pts = q[:8].reshape(4, 2).astype(np.int32)
         cv2.fillPoly(mask, [pts], 1.0)
 
+    # 2) Размываем границу
     k = blur_ksize if blur_ksize % 2 == 1 else blur_ksize + 1
     mask = cv2.GaussianBlur(mask, (k, k), 0)
     mask = np.clip(mask, 0.0, 1.0)
     mask_3 = mask[:, :, None]
 
+    # 3) Смешиваем исход и затемнённый фон
     out = img.astype(np.float32) * mask_3 + dark_bg.astype(np.float32) * (1 - mask_3)
     out = np.clip(out, 0, 255).astype(np.uint8)
 
+    # 4) Рисуем контуры полигонов
     for q in quads:
         pts = q[:8].reshape(4, 2).astype(np.int32)
-        cv2.polylines(out, [pts], isClosed=True, color=(0, 0, 0), thickness=thickness)
-
-        if draw_scores and len(q) >= 9:
-            score = q[8]
-            x, y = pts[0]
-            y = y - 4 if y - 4 > 10 else y + 15
-            text = f"{score:.4f}"
-
-            # Цвет текста по уверенности
-            if score >= 0.9:
-                color = (0, 200, 0)      # Зелёный
-            elif score >= 0.7:
-                color = (0, 200, 200)    # Жёлтый (голубоватый)
-            else:
-                color = (0, 0, 200)      # Красный
-
-            cv2.putText(
-                out,
-                text,
-                (x, y),
-                cv2.FONT_HERSHEY_SIMPLEX,
-                font_scale,
-                color,
-                font_thickness,
-                lineType=cv2.LINE_AA,
-            )
+        cv2.polylines(out, [pts], isClosed=True, color=color, thickness=thickness)
 
     return out
+
+
+def draw_rboxes(image, rboxes, color=(0, 255, 0), thickness=2, alpha=0.5):
+    img = image.copy()
+    if rboxes is None or len(rboxes) == 0:
+        return img
+    if isinstance(rboxes, torch.Tensor):
+        rboxes = rboxes.detach().cpu().numpy()
+    overlay = img.copy()
+    for r in rboxes:
+        cx, cy, w, h, angle = r
+        pts = cv2.boxPoints(((cx, cy), (w, h), angle))
+        pts = np.int32(pts)
+        cv2.polylines(overlay, [pts], isClosed=True, color=color, thickness=thickness)
+    return cv2.addWeighted(overlay, alpha, img, 1 - alpha, 0)
+
+
+def draw_boxes(image, boxes, color=(0, 255, 0), thickness=2, alpha=0.5):
+    if boxes is None or len(boxes) == 0:
+        return image
+    if isinstance(boxes, torch.Tensor):
+        boxes = boxes.detach().cpu().numpy()
+    # detect format by length
+    first = boxes[0]
+    if len(first) == 5:
+        return draw_rboxes(image, boxes, color=color, thickness=thickness, alpha=alpha)
+    elif len(first) in (8, 9):
+        # quad with or without score
+        return draw_quads(
+            image, boxes, color=color, thickness=thickness, dark_alpha=alpha
+        )
+    else:
+        raise ValueError(f"Unsupported box format with length {len(first)}")
 
 
 def create_collage(
@@ -110,7 +142,7 @@ def create_collage(
     orig = tensor_to_image(img_tensor)
 
     # GT
-    gt_img = draw_quads(orig, gt_rboxes)
+    gt_img = draw_boxes(orig, gt_rboxes, color=(0, 255, 0))
     gt_score = (
         gt_score_map.detach().cpu().numpy().squeeze()
         if isinstance(gt_score_map, torch.Tensor)
@@ -132,7 +164,7 @@ def create_collage(
 
     # Pred
     if pred_score_map is not None and pred_geo_map is not None:
-        pred_img = draw_quads(orig, pred_rboxes)
+        pred_img = draw_boxes(orig, pred_rboxes, color=(0, 0, 255))
         pred_score = (
             pred_score_map.detach().cpu().numpy().squeeze()
             if isinstance(pred_score_map, torch.Tensor)
@@ -154,6 +186,7 @@ def create_collage(
     else:
         pred_cells = [np.zeros((cell_size, cell_size, 3), dtype=np.uint8)] * n_cols
 
+    # assemble
     for r in range(n_rows):
         cells = gt_cells if r == 0 else pred_cells
         for c in range(n_cols):
@@ -165,11 +198,29 @@ def create_collage(
     return collage
 
 
-def decode_boxes_from_maps(score_map: np.ndarray, geo_map: np.ndarray, score_thresh: float = 0.9, scale: float = 4.0) -> np.ndarray:
+def decode_boxes_from_maps(
+    score_map: np.ndarray,
+    geo_map: np.ndarray,
+    score_thresh: float = 0.9,
+    scale: float = 4.0,
+    iou_threshold: float = 0.2,
+    expand_ratio: float = 0.0,
+) -> np.ndarray:
     """
-    Декодирует quad-боксы из geo_map
-    Возвращает массив (N, 9) — [x0, y0, ..., x3, y3, score].
+    Декодирует quad-боксы из 8-канальной geo_map, с опциональным расширением (обратным shrink).
+
+    Параметры:
+      score_map     — карта вероятностей (H, W) или (1, H, W);
+      geo_map       — гео-карта (H, W, 8);
+      score_thresh  — порог для отбора пикселей;
+      scale         — коэффициент восстановления в исходные пиксели (обычно = 1.0/score_geo_scale);
+      iou_threshold — порог IoU для NMS;
+      expand_ratio  — коэффициент обратного расширения (обычно = shrink_ratio).
+
+    Возвращает:
+      quad-боксы (N, 9) — [x0, y0, …, x3, y3, score].
     """
+    # убираем лишнюю первую размерность
     if score_map.ndim == 3 and score_map.shape[0] == 1:
         score_map = score_map.squeeze(0)
 
@@ -187,7 +238,28 @@ def decode_boxes_from_maps(score_map: np.ndarray, geo_map: np.ndarray, score_thr
             verts.extend([vx, vy])
         quads.append(verts + [float(score_map[y, x])])
 
-    return np.array(quads, dtype=np.float32) if quads else np.zeros((0, 9), dtype=np.float32)
+    if not quads:
+        return np.zeros((0, 9), dtype=np.float32)
+
+    quads = np.array(quads, dtype=np.float32)
+
+    # NMS
+    keep = locality_aware_nms(quads, iou_threshold=iou_threshold)
+
+    # обратное расширение shrink_poly (если нужно)
+    if expand_ratio and len(keep) > 0:
+        from .dataset import shrink_poly
+
+        expanded = []
+        for quad in keep:
+            coords = quad[:8].reshape(4, 2)
+            # применяем shrink с отрицательным коэффициентом
+            exp_poly = shrink_poly(coords, shrink_ratio=-expand_ratio)
+            expanded.append(list(exp_poly.flatten()) + [quad[8]])
+        keep = np.array(expanded, dtype=np.float32)
+
+    return keep
+
 
 def expand_boxes(quads: np.ndarray, expand_ratio: float) -> np.ndarray:
     """
@@ -205,6 +277,7 @@ def expand_boxes(quads: np.ndarray, expand_ratio: float) -> np.ndarray:
         expanded.append(list(exp_poly.flatten()) + [quad[8]])
     return np.array(expanded, dtype=np.float32)
 
+
 def apply_nms(quads: np.ndarray, iou_threshold: float = 0.2) -> np.ndarray:
     """
     Применяет locality-aware NMS к массиву quad-боксов.
@@ -212,6 +285,7 @@ def apply_nms(quads: np.ndarray, iou_threshold: float = 0.2) -> np.ndarray:
     if len(quads) == 0:
         return quads
     return locality_aware_nms(quads, iou_threshold=iou_threshold)
+
 
 def poly_iou(segA, segB):
     A = Polygon(np.array(segA).reshape(-1, 2))
@@ -222,6 +296,7 @@ def poly_iou(segA, segB):
     union = A.union(B).area
     return inter / union if union > 0 else 0.0
 
+
 def compute_f1(preds, thresh, gt_segs, processed_ids):
     # Кэшируем полигоны
     gt_polys = {
@@ -229,7 +304,10 @@ def compute_f1(preds, thresh, gt_segs, processed_ids):
         for iid in processed_ids
     }
     pred_polys = [
-        {"image_id": p["image_id"], "polygon": Polygon(np.array(p["segmentation"]).reshape(-1, 2))}
+        {
+            "image_id": p["image_id"],
+            "polygon": Polygon(np.array(p["segmentation"]).reshape(-1, 2)),
+        }
         for p in preds
     ]
 
@@ -261,6 +339,7 @@ def compute_f1(preds, thresh, gt_segs, processed_ids):
     rec = tp / (tp + fn) if tp + fn > 0 else 0
     return 2 * prec * rec / (prec + rec) if (prec + rec) > 0 else 0
 
+
 def load_gt(gt_path):
     with open(gt_path, "r", encoding="utf-8") as f:
         gt_coco = json.load(f)
@@ -290,9 +369,10 @@ def load_preds(pred_path):
         )
     return preds
 
-from tqdm import tqdm
 
-def compute_f1_metrics(preds, gt_segs, processed_ids, avg_range=(0.50, 0.95), avg_step=0.05):
+def compute_f1_metrics(
+    preds, gt_segs, processed_ids, avg_range=(0.50, 0.95), avg_step=0.05
+):
     f1_at_05 = compute_f1(preds, 0.5, gt_segs, processed_ids)
 
     iou_vals = np.arange(avg_range[0], avg_range[1] + 1e-9, avg_step)
