@@ -23,9 +23,10 @@ class EASTLoss(nn.Module):
         self.focal_gamma = focal_gamma
 
     def forward(self, gt_score, pred_score, gt_geo, pred_geo):
-        # If no positive pixels, return zero
+        # Если нет положительных пикселей — возвращаем ноль, но с requires_grad=True,
+        # чтобы .backward() сработал корректно.
         if torch.sum(gt_score) < 1:
-            return torch.tensor(0.0, device=pred_score.device)
+            return torch.tensor(0.0, device=pred_score.device, requires_grad=True)
 
         # classification loss
         dice = compute_dice_loss(gt_score, pred_score)

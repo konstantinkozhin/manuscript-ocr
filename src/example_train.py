@@ -39,6 +39,9 @@ if __name__ == "__main__":
         train_anns=train_anns,
         val_images=val_images,
         val_anns=val_anns,
-        epochs=50,
+        target_size=1024,
+        epochs=1000,
         batch_size=4,
+        use_sam=False,
+        freeze_first=False,
     )

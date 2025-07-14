@@ -60,7 +60,7 @@ def _run_training(
         val_dataset,
         batch_size=batch_size,
         shuffle=False,
-        num_workers=4,
+        num_workers=0,
         collate_fn=_custom_collate_fn,
         pin_memory=False,
     )
@@ -370,6 +370,7 @@ def train(
 
     # Создаём модель
     model = TextDetectionFCN(
+        backbone_name='resnet101',
         pretrained_backbone=pretrained_backbone,
         freeze_first=freeze_first
     ).to(device)
