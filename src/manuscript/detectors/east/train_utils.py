@@ -13,6 +13,7 @@ from .sam import SAMSolver
 from .loss import EASTLoss
 from .utils import create_collage, decode_boxes_from_maps
 from .east import TextDetectionFCN
+from torch.utils.data import ConcatDataset
 
 
 def _run_training(
@@ -367,31 +368,45 @@ def train(
     if device is None:
         device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-    # Model
+    # Создаём модель
     model = TextDetectionFCN(
-        pretrained_backbone=pretrained_backbone, freeze_first=freeze_first
+        pretrained_backbone=pretrained_backbone,
+        freeze_first=freeze_first
     ).to(device)
 
-    # Determine score_geo_scale
+    # Определяем scale (если не задан)
     if score_geo_scale is None:
         score_geo_scale = model.score_scale
 
-    # Datasets
-    train_ds = EASTDataset(
-        images_folder=train_images,
-        coco_annotation_file=train_anns,
-        target_size=target_size,
-        score_geo_scale=score_geo_scale,
-    )
-    val_ds = EASTDataset(
-        images_folder=val_images,
-        coco_annotation_file=val_anns,
-        target_size=target_size,
-        score_geo_scale=score_geo_scale,
-    )
+    # Вспомогательная фабрика для востановления списка путей в EASTDataset
+    def make_dataset(imgs, anns):
+        return EASTDataset(
+            images_folder=imgs,
+            coco_annotation_file=anns,
+            target_size=target_size,
+            score_geo_scale=score_geo_scale,
+        )
 
-    # Run training
+    # Собираем списки (если один путь, оборачиваем в список)
+    train_imgs_list = train_images if isinstance(train_images, (list, tuple)) else [train_images]
+    train_anns_list = train_anns   if isinstance(train_anns,   (list, tuple)) else [train_anns]
+    val_imgs_list   = val_images   if isinstance(val_images,   (list, tuple)) else [val_images]
+    val_anns_list   = val_anns     if isinstance(val_anns,     (list, tuple)) else [val_anns]
+
+    # Проверяем что длины совпадают
+    assert len(train_imgs_list) == len(train_anns_list), "train_images и train_anns должны иметь одинаковую длину"
+    assert len(val_imgs_list)   == len(val_anns_list),   "val_images и val_anns должны иметь одинаковую длину"
+
+    # Строим ConcatDataset
+    train_datasets = [make_dataset(imgs, anns) for imgs, anns in zip(train_imgs_list, train_anns_list)]
+    val_datasets   = [make_dataset(imgs, anns) for imgs, anns in zip(val_imgs_list,   val_anns_list)]
+    train_ds = ConcatDataset(train_datasets)
+    val_ds   = ConcatDataset(val_datasets)
+
+    # Путь для логов и чекпоинтов
     experiment_dir = os.path.join(experiment_root, model_name)
+
+    # Запускаем прежнюю функцию обучения
     best_model = _run_training(
         experiment_dir=experiment_dir,
         model=model,

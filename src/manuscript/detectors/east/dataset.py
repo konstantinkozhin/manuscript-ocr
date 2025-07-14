@@ -7,6 +7,7 @@ from torch.utils.data import Dataset
 import torchvision.transforms as transforms
 import skimage.draw
 from .utils import quad_to_rbox
+import warnings
 
 
 def order_vertices_clockwise(poly):
@@ -84,6 +85,33 @@ class EASTDataset(Dataset):
         self.annots = {}
         for ann in data["annotations"]:
             self.annots.setdefault(ann["image_id"], []).append(ann)
+        self._filter_invalid()
+
+    def _filter_invalid(self):
+        invalid_ids = []
+        for img_id in list(self.image_ids):
+            anns = self.annots.get(img_id, [])
+            # проверяем: хотя бы одна аннотация с сегментацией, дающей >=4 точек
+            has_valid = False
+            for ann in anns:
+                seg = ann.get("segmentation")
+                if seg:
+                    pts = np.array(seg, dtype=np.float32).reshape(-1, 2)
+                    if pts.shape[0] >= 4:
+                        has_valid = True
+                        break
+            if not has_valid:
+                invalid_ids.append(img_id)
+        # убираем «битые» картинки из списка
+        for img_id in invalid_ids:
+            self.image_ids.remove(img_id)
+            self.annots.pop(img_id, None)
+
+        if invalid_ids:
+            warnings.warn(
+                f"EASTDataset: найдено {len(invalid_ids)} изображений без годных квадов — они будут пропущены",
+                UserWarning
+            )
 
     def __len__(self):
         return len(self.image_ids)
