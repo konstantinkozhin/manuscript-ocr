@@ -8,7 +8,7 @@ def parse_requirements(fname="requirements.txt"):
         return [ln.strip() for ln in f if ln.strip() and not ln.startswith("#") and not ln.startswith("--")]
 
 
-# Базовые зависимости (CPU версия)
+# Базовые зависимости (CPU версия) - включает все необходимое для работы
 base_requirements = [
     "torch>=1.11.0,<2.8.0",
     "torchvision>=0.12.0,<0.23.0", 
@@ -20,13 +20,13 @@ base_requirements = [
     "numba>=0.56.0,<1.0.0",
     "pydantic>=2.0.0,<3.0.0",
     "gdown>=4.4.0,<6.0.0",
+    "scikit-image>=0.19.0,<1.0.0",  # Нужно для импортов в коде
+    "torch-optimizer>=0.1.0,<1.0.0",  # Нужно для train_utils.py
 ]
 
-# GPU и обучение зависимости
+# Дополнительные зависимости для GPU (в основном для обучения)
 gpu_requirements = [
-    "tensorboard>=2.8.0,<3.0.0",
-    "scikit-image>=0.19.0,<1.0.0",
-    "torch-optimizer>=0.1.0,<1.0.0",
+    "tensorboard>=2.8.0,<3.0.0",  # Логирование обучения
 ]
 
 setup(

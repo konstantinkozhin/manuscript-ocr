@@ -34,13 +34,13 @@ dependencies = [
     "numba>=0.56.0,<1.0.0",
     "pydantic>=2.0.0,<3.0.0",
     "gdown>=4.4.0,<6.0.0",
+    "scikit-image>=0.19.0,<1.0.0",
+    "torch-optimizer>=0.1.0,<1.0.0",
 ]
 
 [project.optional-dependencies]
 gpu = [
     "tensorboard>=2.8.0,<3.0.0",
-    "scikit-image>=0.19.0,<1.0.0",
-    "torch-optimizer>=0.1.0,<1.0.0",
 ]
 
 [project.urls]

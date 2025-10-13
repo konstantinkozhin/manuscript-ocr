@@ -136,6 +136,8 @@ class TestInstallation:
         import numba
         import pydantic
         import gdown
+        import skimage
+        import torch_optimizer
         
         # Все импорты прошли успешно
         print("Все основные зависимости импортированы успешно")

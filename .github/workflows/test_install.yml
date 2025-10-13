@@ -77,7 +77,7 @@ jobs:
 
       - name: Test GPU extras import
         run: |
-          python -c "from manuscript.detectors import EASTInfer; import tensorboard; import scikit_image; print('GPU installation successful')"
+          python -c "from manuscript.detectors import EASTInfer; import tensorboard; import skimage; print('GPU installation successful')"
 
       - name: Test functional inference (CPU fallback)
         run: pytest tests/test_integration.py::TestIntegration::test_detector_initialization -v

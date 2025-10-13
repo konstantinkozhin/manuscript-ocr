@@ -10,8 +10,6 @@ pip install manuscript-ocr
 pip install manuscript-ocr[gpu]
 ```
 
-> **Примечание**: GPU версия включает дополнительные зависимости для обучения моделей (tensorboard, scikit-image, torch-optimizer).
-
 ## Usage Example
 
 ```python
