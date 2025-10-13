@@ -9,13 +9,7 @@ from .model.model import RCNN
 from .data.transforms import load_charset, get_val_transform, decode_tokens
 
 
-class TRBAInfer:
-    """
-    Класс для инференса TRBA (TPS-ResNet-BiLSTM-Attention) модели распознавания текста.
-    
-    Поддерживает загрузку модели из checkpoint и предсказание текста с изображений.
-    """
-    
+class TRBAInfer:    
     def __init__(
         self,
         model_path: str,
@@ -24,16 +18,6 @@ class TRBAInfer:
         img_h: int = 64,
         img_w: int = 256,
     ):
-        """
-        Инициализация инференса.
-        
-        Args:
-            model_path: Путь к файлу модели (.pth)
-            charset_path: Путь к файлу с символьным словарем
-            device: Устройство для вычислений ("cpu", "cuda", "auto")
-            img_h: Высота входного изображения
-            img_w: Ширина входного изображения
-        """
         self.model_path = model_path
         self.charset_path = charset_path
         self.img_h = img_h
@@ -59,7 +43,6 @@ class TRBAInfer:
         print(f"Input image size: {img_h}x{img_w}")
     
     def _load_model(self) -> RCNN:
-        """Загрузка модели из checkpoint."""
         checkpoint = torch.load(self.model_path, map_location=self.device)
         
         num_classes = len(self.itos)
@@ -91,15 +74,6 @@ class TRBAInfer:
         return model
     
     def _preprocess_image(self, image: Union[np.ndarray, str, Image.Image]) -> torch.Tensor:
-        """
-        Предобработка изображения для модели.
-        
-        Args:
-            image: Изображение в формате numpy array, путь к файлу или PIL Image
-            
-        Returns:
-            Preprocessed tensor готовый для модели
-        """
         if isinstance(image, str):
             if not os.path.exists(image):
                 raise FileNotFoundError(f"Image file not found: {image}")
@@ -130,19 +104,7 @@ class TRBAInfer:
         batch_size: int = 32,
         return_confidence: bool = False
     ) -> Union[str, List[str], Tuple[str, float], List[Tuple[str, float]]]:
-        """
-        Универсальный метод предсказания текста.
         
-        Args:
-            images: Изображение или список изображений для распознавания
-            max_length: Максимальная длина выходного текста
-            batch_size: Размер батча для обработки (используется только для списка)
-            return_confidence: Возвращать ли confidence score
-            
-        Returns:
-            - Для одного изображения: str или (str, float) если return_confidence=True
-            - Для списка изображений: List[str] или List[(str, float)] если return_confidence=True
-        """
         is_single = not isinstance(images, list)
         
         if is_single:

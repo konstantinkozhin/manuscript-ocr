@@ -1,13 +1,19 @@
 from pydantic import BaseModel, Field
-from typing import List, Tuple
+from typing import List, Tuple, Optional
 
 
 class Word(BaseModel):
     polygon: List[Tuple[float, float]] = Field(
         ..., description="List of vertices (x, y) of the polygon defining the region"
     )
-    score: float = Field(
-        ..., ge=0.0, le=1.0, description="Score of the word detection between 0 and 1"
+    detection_confidence: float = Field(
+        ..., ge=0.0, le=1.0, description="Text detection confidence score from detector"
+    )
+    text: Optional[str] = Field(
+        None, description="Recognized text content (populated by OCR pipeline)"
+    )
+    recognition_confidence: Optional[float] = Field(
+        None, ge=0.0, le=1.0, description="Text recognition confidence score from recognizer"
     )
 
 

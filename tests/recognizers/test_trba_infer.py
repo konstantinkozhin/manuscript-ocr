@@ -2,7 +2,7 @@
 Базовые тесты для TRBAInfer распознавателя
 """
 import pytest
-from manuscript.recognizers import TRBAInfer
+from manuscript import TRBAInfer
 
 
 class TestTRBAInfer:
@@ -20,6 +20,7 @@ class TestTRBAInfer:
             # Это должно упасть с FileNotFoundError, но класс должен существовать
             TRBAInfer(
                 model_path="non_existent.pth",
+                config_path="non_existent.json",
                 charset_path="non_existent.txt",
                 device="cpu"
             )

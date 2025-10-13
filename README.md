@@ -25,37 +25,102 @@ import torch
 print(f"CUDA доступна: {torch.cuda.is_available()}")
 ```
 
-## Usage Example
+## Usage Examples
+
+### OCR Pipeline
+
+```python
+from manuscript.detectors import EASTInfer
+from manuscript import TRBAInfer  
+from manuscript.pipeline import OCRPipeline
+
+# Инициализация компонентов
+detector = EASTInfer(score_thresh=0.7)
+
+# TRBAInfer использует config.json для параметров модели
+# img_h, img_w, hidden_size берутся из конфига
+recognizer = TRBAInfer(
+    model_path="path/to/model.pth",
+    config_path="path/to/config.json", 
+    charset_path="path/to/charset.txt"  # Отдельно, т.к. может быть в разных местах
+)
+
+pipeline = OCRPipeline(detector, recognizer)
+
+# Полная обработка изображения
+result = pipeline.process("path/to/image.jpg")
+
+# Получение распознанного текста
+text = pipeline.get_text(result)
+print("Распознанный текст:", text)
+
+# Подробная информация о каждом слове
+for block in result.blocks:
+    for word in block.words:
+        print(f"Текст: '{word.text}' | "
+              f"Детекция: {word.detection_confidence:.3f} | "
+              f"Распознавание: {word.recognition_confidence:.3f}")
+```
+
+### Детекция текста 
 
 ```python
 from PIL import Image
 from manuscript.detectors import EASTInfer
 
-# Инициализация
-det = EASTInfer(score_thresh=0.9)
+# Инициализация детектора
+detector = EASTInfer(score_thresh=0.9)
 
-# Инфер с визуализацией
-page, vis_image = det.infer(r"example\ocr_example_image.jpg", vis=True)
+# Детекция с визуализацией
+page, vis_image = detector.infer("example/image.jpg", vis=True)
 
-print(page)
-
-# Покажет картинку с наложенными боксами
+# Показать результат
 Image.fromarray(vis_image).show()
 
-# Или сохранить результат на диск:
-Image.fromarray(vis_image).save(r"example\ocr_example_image_infer.png")
+# Информация о найденных областях
+for block in page.blocks:
+    for word in block.words:
+        print(f"Область: {word.polygon} | Уверенность: {word.detection_confidence:.3f}")
 ```
 
-### Результат
+### Пакетная обработка
 
-Текстовые блоки будут выведены в консоль, например:
+```python
+# Обработка нескольких изображений
+image_paths = ["img1.jpg", "img2.jpg", "img3.jpg"]
+results = pipeline.process_batch(image_paths)
 
+for i, page in enumerate(results):
+    text = pipeline.get_text(page)
+    print(f"Изображение {i+1}: {text}")
 ```
-Page(blocks=[Block(words=[Word(polygon=[(874.1005, 909.1005), (966.8995, 909.1005), (966.8995, 956.8995), (874.1005, 956.8995)]),
-                          Word(polygon=[(849.1234, 810.5678), … ])])])
+
+### Конфигурация
+
+TRBAInfer uses JSON configuration for model parameters:
+
+```json
+{
+    "img_h": 32,
+    "img_w": 128, 
+    "hidden_size": 256,
+    "max_len": 40,
+    "encoding": "utf-8"
+}
 ```
 
-А визуализация сохранится в файл `example/ocr_example_image_infer.png`:
+**Обязательные параметры в config.json:** `img_h`, `img_w`, `hidden_size`  
+**Отдельные параметры:** `charset_path` (передается в конструктор)
 
-![OCR Inference Result](example/ocr_example_image_infer.png)
+### Запуск примеров
+
+Полные рабочие примеры доступны в файлах:
+- `example_ocr_pipeline.py` - подробная демонстрация всех возможностей
+- `example_config_usage.py` - пример использования конфигурации
+- `simple_ocr_example.py` - простые примеры для быстрого старта
+
+```bash
+python example_ocr_pipeline.py
+python simple_ocr_example.py
+```
 

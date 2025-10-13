@@ -15,7 +15,7 @@ class TestInstallation:
         
     def test_recognizers_imports(self):
         """Тест базовых импортов распознавателей"""
-        from manuscript.recognizers import TRBAInfer
+        from manuscript import TRBAInfer
         assert TRBAInfer is not None
         
     def test_pytorch_installation(self):

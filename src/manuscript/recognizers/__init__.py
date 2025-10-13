@@ -1,7 +1,7 @@
 """
 Модуль для распознавания текста (OCR)
+Содержит модель RCNN, утилиты для обучения и обработки данных
 """
 
-from .inference import TRBAInfer
-
-__all__ = ["TRBAInfer"]
+# TRBAInfer теперь доступен из основного модуля manuscript
+# from manuscript import TRBAInfer
