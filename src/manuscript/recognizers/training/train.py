@@ -3,6 +3,7 @@ import os
 import logging
 import csv
 from pathlib import Path
+from typing import Union, Optional
 
 import torch
 import torch.cuda.amp as amp
@@ -77,7 +78,7 @@ class Config:
                 exp_idx += 1
             self.exp_dir = f"exp{exp_idx}"
 
-    def save(self, out_path: str | None = None):
+    def save(self, out_path: Optional[str] = None):
         if out_path is None:
             out_path = os.path.join(self.exp_dir, "config.json")
         os.makedirs(os.path.dirname(out_path), exist_ok=True)
@@ -97,7 +98,7 @@ class Config:
             raise FileNotFoundError(f"Путь для резюме не найден: {resume_path}")
 
         resume_dir: Path
-        resume_ckpt: Path | None = None
+        resume_ckpt: Optional[Path] = None
 
         if resume_path.is_dir():
             resume_dir = resume_path

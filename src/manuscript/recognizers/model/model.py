@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from typing import Union, Optional
 
 from .seresnet31 import SEResNet31
 
@@ -54,7 +55,7 @@ class Attention(nn.Module):
         sos_id: int,
         eos_id: int,
         pad_id: int,
-        blank_id: int | None = None,
+        blank_id: Optional[int] = None,
         dropout_p: float = 0.1,
         sampling_prob: float = 0.0,
     ):
@@ -171,7 +172,7 @@ class RCNN(nn.Module):
         sos_id: int = 1,
         eos_id: int = 2,
         pad_id: int = 0,
-        blank_id: int | None = 3,
+        blank_id: Optional[int] = 3,
         enc_dropout_p: float = 0.1,
         dropblock_p: float = 0.0,
         dropblock_block_size: int = 5,

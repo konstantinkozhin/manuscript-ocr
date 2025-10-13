@@ -1,4 +1,5 @@
 import random
+from typing import Union, Optional
 
 import torch
 import torch.nn.functional as F
@@ -69,14 +70,14 @@ def set_seed(seed: int = 42):
 
 def load_crnn(
     checkpoint_path: str,
-    itos: list[str] | None = None,
-    stoi: dict | None = None,
+    itos: Optional[list] = None,
+    stoi: Optional[dict] = None,
     hidden_size: int = 256,
     sos_token: str = "<SOS>",
     eos_token: str = "<EOS>",
     pad_token: str = "<PAD>",
-    blank_token: str | None = "<BLANK>",
-    device: torch.device | None = None,
+    blank_token: Optional[str] = "<BLANK>",
+    device: Optional[torch.device] = None,
     eval_mode: bool = True,
 ) -> RCNN:
     if device is None:

@@ -2,7 +2,7 @@ import csv
 import os
 import random
 from concurrent.futures import ThreadPoolExecutor, as_completed
-from typing import List, Optional, Tuple
+from typing import List, Optional, Tuple, Union
 from collections import Counter, defaultdict
 
 import torch
@@ -24,15 +24,15 @@ class OCRDatasetAttn(Dataset):
     def __init__(
         self,
         csv_path: str,
-        images_dir: str | list,
+        images_dir: Union[str, list],
         stoi: dict,
         img_height: int = 32,
         img_max_width: int = 128,
         encoding: str = "utf-8",
         transform: Optional[callable] = None,
         num_workers: int = -1,
-        delimiter: str | None = None,
-        has_header: bool | None = None,
+        delimiter: Optional[str] = None,
+        has_header: Optional[bool] = None,
         strict_charset: bool = True,
         validate_image: bool = True,
         max_len: Optional[int] = None,
