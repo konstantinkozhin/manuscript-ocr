@@ -1,13 +1,28 @@
 ## Installation
 
-### CPU версия (базовая)
+### Для пользователей
 ```bash
 pip install manuscript-ocr
 ```
 
-### GPU версия (с поддержкой обучения)
+### Для разработчиков
 ```bash
-pip install manuscript-ocr[gpu]
+pip install -r requirements-dev.txt
+```
+
+> **Примечание**: `requirements-dev.txt` включает GPU версию PyTorch, инструменты тестирования, форматирования и сборки.
+
+### GPU поддержка
+Если вы пользователь и хотите GPU поддержку:
+```bash
+pip install manuscript-ocr
+pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 --force-reinstall
+```
+
+**Проверка GPU:**
+```python
+import torch
+print(f"CUDA доступна: {torch.cuda.is_available()}")
 ```
 
 ## Usage Example
@@ -44,24 +59,3 @@ Page(blocks=[Block(words=[Word(polygon=[(874.1005, 909.1005), (966.8995, 909.100
 
 ![OCR Inference Result](example/ocr_example_image_infer.png)
 
-
-### Альтернативная установка через requirements
-
-```bash
-# CPU версия
-pip install -r requirements.txt
-
-# GPU версия (с CUDA 11.8)
-pip install -r requirements-gpu.txt --force-reinstall
-```
-
-### Проверка установки
-
-```python
-import torch
-from manuscript.detectors import EASTInfer
-
-print(f"CUDA доступна: {torch.cuda.is_available()}")
-det = EASTInfer()
-print("Установка успешна!")
-```

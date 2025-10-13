@@ -15,9 +15,7 @@ from manuscript.detectors.east.lanms import (
 import pytest
 
 
-# --- Tests for geometric functions ---
-
-
+# --- Тесты для геометрических функций ---
 def test_polygon_area_square():
     poly = np.array([[0, 0], [1, 0], [1, 1], [0, 1]], dtype=np.float64)
     area = polygon_area(poly)
@@ -31,7 +29,7 @@ def test_polygon_area_triangle():
 
 
 def test_compute_intersection():
-    # Intersection of two segments, should return point (1,1)
+    # Пересечение двух отрезков, должно вернуть точку (1,1)
     p1 = np.array([0, 0], dtype=np.float64)
     p2 = np.array([2, 2], dtype=np.float64)
     A = np.array([0, 2], dtype=np.float64)
@@ -42,7 +40,7 @@ def test_compute_intersection():
 
 def test_clip_polygon():
     subject = np.array([[0, 0], [4, 0], [4, 4], [0, 4]], dtype=np.float64)
-    # Clipping by the line x = 2
+    # Отсечение по линии x = 2
     A = np.array([2, 5], dtype=np.float64)
     B = np.array([2, -1], dtype=np.float64)
     clipped, count = clip_polygon(subject, A, B)
@@ -70,9 +68,9 @@ def test_polygon_iou():
 def test_should_merge():
     poly1 = np.array([[0, 0], [4, 0], [4, 4], [0, 4]], dtype=np.float64)
     poly2 = np.array([[2, 2], [6, 2], [6, 6], [2, 6]], dtype=np.float64)
-    # IoU threshold 0.1 (0.142857 > 0.1) should return True
+    # Порог IoU 0.1 (0.142857 > 0.1) должен вернуть True
     assert should_merge(poly1, poly2, 0.1)
-    # IoU threshold 0.2 (0.142857 < 0.2) should return False
+    # Порог IoU 0.2 (0.142857 < 0.2) должен вернуть False
     assert not should_merge(poly1, poly2, 0.2)
 
 
@@ -80,7 +78,7 @@ def test_normalize_polygon():
     ref = np.array([[0, 0], [4, 0], [4, 4], [0, 4]], dtype=np.float64)
     poly = np.array(
         [[4, 4], [0, 4], [0, 0], [4, 0]], dtype=np.float64
-    )  # Permuted vertices
+    )  # Переставленные вершины
     normalized = normalize_polygon(ref, poly)
     np.testing.assert_allclose(normalized, ref, rtol=1e-5)
 
@@ -96,11 +94,9 @@ def test_polygon_merger():
     np.testing.assert_allclose(merged, expected, rtol=1e-5)
 
 
-# --- Tests for NMS functions ---
-
-
+# --- Тесты для функций NMS ---
 def test_standard_nms():
-    # Three boxes where two overlap and one does not
+    # Три прямоугольника: два пересекаются, один нет
     polys = [
         np.array([[0, 0], [4, 0], [4, 4], [0, 4]], dtype=np.float64),
         np.array([[1, 1], [5, 1], [5, 5], [1, 5]], dtype=np.float64),
@@ -109,12 +105,12 @@ def test_standard_nms():
     scores = [0.9, 0.8, 0.7]
     iou_threshold = 0.1
     kept_polys, kept_scores = standard_nms(polys, scores, iou_threshold)
-    # The first two boxes overlap, the third does not => expect 2 kept boxes
+    # Первые два прямоугольника пересекаются, третий нет => ожидаем 2 оставшихся
     assert len(kept_polys) == 2
 
 
 def test_locality_aware_nms():
-    # Four boxes in (n,9) format: [x0,y0,x1,y1,x2,y2,x3,y3,score]
+    # Четыре прямоугольника в формате (n,9): [x0,y0,x1,y1,x2,y2,x3,y3,score]
     boxes = np.array(
         [
             [0, 0, 4, 0, 4, 4, 0, 4, 0.9],
@@ -126,19 +122,19 @@ def test_locality_aware_nms():
     )
     iou_threshold = 0.1
     final_boxes = locality_aware_nms(boxes, iou_threshold)
-    # Expect 2 final boxes after merging adjacent overlaps
+    # Ожидаем 2 итоговых прямоугольника после слияния соседних пересечений
     assert final_boxes.shape[0] == 2
 
 
 def test_polygon_area_degenerate():
-    # Fewer than three points => area should be 0
+    # Менее трех точек => площадь должна быть 0
     poly = np.array([[0, 0], [1, 0]], dtype=np.float64)
     area = polygon_area(poly)
     assert area == pytest.approx(0.0)
 
 
 def test_compute_intersection_parallel():
-    # Parallel segments => returns starting point
+    # Параллельные отрезки => возвращает начальную точку
     p1 = np.array([0, 0], dtype=np.float64)
     p2 = np.array([1, 1], dtype=np.float64)
     A = np.array([2, 2], dtype=np.float64)
@@ -148,7 +144,7 @@ def test_compute_intersection_parallel():
 
 
 def test_polygon_intersection_no_overlap():
-    # No overlapping region => empty intersection
+    # Нет области пересечения => пустое пересечение
     poly1 = np.array([[0, 0], [1, 0], [1, 1], [0, 1]], dtype=np.float64)
     poly2 = np.array([[2, 2], [3, 2], [3, 3], [2, 3]], dtype=np.float64)
     inter = polygon_intersection(poly1, poly2)
@@ -157,22 +153,22 @@ def test_polygon_intersection_no_overlap():
 
 def test_polygon_iou_extremes():
     poly = np.array([[0, 0], [1, 0], [1, 1], [0, 1]], dtype=np.float64)
-    # Complete overlap => IoU=1.0
+    # Полное пересечение => IoU=1.0
     assert polygon_iou(poly, poly) == pytest.approx(1.0)
-    # No overlap => IoU=0.0
+    # Нет пересечения => IoU=0.0
     other = np.array([[2, 2], [3, 2], [3, 3], [2, 3]], dtype=np.float64)
     assert polygon_iou(poly, other) == pytest.approx(0.0)
 
 
 def test_should_merge_at_threshold():
-    # At threshold boundary
+    # На границе порога
     poly = np.array([[0, 0], [1, 0], [1, 1], [0, 1]], dtype=np.float64)
     assert not should_merge(poly, poly, 1.0)
     assert should_merge(poly, poly, 0.999)
 
 
 def test_clip_polygon_no_clip():
-    # Line far away => no clipping
+    # Линия далеко => нет отсечения
     subject = np.array([[0, 0], [1, 0], [1, 1], [0, 1]], dtype=np.float64)
     A = np.array([100, 0], dtype=np.float64)
     B = np.array([100, 1], dtype=np.float64)
@@ -195,7 +191,7 @@ def test_clip_polygon_full_clip():
 def test_normalize_polygon_variants():
     ref = np.array([[0, 0], [1, 0], [1, 1], [0, 1]], dtype=np.float64)
     variants = []
-    # All cyclic shifts and reversals
+    # Все циклические сдвиги и обращения
     for start in range(4):
         variants.append(np.vstack([ref[(i + start) % 4] for i in range(4)]))
         variants.append(np.vstack([ref[(start - i) % 4] for i in range(4)]))
@@ -205,14 +201,14 @@ def test_normalize_polygon_variants():
 
 
 def test_standard_nms_empty():
-    # Empty input => empty output
+    # Пустой ввод => пустой вывод
     kept_polys, kept_scores = standard_nms([], [], 0.5)
     assert kept_polys == []
     assert kept_scores == []
 
 
 def test_locality_aware_nms_empty():
-    # Empty input => empty output
+    # Пустой ввод => пустой вывод
     out = locality_aware_nms(np.zeros((0, 9), dtype=np.float32), 0.5)
     assert out.shape == (0,)
 
@@ -221,5 +217,5 @@ def test_standard_nms_order():
     polys = [np.zeros((4, 2), dtype=np.float64) for _ in range(3)]
     scores = [0.2, 0.9, 0.5]
     kept_polys, kept_scores = standard_nms(polys, scores, 0.1)
-    # Check that highest scores are kept first
+    # Проверяем, что наивысшие оценки сохраняются первыми
     assert kept_scores[0] == pytest.approx(0.9)

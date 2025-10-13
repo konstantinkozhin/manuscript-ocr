@@ -7,7 +7,7 @@ on:
     branches: [main]
 
 jobs:
-  test-cpu-installation:
+  test-user-installation:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -24,7 +24,7 @@ jobs:
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
 
-      - name: Install CPU version
+      - name: Install package
         run: |
           pip install .
 
@@ -36,9 +36,9 @@ jobs:
 
       - name: Test basic import
         run: |
-          python -c "from manuscript.detectors import EASTInfer; print('CPU installation successful')"
+          python -c "from manuscript.detectors import EASTInfer; print('Installation successful')"
 
-      - name: Test PyTorch CPU
+      - name: Test PyTorch version
         run: |
           python -c "import torch; print(f'PyTorch: {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
 
@@ -48,7 +48,7 @@ jobs:
       - name: Run all tests with coverage
         run: pytest --cov=src --cov-report=xml
 
-  test-gpu-installation:
+  test-dev-installation:
     runs-on: ubuntu-latest
     strategy:
       matrix:
@@ -65,22 +65,25 @@ jobs:
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
 
-      - name: Install GPU version 
+      - name: Install dev dependencies (with GPU PyTorch)
         run: |
-          pip install .[gpu]
-
-      - name: Install development dependencies
-        run: pip install pytest pytest-cov
+          pip install -r requirements-dev.txt
 
       - name: Check for dependency conflicts
         run: pip check
 
-      - name: Test GPU extras import
+      - name: Test import with dev setup
         run: |
-          python -c "from manuscript.detectors import EASTInfer; import tensorboard; import skimage; print('GPU installation successful')"
+          python -c "from manuscript.detectors import EASTInfer; print('Dev installation successful')"
 
-      - name: Test functional inference (CPU fallback)
-        run: pytest tests/test_integration.py::TestIntegration::test_detector_initialization -v
+      - name: Test GPU PyTorch installation
+        run: |
+          python -c "import torch; print(f'PyTorch: {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
+
+      - name: Run code quality checks
+        run: |
+          black --check . || echo "Black formatting needed"
+          flake8 . || echo "Flake8 issues found"
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3
