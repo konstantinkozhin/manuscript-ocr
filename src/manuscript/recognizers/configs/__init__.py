@@ -1,0 +1,1 @@
+# Configs package for RCNN-OCR project

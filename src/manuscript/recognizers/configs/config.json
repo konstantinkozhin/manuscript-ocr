@@ -1,0 +1,49 @@
+{
+    "train_csvs": [
+        "C:\\Users\\USER\\Desktop\\archive_25_09\\dataset\\handwritten\\train\\labels.csv",
+        "C:\\Users\\USER\\Desktop\\archive_25_09\\dataset\\printed\\train\\labels.csv"
+    ],
+    "train_roots": [
+        "C:\\Users\\USER\\Desktop\\archive_25_09\\dataset\\handwritten\\train",
+        "C:\\Users\\USER\\Desktop\\archive_25_09\\dataset\\printed\\train"
+    ],
+    "val_csvs": [
+        null,
+        "C:\\Users\\USER\\Desktop\\archive_25_09\\dataset\\printed\\val\\labels.csv"
+    ],
+    "val_roots": [
+        null,
+        "C:\\Users\\USER\\Desktop\\archive_25_09\\dataset\\printed\\val"
+    ],
+    "charset_path": "configs/charset.txt",
+    "encoding": "utf-8",
+    "img_h": 32,
+    "img_w": 128,
+    "max_len": 40,
+    "hidden_size": 256,
+    "batch_size": 128,
+    "epochs": 1000,
+    "lr": 0.000510753964866869,
+    "optimizer": "Adam",
+    "scheduler": "CosineAnnealingLR",
+    "weight_decay": 1.9547932698947658e-05,
+    "momentum": 0.9668957400876318,
+    "shift_limit": 0.031093613247891404,
+    "scale_limit": 0.03453229857924949,
+    "rotate_limit": 3,
+    "p_ShiftScaleRotate": 0.4002319329123872,
+    "brightness_limit": 0.1603913800465498,
+    "contrast_limit": 0.21538713295649292,
+    "p_BrightnessContrast": 0.09102159869005591,
+    "invert_p": 0.01,
+    "train_proportions": [
+        0.5,
+        0.5
+    ],
+    "val_size": 1000,
+    "num_workers": 0,
+    "resume_path": null,
+    "exp_dir": "exp1",
+    "seed": 42,
+    "eval_every": 10
+}

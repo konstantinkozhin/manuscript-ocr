@@ -15,10 +15,8 @@ class TestInstallation:
         
     def test_recognizers_imports(self):
         """Тест базовых импортов распознавателей"""
-        # TODO: Добавить импорты когда появится src\manuscript\recognizers
-        # from manuscript.recognizers import SomeRecognizer
-        # assert SomeRecognizer is not None
-        pass
+        from manuscript.recognizers import TRBAInfer
+        assert TRBAInfer is not None
         
     def test_pytorch_installation(self):
         """Тест установки PyTorch"""

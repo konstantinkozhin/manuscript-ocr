@@ -1,14 +1,30 @@
-# Базовая CPU версия
+# Объединенные требования для детекции и распознавания (CPU версия)
+
+# PyTorch экосистема
 torch>=1.11.0,<2.8.0
 torchvision>=0.12.0,<0.23.0
 torchaudio>=0.11.0,<2.8.0
-numpy>=1.21.0,<2.3.0
+
+# Базовые библиотеки
+numpy>=1.19.0,<2.3.0
 opencv-python>=4.5.0,<5.0.0
-Pillow>=9.0.0
+Pillow>=8.0.0
+pandas>=1.3.0,<3.0.0
+
+# Детекция EAST
 shapely>=1.8.0,<3.0.0
 numba>=0.56.0,<1.0.0
 pydantic>=2.0.0,<3.0.0
 gdown>=4.4.0,<6.0.0
 scikit-image>=0.19.0,<1.0.0
 torch-optimizer>=0.1.0,<1.0.0
-tensorboard>=2.8.0,<3.0.0 
+
+# Распознавание TRBA (TPS-ResNet-BiLSTM-Attention)
+python-Levenshtein>=0.12.0,<1.0.0
+jiwer>=2.3.0,<4.0.0
+matplotlib>=3.3.0,<4.0.0
+tqdm>=4.60.0,<5.0.0
+albumentations>=1.0.0,<2.0.0
+
+# Общие инструменты
+tensorboard>=2.4.0,<3.0.0 
