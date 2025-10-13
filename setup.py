@@ -12,7 +12,7 @@ base_requirements = parse_requirements("requirements.txt")
 
 setup(
     name="manuscript-ocr",
-    version="0.1.7",
+    version="0.1.8",
     description="EAST-based OCR detector API",
     long_description=open("README.md", encoding="utf-8").read(),
     long_description_content_type="text/markdown",
