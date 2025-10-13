@@ -1,13 +1,7 @@
 # Зависимости для разработки
 
-# Сначала устанавливаем базовые зависимости  
+# Базовые зависимости  
 -r requirements.txt
-
-# GPU PyTorch
---extra-index-url https://download.pytorch.org/whl/cu118
-torch>=2.0.0
-torchvision>=0.15.0
-torchaudio>=2.0.0
 
 # Инструменты разработки
 pytest>=7.0.0
