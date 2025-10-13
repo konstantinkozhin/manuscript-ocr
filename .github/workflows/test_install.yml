@@ -42,8 +42,8 @@ jobs:
         run: |
           python -c "import torch; print(f'PyTorch: {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
 
-      - name: Run integration tests
-        run: pytest tests/test_integration.py::TestInstallation -v
+      - name: Run installation tests
+        run: pytest tests/test_installation.py -v
 
       - name: Run all tests with coverage
         run: pytest --cov=src --cov-report=xml

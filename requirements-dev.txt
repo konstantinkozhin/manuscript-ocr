@@ -5,9 +5,9 @@
 
 # GPU PyTorch
 --extra-index-url https://download.pytorch.org/whl/cu118
-torch>=1.11.0+cu118,<2.8.0 --force-reinstall
-torchvision>=0.12.0+cu118,<2.8.0 --force-reinstall  
-torchaudio>=0.11.0+cu118,<2.8.0 --force-reinstall
+torch>=1.11.0+cu118,<2.8.0
+torchvision>=0.12.0+cu118,<2.8.0  
+torchaudio>=0.11.0+cu118,<2.8.0
 
 # Инструменты разработки
 pytest>=7.0.0
