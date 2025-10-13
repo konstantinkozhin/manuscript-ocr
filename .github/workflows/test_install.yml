@@ -65,9 +65,18 @@ jobs:
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
 
-      - name: Install dev dependencies (with GPU PyTorch)
+      - name: Install base package dependencies
         run: |
-          pip install -r requirements-dev.txt
+          pip install -r requirements.txt
+
+      - name: Install GPU PyTorch (override CPU version)
+        run: |
+          pip install --extra-index-url https://download.pytorch.org/whl/cu118 torch torchvision torchaudio --upgrade
+
+      - name: Install development tools
+        run: |
+          pip install pytest>=7.0.0 pytest-cov>=4.0.0 black>=22.0.0 flake8>=5.0.0 isort>=5.10.0 mypy>=0.991
+          pip install sphinx>=5.0.0 sphinx-rtd-theme>=1.0.0 build>=0.8.0 twine>=4.0.0
 
       - name: Check for dependency conflicts
         run: pip check
