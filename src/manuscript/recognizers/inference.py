@@ -2,7 +2,7 @@ import os
 import torch
 import numpy as np
 from PIL import Image
-from typing import List, Union, Optional
+from typing import List, Union, Optional, Tuple
 import cv2
 
 from .model.model import RCNN
@@ -129,7 +129,7 @@ class TRBAInfer:
         max_length: int = 25,
         batch_size: int = 32,
         return_confidence: bool = False
-    ) -> Union[str, List[str], tuple[str, float], List[tuple[str, float]]]:
+    ) -> Union[str, List[str], Tuple[str, float], List[Tuple[str, float]]]:
         """
         Универсальный метод предсказания текста.
         

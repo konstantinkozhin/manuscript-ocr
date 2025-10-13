@@ -161,7 +161,7 @@ class OCRDatasetAttn(Dataset):
             rows = list(reader)
         return rows
 
-    def _maybe_detect_header(self, rows: list[list[str]]):
+    def _maybe_detect_header(self, rows: List[List[str]]):
         if self._has_header is not None or not rows:
             return
         head0 = str(rows[0][0]).strip().lower()
@@ -211,7 +211,7 @@ class OCRDatasetAttn(Dataset):
             return len(label)
         return sum(1 for c in label if c in self.stoi)
 
-    def _validate_row(self, row: list[str]) -> Optional[tuple[str, str]]:
+    def _validate_row(self, row: List[str]) -> Optional[Tuple[str, str]]:
         if len(row) < 2:
             self._reasons["bad_row"] += 1
             if len(self._examples["bad_row"]) < self._EX_MAX:
@@ -259,7 +259,7 @@ class OCRDatasetAttn(Dataset):
 
         return abs_path, label
 
-    def _build_samples(self, rows: list[list[str]], num_workers: int):
+    def _build_samples(self, rows: List[List[str]], num_workers: int):
         if num_workers == -1:
             workers = os.cpu_count() or 4
         elif num_workers is None:

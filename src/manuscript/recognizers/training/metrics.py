@@ -1,5 +1,6 @@
 import Levenshtein as lev
 from jiwer import wer as jiwer_wer
+from typing import List
 
 
 def character_error_rate(reference: str, hypothesis: str) -> float:
@@ -21,7 +22,7 @@ def word_error_rate(reference: str, hypothesis: str) -> float:
     return jiwer_wer(reference, hypothesis)
 
 
-def compute_accuracy(references: list[str], hypotheses: list[str]) -> float:
+def compute_accuracy(references: List[str], hypotheses: List[str]) -> float:
     """
     Простая точность: доля точных совпадений (prediction == reference).
     """
