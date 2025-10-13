@@ -78,6 +78,9 @@ jobs:
           pip install pytest>=7.0.0 pytest-cov>=4.0.0 black>=22.0.0 flake8>=5.0.0 isort>=5.10.0 mypy>=0.991
           pip install sphinx>=5.0.0 sphinx-rtd-theme>=1.0.0 build>=0.8.0 twine>=4.0.0
 
+      - name: Install package in editable mode
+        run: pip install -e .
+
       - name: Check for dependency conflicts
         run: pip check
 
