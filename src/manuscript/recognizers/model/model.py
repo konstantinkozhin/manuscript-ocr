@@ -2,7 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
-from model.seresnet31 import SEResNet31
+from .seresnet31 import SEResNet31
 
 
 class BidirectionalLSTM(nn.Module):

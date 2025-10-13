@@ -9,7 +9,7 @@ import torch
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
-from data.transforms import (
+from .transforms import (
     build_file_index,
     imread_cv2,
     load_charset,

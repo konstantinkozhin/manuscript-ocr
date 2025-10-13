@@ -3,7 +3,7 @@ import random
 import torch
 import torch.nn.functional as F
 
-from model.model import RCNN
+from ..model.model import RCNN
 
 
 def save_checkpoint(

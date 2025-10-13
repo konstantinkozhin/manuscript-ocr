@@ -5,8 +5,8 @@ from PIL import Image
 from typing import List, Union, Optional
 import cv2
 
-from model.model import RCNN
-from data.transforms import load_charset, get_val_transform, decode_tokens
+from .model.model import RCNN
+from .data.transforms import load_charset, get_val_transform, decode_tokens
 
 
 class TRBAInfer:

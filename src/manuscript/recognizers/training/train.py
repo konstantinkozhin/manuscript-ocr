@@ -13,20 +13,20 @@ from torch.utils.data import ConcatDataset, DataLoader, random_split
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
-from data.dataset import (
+from ..data.dataset import (
     OCRDatasetAttn,
     MultiDataset,
     ProportionalBatchSampler,
 )
-from data.transforms import (
+from ..data.transforms import (
     decode_tokens,
     get_train_transform,
     get_val_transform,
     load_charset,
 )
-from training.metrics import character_error_rate, compute_accuracy, word_error_rate
-from model.model import RCNN
-from training.utils import load_checkpoint, save_checkpoint, save_weights, set_seed
+from .metrics import character_error_rate, compute_accuracy, word_error_rate
+from ..model.model import RCNN
+from .utils import load_checkpoint, save_checkpoint, save_weights, set_seed
 
 
 # -------------------------
