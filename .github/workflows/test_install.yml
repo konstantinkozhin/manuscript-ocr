@@ -7,11 +7,11 @@ on:
     branches: [main]
 
 jobs:
-  install:
+  test-cpu-installation:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: ["3.9", "3.10", "3.11", "3.12"]
+        python-version: ["3.8", "3.9", "3.10", "3.11", "3.12"]
     steps:
       - name: Checkout repository
         uses: actions/checkout@v3
@@ -24,10 +24,9 @@ jobs:
       - name: Upgrade pip
         run: python -m pip install --upgrade pip
 
-      - name: Install package and dependencies
+      - name: Install CPU version
         run: |
           pip install .
-          pip install -r requirements.txt
 
       - name: Install development dependencies
         run: pip install pytest pytest-cov
@@ -35,12 +34,53 @@ jobs:
       - name: Check for dependency conflicts
         run: pip check
 
-      - name: Smoke-test import
+      - name: Test basic import
         run: |
-          python -c "import pkg_resources; pkg_resources.require('manuscript-ocr'); print('Import successful')"
+          python -c "from manuscript.detectors import EASTInfer; print('CPU installation successful')"
 
-      - name: Run pytest with coverage
+      - name: Test PyTorch CPU
+        run: |
+          python -c "import torch; print(f'PyTorch: {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
+
+      - name: Run integration tests
+        run: pytest tests/test_integration.py::TestInstallation -v
+
+      - name: Run all tests with coverage
         run: pytest --cov=src --cov-report=xml
+
+  test-gpu-installation:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        python-version: ["3.9", "3.10", "3.11"]
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v3
+
+      - name: Set up Python ${{ matrix.python-version }}
+        uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install GPU version 
+        run: |
+          pip install .[gpu]
+
+      - name: Install development dependencies
+        run: pip install pytest pytest-cov
+
+      - name: Check for dependency conflicts
+        run: pip check
+
+      - name: Test GPU extras import
+        run: |
+          python -c "from manuscript.detectors import EASTInfer; import tensorboard; import scikit_image; print('GPU installation successful')"
+
+      - name: Test functional inference (CPU fallback)
+        run: pytest tests/test_integration.py::TestIntegration::test_detector_initialization -v
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v3

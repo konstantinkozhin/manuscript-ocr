@@ -1,8 +1,16 @@
 ## Installation
 
+### CPU версия (базовая)
 ```bash
 pip install manuscript-ocr
-````
+```
+
+### GPU версия (с поддержкой обучения)
+```bash
+pip install manuscript-ocr[gpu]
+```
+
+> **Примечание**: GPU версия включает дополнительные зависимости для обучения моделей (tensorboard, scikit-image, torch-optimizer).
 
 ## Usage Example
 
@@ -39,7 +47,23 @@ Page(blocks=[Block(words=[Word(polygon=[(874.1005, 909.1005), (966.8995, 909.100
 ![OCR Inference Result](example/ocr_example_image_infer.png)
 
 
+### Альтернативная установка через requirements
+
+```bash
+# CPU версия
+pip install -r requirements.txt
+
+# GPU версия (с CUDA 11.8)
 pip install -r requirements-gpu.txt --force-reinstall
+```
 
+### Проверка установки
 
-pip install --pre triton --index-url https://download.pytorch.org/whl/nightly/cu118
+```python
+import torch
+from manuscript.detectors import EASTInfer
+
+print(f"CUDA доступна: {torch.cuda.is_available()}")
+det = EASTInfer()
+print("Установка успешна!")
+```

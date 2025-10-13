@@ -1,14 +1,11 @@
-torch>=2.7.0
-torchvision>=0.22.0
-torchaudio>=2.0.2
-numpy>=1.23
-opencv-python>=4.5
-Pillow>=11.1.0
-shapely>=2.0
-numba>=0.56
-tensorboard>=2.10
-gdown>=4.4
-pydantic[email,timezone]>=2.10.6
-pydantic-extra-types>=2.10.3
-scikit-image>=0.19
-torch-optimizer>=0.1 
+# Базовая CPU версия
+torch>=1.11.0,<2.8.0
+torchvision>=0.12.0,<0.23.0
+torchaudio>=0.11.0,<2.8.0
+numpy>=1.21.0,<2.3.0
+opencv-python>=4.5.0,<5.0.0
+Pillow>=9.0.0
+shapely>=1.8.0,<3.0.0
+numba>=0.56.0,<1.0.0
+pydantic>=2.0.0,<3.0.0
+gdown>=4.4.0,<6.0.0 
