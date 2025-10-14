@@ -1,1 +1,0 @@
-# Training package for RCNN-OCR project

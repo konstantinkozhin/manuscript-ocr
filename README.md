@@ -42,7 +42,13 @@ detector = EASTInfer(score_thresh=0.7)
 recognizer = TRBAInfer(
     model_path="path/to/model.pth",
     config_path="path/to/config.json", 
-    charset_path="path/to/charset.txt"  # Отдельно, т.к. может быть в разных местах
+    charset_path="path/to/charset.txt"  # Опционально, можно в конфиге
+)
+
+# Альтернативно: charset_path в конфиге
+recognizer = TRBAInfer(
+    model_path="path/to/model.pth",
+    config_path="path/to/config.json"  # charset_path внутри конфига
 )
 
 pipeline = OCRPipeline(detector, recognizer)

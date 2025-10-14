@@ -105,16 +105,25 @@ class EASTInfer:
         else:
             quads9 = quads_exp  # пропустить NMS
 
-        # 8) Build Page
+        # 8) Scale coordinates back to original image size
+        orig_h, orig_w = img.shape[:2]
+        scale_x = orig_w / self.target_size
+        scale_y = orig_h / self.target_size
+        
+        # 9) Build Page with scaled coordinates
         words: List[Word] = []
         for quad in quads9:
-            pts = quad[:8].reshape(4, 2).tolist()
+            pts = quad[:8].reshape(4, 2)
+            # Scale coordinates back to original image size
+            pts[:, 0] *= scale_x  # x coordinates
+            pts[:, 1] *= scale_y  # y coordinates
             score = quad[8]
-            words.append(Word(polygon=pts, detection_confidence=score))
+            words.append(Word(polygon=pts.tolist(), detection_confidence=score))
         page = Page(blocks=[Block(words=words)])
 
-        # 9) Optional visualization
+        # 10) Optional visualization
         if vis:
+            # For visualization, use coordinates on resized image
             vis_img = draw_quads(resized, quads9)
             return page, vis_img
 

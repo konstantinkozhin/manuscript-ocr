@@ -1,8 +1,9 @@
 import os
+import json
 import torch
 import numpy as np
 from PIL import Image
-from typing import List, Union, Optional, Tuple
+from typing import List, Union, Tuple
 import cv2
 
 from .model.model import RCNN
@@ -14,14 +15,22 @@ class TRBAInfer:
         self,
         model_path: str,
         charset_path: str,
+        config_path: str,
         device: str = "auto",
-        img_h: int = 64,
-        img_w: int = 256,
     ):
         self.model_path = model_path
         self.charset_path = charset_path
-        self.img_h = img_h
-        self.img_w = img_w
+        self.config_path = config_path
+
+        # Load config
+        with open(config_path, 'r', encoding='utf-8') as f:
+            config = json.load(f)
+        
+        # Get parameters from config with fallbacks
+        self.max_length = config.get('max_len', 25)  # Исправлено: max_len вместо max_length
+        self.hidden_size = config.get('hidden_size', 256)
+        self.img_h = config.get('img_h', 64)
+        self.img_w = config.get('img_w', 256)
 
         if device == "auto":
             self.device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -34,32 +43,26 @@ class TRBAInfer:
         self.eos_id = self.stoi["<EOS>"]
         self.blank_id = self.stoi.get("<BLANK>", None)
 
-        self.transform = get_val_transform(img_h, img_w)
+        self.transform = get_val_transform(self.img_h, self.img_w)
 
         self.model = self._load_model()
-        
-        print(f"OCR model loaded on {self.device}")
-        print(f"Charset size: {len(self.itos)} symbols")
-        print(f"Input image size: {img_h}x{img_w}")
-    
+
     def _load_model(self) -> RCNN:
         checkpoint = torch.load(self.model_path, map_location=self.device)
         
         num_classes = len(self.itos)
 
+        # Extract state_dict from checkpoint
         if "config" in checkpoint:
-            hidden_size = checkpoint["config"].get("hidden_size", 256)
             state_dict = checkpoint["model_state"]
         elif "model_state_dict" in checkpoint:
-            hidden_size = checkpoint.get("hidden_size", 256)
             state_dict = checkpoint["model_state_dict"]
         else:
-            hidden_size = 256
             state_dict = checkpoint
 
         model = RCNN(
             num_classes=num_classes,
-            hidden_size=hidden_size,
+            hidden_size=self.hidden_size,
             sos_id=self.sos_id,
             eos_id=self.eos_id,
             pad_id=self.pad_id,
@@ -100,14 +103,10 @@ class TRBAInfer:
     def predict(
         self, 
         images: Union[np.ndarray, str, Image.Image, List[Union[np.ndarray, str, Image.Image]]], 
-        max_length: int = 25,
-        batch_size: int = 32,
-        return_confidence: bool = False
-    ) -> Union[str, List[str], Tuple[str, float], List[Tuple[str, float]]]:
+        batch_size: int = 32
+    ) -> List[Tuple[str, float]]:
         
-        is_single = not isinstance(images, list)
-        
-        if is_single:
+        if not isinstance(images, list):
             images_list = [images]
         else:
             images_list = images
@@ -125,12 +124,11 @@ class TRBAInfer:
                 
                 batch_tensor = torch.stack(batch_tensors).to(self.device)
                 
-                output = self.model(batch_tensor, is_train=False, batch_max_length=max_length)
+                output = self.model(batch_tensor, is_train=False, batch_max_length=self.max_length)
                 pred_ids = output.argmax(dim=-1).cpu()
                 
-                if return_confidence:
-                    probs = torch.softmax(output, dim=-1)
-                    max_probs = probs.max(dim=-1)[0].cpu()
+                probs = torch.softmax(output, dim=-1)
+                max_probs = probs.max(dim=-1)[0].cpu()
                 
                 for j, pred_row in enumerate(pred_ids):
                     text = decode_tokens(
@@ -141,17 +139,12 @@ class TRBAInfer:
                         blank_id=self.blank_id
                     )
                     
-                    if return_confidence:
-                        valid_mask = (pred_row != self.pad_id) & (pred_row != self.eos_id)
-                        if valid_mask.sum() > 0:
-                            confidence = max_probs[j][valid_mask].mean().item()
-                        else:
-                            confidence = 0.0
-                        results.append((text, confidence))
+                    valid_mask = (pred_row != self.pad_id) & (pred_row != self.eos_id)
+                    if valid_mask.sum() > 0:
+                        confidence = max_probs[j][valid_mask].mean().item()
                     else:
-                        results.append(text)
+                        confidence = 0.0
+                    
+                    results.append((text, confidence))
         
-        if is_single:
-            return results[0]
-        else:
-            return results
+        return results
