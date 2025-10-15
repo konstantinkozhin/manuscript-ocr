@@ -22,10 +22,11 @@ class EASTInfer:
         weights_path: Optional[Union[str, Path]] = None,
         device: Optional[str] = None,
         target_size: int = 1024,
-        shrink_ratio: float = 0.3,
-        score_thresh: float = 0.9,
+        shrink_ratio: float = 0.4,
+        score_thresh: float = 0.98,
         iou_threshold: float = 0.2,
         score_geo_scale: float = 0.25,
+        score_percentile: float = 85.0,
     ):
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -51,6 +52,7 @@ class EASTInfer:
         self.shrink_ratio = shrink_ratio
         self.score_thresh = score_thresh
         self.iou_threshold = iou_threshold
+        self.score_percentile = score_percentile
 
         self.tf = transforms.Compose(
             [
@@ -114,6 +116,7 @@ class EASTInfer:
             score_thresh=self.score_thresh,
             scale=1.0 / self.score_geo_scale,
             profile=profile,
+            score_percentile=self.score_percentile,
         )
         if profile: print(f"  Decode boxes: {time.time() - t0:.3f}s")
 
@@ -135,6 +138,8 @@ class EASTInfer:
             # Scale coordinates back to original image size
             pts[:, 0] *= scale_x  # x coordinates
             pts[:, 1] *= scale_y  # y coordinates
+            # Round final coordinates to pixels
+            pts = np.round(pts).astype(int)
             score = quad[8]
             words.append(Word(polygon=pts.tolist(), detection_confidence=score))
         page = Page(blocks=[Block(words=words)])

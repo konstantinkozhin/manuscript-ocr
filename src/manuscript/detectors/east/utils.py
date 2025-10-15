@@ -9,6 +9,77 @@ from collections import defaultdict
 import time
 
 
+def fast_nms(boxes, iou_threshold=0.2):
+    """
+    Быстрый классический NMS для quad-боксов.
+    O(n²) сложность вместо O(n³) у locality_aware_nms.
+    
+    Args:
+        boxes: np.array shape (N, 9) - [x0, y0, x1, y1, x2, y2, x3, y3, score]
+        iou_threshold: float - порог IoU для подавления
+        
+    Returns:
+        np.array - отфильтрованные боксы
+    """
+    if len(boxes) == 0:
+        return np.zeros((0, 9), dtype=np.float32)
+    
+    # Сортируем по score (убывание) - гарантирует качество
+    scores = boxes[:, 8]
+    sorted_indices = np.argsort(scores)[::-1]
+    
+    keep = []
+    while len(sorted_indices) > 0:
+        # Берем бокс с максимальным score
+        current_idx = sorted_indices[0]
+        keep.append(current_idx)
+        
+        if len(sorted_indices) == 1:
+            break
+            
+        # Быстро вычисляем IoU через bounding rectangles
+        current_box = boxes[current_idx]
+        remaining_indices = sorted_indices[1:]
+        
+        # Конвертируем quad в bounding rect
+        curr_coords = current_box[:8].reshape(4, 2)
+        curr_x1, curr_y1 = curr_coords.min(axis=0)
+        curr_x2, curr_y2 = curr_coords.max(axis=0)
+        curr_area = (curr_x2 - curr_x1) * (curr_y2 - curr_y1)
+        
+        # Векторизованное вычисление IoU для всех оставшихся боксов
+        other_boxes = boxes[remaining_indices]
+        other_coords = other_boxes[:, :8].reshape(-1, 4, 2)
+        
+        other_mins = other_coords.min(axis=1)  # (N, 2)
+        other_maxs = other_coords.max(axis=1)  # (N, 2)
+        
+        other_x1s, other_y1s = other_mins[:, 0], other_mins[:, 1]  
+        other_x2s, other_y2s = other_maxs[:, 0], other_maxs[:, 1]
+        other_areas = (other_x2s - other_x1s) * (other_y2s - other_y1s)
+        
+        # Векторизованное пересечение
+        inter_x1s = np.maximum(curr_x1, other_x1s)
+        inter_y1s = np.maximum(curr_y1, other_y1s)  
+        inter_x2s = np.minimum(curr_x2, other_x2s)
+        inter_y2s = np.minimum(curr_y2, other_y2s)
+        
+        # Только положительные пересечения
+        inter_ws = np.maximum(0, inter_x2s - inter_x1s)
+        inter_hs = np.maximum(0, inter_y2s - inter_y1s)
+        inter_areas = inter_ws * inter_hs
+        
+        # IoU
+        union_areas = curr_area + other_areas - inter_areas
+        ious = np.where(union_areas > 0, inter_areas / union_areas, 0)
+        
+        # Оставляем только боксы с IoU ≤ threshold
+        keep_mask = ious <= iou_threshold
+        sorted_indices = remaining_indices[keep_mask]
+    
+    return boxes[keep]
+
+
 def convert_rboxes_to_quad_boxes(rboxes, scores=None):
     quad_boxes = []
     if scores is None:
@@ -199,6 +270,100 @@ def create_collage(
     return collage
 
 
+def remove_duplicate_boxes(quads: np.ndarray) -> np.ndarray:
+    """
+    Убирает дубликаты боксов с одинаковыми координатами,
+    оставляя бокс с максимальным score.
+    
+    Args:
+        quads: массив (N, 9) с координатами и score
+        
+    Returns:
+        массив с уникальными боксами
+    """
+    if len(quads) == 0:
+        return quads
+    
+    # Группируем по координатам (первые 8 значений)
+    coord_to_indices = {}
+    
+    for i, quad in enumerate(quads):
+        # Используем tuple координат как ключ
+        key = tuple(quad[:8])
+        if key not in coord_to_indices:
+            coord_to_indices[key] = []
+        coord_to_indices[key].append(i)
+    
+    # Оставляем только боксы с максимальным score среди дубликатов
+    unique_quads = []
+    for indices in coord_to_indices.values():
+        if len(indices) == 1:
+            unique_quads.append(quads[indices[0]])
+        else:
+            # Берем бокс с максимальным score
+            best_idx = max(indices, key=lambda idx: quads[idx, 8])
+            unique_quads.append(quads[best_idx])
+    
+    return np.array(unique_quads, dtype=np.float32)
+
+
+def compute_quad_score(score_map: np.ndarray, quad_coords: np.ndarray, scale: float, percentile: float = 80.0) -> float:
+    """
+    Вычисляет процентиль score внутри области квадрилатерала (полигона из 4 точек).
+    
+    Args:
+        score_map: карта score (H, W)
+        quad_coords: координаты квадрилатерала (4, 2) в пикселях
+        scale: масштаб для преобразования обратно в координаты score_map
+        percentile: процентиль для вычисления (по умолчанию 80.0)
+        
+    Returns:
+        процентиль score внутри полигона
+    """
+    h, w = score_map.shape
+    
+    # Преобразуем координаты обратно в координаты score_map
+    map_coords = quad_coords / scale
+    
+    # Находим bounding box полигона
+    min_x = max(0, int(np.floor(map_coords[:, 0].min())))
+    max_x = min(w - 1, int(np.ceil(map_coords[:, 0].max())))
+    min_y = max(0, int(np.floor(map_coords[:, 1].min())))
+    max_y = min(h - 1, int(np.ceil(map_coords[:, 1].max())))
+    
+    if min_x >= max_x or min_y >= max_y:
+        # Если область пустая, возвращаем значение центральной точки
+        center_x = int(np.clip(map_coords[:, 0].mean(), 0, w - 1))
+        center_y = int(np.clip(map_coords[:, 1].mean(), 0, h - 1))
+        return float(score_map[center_y, center_x])
+    
+    # Создаем маску для области внутри квадрилатерала
+    bbox_h = max_y - min_y + 1
+    bbox_w = max_x - min_x + 1
+    
+    # Сдвигаем координаты полигона относительно bounding box
+    shifted_coords = map_coords.copy()
+    shifted_coords[:, 0] -= min_x
+    shifted_coords[:, 1] -= min_y
+    
+    # Создаем маску полигона с помощью cv2.fillPoly
+    mask = np.zeros((bbox_h, bbox_w), dtype=np.uint8)
+    cv2.fillPoly(mask, [shifted_coords.astype(np.int32)], 1)
+    
+    # Извлекаем область score_map, соответствующую bounding box
+    score_region = score_map[min_y:max_y+1, min_x:max_x+1]
+    
+    # Вычисляем процентиль score только внутри полигона
+    mask_bool = mask > 0
+    if mask_bool.any():
+        return float(np.percentile(score_region[mask_bool], percentile))
+    else:
+        # Fallback: если маска пустая, берем центральную точку
+        center_x = int(np.clip(map_coords[:, 0].mean(), 0, w - 1))
+        center_y = int(np.clip(map_coords[:, 1].mean(), 0, h - 1))
+        return float(score_map[center_y, center_x])
+
+
 def decode_boxes_from_maps(
     score_map: np.ndarray,
     geo_map: np.ndarray,
@@ -207,18 +372,20 @@ def decode_boxes_from_maps(
     iou_threshold: float = 0.2,
     expand_ratio: float = 0.0,
     profile: bool = False,
+    score_percentile: float = 80.0,
 ) -> np.ndarray:
     """
     Декодирует quad-боксы из 8-канальной geo_map, с опциональным расширением (обратным shrink).
 
     Параметры:
-      score_map     — карта вероятностей (H, W) или (1, H, W);
-      geo_map       — гео-карта (H, W, 8);
-      score_thresh  — порог для отбора пикселей;
-      scale         — коэффициент восстановления в исходные пиксели (обычно = 1.0/score_geo_scale);
-      iou_threshold — порог IoU для NMS;
-      expand_ratio  — коэффициент обратного расширения (обычно = shrink_ratio);
-      profile       — если True, выводит время выполнения этапов.
+      score_map           — карта вероятностей (H, W) или (1, H, W);
+      geo_map             — гео-карта (H, W, 8);
+      score_thresh        — порог для отбора пикселей;
+      scale               — коэффициент восстановления в исходные пиксели (обычно = 1.0/score_geo_scale);
+      iou_threshold       — порог IoU для NMS;
+      expand_ratio        — коэффициент обратного расширения (обычно = shrink_ratio);
+      profile             — если True, выводит время выполнения этапов;
+      score_percentile       — процентиль для вычисления confidence (по умолчанию 80.0).
 
     Возвращает:
       quad-боксы (N, 9) — [x0, y0, …, x3, y3, score].
@@ -246,11 +413,27 @@ def decode_boxes_from_maps(
             dx_map, dy_map = offs[2 * i], offs[2 * i + 1]
             dx = dx_map * scale
             dy = dy_map * scale
-            vx = x * scale + dx
-            vy = y * scale + dy
+            vx = round(x * scale + dx)
+            vy = round(y * scale + dy)
             verts.extend([vx, vy])
-        quads.append(verts + [float(score_map[y, x])])
-    if profile: print(f"    Decode coordinates: {time.time() - t0:.3f}s ({len(quads)} quads)")
+        
+        # Вычисляем процентиль score внутри области квадрата
+        quad_coords = np.array(verts).reshape(4, 2)
+        score_val = compute_quad_score(score_map, quad_coords, scale, score_percentile)
+        
+        # Фильтруем по финальному score после вычисления процентиля
+        if score_val >= score_thresh:
+            quads.append(verts + [score_val])
+    if profile: 
+        print(f"    Decode coordinates: {time.time() - t0:.3f}s ({len(quads)} quads)")
+        if len(quads) > 0:
+            scores = [q[-1] for q in quads]
+            print(f"    Score range: {min(scores):.3f} - {max(scores):.3f}")
+            print(f"    Score samples: {scores[:5]}")
+            # Считаем сколько боксов с низким финальным score
+            low_scores = [s for s in scores if s < score_thresh]
+            if low_scores:
+                print(f"    Boxes below thresh: {len(low_scores)}/{len(scores)} (lowest: {min(low_scores):.3f})")
 
     if not quads:
         if profile: print(f"    decode_boxes_from_maps total: {time.time() - start_time:.3f}s")
@@ -260,10 +443,32 @@ def decode_boxes_from_maps(
     quads = np.array(quads, dtype=np.float32)
     if profile: print(f"    Convert to numpy: {time.time() - t0:.3f}s")
 
-    # NMS
+
+
+    # Убираем дубликаты с одинаковыми координатами
     t0 = time.time()
-    keep = locality_aware_nms(quads, iou_threshold=iou_threshold)
-    if profile: print(f"    NMS: {time.time() - t0:.3f}s ({len(keep)} kept)")
+    if profile: print(f"      Before dedup: {len(quads)} boxes")
+    quads = remove_duplicate_boxes(quads)
+    if profile: print(f"    Remove duplicates: {time.time() - t0:.3f}s ({len(quads)} after dedup)")
+
+    # NMS (быстрый классический O(n²) вместо медленного locality_aware O(n³))
+    t0 = time.time()
+    if profile: print(f"      Before NMS: {len(quads)} boxes")
+    keep = fast_nms(quads, iou_threshold=iou_threshold)
+    if profile: print(f"    Fast NMS: {time.time() - t0:.3f}s ({len(keep)} kept)")
+    
+    # Дополнительная фильтрация после NMS по финальному score
+    t0 = time.time()
+    if len(keep) > 0:
+        if profile: print(f"      Before score filter: {len(keep)} boxes, score_thresh={score_thresh}")
+        final_keep = []
+        for quad in keep:
+            if quad[8] >= score_thresh:  # score находится в позиции 8
+                final_keep.append(quad)
+            elif profile and len(final_keep) < 3:  # Показываем первые отброшенные
+                print(f"      Rejecting box with score {quad[8]:.3f} < {score_thresh}")
+        keep = np.array(final_keep, dtype=np.float32) if final_keep else np.zeros((0, 9), dtype=np.float32)
+    if profile: print(f"    Filter by score: {time.time() - t0:.3f}s ({len(keep)} kept after score filter)")
     
     # обратное расширение shrink_poly (если нужно)
     if expand_ratio and len(keep) > 0:
@@ -302,11 +507,11 @@ def expand_boxes(quads: np.ndarray, expand_ratio: float) -> np.ndarray:
 
 def apply_nms(quads: np.ndarray, iou_threshold: float = 0.2) -> np.ndarray:
     """
-    Применяет locality-aware NMS к массиву quad-боксов.
+    Применяет быстрый NMS к массиву quad-боксов.
     """
     if len(quads) == 0:
         return quads
-    return locality_aware_nms(quads, iou_threshold=iou_threshold)
+    return fast_nms(quads, iou_threshold=iou_threshold)
 
 
 def poly_iou(segA, segB):
