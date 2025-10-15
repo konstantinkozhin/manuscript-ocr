@@ -6,6 +6,7 @@ from tqdm import tqdm
 from shapely.geometry import Polygon
 import json
 from collections import defaultdict
+import time
 
 
 def convert_rboxes_to_quad_boxes(rboxes, scores=None):
@@ -205,6 +206,7 @@ def decode_boxes_from_maps(
     scale: float = 4.0,
     iou_threshold: float = 0.2,
     expand_ratio: float = 0.0,
+    profile: bool = False,
 ) -> np.ndarray:
     """
     Декодирует quad-боксы из 8-канальной geo_map, с опциональным расширением (обратным shrink).
@@ -215,16 +217,27 @@ def decode_boxes_from_maps(
       score_thresh  — порог для отбора пикселей;
       scale         — коэффициент восстановления в исходные пиксели (обычно = 1.0/score_geo_scale);
       iou_threshold — порог IoU для NMS;
-      expand_ratio  — коэффициент обратного расширения (обычно = shrink_ratio).
+      expand_ratio  — коэффициент обратного расширения (обычно = shrink_ratio);
+      profile       — если True, выводит время выполнения этапов.
 
     Возвращает:
       quad-боксы (N, 9) — [x0, y0, …, x3, y3, score].
     """
+    start_time = time.time()
+    
     # убираем лишнюю первую размерность
+    t0 = time.time()
     if score_map.ndim == 3 and score_map.shape[0] == 1:
         score_map = score_map.squeeze(0)
+    if profile: print(f"    Squeeze score_map: {time.time() - t0:.3f}s")
 
+    # найти пиксели выше порога
+    t0 = time.time()
     ys, xs = np.where(score_map > score_thresh)
+    if profile: print(f"    Find pixels > thresh: {time.time() - t0:.3f}s ({len(ys)} pixels)")
+    
+    # декодировать координаты боксов
+    t0 = time.time()
     quads = []
     for y, x in zip(ys, xs):
         offs = geo_map[y, x]
@@ -237,17 +250,24 @@ def decode_boxes_from_maps(
             vy = y * scale + dy
             verts.extend([vx, vy])
         quads.append(verts + [float(score_map[y, x])])
+    if profile: print(f"    Decode coordinates: {time.time() - t0:.3f}s ({len(quads)} quads)")
 
     if not quads:
+        if profile: print(f"    decode_boxes_from_maps total: {time.time() - start_time:.3f}s")
         return np.zeros((0, 9), dtype=np.float32)
 
+    t0 = time.time()
     quads = np.array(quads, dtype=np.float32)
+    if profile: print(f"    Convert to numpy: {time.time() - t0:.3f}s")
 
     # NMS
+    t0 = time.time()
     keep = locality_aware_nms(quads, iou_threshold=iou_threshold)
-
+    if profile: print(f"    NMS: {time.time() - t0:.3f}s ({len(keep)} kept)")
+    
     # обратное расширение shrink_poly (если нужно)
     if expand_ratio and len(keep) > 0:
+        t0 = time.time()
         from .dataset import shrink_poly
 
         expanded = []
@@ -257,7 +277,9 @@ def decode_boxes_from_maps(
             exp_poly = shrink_poly(coords, shrink_ratio=-expand_ratio)
             expanded.append(list(exp_poly.flatten()) + [quad[8]])
         keep = np.array(expanded, dtype=np.float32)
+        if profile: print(f"    Expand boxes: {time.time() - t0:.3f}s")
 
+    if profile: print(f"    decode_boxes_from_maps total: {time.time() - start_time:.3f}s")
     return keep
 
 

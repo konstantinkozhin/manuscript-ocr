@@ -14,7 +14,8 @@ pipeline = OCRPipeline(
 )
 
 # инфер
-page, image = pipeline.process(r"C:\Users\USER\Desktop\scale_1200.jpg", vis=True)
+page, image = pipeline.process(
+    r"C:\shared\data0205\Archives020525\test_images\430.jpg", vis=True, profile=True)
 print(page)
 
 pil_img = Image.fromarray(image)
