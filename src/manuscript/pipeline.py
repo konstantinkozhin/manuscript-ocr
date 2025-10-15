@@ -4,26 +4,16 @@ from typing import Union, Optional
 import cv2
 
 from .detectors import EASTInfer
-from .detectors._types import Page
 from .recognizers import TRBAInfer
 
 
 class OCRPipeline:
-    
     def __init__(
         self,
         detector: EASTInfer,
         recognizer: TRBAInfer,
         min_text_size: int = 10
     ):
-        """
-        Инициализация OCR пайплайна
-        
-        Args:
-            detector: Инстанс EASTInfer для детекции текста
-            recognizer: Инстанс TRBAInfer для распознавания текста
-            min_text_size: Минимальный размер текстовой области (пиксели)
-        """
         self.detector = detector
         self.recognizer = recognizer
         self.min_text_size = min_text_size
@@ -31,22 +21,18 @@ class OCRPipeline:
     def process(
         self,
         image: Union[str, np.ndarray, Image.Image],
-        recognize_text: bool = True
-    ) -> Page:
-        """
-        Основной метод обработки: детекция + распознавание
+        recognize_text: bool = True,
+        vis: bool = False
+    ):
+        detection_result = self.detector.infer(image, vis=vis)
         
-        Args:
-            image: Входное изображение (путь, numpy array или PIL Image)
-            recognize_text: Выполнять ли распознавание текста (иначе только детекция)
-            
-        Returns:
-            Page объект с заполненными полями text и recognition_confidence для Word'ов
-        """
-        detection_result = self.detector.infer(image, vis=False)
+        if vis and isinstance(detection_result, tuple):
+            detection_result, vis_image = detection_result
+        else:
+            vis_image = None
         
         if not recognize_text:
-            return detection_result
+            return detection_result, vis_image
         
         image_array = self._load_image_as_array(image)
         
@@ -75,12 +61,9 @@ class OCRPipeline:
                 word.text = text
                 word.recognition_confidence = confidence
         
-        return detection_result
+        return detection_result, vis_image
     
     def _extract_word_image(self, image: np.ndarray, polygon: np.ndarray) -> Optional[np.ndarray]:
-        """
-        Извлекает изображение слова по полигону
-        """
         try:
             x_min, y_min = np.min(polygon, axis=0)
             x_max, y_max = np.max(polygon, axis=0)
@@ -98,7 +81,6 @@ class OCRPipeline:
             return None
     
     def _load_image_as_array(self, image: Union[str, np.ndarray, Image.Image]) -> np.ndarray:
-        """Загружает изображение как numpy array"""
         if isinstance(image, str):
             img_array = cv2.imread(image)
             if img_array is None:

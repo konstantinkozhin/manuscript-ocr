@@ -14,20 +14,29 @@ class TRBAInfer:
     def __init__(
         self,
         model_path: str,
-        charset_path: str,
-        config_path: str,
+        charset_path: str = None,
+        config_path: str = None,
         device: str = "auto",
     ):
         self.model_path = model_path
+
+        if charset_path is None:
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            charset_path = os.path.join(current_dir, "configs", "charset.txt")
+        
         self.charset_path = charset_path
         self.config_path = config_path
 
-        # Load config
-        with open(config_path, 'r', encoding='utf-8') as f:
-            config = json.load(f)
-        
-        # Get parameters from config with fallbacks
-        self.max_length = config.get('max_len', 25)  # Исправлено: max_len вместо max_length
+        if not os.path.exists(self.charset_path):
+            raise FileNotFoundError(f"Charset file not found: {self.charset_path}")
+
+        if config_path is not None:
+            with open(config_path, 'r', encoding='utf-8') as f:
+                config = json.load(f)
+        else:
+            config = {}
+
+        self.max_length = config.get('max_len', 25)
         self.hidden_size = config.get('hidden_size', 256)
         self.img_h = config.get('img_h', 64)
         self.img_w = config.get('img_w', 256)
@@ -52,7 +61,6 @@ class TRBAInfer:
         
         num_classes = len(self.itos)
 
-        # Extract state_dict from checkpoint
         if "config" in checkpoint:
             state_dict = checkpoint["model_state"]
         elif "model_state_dict" in checkpoint:

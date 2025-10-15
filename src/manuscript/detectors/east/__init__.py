@@ -30,7 +30,7 @@ class EASTInfer:
         if weights_path is None:
             url = (
                 "https://github.com/konstantinkozhin/manuscript-ocr"
-                "/releases/download/v0.1.0/east_quad_14_05.pth"
+                "/releases/download/v0.1.0/east_quad_23_05.pth"
             )
             out = os.path.expanduser("~/.east_weights.pth")
             if not os.path.exists(out):
@@ -124,7 +124,7 @@ class EASTInfer:
         # 10) Optional visualization
         if vis:
             # For visualization, use coordinates on resized image
-            vis_img = draw_quads(resized, quads9)
+            vis_img = draw_quads(img, quads9)
             return page, vis_img
 
         return page
