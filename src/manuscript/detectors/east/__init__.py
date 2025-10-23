@@ -22,13 +22,13 @@ class EASTInfer:
         self,
         weights_path: Optional[Union[str, Path]] = None,
         device: Optional[str] = None,
-        target_size: int = 1280,
-        expand_ratio_w: float = 0.4,
+        target_size: int = 1536,
+        expand_ratio_w: float = 0.8,
         expand_ratio_h: float = 0.8,
         score_thresh: float = 0.99,
         iou_threshold: float = 0.2,
         score_geo_scale: float = 0.25,
-        quantization: int = 5,
+        quantization: int = 2,
         use_tta: bool = False,
         tta_merge_mode: str = "mean",
     ):
@@ -39,7 +39,7 @@ class EASTInfer:
                 "https://github.com/konstantinkozhin/manuscript-ocr"
                 "/releases/download/v0.1.0/east_quad_23_05.pth"
             )
-            out = os.path.expanduser("~/.east_weights.pth")
+            out = os.path.expanduser("~/.east_quad_23_05.pth")
             if not os.path.exists(out):
                 print(f"Downloading EAST weights from {url} …")
                 gdown.download(url, out, quiet=False)
@@ -152,7 +152,7 @@ class EASTInfer:
                 geo_orig = out["geometry"][0].cpu().numpy()
 
                 score_map = self._merge_maps(score_orig, score_flipped)
-                geo_map = self._merge_maps(geo_orig, geo_flipped_corrected)
+                geo_map = geo_orig
             else:
                 score_map = out["score"][0].cpu().numpy().squeeze(0)
                 geo_map = out["geometry"][0].cpu().numpy()

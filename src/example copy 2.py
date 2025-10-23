@@ -7,14 +7,15 @@ from show_histogram import show_histogram
 
 # Инициализация модели
 model = EASTInfer(
-    score_thresh=0.9,
+    weights_path=r"C:\east_quad_23_05.pth",
+    score_thresh=0.85,
     iou_threshold=0.2,
     use_tta=False,
     tta_merge_mode="mean",
     quantization=2,
 )
 
-img_path = r"C:\Users\pasha\OneDrive\Рабочий стол\scale_1200.png"
+img_path = r"C:\shared\Archive_19_04\combined_images\1013.jpg"
 
 # Инференс с визуализацией (возвращает изображение с боксами и score map)
 page, img_with_boxes, score_map_resized = model.infer(img_path, vis=True, profile=True)
