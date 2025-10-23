@@ -6,11 +6,13 @@ import random
 from show_histogram import show_histogram
 
 # Инициализация модели
-model = EASTInfer(score_thresh=0.9, 
-                    iou_threshold=1.2,
-                    use_tta=True,
-                    tta_merge_mode="mean"
-                   )
+model = EASTInfer(
+    score_thresh=0.9,
+    iou_threshold=1.2,
+    use_tta=False,
+    tta_merge_mode="mean",
+    quantization=1,
+)
 
 img_path = r"C:\Users\USER\Desktop\верифицированные архъивы\combined_images\48.jpg"
 
@@ -26,25 +28,39 @@ print(f"Score map min/max: {score_map_resized.min():.3f}/{score_map_resized.max(
 box_scores = []
 for word in page.blocks[0].words:
     polygon = np.array(word.polygon, dtype=np.int32)
-    
+
     # Создаем маску для текущего бокса
     mask = np.zeros(score_map_resized.shape, dtype=np.uint8)
     cv2.fillPoly(mask, [polygon], 1)
-    
+
     # Вычисляем средний score в области бокса
     masked_scores = score_map_resized[mask > 0]
-    avg_score = masked_scores[masked_scores > np.quantile(masked_scores, 0.05)].mean() if len(masked_scores) > 0 else 0.0
+    avg_score = (
+        masked_scores[masked_scores > np.quantile(masked_scores, 0.05)].mean()
+        if len(masked_scores) > 0
+        else 0.0
+    )
     box_scores.append(avg_score)
-    
+
     # Находим центр бокса для отображения текста
     center = polygon.mean(axis=0).astype(int)
-    
+
     # Рисуем score на изображении
     text = f"{avg_score:.2f}"
-    cv2.putText(img_with_boxes, text, tuple(center), 
-                cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 255, 0), 2, cv2.LINE_AA)
+    cv2.putText(
+        img_with_boxes,
+        text,
+        tuple(center),
+        cv2.FONT_HERSHEY_SIMPLEX,
+        0.6,
+        (255, 255, 0),
+        2,
+        cv2.LINE_AA,
+    )
 
-print(f"Box scores (mean): min={min(box_scores):.3f}, max={max(box_scores):.3f}, avg={np.mean(box_scores):.3f}")
+print(
+    f"Box scores (mean): min={min(box_scores):.3f}, max={max(box_scores):.3f}, avg={np.mean(box_scores):.3f}"
+)
 
 # Нормализуем score map в диапазон [0, 255]
 score_map_normalized = (score_map_resized * 255).astype(np.uint8)

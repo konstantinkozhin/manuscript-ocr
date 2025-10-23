@@ -200,12 +200,53 @@ def create_collage(
     return collage
 
 
-def decode_quads_from_maps(score_map: np.ndarray,
-                           geo_map: np.ndarray,
-                           score_thresh: float,
-                           scale: float,
-                           quantization: int = 1,
-                           profile=False) -> np.ndarray:
+def compute_quad_score_from_map(
+    score_map: np.ndarray, quad: np.ndarray, scale: float
+) -> float:
+    """
+    Возвращает скор бокса как максимум значений score map внутри исходного полигона.
+    """
+    if score_map.ndim == 3 and score_map.shape[0] == 1:
+        score_map = score_map.squeeze(0)
+
+    if score_map.ndim != 2:
+        raise ValueError(f"Score map must be 2D, got shape {score_map.shape}")
+
+    quad = np.asarray(quad, dtype=np.float32).reshape(4, 2)
+    h, w = score_map.shape
+    if h == 0 or w == 0:
+        return 0.0
+
+    safe_scale = float(scale) if scale > 0 else 1.0
+    quad_map = quad / safe_scale
+    quad_map[:, 0] = np.clip(quad_map[:, 0], 0, w - 1)
+    quad_map[:, 1] = np.clip(quad_map[:, 1], 0, h - 1)
+
+    mask = np.zeros_like(score_map, dtype=np.uint8)
+    pts = np.round(quad_map).astype(np.int32)
+    pts[:, 0] = np.clip(pts[:, 0], 0, w - 1)
+    pts[:, 1] = np.clip(pts[:, 1], 0, h - 1)
+
+    if len(np.unique(pts, axis=0)) < 3:
+        return 0.0
+
+    cv2.fillConvexPoly(mask, pts, 1)
+    scores = score_map[mask == 1]
+
+    if scores.size == 0:
+        return 0.0
+
+    return float(scores.max())
+
+
+def decode_quads_from_maps(
+    score_map: np.ndarray,
+    geo_map: np.ndarray,
+    score_thresh: float,
+    scale: float,
+    quantization: int = 1,
+    profile=False,
+) -> np.ndarray:
     if score_map.ndim == 3 and score_map.shape[0] == 1:
         score_map = score_map.squeeze(0)
 
@@ -217,24 +258,6 @@ def decode_quads_from_maps(score_map: np.ndarray,
     if len(ys) == 0:
         return np.zeros((0, 9), dtype=np.float32)
 
-    # Квантизация координат точек для объединения близких
-    if quantization > 1:
-        t0_quant = time.time()
-        # Квантуем координаты - берем центр квантованной ячейки
-        ys_quant = (ys // quantization) * quantization + quantization // 2
-        xs_quant = (xs // quantization) * quantization + quantization // 2
-        
-        # Объединяем дубликаты
-        coords = np.column_stack([ys_quant, xs_quant])
-        unique_coords = np.unique(coords, axis=0)
-        
-        ys = unique_coords[:, 0]
-        xs = unique_coords[:, 1]
-        
-        if profile:
-            print(f"    Quantization (step={quantization}): {time.time() - t0_quant:.3f}s")
-            print(f"    Points after quantization: {len(ys)} (removed {len(coords) - len(ys)})")
-
     t0 = time.time()
     quads = []
     for y, x in zip(ys, xs):
@@ -245,14 +268,55 @@ def decode_quads_from_maps(score_map: np.ndarray,
             vx = x * scale + dx_map * scale
             vy = y * scale + dy_map * scale
             verts.extend([vx, vy])
-        quads.append(verts + [float(score_map[y, x])])
+        quad_coords = np.array(verts, dtype=np.float32).reshape(4, 2)
+        quad_score = compute_quad_score_from_map(score_map, quad_coords, scale)
+        if quad_score <= score_thresh:
+            continue
+        quads.append(quad_coords.flatten().tolist() + [quad_score])
 
     if profile:
         print(f"    Decode coordinates: {time.time() - t0:.3f}s ({len(quads)} quads)")
 
-    return np.array(quads, dtype=np.float32)
+    if not quads:
+        return np.zeros((0, 9), dtype=np.float32)
 
-def expand_boxes(quads: np.ndarray, expand_w: float = 0.0, expand_h: float = 0.0) -> np.ndarray:
+    quads_arr = np.array(quads, dtype=np.float32)
+
+    # Квантизация уже полученных боксов и удаление дубликатов
+    if quantization > 1:
+        t0_quant = time.time()
+        quant_step = float(quantization)
+        coords = quads_arr[:, :8]
+        grid_idx = np.floor(coords / quant_step).astype(np.int32)
+        quantized_coords = grid_idx.astype(np.float32) * quant_step + quant_step / 2.0
+        quads_arr[:, :8] = quantized_coords
+
+        dedup = {}
+        for idx, quad in enumerate(quads_arr):
+            key = tuple(grid_idx[idx])
+            score = quad[8]
+            stored = dedup.get(key)
+            if stored is None or score > stored[0]:
+                dedup[key] = (score, quad)
+
+        quads_before = quads_arr.shape[0]
+        quads_arr = np.stack([item[1] for item in dedup.values()], dtype=np.float32)
+
+        if profile:
+            print(
+                f"    Quantization (step={quantization}): {time.time() - t0_quant:.3f}s"
+            )
+            print(
+                f"    Quads after quantization: {len(quads_arr)} "
+                f"(removed {quads_before - len(quads_arr)})"
+            )
+
+    return quads_arr
+
+
+def expand_boxes(
+    quads: np.ndarray, expand_w: float = 0.0, expand_h: float = 0.0
+) -> np.ndarray:
 
     if len(quads) == 0 or (expand_w == 0 and expand_h == 0):
         return quads
@@ -289,6 +353,7 @@ def expand_boxes(quads: np.ndarray, expand_w: float = 0.0, expand_h: float = 0.0
 
     expanded = np.hstack([new_coords.reshape(-1, 8), scores])
     return expanded.astype(np.float32)
+
 
 def poly_iou(segA, segB):
     A = Polygon(np.array(segA).reshape(-1, 2))
@@ -372,6 +437,7 @@ def load_preds(pred_path):
         )
     return preds
 
+
 def read_image(img_or_path):
     """
     Универсальная функция чтения изображения:
@@ -384,9 +450,11 @@ def read_image(img_or_path):
             # cv2 не смог прочитать — пробуем через PIL
             try:
                 with Image.open(str(img_or_path)) as pil_img:
-                    img = np.array(pil_img.convert('RGB'))
+                    img = np.array(pil_img.convert("RGB"))
             except Exception as e:
-                raise FileNotFoundError(f"Cannot read image with cv2 or PIL: {img_or_path}. Error: {e}")
+                raise FileNotFoundError(
+                    f"Cannot read image with cv2 or PIL: {img_or_path}. Error: {e}"
+                )
         else:
             img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
@@ -397,6 +465,7 @@ def read_image(img_or_path):
         raise TypeError(f"Unsupported type for image input: {type(img_or_path)}")
 
     return img
+
 
 def compute_f1_metrics(
     preds, gt_segs, processed_ids, avg_range=(0.50, 0.95), avg_step=0.05
