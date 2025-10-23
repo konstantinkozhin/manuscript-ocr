@@ -222,16 +222,35 @@ def compute_quad_score_from_map(
     quad_map[:, 0] = np.clip(quad_map[:, 0], 0, w - 1)
     quad_map[:, 1] = np.clip(quad_map[:, 1], 0, h - 1)
 
-    mask = np.zeros_like(score_map, dtype=np.uint8)
     pts = np.round(quad_map).astype(np.int32)
-    pts[:, 0] = np.clip(pts[:, 0], 0, w - 1)
-    pts[:, 1] = np.clip(pts[:, 1], 0, h - 1)
-
     if len(np.unique(pts, axis=0)) < 3:
         return 0.0
 
-    cv2.fillConvexPoly(mask, pts, 1)
-    scores = score_map[mask == 1]
+    x_min, y_min, box_w, box_h = cv2.boundingRect(pts)
+    x_max = x_min + box_w - 1
+    y_max = y_min + box_h - 1
+
+    if x_max < 0 or y_max < 0 or x_min >= w or y_min >= h:
+        return 0.0
+
+    x_min = max(0, x_min)
+    y_min = max(0, y_min)
+    x_max = min(w - 1, x_max)
+    y_max = min(h - 1, y_max)
+
+    roi = score_map[y_min : y_max + 1, x_min : x_max + 1]
+    if roi.size == 0:
+        return 0.0
+
+    local_pts = pts.copy()
+    local_pts[:, 0] -= x_min
+    local_pts[:, 1] -= y_min
+    local_pts[:, 0] = np.clip(local_pts[:, 0], 0, roi.shape[1] - 1)
+    local_pts[:, 1] = np.clip(local_pts[:, 1], 0, roi.shape[0] - 1)
+
+    mask = np.zeros(roi.shape, dtype=np.uint8)
+    cv2.fillConvexPoly(mask, local_pts, 1)
+    scores = roi[mask == 1]
 
     if scores.size == 0:
         return 0.0
@@ -258,6 +277,28 @@ def decode_quads_from_maps(
     if len(ys) == 0:
         return np.zeros((0, 9), dtype=np.float32)
 
+    # Квантизация координат точек для объединения близких
+    if quantization > 1:
+        t0_quant = time.time()
+        # Квантуем координаты - берем центр квантованной ячейки
+        ys_quant = (ys // quantization) * quantization + quantization // 2
+        xs_quant = (xs // quantization) * quantization + quantization // 2
+
+        # Объединяем дубликаты
+        coords = np.column_stack([ys_quant, xs_quant])
+        unique_coords = np.unique(coords, axis=0)
+
+        ys = unique_coords[:, 0]
+        xs = unique_coords[:, 1]
+
+        if profile:
+            print(
+                f"    Quantization (step={quantization}): {time.time() - t0_quant:.3f}s"
+            )
+            print(
+                f"    Points after quantization: {len(ys)} (removed {len(coords) - len(ys)})"
+            )
+
     t0 = time.time()
     quads = []
     for y, x in zip(ys, xs):
@@ -268,50 +309,12 @@ def decode_quads_from_maps(
             vx = x * scale + dx_map * scale
             vy = y * scale + dy_map * scale
             verts.extend([vx, vy])
-        quad_coords = np.array(verts, dtype=np.float32).reshape(4, 2)
-        quad_score = compute_quad_score_from_map(score_map, quad_coords, scale)
-        if quad_score <= score_thresh:
-            continue
-        quads.append(quad_coords.flatten().tolist() + [quad_score])
+        quads.append(verts + [float(score_map[y, x])])
 
     if profile:
         print(f"    Decode coordinates: {time.time() - t0:.3f}s ({len(quads)} quads)")
 
-    if not quads:
-        return np.zeros((0, 9), dtype=np.float32)
-
-    quads_arr = np.array(quads, dtype=np.float32)
-
-    # Квантизация уже полученных боксов и удаление дубликатов
-    if quantization > 1:
-        t0_quant = time.time()
-        quant_step = float(quantization)
-        coords = quads_arr[:, :8]
-        grid_idx = np.floor(coords / quant_step).astype(np.int32)
-        quantized_coords = grid_idx.astype(np.float32) * quant_step + quant_step / 2.0
-        quads_arr[:, :8] = quantized_coords
-
-        dedup = {}
-        for idx, quad in enumerate(quads_arr):
-            key = tuple(grid_idx[idx])
-            score = quad[8]
-            stored = dedup.get(key)
-            if stored is None or score > stored[0]:
-                dedup[key] = (score, quad)
-
-        quads_before = quads_arr.shape[0]
-        quads_arr = np.stack([item[1] for item in dedup.values()], dtype=np.float32)
-
-        if profile:
-            print(
-                f"    Quantization (step={quantization}): {time.time() - t0_quant:.3f}s"
-            )
-            print(
-                f"    Quads after quantization: {len(quads_arr)} "
-                f"(removed {quads_before - len(quads_arr)})"
-            )
-
-    return quads_arr
+    return np.array(quads, dtype=np.float32)
 
 
 def expand_boxes(

@@ -4,7 +4,6 @@ import torch
 from torchvision import transforms
 from pathlib import Path
 from typing import Union, Optional, List, Tuple
-from PIL import Image
 import time
 
 from .east import TextDetectionFCN
@@ -22,15 +21,17 @@ class EASTInfer:
         self,
         weights_path: Optional[Union[str, Path]] = None,
         device: Optional[str] = None,
-        target_size: int = 1536,
-        expand_ratio_w: float = 0.8,
-        expand_ratio_h: float = 0.8,
-        score_thresh: float = 0.99,
+        target_size: int = 1280,
+        expand_ratio_w: float = 0.9,
+        expand_ratio_h: float = 0.9,
+        score_thresh: float = 0.6,
         iou_threshold: float = 0.2,
         score_geo_scale: float = 0.25,
         quantization: int = 2,
-        use_tta: bool = False,
-        tta_merge_mode: str = "mean",
+        axis_aligned_output: bool = True,
+        remove_area_anomalies: bool = True,
+        anomaly_sigma_threshold: float = 5.0,
+        anomaly_min_box_count: int = 30,
     ):
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
 
@@ -58,8 +59,10 @@ class EASTInfer:
         self.score_thresh = score_thresh
         self.iou_threshold = iou_threshold
         self.quantization = quantization
-        self.use_tta = use_tta
-        self.tta_merge_mode = tta_merge_mode  # "mean", "max", "min"
+        self.axis_aligned_output = axis_aligned_output
+        self.remove_area_anomalies = remove_area_anomalies
+        self.anomaly_sigma_threshold = anomaly_sigma_threshold
+        self.anomaly_min_box_count = anomaly_min_box_count
 
         self.tf = transforms.Compose(
             [
@@ -83,16 +86,91 @@ class EASTInfer:
         scaled[:, 1:8:2] *= scale_y
         return scaled
 
-    def _merge_maps(self, map1: np.ndarray, map2: np.ndarray) -> np.ndarray:
-        """Объединяет две карты согласно tta_merge_mode"""
-        if self.tta_merge_mode == "mean":
-            return (map1 + map2) / 2.0
-        elif self.tta_merge_mode == "max":
-            return np.maximum(map1, map2)
-        elif self.tta_merge_mode == "min":
-            return np.minimum(map1, map2)
-        else:
-            raise ValueError(f"Unknown tta_merge_mode: {self.tta_merge_mode}")
+    def _convert_to_axis_aligned(self, quads: np.ndarray) -> np.ndarray:
+        if len(quads) == 0:
+            return quads
+        aligned = quads.copy()
+        coords = aligned[:, :8].reshape(-1, 4, 2)
+        x_min = coords[:, :, 0].min(axis=1)
+        x_max = coords[:, :, 0].max(axis=1)
+        y_min = coords[:, :, 1].min(axis=1)
+        y_max = coords[:, :, 1].max(axis=1)
+        rects = np.stack(
+            [
+                x_min,
+                y_min,
+                x_max,
+                y_min,
+                x_max,
+                y_max,
+                x_min,
+                y_max,
+            ],
+            axis=1,
+        )
+        aligned[:, :8] = rects.reshape(-1, 8)
+        return aligned
+
+    @staticmethod
+    def _polygon_area_batch(polys: np.ndarray) -> np.ndarray:
+        if polys.size == 0:
+            return np.zeros((0,), dtype=np.float32)
+        x = polys[:, :, 0]
+        y = polys[:, :, 1]
+        return 0.5 * np.abs(
+            np.sum(x * np.roll(y, -1, axis=1) - y * np.roll(x, -1, axis=1), axis=1)
+        )
+
+    def _is_quad_inside(self, inner: np.ndarray, outer: np.ndarray) -> bool:
+        contour = outer.reshape(-1, 1, 2).astype(np.float32)
+        for point in inner.astype(np.float32):
+            if (
+                cv2.pointPolygonTest(contour, (float(point[0]), float(point[1])), False)
+                < 0
+            ):
+                return False
+        return True
+
+    def _remove_fully_contained_boxes(self, quads: np.ndarray) -> np.ndarray:
+        if len(quads) <= 1:
+            return quads
+        coords = quads[:, :8].reshape(-1, 4, 2)
+        areas = self._polygon_area_batch(coords)
+        keep = np.ones(len(quads), dtype=bool)
+        order = np.argsort(areas)
+        for idx in order:
+            if not keep[idx]:
+                continue
+            inner = coords[idx]
+            inner_area = areas[idx]
+            for jdx in range(len(quads)):
+                if idx == jdx or not keep[jdx]:
+                    continue
+                if areas[jdx] + 1e-6 < inner_area:
+                    continue
+                if self._is_quad_inside(inner, coords[jdx]):
+                    keep[idx] = False
+                    break
+        return quads[keep]
+
+    def _remove_area_anomalies(self, quads: np.ndarray) -> np.ndarray:
+        if (
+            not self.remove_area_anomalies
+            or len(quads) == 0
+            or len(quads) <= self.anomaly_min_box_count
+        ):
+            return quads
+        coords = quads[:, :8].reshape(-1, 4, 2)
+        areas = self._polygon_area_batch(coords).astype(np.float32)
+        mean = float(np.mean(areas))
+        std = float(np.std(areas))
+        if std == 0.0:
+            return quads
+        threshold = mean + self.anomaly_sigma_threshold * std
+        keep = areas <= threshold
+        if not np.any(keep):
+            return quads
+        return quads[keep]
 
     def infer(
         self,
@@ -118,44 +196,8 @@ class EASTInfer:
         with torch.no_grad():
             out = self.model(img_t.unsqueeze(0))
 
-            if self.use_tta:
-                # TTA: переворачиваем изображение горизонтально
-                img_t_flipped = torch.flip(img_t, dims=[2])  # flip по ширине
-                out_flipped = self.model(img_t_flipped.unsqueeze(0))
-
-                # Разворачиваем карты обратно
-                score_flipped = (
-                    torch.flip(out_flipped["score"], dims=[3]).cpu().numpy()[0, 0]
-                )
-                geo_flipped = (
-                    torch.flip(out_flipped["geometry"], dims=[3]).cpu().numpy()[0]
-                )
-
-                geo_flipped_corrected = geo_flipped.copy()
-
-                # Переставляем вершины: 0↔1, 2↔3
-                v0 = geo_flipped[0:2].copy()
-                v1 = geo_flipped[2:4].copy()
-                v2 = geo_flipped[4:6].copy()
-                v3 = geo_flipped[6:8].copy()
-
-                geo_flipped_corrected[0:2] = v1  # v0 <- v1
-                geo_flipped_corrected[2:4] = v0  # v1 <- v0
-                geo_flipped_corrected[4:6] = v3  # v2 <- v3
-                geo_flipped_corrected[6:8] = v2  # v3 <- v2
-
-                # Инвертируем dx (каналы 0, 2, 4, 6)
-                geo_flipped_corrected[0::2] = -geo_flipped_corrected[0::2]
-
-                # Объединяем карты
-                score_orig = out["score"][0].cpu().numpy()[0]
-                geo_orig = out["geometry"][0].cpu().numpy()
-
-                score_map = self._merge_maps(score_orig, score_flipped)
-                geo_map = geo_orig
-            else:
-                score_map = out["score"][0].cpu().numpy().squeeze(0)
-                geo_map = out["geometry"][0].cpu().numpy()
+            score_map = out["score"][0].cpu().numpy().squeeze(0)
+            geo_map = out["geometry"][0].cpu().numpy()
         if profile:
             print(f"  Model inference: {time.time() - t0:.3f}s")
 
@@ -192,9 +234,17 @@ class EASTInfer:
             final_quads_nms_expanded, (orig_h, orig_w)
         )
 
+        processed_quads = self._remove_fully_contained_boxes(scaled_quads)
+        processed_quads = self._remove_area_anomalies(processed_quads)
+        output_quads = (
+            self._convert_to_axis_aligned(processed_quads)
+            if self.axis_aligned_output
+            else processed_quads
+        )
+
         # 8) Build Page with scaled coordinates (after NMS & expand)
         words: List[Word] = []
-        for quad in scaled_quads:
+        for quad in output_quads:
             pts = quad[:8].reshape(4, 2)
             score = float(quad[8])
             words.append(Word(polygon=pts.tolist(), detection_confidence=score))
@@ -202,8 +252,9 @@ class EASTInfer:
 
         # 10) Optional visualization
         if vis:
-            vis_img = draw_quads(img, scaled_quads)
-            # Масштабируем score map до размера исходного изображения
+            vis_img = draw_quads(
+                img, output_quads if self.axis_aligned_output else processed_quads
+            )
             score_map_resized = cv2.resize(
                 score_map, (orig_w, orig_h), interpolation=cv2.INTER_LINEAR
             )

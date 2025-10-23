@@ -370,9 +370,9 @@ def train(
 
     # Создаём модель
     model = TextDetectionFCN(
-        backbone_name='resnet101',
+        backbone_name="resnet101",
         pretrained_backbone=pretrained_backbone,
-        freeze_first=freeze_first
+        freeze_first=freeze_first,
     ).to(device)
 
     # Определяем scale (если не задан)
@@ -389,20 +389,34 @@ def train(
         )
 
     # Собираем списки (если один путь, оборачиваем в список)
-    train_imgs_list = train_images if isinstance(train_images, (list, tuple)) else [train_images]
-    train_anns_list = train_anns   if isinstance(train_anns,   (list, tuple)) else [train_anns]
-    val_imgs_list   = val_images   if isinstance(val_images,   (list, tuple)) else [val_images]
-    val_anns_list   = val_anns     if isinstance(val_anns,     (list, tuple)) else [val_anns]
+    train_imgs_list = (
+        train_images if isinstance(train_images, (list, tuple)) else [train_images]
+    )
+    train_anns_list = (
+        train_anns if isinstance(train_anns, (list, tuple)) else [train_anns]
+    )
+    val_imgs_list = (
+        val_images if isinstance(val_images, (list, tuple)) else [val_images]
+    )
+    val_anns_list = val_anns if isinstance(val_anns, (list, tuple)) else [val_anns]
 
     # Проверяем что длины совпадают
-    assert len(train_imgs_list) == len(train_anns_list), "train_images и train_anns должны иметь одинаковую длину"
-    assert len(val_imgs_list)   == len(val_anns_list),   "val_images и val_anns должны иметь одинаковую длину"
+    assert len(train_imgs_list) == len(
+        train_anns_list
+    ), "train_images и train_anns должны иметь одинаковую длину"
+    assert len(val_imgs_list) == len(
+        val_anns_list
+    ), "val_images и val_anns должны иметь одинаковую длину"
 
     # Строим ConcatDataset
-    train_datasets = [make_dataset(imgs, anns) for imgs, anns in zip(train_imgs_list, train_anns_list)]
-    val_datasets   = [make_dataset(imgs, anns) for imgs, anns in zip(val_imgs_list,   val_anns_list)]
+    train_datasets = [
+        make_dataset(imgs, anns) for imgs, anns in zip(train_imgs_list, train_anns_list)
+    ]
+    val_datasets = [
+        make_dataset(imgs, anns) for imgs, anns in zip(val_imgs_list, val_anns_list)
+    ]
     train_ds = ConcatDataset(train_datasets)
-    val_ds   = ConcatDataset(val_datasets)
+    val_ds = ConcatDataset(val_datasets)
 
     # Путь для логов и чекпоинтов
     experiment_dir = os.path.join(experiment_root, model_name)
