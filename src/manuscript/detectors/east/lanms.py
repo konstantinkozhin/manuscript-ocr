@@ -179,91 +179,31 @@ def locality_aware_nms(boxes, iou_threshold):
     iou_threshold — порог для объединения (IoU)
     Возвращает итоговый numpy-массив боксов (m,9).
     """
-    if len(boxes) == 0:
-        return boxes
-        
     n = boxes.shape[0]
-    
-    # Группы для объединения боксов
-    groups = []
-    used = np.zeros(n, dtype=bool)
-    
-    # Проходим по всем боксам
+    polys = []
+    scores = []
+
     for i in range(n):
-        if used[i]:
-            continue
-            
-        poly_i = boxes[i, :8].reshape((4, 2)).astype(np.float64)
-        current_group = [i]
-        used[i] = True
-        
-        # Ищем все боксы, которые нужно объединить с текущим
-        for j in range(i + 1, n):
-            if used[j]:
-                continue
-                
-            poly_j = boxes[j, :8].reshape((4, 2)).astype(np.float64)
-            
-            # Проверяем пересечение с любым боксом в текущей группе
-            should_add = False
-            for group_idx in current_group:
-                poly_group = boxes[group_idx, :8].reshape((4, 2)).astype(np.float64)
-                if should_merge(poly_j, poly_group, iou_threshold):
-                    should_add = True
-                    break
-            
-            if should_add:
-                current_group.append(j)
-                used[j] = True
-        
-        groups.append(current_group)
-    
-    # Объединяем боксы в каждой группе
-    final_polys = []
-    final_scores = []
-    
-    for group in groups:
-        if len(group) == 1:
-            # Одиночный бокс
-            idx = group[0]
-            poly = boxes[idx, :8].reshape((4, 2)).astype(np.float64)
-            score = boxes[idx, 8]
-            final_polys.append(poly)
-            final_scores.append(score)
+        poly = boxes[i, :8].reshape((4, 2)).astype(np.float64)
+        score = boxes[i, 8]
+
+        if polys:
+            last_poly = polys[-1]
+            if should_merge(poly, last_poly, iou_threshold):
+                merger = PolygonMerger()
+                merger.add(last_poly, scores[-1])
+                merger.add(poly, score)
+                merged_poly = merger.get()
+                polys[-1] = merged_poly
+                scores[-1] = merger.total_score / merger.count
+            else:
+                polys.append(poly)
+                scores.append(score)
         else:
-            # Объединяем группу боксов
-            # Используем простое геометрическое усреднение координат
-            # и максимальный score из группы
-            group_polys = []
-            group_scores = []
-            
-            for idx in group:
-                poly = boxes[idx, :8].reshape((4, 2)).astype(np.float64)
-                score = boxes[idx, 8]
-                group_polys.append(poly)
-                group_scores.append(score)
-            
-            # Находим bounding box всех полигонов в группе
-            all_points = np.vstack(group_polys)
-            min_x, min_y = all_points.min(axis=0)
-            max_x, max_y = all_points.max(axis=0)
-            
-            # Создаем объединенный прямоугольник
-            merged_poly = np.array([
-                [min_x, min_y],
-                [max_x, min_y], 
-                [max_x, max_y],
-                [min_x, max_y]
-            ], dtype=np.float64)
-            
-            # Используем максимальный score из группы
-            merged_score = max(group_scores)
-            
-            final_polys.append(merged_poly)
-            final_scores.append(merged_score)
-    
-    # Применяем стандартный NMS для окончательной фильтрации
-    kept_polys, kept_scores = standard_nms(final_polys, final_scores, iou_threshold)
+            polys.append(poly)
+            scores.append(score)
+
+    kept_polys, kept_scores = standard_nms(polys, scores, iou_threshold)
 
     final_boxes = []
     for poly, score in zip(kept_polys, kept_scores):

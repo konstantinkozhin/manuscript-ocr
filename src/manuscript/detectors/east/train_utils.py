@@ -11,7 +11,7 @@ from tqdm.auto import tqdm
 from .dataset import EASTDataset
 from .sam import SAMSolver
 from .loss import EASTLoss
-from .utils import create_collage, decode_boxes_from_maps
+from .utils import create_collage, decode_quads_from_maps
 from .east import TextDetectionFCN
 from torch.utils.data import ConcatDataset
 
@@ -251,8 +251,8 @@ def _collage_batch(model, dataset, device, num: int = 4):
         ps = out["score"][0].cpu().numpy().squeeze(0)
         pg = out["geometry"][0].cpu().numpy().transpose(1, 2, 0)
 
-        pred_r = decode_boxes_from_maps(
-            ps, pg, score_thresh=0.9, scale=1 / model.score_scale
+        pred_r = decode_quads_from_maps(
+            ps, pg, score_thresh=0.9, scale=1 / model.score_scale, quantization=1
         )
 
         coll = create_collage(

@@ -1,12 +1,13 @@
 import cv2
 import numpy as np
 import torch
-from .lanms import locality_aware_nms
 from tqdm import tqdm
 from shapely.geometry import Polygon
 import json
 from collections import defaultdict
 import time
+from pathlib import Path
+from PIL import Image
 
 
 def convert_rboxes_to_quad_boxes(rboxes, scores=None):
@@ -199,44 +200,41 @@ def create_collage(
     return collage
 
 
-def decode_boxes_from_maps(
-    score_map: np.ndarray,
-    geo_map: np.ndarray,
-    score_thresh: float = 0.9,
-    scale: float = 4.0,
-    iou_threshold: float = 0.2,
-    expand_ratio: float = 0.0,
-    profile: bool = False,
-) -> np.ndarray:
-    """
-    Декодирует quad-боксы из 8-канальной geo_map, с опциональным расширением (обратным shrink).
-
-    Параметры:
-      score_map     — карта вероятностей (H, W) или (1, H, W);
-      geo_map       — гео-карта (H, W, 8);
-      score_thresh  — порог для отбора пикселей;
-      scale         — коэффициент восстановления в исходные пиксели (обычно = 1.0/score_geo_scale);
-      iou_threshold — порог IoU для NMS;
-      expand_ratio  — коэффициент обратного расширения (обычно = shrink_ratio);
-      profile       — если True, выводит время выполнения этапов.
-
-    Возвращает:
-      quad-боксы (N, 9) — [x0, y0, …, x3, y3, score].
-    """
-    start_time = time.time()
-    
-    # убираем лишнюю первую размерность
-    t0 = time.time()
+def decode_quads_from_maps(score_map: np.ndarray,
+                           geo_map: np.ndarray,
+                           score_thresh: float,
+                           scale: float,
+                           quantization: int = 1,
+                           profile=False) -> np.ndarray:
     if score_map.ndim == 3 and score_map.shape[0] == 1:
         score_map = score_map.squeeze(0)
-    if profile: print(f"    Squeeze score_map: {time.time() - t0:.3f}s")
 
-    # найти пиксели выше порога
     t0 = time.time()
     ys, xs = np.where(score_map > score_thresh)
-    if profile: print(f"    Find pixels > thresh: {time.time() - t0:.3f}s ({len(ys)} pixels)")
-    
-    # декодировать координаты боксов
+    if profile:
+        print(f"    Find pixels > thresh: {time.time() - t0:.3f}s ({len(ys)} pixels)")
+
+    if len(ys) == 0:
+        return np.zeros((0, 9), dtype=np.float32)
+
+    # Квантизация координат точек для объединения близких
+    if quantization > 1:
+        t0_quant = time.time()
+        # Квантуем координаты - берем центр квантованной ячейки
+        ys_quant = (ys // quantization) * quantization + quantization // 2
+        xs_quant = (xs // quantization) * quantization + quantization // 2
+        
+        # Объединяем дубликаты
+        coords = np.column_stack([ys_quant, xs_quant])
+        unique_coords = np.unique(coords, axis=0)
+        
+        ys = unique_coords[:, 0]
+        xs = unique_coords[:, 1]
+        
+        if profile:
+            print(f"    Quantization (step={quantization}): {time.time() - t0_quant:.3f}s")
+            print(f"    Points after quantization: {len(ys)} (removed {len(coords) - len(ys)})")
+
     t0 = time.time()
     quads = []
     for y, x in zip(ys, xs):
@@ -244,70 +242,53 @@ def decode_boxes_from_maps(
         verts = []
         for i in range(4):
             dx_map, dy_map = offs[2 * i], offs[2 * i + 1]
-            dx = dx_map * scale
-            dy = dy_map * scale
-            vx = x * scale + dx
-            vy = y * scale + dy
+            vx = x * scale + dx_map * scale
+            vy = y * scale + dy_map * scale
             verts.extend([vx, vy])
         quads.append(verts + [float(score_map[y, x])])
-    if profile: print(f"    Decode coordinates: {time.time() - t0:.3f}s ({len(quads)} quads)")
 
-    if not quads:
-        if profile: print(f"    decode_boxes_from_maps total: {time.time() - start_time:.3f}s")
-        return np.zeros((0, 9), dtype=np.float32)
+    if profile:
+        print(f"    Decode coordinates: {time.time() - t0:.3f}s ({len(quads)} quads)")
 
-    t0 = time.time()
-    quads = np.array(quads, dtype=np.float32)
-    if profile: print(f"    Convert to numpy: {time.time() - t0:.3f}s")
+    return np.array(quads, dtype=np.float32)
 
-    # NMS
-    t0 = time.time()
-    keep = locality_aware_nms(quads, iou_threshold=iou_threshold)
-    if profile: print(f"    NMS: {time.time() - t0:.3f}s ({len(keep)} kept)")
-    
-    # обратное расширение shrink_poly (если нужно)
-    if expand_ratio and len(keep) > 0:
-        t0 = time.time()
-        from .dataset import shrink_poly
+def expand_boxes(quads: np.ndarray, expand_w: float = 0.0, expand_h: float = 0.0) -> np.ndarray:
 
-        expanded = []
-        for quad in keep:
-            coords = quad[:8].reshape(4, 2)
-            # применяем shrink с отрицательным коэффициентом
-            exp_poly = shrink_poly(coords, shrink_ratio=-expand_ratio)
-            expanded.append(list(exp_poly.flatten()) + [quad[8]])
-        keep = np.array(expanded, dtype=np.float32)
-        if profile: print(f"    Expand boxes: {time.time() - t0:.3f}s")
-
-    if profile: print(f"    decode_boxes_from_maps total: {time.time() - start_time:.3f}s")
-    return keep
-
-
-def expand_boxes(quads: np.ndarray, expand_ratio: float) -> np.ndarray:
-    """
-    Расширяет каждый quad обратно с помощью shrink_poly с отрицательным коэффициентом.
-    """
-    if expand_ratio == 0 or len(quads) == 0:
+    if len(quads) == 0 or (expand_w == 0 and expand_h == 0):
         return quads
 
-    from .dataset import shrink_poly
+    coords = quads[:, :8].reshape(-1, 4, 2)
+    scores = quads[:, 8:9]
 
-    expanded = []
-    for quad in quads:
-        coords = quad[:8].reshape(4, 2)
-        exp_poly = shrink_poly(coords, shrink_ratio=-expand_ratio)
-        expanded.append(list(exp_poly.flatten()) + [quad[8]])
-    return np.array(expanded, dtype=np.float32)
+    x, y = coords[:, :, 0], coords[:, :, 1]
+    area = np.sum(x * np.roll(y, -1, axis=1) - np.roll(x, -1, axis=1) * y, axis=1)
+    sign = np.sign(area).reshape(-1, 1, 1)
+    sign[sign == 0] = 1
 
+    p_prev = np.roll(coords, 1, axis=1)
+    p_curr = coords
+    p_next = np.roll(coords, -1, axis=1)
 
-def apply_nms(quads: np.ndarray, iou_threshold: float = 0.2) -> np.ndarray:
-    """
-    Применяет locality-aware NMS к массиву quad-боксов.
-    """
-    if len(quads) == 0:
-        return quads
-    return locality_aware_nms(quads, iou_threshold=iou_threshold)
+    edge1 = p_curr - p_prev
+    edge2 = p_next - p_curr
+    len1 = np.linalg.norm(edge1, axis=2, keepdims=True)
+    len2 = np.linalg.norm(edge2, axis=2, keepdims=True)
 
+    n1 = sign * np.stack([edge1[..., 1], -edge1[..., 0]], axis=2) / (len1 + 1e-6)
+    n2 = sign * np.stack([edge2[..., 1], -edge2[..., 0]], axis=2) / (len2 + 1e-6)
+    n_avg = n1 + n2
+    norm = np.linalg.norm(n_avg, axis=2, keepdims=True)
+    n_avg = np.divide(n_avg, norm, out=np.zeros_like(n_avg), where=norm > 0)
+
+    offset = np.minimum(len1, len2)
+
+    scale_xy = np.array([1 + expand_w, 1 + expand_h], dtype=np.float32).reshape(1, 1, 2)
+    delta = (scale_xy - 1.0) * offset
+
+    new_coords = p_curr + delta * n_avg
+
+    expanded = np.hstack([new_coords.reshape(-1, 8), scores])
+    return expanded.astype(np.float32)
 
 def poly_iou(segA, segB):
     A = Polygon(np.array(segA).reshape(-1, 2))
@@ -391,6 +372,31 @@ def load_preds(pred_path):
         )
     return preds
 
+def read_image(img_or_path):
+    """
+    Универсальная функция чтения изображения:
+    - Принимает путь (str | Path) или numpy-массив.
+    - Возвращает RGB np.ndarray.
+    """
+    if isinstance(img_or_path, (str, Path)):
+        img = cv2.imread(str(img_or_path))
+        if img is None:
+            # cv2 не смог прочитать — пробуем через PIL
+            try:
+                with Image.open(str(img_or_path)) as pil_img:
+                    img = np.array(pil_img.convert('RGB'))
+            except Exception as e:
+                raise FileNotFoundError(f"Cannot read image with cv2 or PIL: {img_or_path}. Error: {e}")
+        else:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+
+    elif isinstance(img_or_path, np.ndarray):
+        img = img_or_path
+
+    else:
+        raise TypeError(f"Unsupported type for image input: {type(img_or_path)}")
+
+    return img
 
 def compute_f1_metrics(
     preds, gt_segs, processed_ids, avg_range=(0.50, 0.95), avg_step=0.05

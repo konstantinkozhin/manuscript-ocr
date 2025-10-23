@@ -7,7 +7,10 @@ from manuscript.recognizers import TRBAInfer
 
 # инициализация
 pipeline = OCRPipeline(
-    detector=EASTInfer(score_thresh=0.9),
+    detector=EASTInfer(
+        score_thresh=0.9,
+        quantization=2  # Квантование координат до 2 пикселей
+    ),
     recognizer=TRBAInfer(
         model_path=r"C:\Users\USER\Desktop\OCR_MODELS\exp_4_model_32\best_acc_weights.pth",
     )
