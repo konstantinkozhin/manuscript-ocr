@@ -1,5 +1,5 @@
 import numpy as np
-from manuscript.detectors.east.lanms import (
+from manuscript.detectors._east.lanms import (
     polygon_area,
     compute_intersection,
     clip_polygon,

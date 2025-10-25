@@ -2,8 +2,10 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torchvision.models import (
-    resnet50, ResNet50_Weights,
-    resnet101, ResNet101_Weights,
+    resnet50,
+    ResNet50_Weights,
+    resnet101,
+    ResNet101_Weights,
 )
 from torchvision.models.feature_extraction import create_feature_extractor
 
@@ -31,15 +33,15 @@ class DecoderBlock(nn.Module):
 class ResNetFeatureExtractor(nn.Module):
     def __init__(
         self,
-        backbone_name: str = 'resnet50',
+        backbone_name: str = "resnet50",
         pretrained: bool = True,
         freeze_first: bool = False,
     ):
         super().__init__()
         # select model and weights
-        if backbone_name == 'resnet50':
+        if backbone_name == "resnet50":
             model = resnet50(weights=ResNet50_Weights.DEFAULT if pretrained else None)
-        elif backbone_name == 'resnet101':
+        elif backbone_name == "resnet101":
             model = resnet101(weights=ResNet101_Weights.DEFAULT if pretrained else None)
         else:
             raise ValueError(f"Unsupported backbone: {backbone_name}")
@@ -69,12 +71,18 @@ class FeatureMergingBranchResNet(nn.Module):
     def __init__(self):
         super().__init__()
         self.block1 = DecoderBlock(in_channels=2048, mid_channels=512, out_channels=512)
-        self.block2 = DecoderBlock(in_channels=512 + 1024, mid_channels=256, out_channels=256)
-        self.block3 = DecoderBlock(in_channels=256 + 512, mid_channels=128, out_channels=128)
-        self.block4 = DecoderBlock(in_channels=128 + 256, mid_channels=64, out_channels=32)
+        self.block2 = DecoderBlock(
+            in_channels=512 + 1024, mid_channels=256, out_channels=256
+        )
+        self.block3 = DecoderBlock(
+            in_channels=256 + 512, mid_channels=128, out_channels=128
+        )
+        self.block4 = DecoderBlock(
+            in_channels=128 + 256, mid_channels=64, out_channels=32
+        )
 
     def forward(self, feats):
-        f1, f2, f3, f4 = feats['res1'], feats['res2'], feats['res3'], feats['res4']
+        f1, f2, f3, f4 = feats["res1"], feats["res2"], feats["res3"], feats["res4"]
         h4 = self.block1(f4)
         h4_up = F.interpolate(h4, scale_factor=2, mode="bilinear", align_corners=False)
         h3 = self.block2(torch.cat([h4_up, f3], dim=1))
@@ -97,10 +105,10 @@ class OutputHead(nn.Module):
         return score, geometry
 
 
-class TextDetectionFCN(nn.Module):
+class EAST(nn.Module):
     def __init__(
         self,
-        backbone_name: str = 'resnet50',
+        backbone_name: str = "resnet50",
         pretrained_backbone: bool = True,
         freeze_first: bool = False,
         pretrained_model_path: str = None,

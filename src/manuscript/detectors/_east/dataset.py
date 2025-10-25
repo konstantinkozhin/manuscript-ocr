@@ -1,13 +1,16 @@
 import os
 import json
+import warnings
+from pathlib import Path
+
 import cv2
 import numpy as np
-import torch
-from torch.utils.data import Dataset
-import torchvision.transforms as transforms
 import skimage.draw
+import torch
+import torchvision.transforms as transforms
+from torch.utils.data import Dataset
+
 from .utils import quad_to_rbox
-import warnings
 
 
 def order_vertices_clockwise(poly):
@@ -61,10 +64,14 @@ class EASTDataset(Dataset):
         target_size=512,
         score_geo_scale=0.25,
         transform=None,
+        dataset_name=None,
     ):
         self.images_folder = images_folder
         self.target_size = target_size
         self.score_geo_scale = score_geo_scale
+        self.dataset_name = (
+            dataset_name if dataset_name is not None else Path(images_folder).stem
+        )
         # transform pipeline
         if transform is None:
             self.transform = transforms.Compose(
@@ -110,7 +117,7 @@ class EASTDataset(Dataset):
         if invalid_ids:
             warnings.warn(
                 f"EASTDataset: найдено {len(invalid_ids)} изображений без годных квадов — они будут пропущены",
-                UserWarning
+                UserWarning,
             )
 
     def __len__(self):
@@ -124,32 +131,49 @@ class EASTDataset(Dataset):
         if img is None:
             raise FileNotFoundError(f"Image not found: {path}")
         img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
         img_resized = cv2.resize(img, (self.target_size, self.target_size))
 
         anns = self.annots.get(image_id, [])
         quads = []
+
+        scale_x = self.target_size / info["width"]
+        scale_y = self.target_size / info["height"]
+
         for ann in anns:
             if "segmentation" not in ann:
                 continue
             seg = ann["segmentation"]
-            pts = np.array(seg, dtype=np.float32).reshape(-1, 2)
-            rect = cv2.minAreaRect(pts)
-            box = cv2.boxPoints(rect)
-            quad = order_vertices_clockwise(box)
-            quad[:, 0] *= self.target_size / info["width"]
-            quad[:, 1] *= self.target_size / info["height"]
-            quads.append(quad)
+            if len(seg) == 0:
+                continue
+            seg_parts = seg if isinstance(seg[0], list) else [seg]
+            for seg_poly in seg_parts:
+                pts = np.array(seg_poly, dtype=np.float32).reshape(-1, 2)
+                if pts.size == 0:
+                    continue
+                rect = cv2.minAreaRect(pts)
+                box = cv2.boxPoints(rect)
+                quad = order_vertices_clockwise(box)
+                quad[:, 0] *= scale_x
+                quad[:, 1] *= scale_y
+                quads.append(quad)
+
+                pts_scaled = pts.copy()
+                pts_scaled[:, 0] *= scale_x
+                pts_scaled[:, 1] *= scale_y
+
+        if quads:
+            rboxes = np.stack(
+                [quad_to_rbox(q.flatten()) for q in quads], axis=0
+            ).astype(np.float32)
+        else:
+            rboxes = np.zeros((0, 5), dtype=np.float32)
         # generate maps
         score_map, geo_map = self.compute_quad_maps(quads)
-        rboxes = np.stack([quad_to_rbox(q.flatten()) for q in quads], axis=0).astype(
-            np.float32
-        )
         img_tensor = self.transform(img_resized)
         target = {
             "score_map": torch.tensor(score_map).unsqueeze(0),
             "geo_map": torch.tensor(geo_map),
-            "rboxes": torch.tensor(rboxes),
+            "rboxes": torch.from_numpy(rboxes),
         }
         return img_tensor, target
 

@@ -1,14 +1,12 @@
 import pytest
 import numpy as np
 from shapely.geometry import Polygon
-from manuscript.detectors.east.utils import (
-    poly_iou,
-    compute_f1
-)
+from manuscript.detectors._east.utils import poly_iou, compute_f1
 
 # Глобальные переменные, которые использует compute_f1
 gt_segs = {}
 processed_ids = []
+
 
 def test_identical_polygons():
     seg = [0, 0, 1, 0, 1, 1, 0, 1]
@@ -24,10 +22,14 @@ def test_non_overlapping_polygons():
 def test_partial_overlap():
     segA = [0, 0, 2, 0, 2, 2, 0, 2]
     segB = [1, 1, 3, 1, 3, 3, 1, 3]
-    expected_iou = Polygon(np.array(segA).reshape(-1, 2)).intersection(
-        Polygon(np.array(segB).reshape(-1, 2))).area / \
-        Polygon(np.array(segA).reshape(-1, 2)).union(
-        Polygon(np.array(segB).reshape(-1, 2))).area
+    expected_iou = (
+        Polygon(np.array(segA).reshape(-1, 2))
+        .intersection(Polygon(np.array(segB).reshape(-1, 2)))
+        .area
+        / Polygon(np.array(segA).reshape(-1, 2))
+        .union(Polygon(np.array(segB).reshape(-1, 2)))
+        .area
+    )
     assert pytest.approx(poly_iou(segA, segB), 0.01) == expected_iou
 
 

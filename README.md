@@ -78,7 +78,7 @@ from manuscript.detectors import EASTInfer
 detector = EASTInfer(score_thresh=0.9)
 
 # Детекция с визуализацией
-page, vis_image = detector.infer("example/image.jpg", vis=True)
+page, vis_image = detector.predict("example/image.jpg", vis=True)
 
 # Показать результат
 Image.fromarray(vis_image).show()

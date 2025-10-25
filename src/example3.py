@@ -53,7 +53,7 @@ def main() -> None:
 
     for image_path in tqdm(image_paths, desc="Inference", unit="img"):
         t0 = time.perf_counter()
-        model.infer(str(image_path), vis=False, profile=False)
+        model.predict(str(image_path), vis=False, profile=False)
         all_times.append(time.perf_counter() - t0)
 
     total_elapsed = time.perf_counter() - total_start

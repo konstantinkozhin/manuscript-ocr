@@ -200,64 +200,6 @@ def create_collage(
     return collage
 
 
-def compute_quad_score_from_map(
-    score_map: np.ndarray, quad: np.ndarray, scale: float
-) -> float:
-    """
-    Возвращает скор бокса как максимум значений score map внутри исходного полигона.
-    """
-    if score_map.ndim == 3 and score_map.shape[0] == 1:
-        score_map = score_map.squeeze(0)
-
-    if score_map.ndim != 2:
-        raise ValueError(f"Score map must be 2D, got shape {score_map.shape}")
-
-    quad = np.asarray(quad, dtype=np.float32).reshape(4, 2)
-    h, w = score_map.shape
-    if h == 0 or w == 0:
-        return 0.0
-
-    safe_scale = float(scale) if scale > 0 else 1.0
-    quad_map = quad / safe_scale
-    quad_map[:, 0] = np.clip(quad_map[:, 0], 0, w - 1)
-    quad_map[:, 1] = np.clip(quad_map[:, 1], 0, h - 1)
-
-    pts = np.round(quad_map).astype(np.int32)
-    if len(np.unique(pts, axis=0)) < 3:
-        return 0.0
-
-    x_min, y_min, box_w, box_h = cv2.boundingRect(pts)
-    x_max = x_min + box_w - 1
-    y_max = y_min + box_h - 1
-
-    if x_max < 0 or y_max < 0 or x_min >= w or y_min >= h:
-        return 0.0
-
-    x_min = max(0, x_min)
-    y_min = max(0, y_min)
-    x_max = min(w - 1, x_max)
-    y_max = min(h - 1, y_max)
-
-    roi = score_map[y_min : y_max + 1, x_min : x_max + 1]
-    if roi.size == 0:
-        return 0.0
-
-    local_pts = pts.copy()
-    local_pts[:, 0] -= x_min
-    local_pts[:, 1] -= y_min
-    local_pts[:, 0] = np.clip(local_pts[:, 0], 0, roi.shape[1] - 1)
-    local_pts[:, 1] = np.clip(local_pts[:, 1], 0, roi.shape[0] - 1)
-
-    mask = np.zeros(roi.shape, dtype=np.uint8)
-    cv2.fillConvexPoly(mask, local_pts, 1)
-    scores = roi[mask == 1]
-
-    if scores.size == 0:
-        return 0.0
-
-    return float(scores.max())
-
-
 def decode_quads_from_maps(
     score_map: np.ndarray,
     geo_map: np.ndarray,
@@ -470,14 +412,21 @@ def read_image(img_or_path):
     return img
 
 
+
 def compute_f1_metrics(
-    preds, gt_segs, processed_ids, avg_range=(0.50, 0.95), avg_step=0.05
+    preds,
+    gt_segs,
+    processed_ids,
+    avg_range=(0.50, 0.95),
+    avg_step=0.05,
+    use_tqdm: bool = True,
 ):
     f1_at_05 = compute_f1(preds, 0.5, gt_segs, processed_ids)
 
     iou_vals = np.arange(avg_range[0], avg_range[1] + 1e-9, avg_step)
     f1_list = []
-    for t in tqdm(iou_vals, desc="F1 по IoU", unit="IoU"):
+    iterator = tqdm(iou_vals, desc="F1 ?? IoU", unit="IoU") if use_tqdm else iou_vals
+    for t in iterator:
         f1_list.append(compute_f1(preds, t, gt_segs, processed_ids))
 
     f1_avg = float(np.mean(f1_list))
