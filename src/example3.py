@@ -20,7 +20,7 @@ images = [
 
 # === Измеряем время ===
 start_time = time.perf_counter()
-res = recognizer.predict(images=images, batch_size=16)
+res = recognizer.predict(images=images, batch_size=16, mode="beam")
 end_time = time.perf_counter()
 
 # === Вывод результатов ===

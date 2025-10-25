@@ -13,7 +13,7 @@ def visualize_decoding(
     T, C = log_probs.shape
     probs = log_probs.detach().cpu().exp().numpy().T  # (C, T)
 
-    # фильтруем редко активные классы
+    # === фильтруем редко активные классы ===
     active_mask = probs.max(axis=1) > prob_threshold
     probs = probs[active_mask]
     y_labels = [itos[i] if i < len(itos) else str(i) for i in range(C)]
@@ -22,7 +22,7 @@ def visualize_decoding(
 
     fig = go.Figure()
 
-    # Тепловая карта вероятностей
+    # === фон: тепловая карта вероятностей ===
     fig.add_trace(
         go.Heatmap(
             z=probs,
@@ -55,7 +55,7 @@ def visualize_decoding(
         "gray",
     ]
 
-    # === находим финальные выжившие ===
+    # === определяем финальные выжившие последовательности ===
     final_step = beam_history[-1] if beam_history else []
     final_kept_dict = {}
     for h in final_step:
@@ -69,10 +69,10 @@ def visualize_decoding(
             final_kept_dict[seq_key] = h
     final_kept = set(final_kept_dict.keys())
 
-    # 👇 добавляем множество уже показанных
     shown_legend = set()
-
     kept_count = 0
+
+    # === рисуем все траектории ===
     for t, step_data in enumerate(beam_history):
         for h in step_data:
             seq, score, kept = h["seq"], h["score"], h["kept"]
@@ -98,25 +98,35 @@ def visualize_decoding(
             )
 
             seq_key = tuple(seq)
-            # Показываем в легенде только один раз, если финальная и ещё не добавлена
-            show_in_legend = (
-                kept and seq_key in final_kept and seq_key not in shown_legend
-            )
-            if show_in_legend:
+            is_final = kept and seq_key in final_kept
+
+            if is_final and seq_key not in shown_legend:
+                label = f"'{decoded or '?'}' ({score:.2f})"
+                show_in_legend = True
                 shown_legend.add(seq_key)
+            else:
+                label = f"_hidden_{t}_{len(seq)}"
+                show_in_legend = False
 
-            label = f"'{decoded or '?'}' ({score:.2f})" if show_in_legend else None
-
-            if kept:
+            # === цвет и стиль ===
+            if is_final:
                 color = colors[kept_count % len(colors)]
                 kept_count += 1
                 line_style = dict(color=color, width=3)
                 marker_style = dict(size=5)
-            else:
+                opacity = 1.0
+            elif kept:
                 color = "gray"
                 line_style = dict(color=color, width=1, dash="dot")
                 marker_style = dict(size=3)
+                opacity = 0.3
+            else:
+                color = "lightgray"
+                line_style = dict(color=color, width=1, dash="dot")
+                marker_style = dict(size=2)
+                opacity = 0.15
 
+            # === добавляем трассу ===
             fig.add_trace(
                 go.Scatter(
                     x=xs,
@@ -125,14 +135,16 @@ def visualize_decoding(
                     line=line_style,
                     marker=marker_style,
                     name=label,
-                    opacity=1.0 if kept else 0.3,
+                    opacity=opacity,
                     hoverinfo="x+y+name",
                     showlegend=show_in_legend,
+                    legendgroup=str(seq_key),
                 )
             )
 
+    # === оформление ===
     fig.update_layout(
-        title=dict(text="Beam Search — All Hypotheses (Finals in Legend)", x=0.5),
+        title=dict(text="Beam Search — Final vs Discarded Hypotheses", x=0.5),
         xaxis=dict(title="Time step (t)", tickfont=dict(size=12)),
         yaxis=dict(title="Character", tickfont=dict(size=12), automargin=True),
         width=1500,
@@ -149,6 +161,8 @@ def visualize_decoding(
             bordercolor="black",
             borderwidth=1,
             font=dict(size=11),
+            itemclick="toggle",
+            itemdoubleclick="toggleothers",
         ),
         margin=dict(l=120, r=60, t=80, b=150),
     )

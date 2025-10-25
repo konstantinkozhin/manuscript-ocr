@@ -8,10 +8,7 @@ import cv2
 
 from .model.model import RCNN
 from .data.transforms import load_charset, get_val_transform, decode_tokens
-from .training.utils import (
-    load_checkpoint,
-    decode_predictions,
-)
+from .training.utils import load_checkpoint, decode_predictions, HF_LMScorer
 
 
 class TRBAInfer:
@@ -59,6 +56,7 @@ class TRBAInfer:
         self.transform = get_val_transform(self.img_h, self.img_w)
 
         self.model = self._load_model()
+        self.lm_scorer = HF_LMScorer("sberbank-ai/rugpt3small_based_on_gpt2")
 
     def _load_model(self) -> RCNN:
         model = RCNN(
@@ -111,6 +109,13 @@ class TRBAInfer:
             np.ndarray, str, Image.Image, List[Union[np.ndarray, str, Image.Image]]
         ],
         batch_size: int = 32,
+        mode: str = "greedy",
+        beam_size: int = 5,
+        temperature: float = 1.0,
+        length_penalty: float = 0.0,
+        normalize_by_length: bool = True,
+        diverse_groups: int = 1,
+        diversity_strength: float = 0.0,
     ) -> List[Tuple[str, float]]:
 
         if not isinstance(images, list):
@@ -136,11 +141,19 @@ class TRBAInfer:
                 )
                 pred_ids = decode_predictions(
                     output,
-                    mode="beam",
+                    mode=mode,
+                    beam_size=beam_size,
                     eos_id=self.eos_id,
                     pad_id=self.pad_id,
+                    temperature=temperature,
+                    length_penalty=length_penalty,
+                    normalize_by_length=normalize_by_length,
+                    diverse_groups=diverse_groups,
+                    diversity_strength=diversity_strength,
                     vis=True,
                     itos=self.itos,
+                    lm_scorer=self.lm_scorer,
+                    lm_weight=0.1,
                 ).cpu()
 
                 probs = torch.softmax(output, dim=-1)
