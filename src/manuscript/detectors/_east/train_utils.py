@@ -87,6 +87,7 @@ def _run_training(
         elif len(val_dataset_names) != len(val_datasets):
             raise ValueError("val_dataset_names length must match val_datasets.")
 
+        collage_sources = list(zip(val_dataset_names, val_datasets))
         val_eval_loaders = [
             (
                 name,
@@ -99,9 +100,10 @@ def _run_training(
                     pin_memory=False,
                 ),
             )
-            for name, dataset in zip(val_dataset_names, val_datasets)
+            for name, dataset in collage_sources
         ]
     else:
+        collage_sources = [("val", val_dataset)]
         val_eval_loaders = [
             (
                 "val",
@@ -133,10 +135,15 @@ def _run_training(
 
     # torch>=2.2 expects these attributes; some custom optimizers (e.g. Lookahead)
     # from torch-optimizer do not define them, so create empty registries on demand.
-    if not hasattr(optimizer, "_optimizer_load_state_dict_pre_hooks"):
-        optimizer._optimizer_load_state_dict_pre_hooks = OrderedDict()
-    if not hasattr(optimizer, "_optimizer_load_state_dict_post_hooks"):
-        optimizer._optimizer_load_state_dict_post_hooks = OrderedDict()
+    hook_attrs = [
+        "_optimizer_state_dict_pre_hooks",
+        "_optimizer_state_dict_post_hooks",
+        "_optimizer_load_state_dict_pre_hooks",
+        "_optimizer_load_state_dict_post_hooks",
+    ]
+    for attr in hook_attrs:
+        if not hasattr(optimizer, attr):
+            setattr(optimizer, attr, OrderedDict())
 
     scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
         optimizer,
@@ -197,9 +204,27 @@ def _run_training(
     def _sanitize_tag(name: str) -> str:
         return name.replace("\\", "_").replace("/", "_").replace(" ", "_")
 
+    collage_cell_size = 960
+    collage_samples = 4
+
     def make_collage(tag: str, epoch: int):
-        coll = _collage_batch(ema_model if use_ema else model, val_dataset, device)
-        writer.add_image(f"Val/{tag}", coll, epoch, dataformats="HWC")
+        vis_model = ema_model if use_ema else model
+        for ds_name, dataset in collage_sources:
+            if len(dataset) == 0:
+                continue
+            coll = _collage_batch(
+                vis_model,
+                dataset,
+                device,
+                num=collage_samples,
+                cell_size=collage_cell_size,
+            )
+            writer.add_image(
+                f"Val/{tag}/{_sanitize_tag(ds_name)}",
+                coll,
+                epoch,
+                dataformats="HWC",
+            )
 
     make_collage("start", max(start_epoch - 1, 0))
 
@@ -406,7 +431,9 @@ def _custom_collate_fn(batch):
     return images, {"score_map": score_maps, "geo_map": geo_maps, "rboxes": rboxes_list}
 
 
-def _collage_batch(model, dataset, device, num: int = 4):
+def _collage_batch(
+    model, dataset, device, num: int = 4, cell_size: int = 640
+):
     coll_imgs = []
     for i in range(min(num, len(dataset))):
         img_t, tgt = dataset[i]
@@ -431,7 +458,7 @@ def _collage_batch(model, dataset, device, num: int = 4):
             pred_score_map=ps,
             pred_geo_map=pg,
             pred_rboxes=pred_r,
-            cell_size=640,
+            cell_size=cell_size,
         )
         coll_imgs.append(coll)
     top = np.hstack(coll_imgs[:2])
