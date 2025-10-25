@@ -1,71 +1,36 @@
-from pathlib import Path
 import time
-from statistics import mean
+from manuscript.recognizers import TRBAInfer
 
-from tqdm import tqdm
-
-from manuscript.detectors import EASTInfer
-
-# Укажите путь к папке с изображениями
-FOLDER = Path(r"C:\shared\Archive_19_04\combined_images")
-
-# Настройки
-RECURSIVE = False  # если нужно обрабатывать подпапки, выставьте True
-KEEP_ROTATED = (
-    False  # True — оставить исходные боксы, False — привести к осеориентированным
+# === Инициализация модели ===
+recognizer = TRBAInfer(
+    model_path=r"C:\shared\exp1_model_64\best_acc_ckpt.pth",
+    config_path=r"C:\shared\exp1_model_64\config.json",
 )
-DISABLE_ANOMALY_FILTER = False  # True — отключить фильтр аномальных по площади боксов
 
+# === Список изображений ===
+images = [
+    r"C:\Screenshot 2025-10-25 180736.png",
+    r"C:\Screenshot 2025-10-25 180134.png",
+    r"C:\shared\Archive_19_04\data_hkr\test\hrk_23.png",
+    r"C:\shared\Archive_19_04\data_cyrillic\test\cyrillic_52.png",
+    r"C:\shared\Archive_19_04\data_archive\test\archive_288.png",
+    r"C:\shared\Archive_19_04\data_archive\test\archive_31898.png",
+    r"C:\Screenshot 2025-10-25 210128.png",
+]
 
-def collect_images(folder: Path, recursive: bool) -> list[Path]:
-    exts = {".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff"}
-    if recursive:
-        images = [
-            p for p in folder.rglob("*") if p.is_file() and p.suffix.lower() in exts
-        ]
-    else:
-        images = [
-            p
-            for p in sorted(folder.iterdir())
-            if p.is_file() and p.suffix.lower() in exts
-        ]
-    return images
+# === Измеряем время ===
+start_time = time.perf_counter()
+res = recognizer.predict(images=images, batch_size=16)
+end_time = time.perf_counter()
 
+# === Вывод результатов ===
+total_time = end_time - start_time
+avg_time = total_time / len(images)
+fps = 1.0 / avg_time if avg_time > 0 else float("inf")
 
-def main() -> None:
-    if not FOLDER.exists() or not FOLDER.is_dir():
-        raise SystemExit(f"Папка {FOLDER} не найдена или не является директорией.")
+print("\n=== Результаты распознавания ===")
+for text, score in res:
+    print(f"Recognized: {text}, confidence: {score:.4f}")
 
-    image_paths = collect_images(FOLDER, RECURSIVE)
-    if not image_paths:
-        raise SystemExit("В папке нет изображений поддерживаемых форматов.")
-
-    print(f"Найдено изображений: {len(image_paths)}")
-
-    model = EASTInfer(
-        weights_path=r"C:\east_quad_23_05.pth",
-        axis_aligned_output=not KEEP_ROTATED,
-        remove_area_anomalies=not DISABLE_ANOMALY_FILTER,
-    )
-
-    all_times: list[float] = []
-    total_start = time.perf_counter()
-
-    for image_path in tqdm(image_paths, desc="Inference", unit="img"):
-        t0 = time.perf_counter()
-        model.predict(str(image_path), vis=False, profile=False)
-        all_times.append(time.perf_counter() - t0)
-
-    total_elapsed = time.perf_counter() - total_start
-
-    print("\n--- Результаты ---")
-    print(f"Всего изображений: {len(image_paths)}")
-    print(f"Суммарное время: {total_elapsed:.3f} с")
-    print(f"Среднее на изображение: {mean(all_times):.3f} с")
-    print(
-        f"Минимальное / Максимальное: {min(all_times):.3f} с / {max(all_times):.3f} с"
-    )
-
-
-if __name__ == "__main__":
-    main()
+print(f"\nProcessed {len(images)} images in {total_time:.3f} sec")
+print(f"Average per image: {avg_time:.3f} sec ({fps:.1f} FPS)")
