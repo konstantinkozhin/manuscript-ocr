@@ -5,6 +5,7 @@ import webbrowser
 from typing import Dict, List, Optional
 
 import optuna
+from tqdm import tqdm
 
 try:
     import optuna_dashboard
@@ -18,14 +19,14 @@ from manuscript.recognizers.trba.training.metrics import (
 )
 
 # === User-configurable paths & parameters ===
-IMAGE_DIR = r"C:\shared\orig_cyrillic\test"
-GT_FILE = r"C:\shared\orig_cyrillic\test.tsv"
+IMAGE_DIR = r"C:\shared\Archive_19_04\data_archive\test"
+GT_FILE = r"C:\shared\Archive_19_04\data_archive\gt_test - Copy.txt"
 MODEL_PATH = r"C:\shared\exp1_model_64\best_acc_ckpt.pth"
 CONFIG_PATH = r"C:\shared\exp1_model_64\config.json"
 CHARSET_PATH: Optional[str] = (
     None  # set to override default charset, otherwise keep None
 )
-BATCH_SIZE = 16
+BATCH_SIZE = 128
 TRIALS = 100
 STUDY_NAME = "trba-decode-search"
 DEFAULT_STORAGE_FILE = os.path.join(os.path.dirname(__file__), "optuna_trba.db")
@@ -49,6 +50,36 @@ def load_ground_truth(gt_path: str) -> Dict[str, str]:
     if not mapping:
         raise RuntimeError(f"No ground-truth entries found in {gt_path}")
     return mapping
+
+
+def make_image_list_from_gt(gt_map: Dict[str, str], image_dir: str) -> List[str]:
+    """
+    Строит список путей к изображениям строго по порядку ключей в gt_map,
+    игнорируя содержимое директории. Предупреждает об отсутствующих файлах.
+    """
+    images: List[str] = []
+    missing: List[str] = []
+
+    for fname in gt_map.keys():  # порядок соответствует строкам в GT_FILE (Py3.7+)
+        path = os.path.join(image_dir, fname)
+        if os.path.isfile(path):
+            images.append(path)
+        else:
+            missing.append(fname)
+
+    if missing:
+        print(
+            f"[Warn] В GT указано {len(missing)} файлов, которых нет в папке '{image_dir}':"
+        )
+        for m in missing[:20]:
+            print("   -", m)
+        if len(missing) > 20:
+            print(f"   ... и ещё {len(missing) - 20}")
+
+    if not images:
+        raise RuntimeError("По GT не найдено ни одного существующего изображения.")
+
+    return images
 
 
 def collect_images(image_dir: str) -> List[str]:
@@ -75,14 +106,36 @@ def evaluate_avg_cer(
     mode: str,
     beam_size: int,
     alpha: float,
+    temperature: float = 1.0,
 ) -> float:
-    predictions = recognizer.predict(
-        images=images,
-        batch_size=batch_size,
-        mode=mode,
-        beam_size=beam_size,
-        alpha=alpha,
+    num_batches = (len(images) + batch_size - 1) // batch_size
+
+    print(
+        f"  🔄 Запуск предсказания: {len(images)} изображений, {num_batches} батчей "
+        f"(batch_size={batch_size}, mode={mode}, beam_size={beam_size})"
     )
+
+    # Создаём прогресс-бар для батчей
+    with tqdm(
+        total=num_batches, desc="  Обработка батчей", unit="batch", leave=False
+    ) as pbar:
+        # Разбиваем на батчи и обрабатываем с обновлением прогресс-бара
+        all_predictions = []
+        for i in range(0, len(images), batch_size):
+            batch_images = images[i : i + batch_size]
+            batch_predictions = recognizer.predict(
+                images=batch_images,
+                batch_size=batch_size,
+                mode=mode,
+                beam_size=beam_size,
+                alpha=alpha,
+                temperature=temperature,
+            )
+            all_predictions.extend(batch_predictions)
+            pbar.update(1)
+
+    predictions = all_predictions
+    print(f"  ✅ Предсказания получены, вычисляем метрики...")
 
     total_cer = 0.0
     count = 0
@@ -113,14 +166,34 @@ def evaluate_metrics(
     Возвращает (avg_cer, accuracy).
     accuracy - доля точных совпадений, вычисленная через compute_accuracy.
     """
-    predictions = recognizer.predict(
-        images=images,
-        batch_size=batch_size,
-        mode=mode,
-        beam_size=beam_size,
-        alpha=alpha,
-        temperature=temperature,
+    num_batches = (len(images) + batch_size - 1) // batch_size
+
+    print(
+        f"  🔄 Запуск предсказания: {len(images)} изображений, {num_batches} батчей "
+        f"(batch_size={batch_size}, mode={mode}, beam_size={beam_size})"
     )
+
+    # Создаём прогресс-бар для батчей
+    with tqdm(
+        total=num_batches, desc="  Обработка батчей", unit="batch", leave=False
+    ) as pbar:
+        # Разбиваем на батчи и обрабатываем с обновлением прогресс-бара
+        all_predictions = []
+        for i in range(0, len(images), batch_size):
+            batch_images = images[i : i + batch_size]
+            batch_predictions = recognizer.predict(
+                images=batch_images,
+                batch_size=batch_size,
+                mode=mode,
+                beam_size=beam_size,
+                alpha=alpha,
+                temperature=temperature,
+            )
+            all_predictions.extend(batch_predictions)
+            pbar.update(1)
+
+    predictions = all_predictions
+    print(f"  ✅ Предсказания получены, вычисляем метрики...")
 
     refs: List[str] = []
     hyps: List[str] = []
@@ -200,20 +273,28 @@ def maybe_launch_dashboard(study: optuna.Study) -> None:
 
 
 def main():
+    print("📂 Загрузка ground truth...")
     gt_map = load_ground_truth(GT_FILE)
-    images = collect_images(IMAGE_DIR)
+    print(f"   Загружено {len(gt_map)} записей ground truth")
 
+    print("🖼️  Сборка списка изображений...")
+    images = make_image_list_from_gt(gt_map, IMAGE_DIR)
+    print(f"   Найдено {len(images)} изображений\n")
+
+    print("🤖 Загрузка модели TRBA...")
     recognizer = TRBAInfer(
         model_path=MODEL_PATH,
         config_path=CONFIG_PATH,
         charset_path=CHARSET_PATH,
     )
+    print("   Модель загружена\n")
 
     baseline_params = {
         "mode": "greedy",
         "beam_size": 1,
         "alpha": 0.0,
     }
+    print(f"\n[Baseline evaluation] Запуск с параметрами: {baseline_params}")
     baseline_cer = evaluate_avg_cer(
         recognizer,
         images,
@@ -221,7 +302,7 @@ def main():
         BATCH_SIZE,
         **baseline_params,
     )
-    print(f"[Baseline] mode=greedy Avg CER={baseline_cer:.4f}")
+    print(f"[Baseline] mode=greedy Avg CER={baseline_cer:.4f}\n")
 
     sampler = optuna.samplers.TPESampler(seed=SEED)
     study_kwargs = {
@@ -309,6 +390,7 @@ def main():
         mode=best_params.get("mode", "beam"),
         beam_size=best_params.get("beam_size", 5),
         alpha=best_params.get("alpha", 0.0),
+        temperature=best_params.get("temperature", 1.0),
     )
     print(f"Confirmed CER: {best_cer:.4f}    Confirmed accuracy: {best_accuracy:.4f}")
 

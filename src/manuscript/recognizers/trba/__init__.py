@@ -110,18 +110,9 @@ class TRBAInfer:
         ],
         batch_size: int = 32,
         mode: str = "greedy",
-        beam_size: int = 5,
-        temperature: float = 1.0,
-        alpha: float = 0.0,
-        # normalize_by_length: bool = True,
-        # diverse_groups: int = 1,
-        # diversity_strength: float = 0.0,
-        # noise_level: float = 0.3,
-        # topk_sampling_steps: int = 3,
-        # topk: int = 5,
-        # coverage_penalty_weight: float = 0.1,
-        # expand_beam_steps: int = 3,
-        # seed=None,
+        beam_size: int = 8,
+        temperature: float = 1.7,
+        alpha: float = 0.9,
     ) -> List[Tuple[str, float]]:
 
         if not isinstance(images, list):

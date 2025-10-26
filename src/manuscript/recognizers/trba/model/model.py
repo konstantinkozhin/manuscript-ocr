@@ -1,7 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from typing import Union, Optional
+from typing import Optional
 
 from .seresnet31 import SEResNet31
 
@@ -95,8 +95,8 @@ class Attention(nn.Module):
         batch_H,
         batch_max_length=25,
         beam_size=5,
-        alpha: float = 0.6,
-        temperature: float = 1.0,
+        alpha: float = 0.9,
+        temperature: float = 1.7,
     ):
         B = batch_H.size(0)
         device = batch_H.device
