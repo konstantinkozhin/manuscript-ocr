@@ -172,123 +172,130 @@ def beam_search_decode_torch(
     lm_model=None,
     lm_tokenizer=None,
     lm_weight: float = 0.0,
+    # --- новые параметры ---
+    noise_level: float = 0.3,  # уровень шума для стохастичности
+    topk_sampling_steps: int = 3,  # сколько первых шагов делаем sampling
+    topk: int = 5,  # размер top-k при sampling
+    coverage_penalty_weight: float = 0.1,  # штраф за повтор
+    expand_beam_steps: int = 3,  # сколько шагов расширяем beam в начале
+    seed: Optional[int] = None,
 ):
+    """
+    Улучшенный beam search:
+    - diverse groups
+    - стохастичность в начале
+    - top-k sampling warmup
+    - coverage penalty
+    - расширение beam на первых шагах
+    """
     if logits.dim() != 3:
         raise ValueError(f"Expected (B, T, C), got {tuple(logits.shape)}")
 
     B, T, C = logits.shape
     device = logits.device
+
+    # Добавляем шум для стохастичности
     log_probs = F.log_softmax(logits / temperature, dim=-1)
+    if noise_level > 0:
+        noise = torch.randn_like(log_probs) * noise_level
+        log_probs = log_probs + noise
+
     results = []
 
     for b in range(B):
-        beams = [(0.0, [], None)]  # (score, seq, lm_state)
+        beams = [(0.0, [])]
         beam_history = [] if vis else None
 
         for t in range(T):
+            # Расширяем beam в начале
+            current_beam_size = beam_size * 2 if t < expand_beam_steps else beam_size
+
             all_candidates = []
-            group_size = max(1, beam_size // diverse_groups)
+            group_size = max(1, current_beam_size // diverse_groups)
             token_penalties = torch.zeros(C, device=device)
 
             for g in range(diverse_groups):
                 group_beams = beams[g * group_size : (g + 1) * group_size]
 
-                for score, seq, lm_state in group_beams:
-                    # остановка по EOS
+                for score, seq in group_beams:
+                    # Если достигнут EOS — не продолжаем
                     if eos_id is not None and len(seq) > 0 and seq[-1] == eos_id:
-                        all_candidates.append((score, seq, lm_state))
+                        all_candidates.append((score, seq))
                         continue
 
                     step_log_probs = log_probs[b, t]
+
+                    # diversity penalty
                     if diversity_strength > 0:
                         step_log_probs = (
                             step_log_probs - diversity_strength * token_penalties
                         )
 
+                    # --- top-k sampling warmup ---
+                    if t < topk_sampling_steps:
+                        topk_vals, topk_ids = torch.topk(step_log_probs, topk)
+                        probs = torch.softmax(topk_vals, dim=-1)
+                        sampled_id = int(torch.multinomial(probs, 1))
+                        chosen_id = int(topk_ids[sampled_id])
+                        new_seq = seq + [chosen_id]
+                        new_score = score + float(step_log_probs[chosen_id].item())
+                        all_candidates.append((new_score, new_seq))
+                        token_penalties[chosen_id] += 1
+                        continue
+
+                    # --- стандартный beam step ---
                     topk_log_probs, topk_ids = torch.topk(step_log_probs, group_size)
-                    topk_log_probs = topk_log_probs.detach().cpu().numpy()
-                    topk_ids = topk_ids.detach().cpu().numpy()
-
                     for k in range(group_size):
-                        tok = int(topk_ids[k])
-                        ocr_logp = float(topk_log_probs[k])
-                        new_seq = seq + [tok]
-                        new_score = score + ocr_logp
-
-                        # ==== 🔥 добавляем LM влияние ====
-                        if (
-                            lm_model is not None
-                            and lm_tokenizer is not None
-                            and lm_weight > 0.0
-                            and itos is not None
-                        ):
-                            ch = itos[tok] if 0 <= tok < len(itos) else ""
-                            # создаём начальное состояние LM
-                            if lm_state is None:
-                                lm_state = torch.tensor([lm_tokenizer.bos_token_id]).to(
-                                    device
-                                )
-                            # добавляем токен в префикс
-                            toks = lm_tokenizer.encode(ch, add_special_tokens=False)
-                            if toks:
-                                lm_input = torch.cat(
-                                    [lm_state, torch.tensor(toks, device=device)],
-                                    dim=-1,
-                                )
-                                with torch.no_grad():
-                                    outputs = lm_model(lm_input.unsqueeze(0))
-                                    logits = outputs.logits[
-                                        0, -2, :
-                                    ]  # вероятность предыдущего токена
-                                    probs = F.log_softmax(logits, dim=-1)
-                                    last_token = toks[0]
-                                    lm_logp = float(probs[last_token].item())
-                                lm_state_new = lm_input
-                            else:
-                                lm_logp = 0.0
-                                lm_state_new = lm_state
-                            new_score += lm_weight * lm_logp
-                        else:
-                            lm_state_new = lm_state
-                        # ================================
-
-                        all_candidates.append((new_score, new_seq, lm_state_new))
-
+                        new_seq = seq + [int(topk_ids[k])]
+                        new_score = score + float(topk_log_probs[k].item())
+                        all_candidates.append((new_score, new_seq))
                     token_penalties[topk_ids] += 1
 
-            # отбор beam_size лучших
-            all_candidates.sort(key=lambda x: x[0], reverse=True)
-            beams = all_candidates[:beam_size]
+            # coverage penalty: штраф за повтор
+            def coverage_penalty(seq):
+                if not seq:
+                    return 0.0
+                unique = len(set(seq))
+                return -coverage_penalty_weight * (1 - unique / len(seq))
+
+            scored_candidates = []
+            for s, seq in all_candidates:
+                s += coverage_penalty(seq)
+                scored_candidates.append((s, seq))
+
+            # сортировка
+            scored_candidates.sort(key=lambda x: x[0], reverse=True)
+            kept_candidates = scored_candidates[:current_beam_size]
+            kept_set = {tuple(seq) for _, seq in kept_candidates}
 
             if vis:
-                kept_set = {tuple(seq) for _, seq, _ in beams}
                 beam_history.append(
                     [
-                        {"seq": seq, "score": float(s), "kept": tuple(seq) in kept_set}
-                        for s, seq, _ in all_candidates
+                        {"seq": seq, "score": s, "kept": tuple(seq) in kept_set}
+                        for s, seq in scored_candidates
                     ]
                 )
 
-        # финал
+            beams = kept_candidates
+
+        # финальное нормирование и выбор
         final_beams = []
-        for s, seq, _ in beams:
-            L = max(len(seq), 1)
-            score = s
-            if length_penalty > 0:
-                score /= L**length_penalty
+        for s, seq in beams:
+            length = max(len(seq), 1)
+            score = s / (length**length_penalty) if length_penalty > 0 else s
             if normalize_by_length:
-                score /= L
+                score /= length
             final_beams.append((score, seq))
 
         best_seq = max(final_beams, key=lambda x: x[0])[1]
         if eos_id is not None and eos_id in best_seq:
             best_seq = best_seq[: best_seq.index(eos_id)]
+
         results.append(best_seq)
+        # if vis and itos is not None:
+        #     visualize_decoding(log_probs[b], beam_history, itos)
 
-        if vis and itos is not None:
-            pass
-            # visualize_decoding(log_probs[b], beam_history, itos)
-
+    # Паддинг для финального батча
     max_len = max(len(s) for s in results)
     padded = torch.full(
         (len(results), max_len), pad_id, dtype=torch.long, device=device
@@ -314,6 +321,12 @@ def beam_search_decode(
     lm_model=None,
     lm_tokenizer=None,
     lm_weight: float = 0.0,
+    noise_level: float = 0.3,
+    topk_sampling_steps: int = 3,
+    topk: int = 5,
+    coverage_penalty_weight: float = 0.1,
+    expand_beam_steps: int = 3,
+    seed: Optional[int] = None,  # <---- добавлено
 ):
     if vis:
         return beam_search_decode_torch(
@@ -331,6 +344,12 @@ def beam_search_decode(
             lm_model=lm_model,
             lm_tokenizer=lm_tokenizer,
             lm_weight=lm_weight,
+            noise_level=noise_level,
+            topk_sampling_steps=topk_sampling_steps,
+            topk=topk,
+            coverage_penalty_weight=coverage_penalty_weight,
+            expand_beam_steps=expand_beam_steps,
+            seed=seed,  # <---- пробрасываем
         )
     else:
         if logits.dim() != 3:
@@ -427,6 +446,12 @@ def decode_predictions(
     itos: Optional[List[str]] = None,
     lm_scorer: Optional[HF_LMScorer] = None,
     lm_weight: float = 0.0,
+    noise_level: float = 0.3,
+    topk_sampling_steps: int = 3,
+    topk: int = 5,
+    coverage_penalty_weight: float = 0.1,
+    expand_beam_steps: int = 3,
+    seed: Optional[int] = None,
 ):
     mode = mode.lower()
     if mode not in {"beam", "greedy"}:
@@ -458,7 +483,7 @@ def decode_predictions(
                     if eos_id is not None and token_id == eos_id:
                         stopped = True
 
-                visualize_decoding(log_probs[b], beam_history, itos)
+                # visualize_decoding(log_probs[b], beam_history, itos)
         return preds
 
     elif mode == "beam":

@@ -8,7 +8,8 @@ import cv2
 
 from .model.model import RCNN
 from .data.transforms import load_charset, get_val_transform, decode_tokens
-from .training.utils import load_checkpoint, decode_predictions, HF_LMScorer
+from .training.utils import load_checkpoint, decode_predictions
+import torch.nn.functional as F
 
 
 class TRBAInfer:
@@ -56,7 +57,6 @@ class TRBAInfer:
         self.transform = get_val_transform(self.img_h, self.img_w)
 
         self.model = self._load_model()
-        self.lm_scorer = HF_LMScorer("sberbank-ai/rugpt3small_based_on_gpt2")
 
     def _load_model(self) -> RCNN:
         model = RCNN(
@@ -112,10 +112,16 @@ class TRBAInfer:
         mode: str = "greedy",
         beam_size: int = 5,
         temperature: float = 1.0,
-        length_penalty: float = 0.0,
-        normalize_by_length: bool = True,
-        diverse_groups: int = 1,
-        diversity_strength: float = 0.0,
+        alpha: float = 0.0,
+        # normalize_by_length: bool = True,
+        # diverse_groups: int = 1,
+        # diversity_strength: float = 0.0,
+        # noise_level: float = 0.3,
+        # topk_sampling_steps: int = 3,
+        # topk: int = 5,
+        # coverage_penalty_weight: float = 0.1,
+        # expand_beam_steps: int = 3,
+        # seed=None,
     ) -> List[Tuple[str, float]]:
 
         if not isinstance(images, list):
@@ -129,34 +135,35 @@ class TRBAInfer:
             for i in range(0, len(images_list), batch_size):
                 batch_images = images_list[i : i + batch_size]
 
+                # --- подготовка батча ---
                 batch_tensors = []
                 for img in batch_images:
                     tensor = self._preprocess_image(img)
                     batch_tensors.append(tensor.squeeze(0))
-
                 batch_tensor = torch.stack(batch_tensors).to(self.device)
+                # --- инференс ---
+                if mode == "greedy":
+                    probs, pred_ids = self.model(
+                        batch_tensor,
+                        is_train=False,
+                        batch_max_length=self.max_length,
+                        mode=mode,
+                    )
+                elif mode == "beam":
+                    probs, pred_ids = self.model(
+                        batch_tensor,
+                        is_train=False,
+                        batch_max_length=self.max_length,
+                        mode=mode,
+                        beam_size=beam_size,
+                        alpha=alpha,
+                        temperature=temperature,
+                    )
+                else:
+                    raise ValueError(f"Unknown mode: {mode}")
 
-                output = self.model(
-                    batch_tensor, is_train=False, batch_max_length=self.max_length
-                )
-                pred_ids = decode_predictions(
-                    output,
-                    mode=mode,
-                    beam_size=beam_size,
-                    eos_id=self.eos_id,
-                    pad_id=self.pad_id,
-                    temperature=temperature,
-                    length_penalty=length_penalty,
-                    normalize_by_length=normalize_by_length,
-                    diverse_groups=diverse_groups,
-                    diversity_strength=diversity_strength,
-                    vis=True,
-                    itos=self.itos,
-                    lm_scorer=self.lm_scorer,
-                    lm_weight=0.1,
-                ).cpu()
-
-                probs = torch.softmax(output, dim=-1)
+                # --- вычисление вероятностей ---
+                probs = F.log_softmax(probs, dim=-1)  # [B, T, V]
 
                 for j, pred_row in enumerate(pred_ids):
                     text = decode_tokens(
@@ -167,10 +174,11 @@ class TRBAInfer:
                         blank_id=self.blank_id,
                     )
 
+                    # Confidence = среднее log-prob
                     pred_row = pred_row.tolist()
                     if len(pred_row) > 0:
                         token_probs = probs[j, torch.arange(len(pred_row)), pred_row]
-                        confidence = token_probs.mean().item()
+                        confidence = token_probs.exp().mean().item()
                     else:
                         confidence = 0.0
 

@@ -90,6 +90,141 @@ class Attention(nn.Module):
         return logits
 
     @torch.no_grad()
+    def _beam_decode(
+        self,
+        batch_H,
+        batch_max_length=25,
+        beam_size=5,
+        alpha: float = 0.6,
+        temperature: float = 1.0,
+    ):
+        B = batch_H.size(0)
+        device = batch_H.device
+        H, V = self.hidden_size, self.num_classes
+
+        h0 = torch.zeros(B, H, device=device)
+        c0 = torch.zeros(B, H, device=device)
+
+        beam_tokens = torch.full(
+            (B, beam_size, 1), self.sos_id, dtype=torch.long, device=device
+        )
+        beam_scores = torch.full((B, beam_size), float("-inf"), device=device)
+        beam_scores[:, 0] = 0.0
+
+        beam_h = h0.unsqueeze(1).repeat(1, beam_size, 1).contiguous()
+        beam_c = c0.unsqueeze(1).repeat(1, beam_size, 1).contiguous()
+
+        finished = torch.zeros(B, beam_size, dtype=torch.bool, device=device)
+
+        probs_trace = None
+
+        for t in range(batch_max_length):
+            last_tok = beam_tokens[:, :, -1].reshape(B * beam_size)  # [B*beam]
+            flat_h = beam_h.reshape(B * beam_size, H)
+            flat_c = beam_c.reshape(B * beam_size, H)
+
+            onehots = self._char_to_onehot(last_tok, device)  # [B*beam, V]
+            hidden, _ = self.attention_cell(
+                (flat_h, flat_c),
+                batch_H.repeat_interleave(beam_size, dim=0),
+                onehots,
+            )
+            out = F.dropout(hidden[0], p=self.dropout_p, training=self.training)
+            logits_t = self.generator(out)  # [B*beam, V]
+            logits_t = self._mask_logits(logits_t)
+            if temperature != 1.0:
+                eps = 1e-6
+                logits_t = logits_t / max(temperature, eps)
+
+            log_probs = F.log_softmax(logits_t, dim=-1)
+
+            log_probs = log_probs.view(B, beam_size, V)
+            h_new = hidden[0].view(B, beam_size, H)
+            c_new = hidden[1].view(B, beam_size, H)
+
+            if finished.any():
+                mask = finished.unsqueeze(-1)  # [B, beam, 1]
+                log_probs = torch.where(
+                    mask.expand_as(log_probs),
+                    torch.full_like(log_probs, float("-inf")),
+                    log_probs,
+                )
+                log_probs[..., self.eos_id] = torch.where(
+                    mask.squeeze(-1),
+                    torch.zeros_like(log_probs[..., self.eos_id]),
+                    log_probs[..., self.eos_id],
+                )
+
+            next_sum = beam_scores.unsqueeze(-1) + log_probs  # [B, beam, V]
+            if alpha > 0:
+                lp = ((5.0 + (t + 1)) ** alpha) / (6.0**alpha)
+                next_scores = next_sum / lp
+            else:
+                next_scores = next_sum
+
+            next_scores_flat = next_scores.view(B, -1)  # [B, beam*V]
+            top_scores, top_idx = torch.topk(
+                next_scores_flat, k=beam_size, dim=-1
+            )  # [B, beam]
+
+            next_beam = top_idx // V  # [B, beam]
+            next_token = (top_idx % V).clamp(0, V - 1)  # [B, beam]
+
+            gather_h = h_new.gather(
+                1, next_beam.unsqueeze(-1).expand(-1, -1, H)
+            )  # [B, beam, H]
+            gather_c = c_new.gather(1, next_beam.unsqueeze(-1).expand(-1, -1, H))
+
+            beam_tokens = torch.cat(
+                [
+                    beam_tokens.gather(
+                        1, next_beam.unsqueeze(-1).expand(-1, -1, beam_tokens.size(-1))
+                    ),
+                    next_token.unsqueeze(-1),
+                ],
+                dim=-1,
+            )
+
+            if alpha > 0:
+                sum_logp = top_scores * lp
+            else:
+                sum_logp = top_scores
+            beam_scores = sum_logp
+
+            beam_h, beam_c = gather_h, gather_c
+
+            finished = finished.gather(1, next_beam) | (next_token == self.eos_id)
+
+            cur_logits = logits_t.view(B, beam_size, V)  # от текущего шага ДО выбора
+            cur_logits_sel = cur_logits.gather(
+                1, next_beam.unsqueeze(-1).expand(-1, -1, V)
+            )
+            if probs_trace is None:
+                probs_trace = cur_logits_sel.unsqueeze(2)  # [B, beam, 1, V]
+            else:
+                probs_trace = probs_trace.gather(
+                    1,
+                    next_beam.unsqueeze(-1)
+                    .unsqueeze(-1)
+                    .expand(-1, -1, probs_trace.size(2), V),
+                )
+                probs_trace = torch.cat(
+                    [probs_trace, cur_logits_sel.unsqueeze(2)], dim=2
+                )
+
+            if finished.all():
+                break
+
+        best_idx = beam_scores.argmax(-1)  # [B]
+        best_tokens = beam_tokens[
+            torch.arange(B, device=device), best_idx
+        ]  # [B, T+1], с SOS в начале
+
+        probs_best = probs_trace[torch.arange(B, device=device), best_idx]  # [B, T, V]
+
+        return probs_best, best_tokens[:, 1:]
+
+    @torch.no_grad()
     def _greedy_decode(self, batch_H, batch_max_length=25):
         B = batch_H.size(0)
         device = batch_H.device
@@ -99,26 +234,61 @@ class Attention(nn.Module):
         c = torch.zeros(B, self.hidden_size, device=device)
         hidden = (h, c)
         targets = torch.full((B,), self.sos_id, dtype=torch.long, device=device)
-        probs = torch.zeros(B, steps, self.num_classes, device=device)
+
+        probs = []
+        preds = []
 
         for t in range(steps):
             onehots = self._char_to_onehot(targets, device=device)
             hidden, _ = self.attention_cell(hidden, batch_H, onehots)
             out = F.dropout(hidden[0], p=self.dropout_p, training=self.training)
-            logits_t = self.generator(out)  # [B, V]
+            logits_t = self.generator(out)
             logits_t = self._mask_logits(logits_t)
-            probs[:, t, :] = logits_t
-            targets = logits_t.argmax(1)
 
-        return probs
+            probs.append(logits_t.unsqueeze(1))
+            next_tokens = logits_t.argmax(1)
+            preds.append(next_tokens.unsqueeze(1))
 
-    def forward(self, batch_H, text=None, is_train=True, batch_max_length=25):
+            targets = next_tokens.clone()
+
+            if (next_tokens == self.eos_id).all():
+                break
+
+        probs = torch.cat(probs, dim=1)  # [B, T, V]
+        preds = torch.cat(preds, dim=1)  # [B, T]
+        return probs, preds
+
+    def forward(
+        self,
+        batch_H,
+        text=None,
+        is_train=True,
+        batch_max_length=25,
+        mode: str = "greedy",
+        beam_size: int = 5,
+        alpha: float = 0.6,
+        temperature: float = 1.0,
+    ):
+        # ===== 1. Инференс =====
         if not is_train:
-            return self._greedy_decode(batch_H, batch_max_length)
+            if mode == "greedy":
+                return self._greedy_decode(batch_H, batch_max_length)
+            elif mode == "beam":
+                return self._beam_decode(
+                    batch_H,
+                    batch_max_length,
+                    beam_size=beam_size,
+                    alpha=alpha,
+                    temperature=temperature,
+                )
+            else:
+                raise ValueError(f"Unknown decode mode: {mode}")
 
+        # ===== 2. Обучение (teacher forcing) =====
         assert (
             text is not None
-        ), "For training, `text` with <SOS> at text[:,0] is required"
+        ), "Для обучения необходимо подать `text` с <SOS> токеном в начале"
+
         device = batch_H.device
         B = batch_H.size(0)
         steps = batch_max_length + 1
@@ -138,8 +308,9 @@ class Attention(nn.Module):
             out = F.dropout(hidden[0], p=self.dropout_p, training=self.training)
             logits_t = self.generator(out)
 
+            # scheduled sampling
             if t < steps - 1:
-                if is_train and torch.rand(1).item() < self.sampling_prob:
+                if torch.rand(1).item() < self.sampling_prob:
                     targets = logits_t.argmax(1)
                 else:
                     targets = text[:, t + 1]
@@ -221,8 +392,25 @@ class RCNN(nn.Module):
         f = self.enc_dropout(f)
         return f
 
-    def forward(self, x, text=None, is_train=True, batch_max_length=25):
+    def forward(
+        self,
+        x,
+        text=None,
+        is_train=True,
+        batch_max_length=25,
+        mode: str = "greedy",
+        beam_size: int = 5,
+        alpha: float = 0.6,
+        temperature: float = 1.0,
+    ):
         enc = self.encode(x)
         return self.attn(
-            enc, text=text, is_train=is_train, batch_max_length=batch_max_length
+            enc,
+            text=text,
+            is_train=is_train,
+            batch_max_length=batch_max_length,
+            mode=mode,
+            beam_size=beam_size,
+            alpha=alpha,
+            temperature=temperature,
         )

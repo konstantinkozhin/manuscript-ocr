@@ -74,14 +74,34 @@ def evaluate_avg_cer(
     *,
     mode: str,
     beam_size: int,
-    alpha: float,
+    temperature: float,
+    length_penalty: float,
+    normalize_by_length: bool,
+    diverse_groups: int,
+    diversity_strength: float,
+    noise_level: float,
+    topk_sampling_steps: int,
+    topk: int,
+    coverage_penalty_weight: float,
+    expand_beam_steps: int,
+    seed: Optional[int] = None,
 ) -> float:
     predictions = recognizer.predict(
         images=images,
         batch_size=batch_size,
         mode=mode,
         beam_size=beam_size,
-        alpha=alpha,
+        temperature=temperature,
+        length_penalty=length_penalty,
+        normalize_by_length=normalize_by_length,
+        diverse_groups=diverse_groups,
+        diversity_strength=diversity_strength,
+        noise_level=noise_level,
+        topk_sampling_steps=topk_sampling_steps,
+        topk=topk,
+        coverage_penalty_weight=coverage_penalty_weight,
+        expand_beam_steps=expand_beam_steps,
+        seed=seed,
     )
 
     total_cer = 0.0
@@ -106,8 +126,17 @@ def evaluate_metrics(
     *,
     mode: str,
     beam_size: int,
-    alpha: float,
     temperature: float,
+    length_penalty: float,
+    normalize_by_length: bool,
+    diverse_groups: int,
+    diversity_strength: float,
+    noise_level: float,
+    topk_sampling_steps: int,
+    topk: int,
+    coverage_penalty_weight: float,
+    expand_beam_steps: int,
+    seed: Optional[int] = None,
 ) -> tuple[float, float]:
     """
     Возвращает (avg_cer, accuracy).
@@ -118,8 +147,17 @@ def evaluate_metrics(
         batch_size=batch_size,
         mode=mode,
         beam_size=beam_size,
-        alpha=alpha,
         temperature=temperature,
+        length_penalty=length_penalty,
+        normalize_by_length=normalize_by_length,
+        diverse_groups=diverse_groups,
+        diversity_strength=diversity_strength,
+        noise_level=noise_level,
+        topk_sampling_steps=topk_sampling_steps,
+        topk=topk,
+        coverage_penalty_weight=coverage_penalty_weight,
+        expand_beam_steps=expand_beam_steps,
+        seed=seed,
     )
 
     refs: List[str] = []
@@ -212,7 +250,17 @@ def main():
     baseline_params = {
         "mode": "greedy",
         "beam_size": 1,
-        "alpha": 0.0,
+        "temperature": 1.0,
+        "length_penalty": 0.0,
+        "normalize_by_length": True,
+        "diverse_groups": 1,
+        "diversity_strength": 0.0,
+        "noise_level": 0.3,
+        "topk_sampling_steps": 3,
+        "topk": 5,
+        "coverage_penalty_weight": 0.1,
+        "expand_beam_steps": 3,
+        "seed": SEED,
     }
     baseline_cer = evaluate_avg_cer(
         recognizer,
@@ -243,31 +291,31 @@ def main():
         if mode == "greedy":
             # Для greedy режима beam-специфичные параметры фиксированы
             beam_size = 1
-            alpha = 0.0
             temperature = 1.0
-            # normalize_by_length = True
-            # diverse_groups = 1
-            # diversity_strength = 0.0
-            # noise_level = 0.3
-            # topk_sampling_steps = 3
-            # topk = 5
-            # coverage_penalty_weight = 0.1
-            # expand_beam_steps = 3
+            length_penalty = 0.0
+            normalize_by_length = True
+            diverse_groups = 1
+            diversity_strength = 0.0
+            noise_level = 0.3
+            topk_sampling_steps = 3
+            topk = 5
+            coverage_penalty_weight = 0.1
+            expand_beam_steps = 3
         else:
-            # Для beam режима оптимизируем параметры
+            # Для beam режима оптимизируем все параметры
             beam_size = trial.suggest_int("beam_size", 2, 12)
-            alpha = trial.suggest_float("alpha", 0.0, 1.0)
             temperature = trial.suggest_float("temperature", 0.7, 2.0)
-            # normalize_by_length = True
-            # diverse_groups = trial.suggest_int("diverse_groups", 1, 4)
-            # diversity_strength = trial.suggest_float("diversity_strength", 0.0, 2.0)
-            # noise_level = trial.suggest_float("noise_level", 0.0, 1.0)
-            # topk_sampling_steps = trial.suggest_int("topk_sampling_steps", 0, 10)
-            # topk = trial.suggest_int("topk", 1, 20)
-            # coverage_penalty_weight = trial.suggest_float(
-            #     "coverage_penalty_weight", 0.0, 1.0
-            # )
-            # expand_beam_steps = trial.suggest_int("expand_beam_steps", 0, 10)
+            length_penalty = trial.suggest_float("length_penalty", 0.0, 2.5)
+            normalize_by_length = True
+            diverse_groups = trial.suggest_int("diverse_groups", 1, 4)
+            diversity_strength = trial.suggest_float("diversity_strength", 0.0, 2.0)
+            noise_level = trial.suggest_float("noise_level", 0.0, 1.0)
+            topk_sampling_steps = trial.suggest_int("topk_sampling_steps", 0, 10)
+            topk = trial.suggest_int("topk", 1, 20)
+            coverage_penalty_weight = trial.suggest_float(
+                "coverage_penalty_weight", 0.0, 1.0
+            )
+            expand_beam_steps = trial.suggest_int("expand_beam_steps", 0, 10)
 
         avg_cer, accuracy = evaluate_metrics(
             recognizer,
@@ -276,8 +324,17 @@ def main():
             BATCH_SIZE,
             mode=mode,
             beam_size=beam_size,
-            alpha=alpha,
             temperature=temperature,
+            length_penalty=length_penalty,
+            normalize_by_length=normalize_by_length,
+            diverse_groups=diverse_groups,
+            diversity_strength=diversity_strength,
+            noise_level=noise_level,
+            topk_sampling_steps=topk_sampling_steps,
+            topk=topk,
+            coverage_penalty_weight=coverage_penalty_weight,
+            expand_beam_steps=expand_beam_steps,
+            seed=SEED,
         )
 
         if mode == "greedy":
@@ -286,7 +343,10 @@ def main():
             )
         else:
             print(
-                f"[Trial {trial.number}] mode=beam beam={beam_size} alpha={alpha:.2f} "
+                f"[Trial {trial.number}] mode=beam beam={beam_size} temp={temperature:.2f} "
+                f"len_pen={length_penalty:.2f} groups={diverse_groups} div={diversity_strength:.2f} "
+                f"noise={noise_level:.2f} topk_steps={topk_sampling_steps} topk={topk} "
+                f"cov_pen={coverage_penalty_weight:.2f} exp_steps={expand_beam_steps} "
                 f"-> CER={avg_cer:.4f} Acc={accuracy:.4f}"
             )
         return accuracy
@@ -308,7 +368,17 @@ def main():
         BATCH_SIZE,
         mode=best_params.get("mode", "beam"),
         beam_size=best_params.get("beam_size", 5),
-        alpha=best_params.get("alpha", 0.0),
+        temperature=best_params.get("temperature", 1.0),
+        length_penalty=best_params.get("length_penalty", 0.0),
+        normalize_by_length=best_params.get("normalize_by_length", True),
+        diverse_groups=best_params.get("diverse_groups", 1),
+        diversity_strength=best_params.get("diversity_strength", 0.0),
+        noise_level=best_params.get("noise_level", 0.3),
+        topk_sampling_steps=best_params.get("topk_sampling_steps", 3),
+        topk=best_params.get("topk", 5),
+        coverage_penalty_weight=best_params.get("coverage_penalty_weight", 0.1),
+        expand_beam_steps=best_params.get("expand_beam_steps", 3),
+        seed=SEED,
     )
     print(f"Confirmed CER: {best_cer:.4f}    Confirmed accuracy: {best_accuracy:.4f}")
 
