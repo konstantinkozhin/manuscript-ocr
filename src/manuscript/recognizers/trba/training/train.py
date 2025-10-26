@@ -3,7 +3,7 @@ import os
 import logging
 import csv
 from pathlib import Path
-from typing import Union, Optional, Dict, Any
+from typing import Union, Optional, Dict, Any, List
 
 import torch
 import torch.cuda.amp as amp
@@ -243,6 +243,10 @@ def run_training(cfg: Config, device: str = "cuda"):
     train_proportions = getattr(cfg, "train_proportions", None)
     val_size = getattr(cfg, "val_size", 3000)
     num_workers = getattr(cfg, "num_workers", 0)
+    dual_validate = bool(getattr(cfg, "dual_validate", False))
+    beam_size = getattr(cfg, "beam_size", 8)
+    beam_alpha = getattr(cfg, "beam_alpha", 0.9)
+    beam_temperature = getattr(cfg, "beam_temperature", 1.7)
 
     # --- директории и TensorBoard ---
     if resume_path:
@@ -256,19 +260,20 @@ def run_training(cfg: Config, device: str = "cuda"):
 
     metrics_csv_path = os.path.join(exp_dir, "metrics_epoch.csv")
     if not os.path.exists(metrics_csv_path):
+        header = [
+            "epoch",
+            "train_loss",
+            "val_loss",
+            "val_acc",
+            "val_cer",
+            "val_wer",
+        ]
+        if dual_validate:
+            header.extend(["val_acc_beam", "val_cer_beam", "val_wer_beam"])
+        header.append("lr")
         with open(metrics_csv_path, "w", newline="", encoding="utf-8") as f:
             w = csv.writer(f)
-            w.writerow(
-                [
-                    "epoch",
-                    "train_loss",
-                    "val_loss",
-                    "val_acc",
-                    "val_cer",
-                    "val_wer",
-                    "lr",
-                ]
-            )
+            w.writerow(header)
 
     best_loss_path = os.path.join(exp_dir, "best_loss_ckpt.pth")
     best_acc_path = os.path.join(exp_dir, "best_acc_ckpt.pth")
@@ -560,14 +565,39 @@ def run_training(cfg: Config, device: str = "cuda"):
 
             total_val_loss = 0.0
             total_samples = 0
-            total_correct = 0
-            total_cer_sum = 0.0
-            total_wer_sum = 0.0
-            total_predictions = 0
+
+            eval_modes = {
+                "greedy": {
+                    "forward_kwargs": {
+                        "mode": "greedy",
+                    }
+                }
+            }
+            if dual_validate:
+                eval_modes["beam"] = {
+                    "forward_kwargs": {
+                        "mode": "beam",
+                        "beam_size": beam_size,
+                        "alpha": beam_alpha,
+                        "temperature": beam_temperature,
+                    }
+                }
+
+            aggregate_mode_stats = {
+                mode_name: {
+                    "total_correct": 0,
+                    "total_predictions": 0,
+                    "total_cer_sum": 0.0,
+                    "total_wer_sum": 0.0,
+                }
+                for mode_name in eval_modes
+            }
 
             for i, val_loader_single in enumerate(val_loaders_individual):
                 total_val_loss_single = 0.0
-                refs_single, hyps_single = [], []
+                refs_single: List[str] = []
+                hyps_single = {mode_name: [] for mode_name in eval_modes}
+
                 pbar_val = tqdm(
                     val_loader_single,
                     desc=f"Valid Set {i} {epoch}/{epochs}",
@@ -592,78 +622,105 @@ def run_training(cfg: Config, device: str = "cuda"):
                             )
                         total_val_loss_single += float(val_loss.item())
 
-                        probs, pred_ids = model(
-                            imgs,
-                            is_train=False,
-                            batch_max_length=max_len,
-                            mode="greedy",
-                        )
-                        pred_ids = pred_ids.cpu()
-                        tgt_ids = target_y.cpu()
-
-                        for p_row, t_row in zip(pred_ids, tgt_ids):
-                            hyp = decode_tokens(
-                                p_row, itos, pad_id=PAD, eos_id=EOS, blank_id=BLANK
+                        preds_batch = {}
+                        for mode_name, mode_cfg in eval_modes.items():
+                            forward_kwargs = dict(mode_cfg["forward_kwargs"])
+                            _, pred_ids = model(
+                                imgs,
+                                is_train=False,
+                                batch_max_length=max_len,
+                                **forward_kwargs,
                             )
+                            preds_batch[mode_name] = pred_ids.cpu()
+
+                        tgt_ids = target_y.cpu()
+                        refs_batch = []
+                        for t_row in tgt_ids:
                             ref = decode_tokens(
                                 t_row, itos, pad_id=PAD, eos_id=EOS, blank_id=BLANK
                             )
-                            hyps_single.append(hyp)
+                            refs_batch.append(ref)
                             refs_single.append(ref)
 
+                        for mode_name, pred_tensor in preds_batch.items():
+                            for p_row, ref in zip(pred_tensor, refs_batch):
+                                hyp = decode_tokens(
+                                    p_row, itos, pad_id=PAD, eos_id=EOS, blank_id=BLANK
+                                )
+                                hyps_single[mode_name].append(hyp)
+
                         pbar_val.set_postfix(val_loss=f"{float(val_loss.item()):.4f}")
-                        del (
-                            imgs,
-                            text_in,
-                            target_y,
-                            logits_tf,
-                            pred_ids,
-                            tgt_ids,
-                        )
+                        del imgs, text_in, target_y, logits_tf, preds_batch, tgt_ids
 
                 avg_val_loss_single = total_val_loss_single / max(
                     1, len(val_loader_single)
                 )
-                val_acc_single = compute_accuracy(refs_single, hyps_single)
-                val_cer_single = sum(
-                    character_error_rate(r, h) for r, h in zip(refs_single, hyps_single)
-                ) / max(1, len(refs_single))
-                val_wer_single = sum(
-                    word_error_rate(r, h) for r, h in zip(refs_single, hyps_single)
-                ) / max(1, len(refs_single))
 
                 writer.add_scalar(f"Loss/val_set_{i}", avg_val_loss_single, epoch)
-                writer.add_scalar(f"Accuracy/val_set_{i}", val_acc_single, epoch)
-                writer.add_scalar(f"CER/val_set_{i}", val_cer_single, epoch)
-                writer.add_scalar(f"WER/val_set_{i}", val_wer_single, epoch)
+
+                for mode_name, hyps in hyps_single.items():
+                    val_acc_single = compute_accuracy(refs_single, hyps)
+                    val_cer_single = sum(
+                        character_error_rate(r, h)
+                        for r, h in zip(refs_single, hyps)
+                    ) / max(1, len(refs_single))
+                    val_wer_single = sum(
+                        word_error_rate(r, h) for r, h in zip(refs_single, hyps)
+                    ) / max(1, len(refs_single))
+
+                    metric_suffix = (
+                        f"/val_set_{i}"
+                        if mode_name == "greedy"
+                        else f"/val_set_{i}_{mode_name}"
+                    )
+                    writer.add_scalar(f"Accuracy{metric_suffix}", val_acc_single, epoch)
+                    writer.add_scalar(f"CER{metric_suffix}", val_cer_single, epoch)
+                    writer.add_scalar(f"WER{metric_suffix}", val_wer_single, epoch)
+
+                    stats = aggregate_mode_stats[mode_name]
+                    correct_single = sum(
+                        1 for r, h in zip(refs_single, hyps) if r == h
+                    )
+                    stats["total_correct"] += correct_single
+                    stats["total_predictions"] += len(refs_single)
+                    stats["total_cer_sum"] += sum(
+                        character_error_rate(r, h)
+                        for r, h in zip(refs_single, hyps)
+                    )
+                    stats["total_wer_sum"] += sum(
+                        word_error_rate(r, h) for r, h in zip(refs_single, hyps)
+                    )
 
                 total_val_loss += total_val_loss_single
                 total_samples += len(val_loader_single)
-
-                correct_single = sum(
-                    1 for r, h in zip(refs_single, hyps_single) if r == h
-                )
-                total_correct += correct_single
-                total_predictions += len(refs_single)
-                total_cer_sum += sum(
-                    character_error_rate(r, h) for r, h in zip(refs_single, hyps_single)
-                )
-                total_wer_sum += sum(
-                    word_error_rate(r, h) for r, h in zip(refs_single, hyps_single)
-                )
 
                 del refs_single, hyps_single
                 torch.cuda.empty_cache()
 
             avg_val_loss = total_val_loss / max(1, total_samples)
-            val_acc = total_correct / max(1, total_predictions)
-            val_cer = total_cer_sum / max(1, total_predictions)
-            val_wer = total_wer_sum / max(1, total_predictions)
+
+            def _finalize(mode_name: str):
+                stats = aggregate_mode_stats[mode_name]
+                total_pred = max(1, stats["total_predictions"])
+                return (
+                    stats["total_correct"] / total_pred,
+                    stats["total_cer_sum"] / total_pred,
+                    stats["total_wer_sum"] / total_pred,
+                )
+
+            val_acc, val_cer, val_wer = _finalize("greedy")
+            val_acc_beam = val_cer_beam = val_wer_beam = None
+            if dual_validate:
+                val_acc_beam, val_cer_beam, val_wer_beam = _finalize("beam")
 
             writer.add_scalar("Loss/val_epoch", avg_val_loss, epoch)
             writer.add_scalar("Accuracy/val", val_acc, epoch)
             writer.add_scalar("CER/val", val_cer, epoch)
             writer.add_scalar("WER/val", val_wer, epoch)
+            if dual_validate:
+                writer.add_scalar("Accuracy/val_beam", val_acc_beam, epoch)
+                writer.add_scalar("CER/val_beam", val_cer_beam, epoch)
+                writer.add_scalar("WER/val_beam", val_wer_beam, epoch)
         else:
             logger.info(
                 f"Epoch {epoch:03d}: skipping validation (eval_every={eval_every})"
@@ -672,29 +729,37 @@ def run_training(cfg: Config, device: str = "cuda"):
         with open(metrics_csv_path, "a", newline="", encoding="utf-8") as f:
             w = csv.writer(f)
             if should_eval:
-                w.writerow(
-                    [
-                        epoch,
-                        f"{avg_train_loss:.6f}",
-                        f"{avg_val_loss:.6f}",
-                        f"{val_acc:.6f}",
-                        f"{val_cer:.6f}",
-                        f"{val_wer:.6f}",
-                        f"{optimizer.param_groups[0]['lr']:.6e}",
-                    ]
-                )
+                row = [
+                    epoch,
+                    f"{avg_train_loss:.6f}",
+                    f"{avg_val_loss:.6f}",
+                    f"{val_acc:.6f}",
+                    f"{val_cer:.6f}",
+                    f"{val_wer:.6f}",
+                ]
+                if dual_validate:
+                    row.extend(
+                        [
+                            f"{val_acc_beam:.6f}",
+                            f"{val_cer_beam:.6f}",
+                            f"{val_wer_beam:.6f}",
+                        ]
+                    )
+                row.append(f"{optimizer.param_groups[0]['lr']:.6e}")
+                w.writerow(row)
             else:
-                w.writerow(
-                    [
-                        epoch,
-                        f"{avg_train_loss:.6f}",
-                        "skipped",
-                        "skipped",
-                        "skipped",
-                        "skipped",
-                        f"{optimizer.param_groups[0]['lr']:.6e}",
-                    ]
-                )
+                row = [
+                    epoch,
+                    f"{avg_train_loss:.6f}",
+                    "skipped",
+                    "skipped",
+                    "skipped",
+                    "skipped",
+                ]
+                if dual_validate:
+                    row.extend(["skipped", "skipped", "skipped"])
+                row.append(f"{optimizer.param_groups[0]['lr']:.6e}")
+                w.writerow(row)
 
         msg_parts = [
             f"Epoch {epoch:03d}/{epochs}",
@@ -709,6 +774,14 @@ def run_training(cfg: Config, device: str = "cuda"):
                     f"WER={val_wer:.4f}",
                 ]
             )
+            if dual_validate:
+                msg_parts.extend(
+                    [
+                        f"acc_beam={val_acc_beam:.4f}",
+                        f"CER_beam={val_cer_beam:.4f}",
+                        f"WER_beam={val_wer_beam:.4f}",
+                    ]
+                )
         else:
             msg_parts.append(f"val=skipped (eval_every={eval_every})")
         msg_parts.append(f"lr={optimizer.param_groups[0]['lr']:.2e}")

@@ -206,6 +206,10 @@ class TRBAInfer:
         seed: int = 42,
         resume_path: Optional[str] = None,
         save_every: Optional[int] = None,
+        dual_validate: bool = False,
+        beam_size: int = 8,
+        beam_alpha: float = 0.9,
+        beam_temperature: float = 1.7,
         device: str = "cuda",
         **extra_config: Any,
     ):
@@ -274,6 +278,10 @@ class TRBAInfer:
             "val_size": val_size,
             "num_workers": num_workers,
             "seed": seed,
+            "dual_validate": bool(dual_validate),
+            "beam_size": beam_size,
+            "beam_alpha": beam_alpha,
+            "beam_temperature": beam_temperature,
         }
 
         if exp_dir is not None:
