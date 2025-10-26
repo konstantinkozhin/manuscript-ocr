@@ -1,12 +1,6 @@
 import random
-from typing import List, Optional
 
-import numpy as np
 import torch
-import torch.nn.functional as F
-from numba import njit
-
-from .vis import visualize_decoding
 
 
 def save_checkpoint(

@@ -44,7 +44,7 @@ recognizer = TRBAInfer(model_path=model_path, config_path=config_path)
 
 # === Распознаём ===
 start_time = time.perf_counter()
-results = recognizer.predict(images=images, batch_size=batch_size, mode="beam")
+results = recognizer.predict(images=images, batch_size=batch_size, mode="greedy")
 end_time = time.perf_counter()
 
 total_time = end_time - start_time

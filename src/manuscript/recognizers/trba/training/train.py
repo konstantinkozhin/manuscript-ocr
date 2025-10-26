@@ -3,7 +3,7 @@ import os
 import logging
 import csv
 from pathlib import Path
-from typing import Union, Optional
+from typing import Union, Optional, Dict, Any
 
 import torch
 import torch.cuda.amp as amp
@@ -64,9 +64,14 @@ class Config:
         "best_acc_ckpt.pth",
     ]
 
-    def __init__(self, path: str):
-        with open(path, "r", encoding="utf-8") as f:
-            user_data = json.load(f)
+    def __init__(self, source: Union[str, Dict[str, Any]]):
+        if isinstance(source, str):
+            with open(source, "r", encoding="utf-8") as f:
+                user_data = json.load(f)
+        elif isinstance(source, dict):
+            user_data = dict(source)
+        else:
+            raise TypeError("Config source must be either a path to JSON or a dict.")
 
         merged = self._maybe_apply_resume(user_data)
         for k, v in merged.items():
@@ -124,9 +129,13 @@ class Config:
                 with open(resume_config_path, "r", encoding="utf-8") as f:
                     resume_config = json.load(f)
             except Exception as e:
-                print(f"[Config] Не удалось прочитать конфиг эксперимента {resume_config_path}: {e}")
+                print(
+                    f"[Config] Не удалось прочитать конфиг эксперимента {resume_config_path}: {e}"
+                )
         else:
-            print(f"[Config] В каталоге резюме нет config.json, используется текущий конфиг")
+            print(
+                f"[Config] В каталоге резюме нет config.json, используется текущий конфиг"
+            )
 
         merged = dict(resume_config)
         for key, value in user_data.items():
@@ -304,7 +313,7 @@ def run_training(cfg: Config, device: str = "cuda"):
     # --- scheduler ---
     if scheduler_name == "ReduceLROnPlateau":
         scheduler = ReduceLROnPlateau(
-            optimizer, mode="min", factor=0.5, patience=3, verbose=False, min_lr=1e-7
+            optimizer, mode="min", factor=0.5, patience=3, min_lr=1e-7
         )
     elif scheduler_name == "CosineAnnealingLR":
         scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(optimizer, T_max=epochs)
@@ -322,12 +331,16 @@ def run_training(cfg: Config, device: str = "cuda"):
     # --- датасеты и лоадеры ---
     train_sets = []
     val_sets = []
-    
+
     if val_csvs and val_roots:
         for i, (train_csv, train_root) in enumerate(zip(train_csvs, train_roots)):
-            has_separate_val = (i < len(val_csvs) and i < len(val_roots) and 
-                              val_csvs[i] is not None and val_roots[i] is not None)
-            
+            has_separate_val = (
+                i < len(val_csvs)
+                and i < len(val_roots)
+                and val_csvs[i] is not None
+                and val_roots[i] is not None
+            )
+
             if has_separate_val:
                 train_ds = OCRDatasetAttn(
                     train_csv,
@@ -338,7 +351,7 @@ def run_training(cfg: Config, device: str = "cuda"):
                     transform=train_transform,
                     encoding=encoding,
                     max_len=max_len,
-                    strict_max_len=True
+                    strict_max_len=True,
                 )
                 val_ds = OCRDatasetAttn(
                     val_csvs[i],
@@ -349,7 +362,7 @@ def run_training(cfg: Config, device: str = "cuda"):
                     transform=val_transform,
                     encoding=encoding,
                     max_len=max_len,
-                    strict_max_len=True
+                    strict_max_len=True,
                 )
                 train_sets.append(train_ds)
                 val_sets.append(val_ds)
@@ -363,7 +376,7 @@ def run_training(cfg: Config, device: str = "cuda"):
                     transform=None,
                     encoding=encoding,
                     max_len=max_len,
-                    strict_max_len=True
+                    strict_max_len=True,
                 )
                 n_val = min(val_size if val_size else 3000, len(full_ds))
                 n_train = len(full_ds) - n_val
@@ -371,11 +384,11 @@ def run_training(cfg: Config, device: str = "cuda"):
                     raise ValueError(
                         f"В датасете {train_csv} всего {len(full_ds)} примеров, меньше чем {n_val}"
                     )
-                
+
                 train_ds, val_ds = random_split(full_ds, [n_train, n_val])
                 train_ds.dataset.transform = train_transform
                 val_ds.dataset.transform = val_transform
-                
+
                 train_sets.append(train_ds)
                 val_sets.append(val_ds)
     else:
@@ -443,17 +456,27 @@ def run_training(cfg: Config, device: str = "cuda"):
         return total
 
     n_train_samples = _total_len(train_sets)
-    n_val_samples   = _total_len(val_sets)
-    
+    n_val_samples = _total_len(val_sets)
+
     # Логгирование информации о валидационной стратегии
     logger.info(f"Validation strategy:")
     for i, (train_csv, train_root) in enumerate(zip(train_csvs, train_roots)):
-        has_separate_val = (val_csvs and val_roots and i < len(val_csvs) and i < len(val_roots) and 
-                          val_csvs[i] is not None and val_roots[i] is not None)
+        has_separate_val = (
+            val_csvs
+            and val_roots
+            and i < len(val_csvs)
+            and i < len(val_roots)
+            and val_csvs[i] is not None
+            and val_roots[i] is not None
+        )
         if has_separate_val:
-            logger.info(f"  Dataset {i}: using separate validation set from {val_roots[i]}")
+            logger.info(
+                f"  Dataset {i}: using separate validation set from {val_roots[i]}"
+            )
         else:
-            logger.info(f"  Dataset {i}: using split from training set (val_size={val_size})")
+            logger.info(
+                f"  Dataset {i}: using split from training set (val_size={val_size})"
+            )
 
     msg_ds = (
         f"Datasets: train={n_train_samples} samples across {len(train_sets)} set(s); "
@@ -465,8 +488,10 @@ def run_training(cfg: Config, device: str = "cuda"):
         f"val_batches={total_val_batches}; batch_size={batch_size}"
     )
 
-    print(msg_ds);  logger.info(msg_ds)
-    print(msg_ld);  logger.info(msg_ld)
+    print(msg_ds)
+    logger.info(msg_ds)
+    print(msg_ld)
+    logger.info(msg_ld)
 
     # --- resume ---
     start_epoch = 1
@@ -532,19 +557,22 @@ def run_training(cfg: Config, device: str = "cuda"):
         if should_eval:
             model.eval()
             torch.cuda.empty_cache()
-            
+
             total_val_loss = 0.0
             total_samples = 0
             total_correct = 0
-            total_chars = 0
             total_cer_sum = 0.0
             total_wer_sum = 0.0
             total_predictions = 0
-            
+
             for i, val_loader_single in enumerate(val_loaders_individual):
                 total_val_loss_single = 0.0
                 refs_single, hyps_single = [], []
-                pbar_val = tqdm(val_loader_single, desc=f"Valid Set {i} {epoch}/{epochs}", leave=False)
+                pbar_val = tqdm(
+                    val_loader_single,
+                    desc=f"Valid Set {i} {epoch}/{epochs}",
+                    leave=False,
+                )
                 with torch.no_grad():
                     for imgs, text_in, target_y, lengths in pbar_val:
                         imgs = imgs.to(device)
@@ -553,17 +581,24 @@ def run_training(cfg: Config, device: str = "cuda"):
 
                         with amp.autocast():
                             logits_tf = model(
-                                imgs, text=text_in, is_train=True, batch_max_length=max_len
+                                imgs,
+                                text=text_in,
+                                is_train=True,
+                                batch_max_length=max_len,
                             )
                             val_loss = criterion(
-                                logits_tf.reshape(-1, logits_tf.size(-1)), target_y.reshape(-1)
+                                logits_tf.reshape(-1, logits_tf.size(-1)),
+                                target_y.reshape(-1),
                             )
                         total_val_loss_single += float(val_loss.item())
 
-                        logits = model(
-                            imgs, is_train=False, batch_max_length=max_len
+                        probs, pred_ids = model(
+                            imgs,
+                            is_train=False,
+                            batch_max_length=max_len,
+                            mode="greedy",
                         )
-                        pred_ids = logits.argmax(-1).cpu()
+                        pred_ids = pred_ids.cpu()
                         tgt_ids = target_y.cpu()
 
                         for p_row, t_row in zip(pred_ids, tgt_ids):
@@ -577,27 +612,46 @@ def run_training(cfg: Config, device: str = "cuda"):
                             refs_single.append(ref)
 
                         pbar_val.set_postfix(val_loss=f"{float(val_loss.item()):.4f}")
-                        del imgs, text_in, target_y, logits_tf, logits, pred_ids, tgt_ids
+                        del (
+                            imgs,
+                            text_in,
+                            target_y,
+                            logits_tf,
+                            pred_ids,
+                            tgt_ids,
+                        )
 
-                avg_val_loss_single = total_val_loss_single / max(1, len(val_loader_single))
+                avg_val_loss_single = total_val_loss_single / max(
+                    1, len(val_loader_single)
+                )
                 val_acc_single = compute_accuracy(refs_single, hyps_single)
-                val_cer_single = sum(character_error_rate(r, h) for r, h in zip(refs_single, hyps_single)) / max(1, len(refs_single))
-                val_wer_single = sum(word_error_rate(r, h) for r, h in zip(refs_single, hyps_single)) / max(1, len(refs_single))
+                val_cer_single = sum(
+                    character_error_rate(r, h) for r, h in zip(refs_single, hyps_single)
+                ) / max(1, len(refs_single))
+                val_wer_single = sum(
+                    word_error_rate(r, h) for r, h in zip(refs_single, hyps_single)
+                ) / max(1, len(refs_single))
 
                 writer.add_scalar(f"Loss/val_set_{i}", avg_val_loss_single, epoch)
                 writer.add_scalar(f"Accuracy/val_set_{i}", val_acc_single, epoch)
                 writer.add_scalar(f"CER/val_set_{i}", val_cer_single, epoch)
                 writer.add_scalar(f"WER/val_set_{i}", val_wer_single, epoch)
-                
+
                 total_val_loss += total_val_loss_single
                 total_samples += len(val_loader_single)
-                
-                correct_single = sum(1 for r, h in zip(refs_single, hyps_single) if r == h)
+
+                correct_single = sum(
+                    1 for r, h in zip(refs_single, hyps_single) if r == h
+                )
                 total_correct += correct_single
                 total_predictions += len(refs_single)
-                total_cer_sum += sum(character_error_rate(r, h) for r, h in zip(refs_single, hyps_single))
-                total_wer_sum += sum(word_error_rate(r, h) for r, h in zip(refs_single, hyps_single))
-                
+                total_cer_sum += sum(
+                    character_error_rate(r, h) for r, h in zip(refs_single, hyps_single)
+                )
+                total_wer_sum += sum(
+                    word_error_rate(r, h) for r, h in zip(refs_single, hyps_single)
+                )
+
                 del refs_single, hyps_single
                 torch.cuda.empty_cache()
 

@@ -3,12 +3,13 @@ import json
 import torch
 import numpy as np
 from PIL import Image
-from typing import List, Union, Tuple
+from typing import List, Union, Tuple, Optional, Sequence, Dict, Any
 import cv2
 
 from .model.model import RCNN
 from .data.transforms import load_charset, get_val_transform, decode_tokens
-from .training.utils import load_checkpoint, decode_predictions
+from .training.utils import load_checkpoint
+from .training.train import Config, run_training
 import torch.nn.functional as F
 
 
@@ -176,3 +177,119 @@ class TRBAInfer:
                     results.append((text, confidence))
 
         return results
+
+    @staticmethod
+    def train(
+        train_csvs: Union[str, Sequence[str]],
+        train_roots: Union[str, Sequence[str]],
+        val_csvs: Optional[Union[str, Sequence[str]]] = None,
+        val_roots: Optional[Union[str, Sequence[str]]] = None,
+        *,
+        exp_dir: Optional[str] = None,
+        charset_path: Optional[str] = None,
+        encoding: str = "utf-8",
+        img_h: int = 64,
+        img_w: int = 256,
+        max_len: int = 25,
+        hidden_size: int = 256,
+        batch_size: int = 32,
+        epochs: int = 20,
+        lr: float = 1e-3,
+        optimizer: str = "Adam",
+        scheduler: str = "ReduceLROnPlateau",
+        weight_decay: float = 0.0,
+        momentum: float = 0.9,
+        eval_every: int = 1,
+        val_size: int = 3000,
+        train_proportions: Optional[Sequence[float]] = None,
+        num_workers: int = 0,
+        seed: int = 42,
+        resume_path: Optional[str] = None,
+        save_every: Optional[int] = None,
+        device: str = "cuda",
+        **extra_config: Any,
+    ):
+        def _ensure_path_list(
+            value: Optional[Union[str, Sequence[str]]],
+            field_name: str,
+            allow_none: bool = False,
+        ) -> Optional[List[str]]:
+            if value is None:
+                if allow_none:
+                    return None
+                raise ValueError(f"{field_name} must be provided")
+
+            if isinstance(value, (list, tuple)):
+                raw_items = list(value)
+            else:
+                raw_items = [value]
+
+            if not raw_items:
+                raise ValueError(f"{field_name} must not be empty")
+
+            return [os.fspath(item) for item in raw_items]
+
+        train_csvs_list = _ensure_path_list(train_csvs, "train_csvs")
+        train_roots_list = _ensure_path_list(train_roots, "train_roots")
+
+        if len(train_csvs_list) != len(train_roots_list):
+            raise ValueError(
+                "train_csvs and train_roots must contain the same number of items"
+            )
+
+        val_csvs_list = _ensure_path_list(val_csvs, "val_csvs", allow_none=True)
+        val_roots_list = _ensure_path_list(val_roots, "val_roots", allow_none=True)
+
+        if (val_csvs_list is None) ^ (val_roots_list is None):
+            raise ValueError(
+                "val_csvs and val_roots must both be provided or both be None"
+            )
+        if val_csvs_list is not None and len(val_csvs_list) != len(val_roots_list):
+            raise ValueError(
+                "val_csvs and val_roots must contain the same number of items"
+            )
+
+        resolved_charset = charset_path
+        if resolved_charset is None:
+            current_dir = os.path.dirname(os.path.abspath(__file__))
+            resolved_charset = os.path.join(current_dir, "configs", "charset.txt")
+
+        config_payload: Dict[str, Any] = {
+            "train_csvs": train_csvs_list,
+            "train_roots": train_roots_list,
+            "charset_path": resolved_charset,
+            "encoding": encoding,
+            "img_h": img_h,
+            "img_w": img_w,
+            "max_len": max_len,
+            "hidden_size": hidden_size,
+            "batch_size": batch_size,
+            "epochs": epochs,
+            "lr": lr,
+            "optimizer": optimizer,
+            "scheduler": scheduler,
+            "weight_decay": weight_decay,
+            "momentum": momentum,
+            "eval_every": eval_every,
+            "val_size": val_size,
+            "num_workers": num_workers,
+            "seed": seed,
+        }
+
+        if exp_dir is not None:
+            config_payload["exp_dir"] = exp_dir
+        if val_csvs_list is not None:
+            config_payload["val_csvs"] = val_csvs_list
+            config_payload["val_roots"] = val_roots_list
+        if train_proportions is not None:
+            config_payload["train_proportions"] = list(train_proportions)
+        if resume_path is not None:
+            config_payload["resume_path"] = resume_path
+        if save_every is not None:
+            config_payload["save_every"] = save_every
+
+        if extra_config:
+            config_payload.update(extra_config)
+
+        config = Config(config_payload)
+        return run_training(config, device=device)
