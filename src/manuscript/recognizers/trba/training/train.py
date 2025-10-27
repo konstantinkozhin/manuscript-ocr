@@ -301,16 +301,118 @@ def run_training(cfg: Config, device: str = "cuda"):
         blank_id=BLANK,
     ).to(device)
 
+    # --- политика заморозки весов ---
+    def _normalize_policy(v: Optional[str]) -> str:
+        if v is None:
+            return "none"
+        v = str(v).strip().lower()
+        mapping = {
+            # english
+            "full": "full",
+            "all": "full",
+            "freeze": "full",
+            "frozen": "full",
+            "partial": "partial",
+            "smart": "partial",
+            "best": "partial",
+            "none": "none",
+            "no": "none",
+            "off": "none",
+            "false": "none",
+            # russian
+            "полностью": "full",
+            "частично": "partial",
+            "нет": "none",
+            "не": "none",
+        }
+        return mapping.get(v, v)
+
+    def _freeze_module(m: torch.nn.Module):
+        for p in m.parameters():
+            p.requires_grad = False
+
+    # we keep BN in eval for frozen CNN parts to avoid stats drift
+    always_eval_modules = []
+
+    def _collect_bn(mod: torch.nn.Module):
+        for sub in mod.modules():
+            if isinstance(sub, torch.nn.BatchNorm2d):
+                always_eval_modules.append(sub)
+
+    def _apply_cnn_policy(policy: str):
+        if policy == "full":
+            _freeze_module(model.cnn)
+            _collect_bn(model.cnn)
+            return "cnn: FULL (all layers frozen)"
+        if policy == "partial":
+            # freeze early/mid layers, unfreeze the last stage + conv_out
+            to_freeze = []
+            for name in ("conv0", "layer1", "layer2", "layer3"):
+                if hasattr(model.cnn, name):
+                    to_freeze.append(getattr(model.cnn, name))
+            for part in to_freeze:
+                _freeze_module(part)
+                _collect_bn(part)
+            return "cnn: PARTIAL (unfrozen layer4 + conv_out)"
+        return "cnn: NONE (no freezing)"
+
+    def _apply_enc_rnn_policy(policy: str):
+        if policy == "full":
+            _freeze_module(model.enc_rnn)
+            return "enc_rnn: FULL (all layers frozen)"
+        if policy == "partial":
+            # enc_rnn is Sequential of two BiLSTMs; freeze first, unfreeze last
+            try:
+                first = model.enc_rnn[0]
+                _freeze_module(first)
+            except Exception:
+                pass
+            return "enc_rnn: PARTIAL (unfrozen last BiLSTM)"
+        return "enc_rnn: NONE (no freezing)"
+
+    def _apply_attention_policy(policy: str):
+        if policy == "full":
+            _freeze_module(model.attn)
+            return "attention: FULL (all layers frozen)"
+        if policy == "partial":
+            # keep generator trainable (most beneficial for vocab adaptation), freeze attention_cell
+            if hasattr(model.attn, "attention_cell"):
+                _freeze_module(model.attn.attention_cell)
+            return "attention: PARTIAL (unfrozen generator, frozen attention_cell)"
+        return "attention: NONE (no freezing)"
+
+    freeze_cnn = _normalize_policy(getattr(cfg, "freeze_cnn", "none"))
+    freeze_enc = _normalize_policy(getattr(cfg, "freeze_enc_rnn", "none"))
+    freeze_attn = _normalize_policy(getattr(cfg, "freeze_attention", "none"))
+
+    msgs = []
+    msgs.append(_apply_cnn_policy(freeze_cnn))
+    msgs.append(_apply_enc_rnn_policy(freeze_enc))
+    msgs.append(_apply_attention_policy(freeze_attn))
+
+    # register a pre-forward hook to keep frozen BN layers in eval mode
+    if always_eval_modules:
+        def _set_bn_eval(module, inputs):
+            for bn in always_eval_modules:
+                bn.eval()
+        model.register_forward_pre_hook(_set_bn_eval)
+    for m in msgs:
+        logger.info(f"Freeze policy applied: {m}")
+    n_trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
+    n_total = sum(p.numel() for p in model.parameters())
+    logger.info(f"Parameters: trainable={n_trainable:,} / total={n_total:,}")
+
     criterion = nn.CrossEntropyLoss(ignore_index=PAD)
 
     # --- optimizer ---
+    trainable_params = [p for p in model.parameters() if p.requires_grad]
     if optimizer_name == "Adam":
-        optimizer = optim.Adam(model.parameters(), lr=lr, weight_decay=weight_decay)
+        optimizer = optim.Adam(trainable_params, lr=lr, weight_decay=weight_decay)
     elif optimizer_name == "AdamW":
-        optimizer = optim.AdamW(model.parameters(), lr=lr, weight_decay=weight_decay)
+        optimizer = optim.AdamW(trainable_params, lr=lr, weight_decay=weight_decay)
     elif optimizer_name == "SGD":
         optimizer = optim.SGD(
-            model.parameters(), lr=lr, momentum=momentum, weight_decay=weight_decay
+            trainable_params, lr=lr, momentum=momentum, weight_decay=weight_decay
         )
     else:
         raise ValueError(f"Unknown optimizer: {optimizer_name}")
@@ -504,9 +606,20 @@ def run_training(cfg: Config, device: str = "cuda"):
     best_val_loss, best_val_acc = float("inf"), -1.0
 
     if resume_path and os.path.isfile(resume_path):
-        ckpt = load_checkpoint(
-            resume_path, model, optimizer=optimizer, scheduler=scheduler, scaler=scaler
-        )
+        try:
+            ckpt = load_checkpoint(
+                resume_path,
+                model,
+                optimizer=optimizer,
+                scheduler=scheduler,
+                scaler=scaler,
+            )
+        except Exception as e:
+            logger.warning(
+                f"Failed to load optimizer/scheduler state from resume due to: {e}.\n"
+                f"Will load model weights only and continue."
+            )
+            ckpt = load_checkpoint(resume_path, model, optimizer=None, scheduler=None, scaler=None)
         start_epoch = int(ckpt.get("epoch", 0)) + 1
         global_step = int(ckpt.get("global_step", 0))
         best_val_loss = float(ckpt.get("best_val_loss", best_val_loss))

@@ -211,6 +211,9 @@ class TRBAInfer:
         beam_alpha: float = 0.9,
         beam_temperature: float = 1.7,
         device: str = "cuda",
+        freeze_cnn: str = "none",
+        freeze_enc_rnn: str = "none",
+        freeze_attention: str = "none",
         **extra_config: Any,
     ):
         def _ensure_path_list(
@@ -298,6 +301,11 @@ class TRBAInfer:
 
         if extra_config:
             config_payload.update(extra_config)
+
+        # Freeze policies for model submodules
+        config_payload["freeze_cnn"] = freeze_cnn
+        config_payload["freeze_enc_rnn"] = freeze_enc_rnn
+        config_payload["freeze_attention"] = freeze_attention
 
         config = Config(config_payload)
         return run_training(config, device=device)
