@@ -400,7 +400,10 @@ def run_training(cfg: Config, device: str = "cuda"):
         logger.info(f"Freeze policy applied: {m}")
     n_trainable = sum(p.numel() for p in model.parameters() if p.requires_grad)
     n_total = sum(p.numel() for p in model.parameters())
-    logger.info(f"Parameters: trainable={n_trainable:,} / total={n_total:,}")
+    n_frozen = n_total - n_trainable
+    logger.info(
+        f"Parameters: trainable={n_trainable:,} | frozen={n_frozen:,} | total={n_total:,}"
+    )
 
     criterion = nn.CrossEntropyLoss(ignore_index=PAD)
 
