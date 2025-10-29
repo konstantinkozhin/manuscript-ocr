@@ -27,7 +27,13 @@ from ..data.transforms import (
 )
 from .metrics import character_error_rate, compute_accuracy, word_error_rate
 from ..model.model import RCNN
-from .utils import load_checkpoint, save_checkpoint, save_weights, set_seed
+from .utils import (
+    load_checkpoint,
+    save_checkpoint,
+    save_weights,
+    set_seed,
+    load_pretrained_weights,
+)
 
 
 # -------------------------
@@ -257,6 +263,7 @@ def run_training(cfg: Config, device: str = "cuda"):
     log_dir = os.path.join(exp_dir, "logs")
     os.makedirs(log_dir, exist_ok=True)
     writer = SummaryWriter(log_dir=log_dir)
+    pin_memory = torch.cuda.is_available()
 
     metrics_csv_path = os.path.join(exp_dir, "metrics_epoch.csv")
     if not os.path.exists(metrics_csv_path):
@@ -301,6 +308,46 @@ def run_training(cfg: Config, device: str = "cuda"):
         blank_id=BLANK,
     ).to(device)
 
+    # --- optional pretrained weights ---
+    # pretrain_weights: None/False/"none" to skip; "default"/True to use release;
+    # or a string path/URL to weights/checkpoint file.
+    pretrain_src = getattr(cfg, "pretrain_weights", "default")
+    resume_path = getattr(cfg, "resume_path", None)
+    if not resume_path:
+        def _normalize_pretrain(v) -> str:
+            if v is True:
+                return "default"
+            if v is False or v is None:
+                return "none"
+            return str(v)
+
+        pretrain_src = _normalize_pretrain(pretrain_src)
+        if pretrain_src.lower() not in ("none", ""):
+            if pretrain_src.lower() == "default":
+                pretrain_src = (
+                    "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/"
+                    "v0.1.0/trba_exp_1_64.pth"
+                )
+                logger.info(
+                    "Using default pretrained weights: trba_exp_1_64.pth (GitHub release)"
+                )
+                logger.info(
+                    "Default pretrain config: "
+                    "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/"
+                    "v0.1.0/trba_exp_1_64.json"
+                )
+
+            stats = load_pretrained_weights(
+                model,
+                src=pretrain_src,
+                map_location=str(device),
+                logger=logger,
+            )
+            if not stats.get("ok", False):
+                logger.warning(
+                    f"Pretrained load failed from {pretrain_src}. Proceeding with random init."
+                )
+
     # --- политика заморозки весов ---
     def _normalize_policy(v: Optional[str]) -> str:
         if v is None:
@@ -339,10 +386,25 @@ def run_training(cfg: Config, device: str = "cuda"):
             if isinstance(sub, torch.nn.BatchNorm2d):
                 always_eval_modules.append(sub)
 
+    def _wrap_forward_no_grad(module: torch.nn.Module):
+        if module is None:
+            return
+        if getattr(module, "_wrapped_no_grad", False):
+            return
+        orig_forward = module.forward
+
+        def _no_grad_forward(*args, **kwargs):
+            with torch.no_grad():
+                return orig_forward(*args, **kwargs)
+
+        module.forward = _no_grad_forward  # type: ignore[attr-defined]
+        module._wrapped_no_grad = True  # type: ignore[attr-defined]
+
     def _apply_cnn_policy(policy: str):
         if policy == "full":
             _freeze_module(model.cnn)
             _collect_bn(model.cnn)
+            _wrap_forward_no_grad(model.cnn)
             return "cnn: FULL (all layers frozen)"
         if policy == "partial":
             # freeze early/mid layers, unfreeze the last stage + conv_out
@@ -353,18 +415,21 @@ def run_training(cfg: Config, device: str = "cuda"):
             for part in to_freeze:
                 _freeze_module(part)
                 _collect_bn(part)
+                _wrap_forward_no_grad(part)
             return "cnn: PARTIAL (unfrozen layer4 + conv_out)"
         return "cnn: NONE (no freezing)"
 
     def _apply_enc_rnn_policy(policy: str):
         if policy == "full":
             _freeze_module(model.enc_rnn)
+            _wrap_forward_no_grad(model.enc_rnn)
             return "enc_rnn: FULL (all layers frozen)"
         if policy == "partial":
             # enc_rnn is Sequential of two BiLSTMs; freeze first, unfreeze last
             try:
                 first = model.enc_rnn[0]
                 _freeze_module(first)
+                _wrap_forward_no_grad(first)
             except Exception:
                 pass
             return "enc_rnn: PARTIAL (unfrozen last BiLSTM)"
@@ -373,11 +438,13 @@ def run_training(cfg: Config, device: str = "cuda"):
     def _apply_attention_policy(policy: str):
         if policy == "full":
             _freeze_module(model.attn)
+            _wrap_forward_no_grad(model.attn)
             return "attention: FULL (all layers frozen)"
         if policy == "partial":
             # keep generator trainable (most beneficial for vocab adaptation), freeze attention_cell
             if hasattr(model.attn, "attention_cell"):
                 _freeze_module(model.attn.attention_cell)
+                _wrap_forward_no_grad(model.attn.attention_cell)
             return "attention: PARTIAL (unfrozen generator, frozen attention_cell)"
         return "attention: NONE (no freezing)"
 
@@ -534,6 +601,7 @@ def run_training(cfg: Config, device: str = "cuda"):
             batch_sampler=batch_sampler,
             num_workers=num_workers,
             collate_fn=collate_train,
+            pin_memory=pin_memory,
         )
     else:
         train_loader = DataLoader(
@@ -542,6 +610,7 @@ def run_training(cfg: Config, device: str = "cuda"):
             shuffle=True,
             num_workers=num_workers,
             collate_fn=collate_train,
+            pin_memory=pin_memory,
         )
 
     val_loaders_individual = [
@@ -551,6 +620,7 @@ def run_training(cfg: Config, device: str = "cuda"):
             shuffle=False,
             num_workers=num_workers,
             collate_fn=collate_val,
+            pin_memory=pin_memory,
         )
         for val_set in val_sets
     ]
@@ -638,9 +708,9 @@ def run_training(cfg: Config, device: str = "cuda"):
         total_train_loss = 0.0
         pbar = tqdm(train_loader, desc=f"Train {epoch}/{epochs}", leave=False)
         for imgs, text_in, target_y, lengths in pbar:
-            imgs = imgs.to(device)
-            text_in = text_in.to(device)
-            target_y = target_y.to(device)
+            imgs = imgs.to(device, non_blocking=pin_memory)
+            text_in = text_in.to(device, non_blocking=pin_memory)
+            target_y = target_y.to(device, non_blocking=pin_memory)
 
             optimizer.zero_grad(set_to_none=True)
             with amp.autocast():
@@ -721,9 +791,9 @@ def run_training(cfg: Config, device: str = "cuda"):
                 )
                 with torch.no_grad():
                     for imgs, text_in, target_y, lengths in pbar_val:
-                        imgs = imgs.to(device)
-                        text_in = text_in.to(device)
-                        target_y = target_y.to(device)
+                        imgs = imgs.to(device, non_blocking=pin_memory)
+                        text_in = text_in.to(device, non_blocking=pin_memory)
+                        target_y = target_y.to(device, non_blocking=pin_memory)
 
                         with amp.autocast():
                             logits_tf = model(

@@ -214,6 +214,7 @@ class TRBAInfer:
         freeze_cnn: str = "none",
         freeze_enc_rnn: str = "none",
         freeze_attention: str = "none",
+        pretrain_weights: Optional[object] = "default",
         **extra_config: Any,
     ):
         def _ensure_path_list(
@@ -298,6 +299,12 @@ class TRBAInfer:
             config_payload["resume_path"] = resume_path
         if save_every is not None:
             config_payload["save_every"] = save_every
+        # Pretrained weights option:
+        # - None/False/"none": skip
+        # - "default"/True: use release weights
+        # - str: path/URL to .pth/.pt/.ckpt
+        if pretrain_weights is not None:
+            config_payload["pretrain_weights"] = pretrain_weights
 
         if extra_config:
             config_payload.update(extra_config)
