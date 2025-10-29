@@ -218,10 +218,11 @@ class TRBAInfer:
         **extra_config: Any,
     ):
         def _ensure_path_list(
-            value: Optional[Union[str, Sequence[str]]],
+            value: Optional[Union[str, Sequence[Optional[str]]]],
             field_name: str,
             allow_none: bool = False,
-        ) -> Optional[List[str]]:
+            allow_item_none: bool = False,
+        ) -> Optional[List[Optional[str]]]:
             if value is None:
                 if allow_none:
                     return None
@@ -235,7 +236,18 @@ class TRBAInfer:
             if not raw_items:
                 raise ValueError(f"{field_name} must not be empty")
 
-            return [os.fspath(item) for item in raw_items]
+            result: List[Optional[str]] = []
+            for item in raw_items:
+                if item is None:
+                    if allow_item_none:
+                        result.append(None)
+                    else:
+                        raise ValueError(
+                            f"{field_name} contains None but allow_item_none is False"
+                        )
+                else:
+                    result.append(os.fspath(item))
+            return result
 
         train_csvs_list = _ensure_path_list(train_csvs, "train_csvs")
         train_roots_list = _ensure_path_list(train_roots, "train_roots")
@@ -245,8 +257,12 @@ class TRBAInfer:
                 "train_csvs and train_roots must contain the same number of items"
             )
 
-        val_csvs_list = _ensure_path_list(val_csvs, "val_csvs", allow_none=True)
-        val_roots_list = _ensure_path_list(val_roots, "val_roots", allow_none=True)
+        val_csvs_list = _ensure_path_list(
+            val_csvs, "val_csvs", allow_none=True, allow_item_none=True
+        )
+        val_roots_list = _ensure_path_list(
+            val_roots, "val_roots", allow_none=True, allow_item_none=True
+        )
 
         if (val_csvs_list is None) ^ (val_roots_list is None):
             raise ValueError(
