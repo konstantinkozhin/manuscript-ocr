@@ -1,3 +1,5 @@
+<img width="2028" height="496" alt="Frame 8" src="https://github.com/user-attachments/assets/cdba0d4c-4cab-4f77-a056-6d3c20192566" />
+
 ## Installation
 
 ### Для пользователей
