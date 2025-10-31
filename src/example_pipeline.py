@@ -8,7 +8,7 @@ recognizer_model_path = r"C:\Users\USER\Desktop\OCR_MODELS\exp1_model_64\best_ac
 config_path = r"C:\Users\USER\Desktop\OCR_MODELS\exp1_model_64\config.json"
 
 # Путь к изображению (укажите свой файл)
-image_path = r"C:\Users\USER\Desktop\20250710_143822.jpg"
+image_path = r"C:\Users\USER\Desktop\77686370-e02a-45ce-bb4d-1738030fad46 (2).jpg"
 
 # Инициализация детектора и распознавателя
 detector = EASTInfer()

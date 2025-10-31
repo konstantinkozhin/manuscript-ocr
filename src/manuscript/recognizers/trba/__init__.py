@@ -110,7 +110,7 @@ class TRBAInfer:
             np.ndarray, str, Image.Image, List[Union[np.ndarray, str, Image.Image]]
         ],
         batch_size: int = 32,
-        mode: str = "greedy",
+        mode: str = "beam",
         beam_size: int = 8,
         temperature: float = 1.7,
         alpha: float = 0.9,
