@@ -10,7 +10,7 @@ from unittest.mock import Mock, MagicMock
 from manuscript import OCRPipeline
 from manuscript.detectors import EASTInfer
 from manuscript.detectors._types import Page, Block, Word
-from manuscript import TRBAInfer
+from manuscript.recognizers import TRBAInfer
 
 
 class TestOCRPipeline:

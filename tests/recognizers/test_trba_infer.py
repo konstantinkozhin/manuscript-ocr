@@ -2,7 +2,7 @@
 Базовые тесты для TRBAInfer распознавателя
 """
 import pytest
-from manuscript import TRBAInfer
+from manuscript.recognizers import TRBAInfer
 
 
 class TestTRBAInfer:

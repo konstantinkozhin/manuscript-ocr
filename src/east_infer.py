@@ -4,9 +4,9 @@ from PIL import Image
 from manuscript.detectors import EASTInfer
 
 # Инициализация модели
-model = EASTInfer(weights_path=r"C:\east_quad_23_05.pth")
+model = EASTInfer()
 
-img_path = r"C:\Users\pasha\OneDrive\Рабочий стол\20250710_143822.png"
+img_path = r"C:\Users\USER\Desktop\Для отчета\2907.jpg"
 
 # Инференс с визуализацией (возвращает изображение с боксами и score map)
 page, img_with_boxes = model.predict(img_path, vis=True, profile=True)

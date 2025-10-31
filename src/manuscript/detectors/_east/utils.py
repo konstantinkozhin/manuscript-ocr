@@ -9,7 +9,7 @@ import time
 from pathlib import Path
 from PIL import Image
 
-
+'''
 def convert_rboxes_to_quad_boxes(rboxes, scores=None):
     quad_boxes = []
     if scores is None:
@@ -20,7 +20,7 @@ def convert_rboxes_to_quad_boxes(rboxes, scores=None):
         quad = np.concatenate([pts.flatten(), [scores[i]]]).astype(np.float32)
         quad_boxes.append(quad)
     return np.array(quad_boxes, dtype=np.float32)
-
+'''
 
 def quad_to_rbox(quad):
     pts = quad[:8].reshape(4, 2).astype(np.float32)
@@ -352,7 +352,30 @@ def compute_f1(preds, thresh, gt_segs, processed_ids):
     rec = tp / (tp + fn) if tp + fn > 0 else 0
     return 2 * prec * rec / (prec + rec) if (prec + rec) > 0 else 0
 
+def read_image(img_or_path):
+    if isinstance(img_or_path, (str, Path)):
+        img = cv2.imread(str(img_or_path))
+        if img is None:
+            try:
+                with Image.open(str(img_or_path)) as pil_img:
+                    img = np.array(pil_img.convert("RGB"))
+            except Exception as e:
+                raise FileNotFoundError(
+                    f"Cannot read image with cv2 or PIL: {img_or_path}. Error: {e}"
+                )
+        else:
+            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
 
+    elif isinstance(img_or_path, np.ndarray):
+        img = img_or_path
+
+    else:
+        raise TypeError(f"Unsupported type for image input: {type(img_or_path)}")
+
+    return img
+
+
+'''
 def load_gt(gt_path):
     with open(gt_path, "r", encoding="utf-8") as f:
         gt_coco = json.load(f)
@@ -381,38 +404,10 @@ def load_preds(pred_path):
             }
         )
     return preds
+'''
 
 
-def read_image(img_or_path):
-    """
-    Универсальная функция чтения изображения:
-    - Принимает путь (str | Path) или numpy-массив.
-    - Возвращает RGB np.ndarray.
-    """
-    if isinstance(img_or_path, (str, Path)):
-        img = cv2.imread(str(img_or_path))
-        if img is None:
-            # cv2 не смог прочитать — пробуем через PIL
-            try:
-                with Image.open(str(img_or_path)) as pil_img:
-                    img = np.array(pil_img.convert("RGB"))
-            except Exception as e:
-                raise FileNotFoundError(
-                    f"Cannot read image with cv2 or PIL: {img_or_path}. Error: {e}"
-                )
-        else:
-            img = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-
-    elif isinstance(img_or_path, np.ndarray):
-        img = img_or_path
-
-    else:
-        raise TypeError(f"Unsupported type for image input: {type(img_or_path)}")
-
-    return img
-
-
-
+'''
 def compute_f1_metrics(
     preds,
     gt_segs,
@@ -431,3 +426,4 @@ def compute_f1_metrics(
 
     f1_avg = float(np.mean(f1_list))
     return f1_at_05, f1_avg
+'''

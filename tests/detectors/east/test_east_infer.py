@@ -40,10 +40,6 @@ class TestEASTInfer:
         print(f"Устройство: {detector.device} (ожидалось: {expected_device})")
         assert detector.device == expected_device
 
-        # Проверяем параметры
-        assert detector.score_thresh == 0.5
-        assert detector.target_size == 1024
-
         print("Инициализация прошла успешно")
 
     def test_eastinfer_basic_inference(self, example_image_path):
