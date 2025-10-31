@@ -1,5 +1,6 @@
 import numpy as np
-from numba import njit, float64, int64
+
+from numba import float64, int64, njit
 from numba.types import Tuple
 
 

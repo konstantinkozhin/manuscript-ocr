@@ -40,7 +40,7 @@ def visualize(
     quads = np.stack(quads, axis=0)
 
     # draw polygons
-    vis = draw_quads(
+    out = draw_quads(
         image=img,
         quads=quads,
         color=(0, 0, 255),
@@ -49,7 +49,6 @@ def visualize(
         blur_ksize=11,
     )
 
-    out = Image.fromarray(vis)
     draw = ImageDraw.Draw(out)
 
     # ---- Draw lines and/or numbers strictly in existing order ----
@@ -59,7 +58,7 @@ def visualize(
         for w in words_in_order:
             xs = [p[0] for p in w.polygon]
             ys = [p[1] for p in w.polygon]
-            centers.append((sum(xs)/4, sum(ys)/4))
+            centers.append((sum(xs) / 4, sum(ys) / 4))
 
         # Lines: between neighbors
         if connect_words and len(centers) > 1:
@@ -78,13 +77,11 @@ def visualize(
 
     return out
 
+
 def resolve_intersections(boxes):
     def intersect(b1, b2):
         return not (
-            b1[2] <= b2[0] or 
-            b2[2] <= b1[0] or 
-            b1[3] <= b2[1] or 
-            b2[3] <= b1[1]
+            b1[2] <= b2[0] or b2[2] <= b1[0] or b1[3] <= b2[1] or b2[3] <= b1[1]
         )
 
     resolved = list(boxes)
@@ -93,13 +90,23 @@ def resolve_intersections(boxes):
     for _ in range(max_iterations):
         changed = False
         for i in range(len(resolved)):
-            for j in range(i+1, len(resolved)):
+            for j in range(i + 1, len(resolved)):
                 if intersect(resolved[i], resolved[j]):
                     x0, y0, x1, y1 = resolved[i]
                     x0b, y0b, x1b, y1b = resolved[j]
 
-                    resolved[i] = (x0, y0, int(x1 - (x1-x0)*0.1), int(y1 - (y1-y0)*0.1))
-                    resolved[j] = (x0b, y0b, int(x1b - (x1b-x0b)*0.1), int(y1b - (y1b-y0b)*0.1))
+                    resolved[i] = (
+                        x0,
+                        y0,
+                        int(x1 - (x1 - x0) * 0.1),
+                        int(y1 - (y1 - y0) * 0.1),
+                    )
+                    resolved[j] = (
+                        x0b,
+                        y0b,
+                        int(x1b - (x1b - x0b) * 0.1),
+                        int(y1b - (y1b - y0b) * 0.1),
+                    )
                     changed = True
         if not changed:
             break
@@ -107,10 +114,11 @@ def resolve_intersections(boxes):
     return resolved
 
 
-def sort_boxes_reading_order(boxes: List[Tuple[int,int,int,int]],
-                             y_tol_ratio: float = 0.6,
-                             x_gap_ratio: float = np.inf
-) -> List[Tuple[int,int,int,int]]:
+def sort_boxes_reading_order(
+    boxes: List[Tuple[int, int, int, int]],
+    y_tol_ratio: float = 0.6,
+    x_gap_ratio: float = np.inf,
+) -> List[Tuple[int, int, int, int]]:
     if not boxes:
         return []
 
@@ -125,8 +133,10 @@ def sort_boxes_reading_order(boxes: List[Tuple[int,int,int,int]],
             line_cy = np.mean([(v[1] + v[3]) / 2 for v in ln])
             last_x1 = max(v[2] for v in ln)
 
-            if abs(cy - line_cy) <= avg_h * y_tol_ratio and \
-               (b[0] - last_x1) <= avg_h * x_gap_ratio:
+            if (
+                abs(cy - line_cy) <= avg_h * y_tol_ratio
+                and (b[0] - last_x1) <= avg_h * x_gap_ratio
+            ):
                 ln.append(b)
                 placed = True
                 break
@@ -141,7 +151,9 @@ def sort_boxes_reading_order(boxes: List[Tuple[int,int,int,int]],
     return [b for ln in lines for b in ln]
 
 
-def sort_boxes_reading_order_with_resolutions(boxes, y_tol_ratio=0.6, x_gap_ratio=np.inf):
+def sort_boxes_reading_order_with_resolutions(
+    boxes, y_tol_ratio=0.6, x_gap_ratio=np.inf
+):
     compressed = resolve_intersections(boxes)
     mapping = {c: o for c, o in zip(compressed, boxes)}
 
@@ -149,6 +161,7 @@ def sort_boxes_reading_order_with_resolutions(boxes, y_tol_ratio=0.6, x_gap_rati
         compressed, y_tol_ratio=y_tol_ratio, x_gap_ratio=x_gap_ratio
     )
     return [mapping[b] for b in sorted_compressed]
+
 
 class OCRPipeline:
     def __init__(
@@ -158,7 +171,7 @@ class OCRPipeline:
         self.recognizer = recognizer
         self.min_text_size = min_text_size
 
-    def process(
+    def predict(
         self,
         image: Union[str, np.ndarray, Image.Image],
         recognize_text: bool = True,
@@ -171,10 +184,15 @@ class OCRPipeline:
         t0 = time.time()
         det_out = self.detector.predict(image, vis=False, profile=profile)
 
-        if isinstance(det_out, tuple):
+        if isinstance(det_out, dict):
+            detection_result = det_out.get("page")
+        elif isinstance(det_out, tuple):
             detection_result = det_out[0]
         else:
             detection_result = det_out
+
+        if detection_result is None:
+            raise RuntimeError("Detector did not return a Page result.")
 
         if profile:
             print(f"Detection: {time.time() - t0:.3f}s")
@@ -260,12 +278,16 @@ class OCRPipeline:
             print(f"Pipeline total: {time.time() - start_time:.3f}s")
 
         if vis:
-            pil = image if isinstance(image, Image.Image) else Image.fromarray(image_array)
+            pil = (
+                image
+                if isinstance(image, Image.Image)
+                else Image.fromarray(image_array)
+            )
             vis_img = visualize(pil, detection_result)
             return detection_result, vis_img
 
         return detection_result
-    
+
     def process_batch(
         self,
         images: list[Union[str, np.ndarray, Image.Image]],
@@ -275,7 +297,9 @@ class OCRPipeline:
     ):
         results = []
         for img in images:
-            res = self.process(img, recognize_text=recognize_text, vis=vis, profile=profile)
+            res = self.process(
+                img, recognize_text=recognize_text, vis=vis, profile=profile
+            )
             results.append(res[0] if vis else res)
         return results
 

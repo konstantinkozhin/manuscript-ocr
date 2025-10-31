@@ -1,7 +1,7 @@
 import os
 import time
 from pathlib import Path
-from typing import Union, Optional, List, Tuple, Sequence, Dict
+from typing import Union, Optional, List, Tuple, Sequence, Dict, Any
 
 import cv2
 import gdown
@@ -26,7 +26,7 @@ class EASTInfer:
         target_size: int = 1280,
         expand_ratio_w: float = 0.9,
         expand_ratio_h: float = 0.9,
-        score_thresh: float = 0.95,
+        score_thresh: float = 0.6,
         iou_threshold: float = 0.2,
         score_geo_scale: float = 0.25,
         quantization: int = 2,
@@ -179,12 +179,61 @@ class EASTInfer:
         img_or_path: Union[str, Path, np.ndarray],
         vis: bool = False,
         profile: bool = False,
-    ) -> Union[Page, Tuple[Page, np.ndarray]]:
+        return_maps: bool = False,
+    ) -> Dict[str, Any]:
         """
-        :param img_or_path: путь или RGB ndarray
-        :param vis: если True, возвращает также изображение с боксами и score map
-        :param profile: если True, выводит время выполнения этапов
-        :return: Page или (Page, vis_image)
+        Run EAST inference and return detection results.
+
+        Parameters
+        ----------
+        img_or_path : str or pathlib.Path or numpy.ndarray
+            Path to an image file or an RGB image provided as a NumPy array
+            with shape ``(H, W, 3)`` in ``uint8`` format.
+        vis : bool, optional
+            If True, a visualization image with rendered detections will be
+            returned under the key ``"vis_image"``. Default is False.
+        profile : bool, optional
+            If True, prints timing information for the main inference stages.
+            Default is False.
+        return_maps : bool, optional
+            If True, returns raw model score and geometry maps under keys
+            ``"score_map"`` and ``"geo_map"``. Default is False.
+
+        Returns
+        -------
+        dict
+            Dictionary with the following keys:
+
+            - ``"page"`` : Page
+                Parsed detection result containing detected ``Word`` objects
+                with polygon coordinates and confidence scores.
+            - ``"vis_image"`` : PIL.Image.Image or None
+                Visualization image with drawn bounding boxes if ``vis=True``,
+                otherwise ``None``.
+            - ``"score_map"`` : numpy.ndarray or None
+                Raw score map produced by the network if ``return_maps=True``.
+            - ``"geo_map"`` : numpy.ndarray or None
+                Raw geometry map if ``return_maps=True``.
+
+        Notes
+        -----
+        The method performs:
+        (1) image loading, (2) resizing and normalization, (3) model inference,
+        (4) quad decoding, (5) NMS, (6) box expansion, (7) scaling coordinates
+        back to original size, and (8) optional visualization.
+
+        Examples
+        --------
+        Perform inference with visualization:
+
+        >>> from manuscript.detectors import EASTInfer
+        >>> model = EASTInfer()
+        >>> img_path = r"example/ocr_example_image.jpg"
+        >>> result = model.predict(img_path, vis=True)
+        >>> page = result["page"]
+        >>> vis_img = result["vis_image"]
+        >>> vis_img.show()
+
         """
         # 1) Read & RGB
         img = read_image(img_or_path)
@@ -225,10 +274,6 @@ class EASTInfer:
             print(f"  NMS: {time.time() - t0:.3f}s")
             print(f"    Boxes after NMS: {len(final_quads_nms)}")
 
-        # 5.1) Hard confidence filter
-        if len(final_quads_nms) > 0:
-            final_quads_nms = final_quads_nms[final_quads_nms[:, 8] >= self.score_thresh]
-
         # 6) Expand (inverse shrink)
         final_quads_nms_expanded = expand_boxes(
             final_quads_nms, expand_w=self.expand_ratio_w, expand_h=self.expand_ratio_h
@@ -257,13 +302,22 @@ class EASTInfer:
         page = Page(blocks=[Block(words=words)])
 
         # 10) Optional visualization
-        vis_img = None
-        if vis:
-            vis_img = draw_quads(
+        vis_img = (
+            draw_quads(
                 img, output_quads if self.axis_aligned_output else processed_quads
             )
+            if vis
+            else None
+        )
 
-        return page, vis_img
+        result: Dict[str, Any] = {
+            "page": page,
+            "vis_image": vis_img,
+            "score_map": score_map if return_maps else None,
+            "geo_map": geo_map if return_maps else None,
+        }
+
+        return result
 
     @staticmethod
     def train(
@@ -297,75 +351,116 @@ class EASTInfer:
         device: Optional[torch.device] = None,
     ) -> torch.nn.Module:
         """
-        High-level training entrypoint.
-
-        Creates model, datasets, and runs the training. Logs and checkpoints
-        are stored under `experiment_root/model_name`.
+        Train EAST model on custom datasets.
 
         Parameters
         ----------
-        train_images : str
-            Path to training images directory.
-        train_anns : str
-            Path to COCO JSON for training annotations.
-        val_images : str
-            Path to validation images directory.
-        val_anns : str
-            Path to COCO JSON for validation annotations.
+        train_images : str, Path or sequence of paths
+            Path(s) to training image folders.
+        train_anns : str, Path or sequence of paths
+            Path(s) to COCO-format JSON annotation files corresponding to
+            ``train_images``.
+        val_images : str, Path or sequence of paths
+            Path(s) to validation image folders.
+        val_anns : str, Path or sequence of paths
+            Path(s) to COCO-format JSON annotation files corresponding to
+            ``val_images``.
         experiment_root : str, optional
-            Root directory for experiments (default "./experiments").
+            Base directory where experiment folders will be created.
+            Default is ``"./experiments"``.
         model_name : str, optional
-            Subfolder under `experiment_root` for logs/checkpoints.
-            Default "resnet_quad".
+            Folder name inside ``experiment_root`` for logs and checkpoints.
+            Default is ``"resnet_quad"``.
         pretrained_backbone : bool, optional
-            Use pretrained backbone weights. Default True.
+            Use ImageNet-pretrained backbone weights. Default ``True``.
         freeze_first : bool, optional
-            Freeze first layers of backbone. Default True.
+            Freeze lowest layers of the backbone. Default ``True``.
         target_size : int, optional
-            Resize shortest side of images to this size. Default 1024.
+            Resize shorter side of images to this size. Default ``1024``.
         score_geo_scale : float, optional
-            Scale factor for score/geometry maps. If None, uses model.score_scale.
+            Multiplier to recover original coordinates from score/geo maps.
+            If None, automatically taken from the model. Default ``None``.
         epochs : int, optional
-            Number of training epochs. Default 500.
+            Number of training epochs. Default ``500``.
         batch_size : int, optional
-            Samples per batch. Default 3.
+            Batch size. Default ``3``.
         lr : float, optional
-            Initial learning rate. Default 1e-3.
+            Learning rate. Default ``1e-3``.
         grad_clip : float, optional
-            Gradient clipping norm. Default 5.0.
+            Gradient clipping value (L2 norm). Default ``5.0``.
         early_stop : int, optional
-            Patience for early stopping. Default 100.
+            Patience (epochs without improvement) for early stopping.
+            Default ``100``.
         use_sam : bool, optional
-            Use SAM optimizer. Default True.
-        sam_type : str, optional
-            "sam" or "asam" variant. Default "asam".
+            Enable SAM optimizer. Default ``True``.
+        sam_type : {"sam", "asam"}, optional
+            Variant of SAM to use. Default ``"asam"``.
         use_lookahead : bool, optional
-            Wrap optimizer with Lookahead. Default True.
+            Wrap optimizer with Lookahead. Default ``True``.
         use_ema : bool, optional
-            Keep EMA of model weights. Default False.
+            Maintain EMA version of model weights. Default ``False``.
         use_multiscale : bool, optional
-            Randomly scale inputs on train. Default True.
+            Random multi-scale training. Default ``True``.
         use_ohem : bool, optional
-            Use Online Hard Example Mining. Default True.
+            Online Hard Example Mining. Default ``True``.
         ohem_ratio : float, optional
-            Ratio for hard negatives. Default 0.5.
+            Ratio of hard negatives for OHEM. Default ``0.5``.
         use_focal_geo : bool, optional
-            Apply focal loss to geometry. Default True.
+            Apply focal loss to geometry channels. Default ``True``.
         focal_gamma : float, optional
-            Gamma for focal geometry loss. Default 2.0.
-        resume_from : str | Path, optional
-            Path to either an experiment directory, its ``checkpoints`` subfolder,
-            or directly to ``.../checkpoints/last_state.pt`` to resume from a
-            previous run. If None, starts a new experiment.
+            Gamma for focal geometry loss. Default ``2.0``.
+        resume_from : str or Path, optional
+            Resume training from a previous experiment:
+            a) experiment directory,
+            b) `.../checkpoints/`,
+            c) direct path to `last_state.pt`.
+            Default ``None``.
         val_interval : int, optional
-            Run validation every `val_interval` epochs. Default 1 (validate each epoch).
+            Run validation every N epochs. Default ``1``.
         device : torch.device, optional
-            Compute device. If None, auto-select. Default None.
+            CUDA or CPU device. Auto-selects if None.
 
         Returns
         -------
         torch.nn.Module
-            Trained model (EMA if use_ema else base).
+            Best model weights (EMA if enabled, otherwise base model).
+
+        Examples
+        --------
+        Train on two datasets with validation:
+
+        >>> from manuscript.detectors import EASTInfer
+        >>>
+        >>> train_images = [
+        ...     "/data/archive/train_images",
+        ...     "/data/ddi/train_images"
+        ... ]
+        >>> train_anns = [
+        ...     "/data/archive/train.json",
+        ...     "/data/ddi/train.json"
+        ... ]
+        >>> val_images = [
+        ...     "/data/archive/test_images",
+        ...     "/data/ddi/test_images"
+        ... ]
+        >>> val_anns = [
+        ...     "/data/archive/test.json",
+        ...     "/data/ddi/test.json"
+        ... ]
+        >>>
+        >>> best_model = EASTInfer.train(
+        ...     train_images=train_images,
+        ...     train_anns=train_anns,
+        ...     val_images=val_images,
+        ...     val_anns=val_anns,
+        ...     target_size=256,
+        ...     epochs=20,
+        ...     batch_size=4,
+        ...     use_sam=False,
+        ...     freeze_first=False,
+        ...     val_interval=3,
+        ... )
+        >>> print("Best checkpoint loaded:", best_model)
         """
 
         if device is None:
@@ -389,7 +484,9 @@ class EASTInfer:
                 dataset_name=name,
             )
 
-        def _dataset_base_name(img_path: Union[str, Path], ann_path: Union[str, Path]) -> str:
+        def _dataset_base_name(
+            img_path: Union[str, Path], ann_path: Union[str, Path]
+        ) -> str:
             ann = Path(os.fspath(ann_path))
             parts: List[str] = []
             if ann.parent.name:

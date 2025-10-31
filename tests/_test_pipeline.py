@@ -36,7 +36,12 @@ class TestOCRPipeline:
         mock_page = Mock()
         mock_page.blocks = [mock_block]
 
-        detector.predict.return_value = mock_page
+        detector.predict.return_value = {
+            "page": mock_page,
+            "vis_image": None,
+            "score_map": None,
+            "geo_map": None,
+        }
         return detector
 
     @pytest.fixture
@@ -134,7 +139,12 @@ class TestOCRPipeline:
         from manuscript.detectors._types import Page
 
         empty_page = Page(blocks=[])
-        pipeline.detector.predict.return_value = empty_page
+        pipeline.detector.predict.return_value = {
+            "page": empty_page,
+            "vis_image": None,
+            "score_map": None,
+            "geo_map": None,
+        }
 
         result = pipeline.process(test_image)
         assert hasattr(result, "blocks")
@@ -165,7 +175,12 @@ class TestOCRPipeline:
         mock_page = Mock()
         mock_page.blocks = [mock_block]
 
-        pipeline.detector.predict.return_value = mock_page
+        pipeline.detector.predict.return_value = {
+            "page": mock_page,
+            "vis_image": None,
+            "score_map": None,
+            "geo_map": None,
+        }
 
         result = pipeline.process(test_image)
         assert result == ""  # Область слишком маленькая, должна быть отфильтрована
@@ -221,7 +236,12 @@ class TestOCRPipeline:
         mock_page = Mock()
         mock_page.blocks = [mock_block]
 
-        pipeline.detector.predict.return_value = mock_page
+        pipeline.detector.predict.return_value = {
+            "page": mock_page,
+            "vis_image": None,
+            "score_map": None,
+            "geo_map": None,
+        }
 
         result = pipeline.process(test_image)
 

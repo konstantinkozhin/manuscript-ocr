@@ -1,40 +1,82 @@
 import os
 import json
-import torch
-import numpy as np
-from PIL import Image
+from pathlib import Path
 from typing import List, Union, Tuple, Optional, Sequence, Dict, Any
+
 import cv2
+import numpy as np
+import torch
+import torch.nn.functional as F
+from PIL import Image
+
+try:
+    import gdown
+except ImportError:  # pragma: no cover - optional dependency for default weights
+    gdown = None  # type: ignore[assignment]
 
 from .model.model import RCNN
 from .data.transforms import load_charset, get_val_transform, decode_tokens
 from .training.utils import load_checkpoint
 from .training.train import Config, run_training
-import torch.nn.functional as F
 
 
 class TRBAInfer:
+    _DEFAULT_PRESET_NAME = "exp_1_baseline"
+    _DEFAULT_RELEASE_WEIGHTS_URL = (
+        "https://github.com/konstantinkozhin/manuscript-ocr/"
+        "releases/download/v0.1.0/trba_exp_1_64.pth"
+    )
+    _DEFAULT_RELEASE_CONFIG_URL = (
+        "https://github.com/konstantinkozhin/manuscript-ocr/"
+        "releases/download/v0.1.0/trba_exp_1_64.json"
+    )
+    _DEFAULT_STORAGE_ROOT = Path.home() / ".manuscript" / "trba"
+    _DEFAULT_WEIGHTS_FILENAME = "weights.pth"
+    _DEFAULT_CONFIG_FILENAME = "config.json"
+
     def __init__(
         self,
-        model_path: str,
-        charset_path: str = None,
-        config_path: str = None,
+        model_path: Optional[str] = None,
+        charset_path: Optional[str] = None,
+        config_path: Optional[str] = None,
         device: str = "auto",
+        **kwargs: Any,
     ):
-        self.model_path = model_path
+        weights_path = kwargs.pop("weights_path", None)
+        if kwargs:
+            unexpected = ", ".join(kwargs.keys())
+            raise TypeError(f"Unexpected keyword argument(s): {unexpected}")
+
+        if weights_path is not None and model_path is not None:
+            if os.path.abspath(os.fspath(weights_path)) != os.path.abspath(
+                os.fspath(model_path)
+            ):
+                raise ValueError(
+                    "Provide either model_path or weights_path, but not both with "
+                    "different values."
+                )
+
+        resolved_model_path, resolved_config_path = (
+            self._resolve_model_and_config_paths(
+                weights_path if weights_path is not None else model_path,
+                config_path,
+            )
+        )
+
+        self.model_path = resolved_model_path
 
         if charset_path is None:
             current_dir = os.path.dirname(os.path.abspath(__file__))
             charset_path = os.path.join(current_dir, "configs", "charset.txt")
 
-        self.charset_path = charset_path
-        self.config_path = config_path
+        self.charset_path = os.fspath(charset_path)
+        self.config_path = resolved_config_path
 
         if not os.path.exists(self.charset_path):
             raise FileNotFoundError(f"Charset file not found: {self.charset_path}")
 
-        if config_path is not None:
-            with open(config_path, "r", encoding="utf-8") as f:
+        if self.config_path is not None:
+            with open(self.config_path, "r", encoding="utf-8") as f:
                 config = json.load(f)
         else:
             config = {}
@@ -58,6 +100,83 @@ class TRBAInfer:
         self.transform = get_val_transform(self.img_h, self.img_w)
 
         self.model = self._load_model()
+
+    def _resolve_model_and_config_paths(
+        self,
+        model_path: Optional[str],
+        config_path: Optional[str],
+    ) -> Tuple[str, Optional[str]]:
+        if model_path is None:
+            return self._ensure_default_artifacts(config_path)
+
+        resolved_model_path = os.fspath(model_path)
+        if not os.path.exists(resolved_model_path):
+            raise FileNotFoundError(
+                f"Model checkpoint not found: {resolved_model_path}"
+            )
+
+        if config_path is not None:
+            resolved_config_path = os.fspath(config_path)
+            if not os.path.exists(resolved_config_path):
+                raise FileNotFoundError(
+                    f"Config file not found: {resolved_config_path}"
+                )
+        else:
+            resolved_config_path = self._infer_config_path_from_weights(
+                resolved_model_path
+            )
+
+        return resolved_model_path, resolved_config_path
+
+    def _infer_config_path_from_weights(self, weights_path: str) -> Optional[str]:
+        weights_file = Path(weights_path)
+        candidates = [
+            weights_file.with_suffix(".json"),
+            weights_file.parent / "config.json",
+        ]
+
+        for candidate in candidates:
+            if candidate.exists():
+                return os.fspath(candidate)
+        return None
+
+    def _ensure_default_artifacts(
+        self,
+        config_path: Optional[str],
+    ) -> Tuple[str, Optional[str]]:
+        storage_root = self._DEFAULT_STORAGE_ROOT.expanduser()
+        target_dir = storage_root / self._DEFAULT_PRESET_NAME
+        target_dir.mkdir(parents=True, exist_ok=True)
+
+        weights_dest = target_dir / self._DEFAULT_WEIGHTS_FILENAME
+        if not weights_dest.exists():
+            self._download_file(self._DEFAULT_RELEASE_WEIGHTS_URL, weights_dest)
+
+        if config_path is not None:
+            resolved_config_path = os.fspath(config_path)
+            if not os.path.exists(resolved_config_path):
+                raise FileNotFoundError(
+                    f"Config file not found: {resolved_config_path}"
+                )
+        else:
+            config_dest = target_dir / self._DEFAULT_CONFIG_FILENAME
+            if not config_dest.exists():
+                self._download_file(self._DEFAULT_RELEASE_CONFIG_URL, config_dest)
+            resolved_config_path = os.fspath(config_dest)
+
+        return os.fspath(weights_dest), resolved_config_path
+
+    def _download_file(self, url: str, destination: Path) -> None:
+        if gdown is None:
+            raise RuntimeError(
+                "gdown is required to download default TRBA weights. "
+                "Install gdown or pass weights_path/model_path explicitly."
+            )
+
+        print(f"Downloading TRBA artifact from {url} -> {destination}")
+        gdown.download(url, os.fspath(destination), quiet=False)
+        if not destination.exists():
+            raise RuntimeError(f"Failed to download artifact from {url}")
 
     def _load_model(self) -> RCNN:
         model = RCNN(

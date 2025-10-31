@@ -1,15 +1,17 @@
+import json
+import time
+from collections import defaultdict
+from pathlib import Path
+
 import cv2
 import numpy as np
 import torch
-from tqdm import tqdm
-from shapely.geometry import Polygon
-import json
-from collections import defaultdict
-import time
-from pathlib import Path
 from PIL import Image
+from shapely.geometry import Polygon
+from tqdm import tqdm
 
-'''
+
+"""
 def convert_rboxes_to_quad_boxes(rboxes, scores=None):
     quad_boxes = []
     if scores is None:
@@ -20,7 +22,8 @@ def convert_rboxes_to_quad_boxes(rboxes, scores=None):
         quad = np.concatenate([pts.flatten(), [scores[i]]]).astype(np.float32)
         quad_boxes.append(quad)
     return np.array(quad_boxes, dtype=np.float32)
-'''
+"""
+
 
 def quad_to_rbox(quad):
     pts = quad[:8].reshape(4, 2).astype(np.float32)
@@ -43,57 +46,50 @@ def draw_quads(
     thickness: int = 1,
     dark_alpha: float = 0.5,
     blur_ksize: int = 11,
-) -> np.ndarray:
+) -> Image.Image:
     """
-    Рисует надписи в стиле EAST:
-      - затемняет фон на dark_alpha,
-      - внутри полигонов оставляет исходное изображение,
-      - рисует контуры толщиной thickness и цветом color,
-      - размывает границу полигонов blur_ksize.
+    Draw quadrilateral boxes over the input image and return a PIL visualization.
 
     Args:
-        image: H×W×3, исходный BGR или RGB.
-        quads: N×M, массив, где первые 8 значений каждой строки —
-               это [x1,y1,...,x4,y4].
-        color: кортеж BGR/RGB для контура.
-        thickness: толщина линии контура.
-        dark_alpha: степень затемнения вне полигонов (0–1).
-        blur_ksize: нечётный размер ядра для размывания маски.
+        image: Source image in RGB (preferred) or BGR order with shape HxWx3.
+        quads: Array-like collection of quadrangles shaped `N x 9` or `N x 8`
+            where the first eight values are `[x1, y1, ..., x4, y4]`.
+        color: Polyline color passed to OpenCV.
+        thickness: Polyline thickness in pixels.
+        dark_alpha: Blending factor for darkening the background under polygons.
+        blur_ksize: Odd kernel size for Gaussian blur applied to the soft mask.
+
+    Returns:
+        PIL.Image.Image: Image containing the visualization overlay.
     """
     img = image.copy()
     if quads is None or len(quads) == 0:
-        return img
+        return Image.fromarray(img)
 
-    # если Tensor, то в numpy
     if isinstance(quads, torch.Tensor):
         quads = quads.detach().cpu().numpy()
 
     h, w = img.shape[:2]
-    # затемнённый фон
     dark_bg = (img.astype(np.float32) * (1 - dark_alpha)).astype(np.uint8)
 
-    # 1) Создаём маску внутри полигонов
     mask = np.zeros((h, w), dtype=np.float32)
     for q in quads:
         pts = q[:8].reshape(4, 2).astype(np.int32)
         cv2.fillPoly(mask, [pts], 1.0)
 
-    # 2) Размываем границу
     k = blur_ksize if blur_ksize % 2 == 1 else blur_ksize + 1
     mask = cv2.GaussianBlur(mask, (k, k), 0)
     mask = np.clip(mask, 0.0, 1.0)
     mask_3 = mask[:, :, None]
 
-    # 3) Смешиваем исход и затемнённый фон
     out = img.astype(np.float32) * mask_3 + dark_bg.astype(np.float32) * (1 - mask_3)
     out = np.clip(out, 0, 255).astype(np.uint8)
 
-    # 4) Рисуем контуры полигонов
     for q in quads:
         pts = q[:8].reshape(4, 2).astype(np.int32)
         cv2.polylines(out, [pts], isClosed=True, color=color, thickness=thickness)
 
-    return out
+    return Image.fromarray(out)
 
 
 def draw_rboxes(image, rboxes, color=(0, 255, 0), thickness=2, alpha=0.5):
@@ -122,9 +118,10 @@ def draw_boxes(image, boxes, color=(0, 255, 0), thickness=2, alpha=0.5):
         return draw_rboxes(image, boxes, color=color, thickness=thickness, alpha=alpha)
     elif len(first) in (8, 9):
         # quad with or without score
-        return draw_quads(
+        quad_img = draw_quads(
             image, boxes, color=color, thickness=thickness, dark_alpha=alpha
         )
+        return np.array(quad_img)
     else:
         raise ValueError(f"Unsupported box format with length {len(first)}")
 
@@ -219,14 +216,11 @@ def decode_quads_from_maps(
     if len(ys) == 0:
         return np.zeros((0, 9), dtype=np.float32)
 
-    # Квантизация координат точек для объединения близких
     if quantization > 1:
         t0_quant = time.time()
-        # Квантуем координаты - берем центр квантованной ячейки
         ys_quant = (ys // quantization) * quantization + quantization // 2
         xs_quant = (xs // quantization) * quantization + quantization // 2
 
-        # Объединяем дубликаты
         coords = np.column_stack([ys_quant, xs_quant])
         unique_coords = np.unique(coords, axis=0)
 
@@ -311,7 +305,6 @@ def poly_iou(segA, segB):
 
 
 def compute_f1(preds, thresh, gt_segs, processed_ids):
-    # Кэшируем полигоны
     gt_polys = {
         iid: [Polygon(np.array(seg).reshape(-1, 2)) for seg in gt_segs.get(iid, [])]
         for iid in processed_ids
@@ -352,6 +345,7 @@ def compute_f1(preds, thresh, gt_segs, processed_ids):
     rec = tp / (tp + fn) if tp + fn > 0 else 0
     return 2 * prec * rec / (prec + rec) if (prec + rec) > 0 else 0
 
+
 def read_image(img_or_path):
     if isinstance(img_or_path, (str, Path)):
         img = cv2.imread(str(img_or_path))
@@ -375,7 +369,7 @@ def read_image(img_or_path):
     return img
 
 
-'''
+"""
 def load_gt(gt_path):
     with open(gt_path, "r", encoding="utf-8") as f:
         gt_coco = json.load(f)
@@ -404,10 +398,10 @@ def load_preds(pred_path):
             }
         )
     return preds
-'''
+"""
 
 
-'''
+"""
 def compute_f1_metrics(
     preds,
     gt_segs,
@@ -426,4 +420,4 @@ def compute_f1_metrics(
 
     f1_avg = float(np.mean(f1_list))
     return f1_at_05, f1_avg
-'''
+"""

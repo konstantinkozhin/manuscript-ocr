@@ -1,15 +1,15 @@
-import cv2
-import numpy as np
-from PIL import Image
 from manuscript.detectors import EASTInfer
 
-# Инициализация модели
+# Model initialization
 model = EASTInfer()
 
-img_path = r"C:\Users\USER\Desktop\scale_1200.jpg"
+# Path to the image
+img_path = r"example\ocr_example_image.jpg"
 
-# Инференс с визуализацией (возвращает изображение с боксами и score map)
-page, img_with_boxes = model.predict(img_path, vis=True, profile=True)
+# Inference with visualization
+result = model.predict(img_path, vis=True)
+page = result["page"]
+img = result["vis_image"]
 
-img_with_boxes_pil = Image.fromarray(img_with_boxes)
-img_with_boxes_pil.show()
+# Show the result
+img.show()

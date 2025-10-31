@@ -73,17 +73,20 @@ for block in result.blocks:
 ### Детекция текста 
 
 ```python
-from PIL import Image
 from manuscript.detectors import EASTInfer
 
-# Инициализация детектора
+# ????????????? ?????????
 detector = EASTInfer(score_thresh=0.9)
 
-# Детекция с визуализацией
-page, vis_image = detector.predict("example/image.jpg", vis=True)
+# ???????? ? ?????????????
+result = detector.predict("example/image.jpg", vis=True)
+page = result["page"]
+vis_image = result["vis_image"]
 
-# Показать результат
-Image.fromarray(vis_image).show()
+# ???????? ?????????
+if vis_image is not None:
+    vis_image.show()
+
 
 # Информация о найденных областях
 for block in page.blocks:

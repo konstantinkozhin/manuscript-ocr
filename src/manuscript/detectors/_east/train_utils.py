@@ -370,9 +370,7 @@ def _run_training(
 
             avg_val = total_val_loss / max(total_val_batches, 1)
             overall_dice = (
-                overall_dice_sum / overall_dice_count
-                if overall_dice_count > 0
-                else 0.0
+                overall_dice_sum / overall_dice_count if overall_dice_count > 0 else 0.0
             )
 
             writer.add_scalar("Loss/Val", avg_val, epoch)
@@ -431,9 +429,7 @@ def _custom_collate_fn(batch):
     return images, {"score_map": score_maps, "geo_map": geo_maps, "rboxes": rboxes_list}
 
 
-def _collage_batch(
-    model, dataset, device, num: int = 4, cell_size: int = 640
-):
+def _collage_batch(model, dataset, device, num: int = 4, cell_size: int = 640):
     coll_imgs = []
     for i in range(min(num, len(dataset))):
         img_t, tgt = dataset[i]

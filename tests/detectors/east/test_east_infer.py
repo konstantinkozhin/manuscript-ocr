@@ -5,8 +5,8 @@
 
 import pytest
 from pathlib import Path
-import numpy as np
 import torch
+from PIL import Image
 
 from manuscript.detectors import EASTInfer
 
@@ -47,7 +47,10 @@ class TestEASTInfer:
         print("\n=== Тест базового inference ===")
 
         detector = EASTInfer(score_thresh=0.3)
-        page = detector.predict(example_image_path, vis=False)
+        result = detector.predict(example_image_path, vis=False)
+        assert isinstance(result, dict)
+        assert "page" in result
+        page = result["page"]
         assert page is not None
         assert hasattr(page, "blocks")
         assert isinstance(page.blocks, list)
@@ -83,21 +86,21 @@ class TestEASTInfer:
         result = detector.predict(example_image_path, vis=True)
 
         # Проверяем, что возвращается кортеж
-        assert isinstance(result, tuple)
-        assert len(result) == 2
+        assert isinstance(result, dict)
+        assert {"page", "vis_image", "score_map", "geo_map"}.issubset(result.keys())
 
-        page, vis_image = result
+        page = result["page"]
+        vis_image = result["vis_image"]
 
         # Проверяем page
         assert hasattr(page, "blocks")
 
         # Проверяем визуализацию
         assert vis_image is not None
-        assert isinstance(vis_image, np.ndarray)
-        assert len(vis_image.shape) == 3
-        assert vis_image.shape[2] == 3
+        assert isinstance(vis_image, Image.Image)
+        assert vis_image.mode in ("RGB", "RGBA")
 
-        print(f"Размер визуализации: {vis_image.shape}")
+        print(f"Размер визуализации: {vis_image.size}")
         print("Визуализация работает")
 
     def test_eastinfer_different_parameters(self, example_image_path):
@@ -110,7 +113,8 @@ class TestEASTInfer:
 
         for thresh in thresholds:
             detector = EASTInfer(score_thresh=thresh)
-            page = detector.predict(example_image_path, vis=False)
+            result = detector.predict(example_image_path, vis=False)
+            page = result["page"]
 
             total_words = sum(len(block.words) for block in page.blocks)
             results.append((thresh, total_words))
@@ -134,7 +138,8 @@ class TestEASTInfer:
 
         # Тестируем с numpy input
         detector = EASTInfer(score_thresh=0.5)
-        page = detector.predict(img_rgb, vis=False)
+        result = detector.predict(img_rgb, vis=False)
+        page = result["page"]
 
         # Проверяем результат
         assert page is not None
