@@ -16,7 +16,6 @@ def main():
     recognizer_model_path = (
         "C:\\Users\\USER\\Desktop\\OCR_MODELS\\exp1_model_64\\best_acc_weights.pth"
     )
-    charset_path = "src/manuscript/recognizers/trba/configs/charset.txt"
     config_path = "C:\\Users\\USER\\Desktop\\OCR_MODELS\\exp1_model_64\\config.json"
 
     # Папка с изображениями для обработки
@@ -55,7 +54,6 @@ def main():
     start_time = time.time()
     recognizer = TRBAInfer(
         model_path=recognizer_model_path,
-        charset_path=charset_path,
         config_path=config_path,
     )
     recognizer_time = time.time() - start_time

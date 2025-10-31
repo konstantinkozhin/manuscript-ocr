@@ -6,7 +6,7 @@ from manuscript.detectors import EASTInfer
 # Инициализация модели
 model = EASTInfer()
 
-img_path = r"C:\Users\USER\Desktop\Для отчета\2907.jpg"
+img_path = r"C:\Users\USER\Desktop\scale_1200.jpg"
 
 # Инференс с визуализацией (возвращает изображение с боксами и score map)
 page, img_with_boxes = model.predict(img_path, vis=True, profile=True)

@@ -3,20 +3,19 @@ from manuscript.recognizers import TRBAInfer
 
 # === Инициализация модели ===
 recognizer = TRBAInfer(
-    model_path=r"C:\shared\exp1_model_64\best_acc_ckpt.pth",
-    config_path=r"C:\shared\exp1_model_64\config.json",
+    model_path=r"C:\Users\USER\Desktop\OCR_MODELS\exp1_model_64\best_acc_weights.pth",
+    config_path=r"C:\Users\USER\Desktop\OCR_MODELS\exp1_model_64\config.json",
 )
 
 # === Список изображений ===
 images = [
-    r"C:\Screenshot 2025-10-26 103539.png",
-    # r"C:\Screenshot 2025-10-25 180736.png",
-    # r"C:\Screenshot 2025-10-25 180134.png",
-    # r"C:\shared\Archive_19_04\data_hkr\test\hrk_23.png",
-    # r"C:\shared\Archive_19_04\data_cyrillic\test\cyrillic_52.png",
-    # r"C:\shared\Archive_19_04\data_archive\test\archive_288.png",
-    # r"C:\shared\Archive_19_04\data_archive\test\archive_31898.png",
-    # r"C:\Screenshot 2025-10-25 210128.png",
+#    r"C:\Users\USER\Desktop\archive_25_09\dataset\handwritten\val\img\images_group_39_632_10901.png",
+#    r"C:\Users\USER\Desktop\archive_25_09\dataset\handwritten\val\img\images_group_39_632_10903.png",
+#    r"C:\Users\USER\Desktop\archive_25_09\dataset\handwritten\val\img\images_group_39_635_11456.png",
+    r"C:\Users\USER\Desktop\t.png",
+    r"C:\Users\USER\Desktop\t2.png",
+    r"C:\Users\USER\Desktop\t3.png",
+    r"C:\Users\USER\Desktop\t4.png"
 ]
 
 # === Измеряем время ===

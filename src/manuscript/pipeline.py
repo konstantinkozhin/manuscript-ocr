@@ -11,7 +11,7 @@ from .recognizers import TRBAInfer
 
 class OCRPipeline:
     def __init__(
-        self, detector: EASTInfer, recognizer: TRBAInfer, min_text_size: int = 10
+        self, detector: EASTInfer, recognizer: TRBAInfer, min_text_size: int = 5
     ):
         self.detector = detector
         self.recognizer = recognizer
@@ -32,7 +32,8 @@ class OCRPipeline:
         if profile:
             print(f"Detection: {time.time() - t0:.3f}s")
 
-        if vis and isinstance(detection_result, tuple):
+        # Detector may return (Page, vis_img) even if vis=False
+        if isinstance(detection_result, tuple):
             detection_result, vis_image = detection_result
         else:
             vis_image = None
@@ -40,7 +41,7 @@ class OCRPipeline:
         if not recognize_text:
             if profile:
                 print(f"Pipeline total: {time.time() - start_time:.3f}s")
-            return detection_result, vis_image
+            return (detection_result, vis_image) if vis else detection_result
 
         # Load image for cropping
         t0 = time.time()
@@ -73,17 +74,52 @@ class OCRPipeline:
         # Recognition
         if word_images:
             t0 = time.time()
+            # TRBA API returns List[Tuple[text, confidence]] for list input
             recognition_results = self.recognizer.predict(word_images)
             if profile:
                 print(f"Recognition: {time.time() - t0:.3f}s")
 
-            for word, (text, confidence) in zip(all_words, recognition_results):
+            # Backward-compat: if recognizer returns list of strings
+            for idx, word in enumerate(all_words):
+                res = recognition_results[idx]
+                if isinstance(res, tuple) and len(res) == 2:
+                    text, confidence = res
+                else:
+                    text, confidence = str(res), None
                 word.text = text
                 word.recognition_confidence = confidence
 
         if profile:
             print(f"Pipeline total: {time.time() - start_time:.3f}s")
-        return detection_result, vis_image
+        return (detection_result, vis_image) if vis else detection_result
+
+    def process_batch(
+        self,
+        images: list[Union[str, np.ndarray, Image.Image]],
+        recognize_text: bool = True,
+        vis: bool = False,
+        profile: bool = False,
+    ):
+        results = []
+        for img in images:
+            res = self.process(img, recognize_text=recognize_text, vis=vis, profile=profile)
+            # For batch, return only Page objects for simplicity
+            results.append(res[0] if vis else res)
+        return results
+
+    def get_text(self, page) -> str:
+        try:
+            blocks = getattr(page, "blocks", []) or []
+        except Exception:
+            return ""
+        lines = []
+        for block in blocks:
+            words = getattr(block, "words", []) or []
+            texts = [getattr(w, "text", None) for w in words]
+            texts = [t for t in texts if t]
+            if texts:
+                lines.append(" ".join(texts))
+        return "\n".join(lines)
 
     def _extract_word_image(
         self, image: np.ndarray, polygon: np.ndarray
