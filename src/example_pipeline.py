@@ -2,12 +2,13 @@ from manuscript.detectors._east import EASTInfer
 from manuscript.recognizers.trba import TRBAInfer
 from manuscript.pipeline import OCRPipeline
 
+
 # Путь к модели распознавателя (укажите свой путь)
-recognizer_model_path = r"C:\Users\USER\Desktop\OCR_MODELS\exp_4_model_64\best_acc_weights.pth"
-config_path = r"C:\Users\USER\Desktop\OCR_MODELS\exp_4_model_64\config.json"
+recognizer_model_path = r"C:\Users\USER\Desktop\OCR_MODELS\exp1_model_64\best_acc_weights.pth"
+config_path = r"C:\Users\USER\Desktop\OCR_MODELS\exp1_model_64\config.json"
 
 # Путь к изображению (укажите свой файл)
-image_path = r"C:\Users\USER\Desktop\верифицированные архъивы\combined_images\4.jpg"
+image_path = r"C:\Users\USER\Desktop\20250710_143822.jpg"
 
 # Инициализация детектора и распознавателя
 detector = EASTInfer()
@@ -17,7 +18,7 @@ recognizer = TRBAInfer(model_path=recognizer_model_path, config_path=config_path
 pipeline = OCRPipeline(detector=detector, recognizer=recognizer)
 
 # Обработка изображения и получение результата
-result = pipeline.process(image_path, recognize_text=True)
+result, img = pipeline.process(image_path, recognize_text=True, profile=True, vis=True)
 # Сбор распознанного текста в одну строку и вывод координат
 recognized_text = ""
 for b_idx, block in enumerate(result.blocks, start=1):
@@ -48,3 +49,7 @@ for b_idx, block in enumerate(result.blocks, start=1):
 # Вывод результата
 print("Распознанный текст:")
 print(recognized_text.strip())
+
+from PIL import Image
+
+img.show()

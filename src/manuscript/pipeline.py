@@ -4,10 +4,151 @@ from typing import Union, Optional
 import cv2
 from pathlib import Path
 import time
-
+from typing import List, Tuple
 from .detectors import EASTInfer
 from .recognizers import TRBAInfer
+from PIL import ImageDraw
+from manuscript.detectors._east.utils import draw_quads
 
+
+def visualize(
+    pil_img: Image.Image,
+    page,
+    *,
+    connect_words=True,
+    show_numbers=True,
+    line_color=(0, 255, 0),
+    number_color=(255, 255, 255),
+    number_bg=(0, 0, 0),
+) -> Image.Image:
+
+    img = np.array(pil_img.convert("RGB"))
+
+    # --- Build quads from words (already sorted in page.blocks[x].words) ---
+    quads = []
+    words_in_order = []  # preserve order for lines & numbers
+
+    for block in page.blocks:
+        for w in block.words:
+            poly = np.array(w.polygon).reshape(-1)
+            quads.append(poly)
+            words_in_order.append(w)
+
+    if len(quads) == 0:
+        return pil_img
+
+    quads = np.stack(quads, axis=0)
+
+    # draw polygons
+    vis = draw_quads(
+        image=img,
+        quads=quads,
+        color=(0, 0, 255),
+        thickness=2,
+        dark_alpha=0.3,
+        blur_ksize=11,
+    )
+
+    out = Image.fromarray(vis)
+    draw = ImageDraw.Draw(out)
+
+    # ---- Draw lines and/or numbers strictly in existing order ----
+    if connect_words or show_numbers:
+
+        centers = []
+        for w in words_in_order:
+            xs = [p[0] for p in w.polygon]
+            ys = [p[1] for p in w.polygon]
+            centers.append((sum(xs)/4, sum(ys)/4))
+
+        # Lines: between neighbors
+        if connect_words and len(centers) > 1:
+            for p, c in zip(centers, centers[1:]):
+                draw.line([p, c], fill=line_color, width=3)
+
+        # Numbers: on centers
+        if show_numbers:
+            for idx, c in enumerate(centers, start=1):
+                cx, cy = c
+                draw.rectangle(
+                    [cx - 12, cy - 12, cx + 12, cy + 12],
+                    fill=number_bg,
+                )
+                draw.text((cx - 6, cy - 8), str(idx), fill=number_color)
+
+    return out
+
+def resolve_intersections(boxes):
+    def intersect(b1, b2):
+        return not (
+            b1[2] <= b2[0] or 
+            b2[2] <= b1[0] or 
+            b1[3] <= b2[1] or 
+            b2[3] <= b1[1]
+        )
+
+    resolved = list(boxes)
+    max_iterations = 50
+
+    for _ in range(max_iterations):
+        changed = False
+        for i in range(len(resolved)):
+            for j in range(i+1, len(resolved)):
+                if intersect(resolved[i], resolved[j]):
+                    x0, y0, x1, y1 = resolved[i]
+                    x0b, y0b, x1b, y1b = resolved[j]
+
+                    resolved[i] = (x0, y0, int(x1 - (x1-x0)*0.1), int(y1 - (y1-y0)*0.1))
+                    resolved[j] = (x0b, y0b, int(x1b - (x1b-x0b)*0.1), int(y1b - (y1b-y0b)*0.1))
+                    changed = True
+        if not changed:
+            break
+
+    return resolved
+
+
+def sort_boxes_reading_order(boxes: List[Tuple[int,int,int,int]],
+                             y_tol_ratio: float = 0.6,
+                             x_gap_ratio: float = np.inf
+) -> List[Tuple[int,int,int,int]]:
+    if not boxes:
+        return []
+
+    avg_h = np.mean([b[3] - b[1] for b in boxes])
+    lines = []
+
+    for b in sorted(boxes, key=lambda b: (b[1] + b[3]) / 2):
+        cy = (b[1] + b[3]) / 2
+        placed = False
+
+        for ln in lines:
+            line_cy = np.mean([(v[1] + v[3]) / 2 for v in ln])
+            last_x1 = max(v[2] for v in ln)
+
+            if abs(cy - line_cy) <= avg_h * y_tol_ratio and \
+               (b[0] - last_x1) <= avg_h * x_gap_ratio:
+                ln.append(b)
+                placed = True
+                break
+
+        if not placed:
+            lines.append([b])
+
+    lines.sort(key=lambda ln: np.mean([(b[1] + b[3]) / 2 for b in ln]))
+    for ln in lines:
+        ln.sort(key=lambda b: b[0])
+
+    return [b for ln in lines for b in ln]
+
+
+def sort_boxes_reading_order_with_resolutions(boxes, y_tol_ratio=0.6, x_gap_ratio=np.inf):
+    compressed = resolve_intersections(boxes)
+    mapping = {c: o for c, o in zip(compressed, boxes)}
+
+    sorted_compressed = sort_boxes_reading_order(
+        compressed, y_tol_ratio=y_tol_ratio, x_gap_ratio=x_gap_ratio
+    )
+    return [mapping[b] for b in sorted_compressed]
 
 class OCRPipeline:
     def __init__(
@@ -26,73 +167,105 @@ class OCRPipeline:
     ):
         start_time = time.time()
 
-        # Detection
+        # ---- DETECTION ----
         t0 = time.time()
-        detection_result = self.detector.predict(image, vis=vis, profile=profile)
+        det_out = self.detector.predict(image, vis=False, profile=profile)
+
+        if isinstance(det_out, tuple):
+            detection_result = det_out[0]
+        else:
+            detection_result = det_out
+
         if profile:
             print(f"Detection: {time.time() - t0:.3f}s")
 
-        # Detector may return (Page, vis_img) even if vis=False
-        if isinstance(detection_result, tuple):
-            detection_result, vis_image = detection_result
-        else:
-            vis_image = None
-
+        # ---- If recognition not needed ----
         if not recognize_text:
-            if profile:
-                print(f"Pipeline total: {time.time() - start_time:.3f}s")
-            return (detection_result, vis_image) if vis else detection_result
+            if vis:
+                arr = self._load_image_as_array(image)
+                pil = image if isinstance(image, Image.Image) else Image.fromarray(arr)
+                vis_img = visualize(pil, detection_result)
+                return detection_result, vis_img
+            return detection_result
 
-        # Load image for cropping
+        # ---- LOAD IMAGE ----
         t0 = time.time()
         image_array = self._load_image_as_array(image)
         if profile:
             print(f"Load image for crops: {time.time() - t0:.3f}s")
 
-        # Extract word regions
+        # ---- SORT + EXTRACT ----
         t0 = time.time()
         all_words = []
         word_images = []
 
         for block in detection_result.blocks:
+
+            boxes = []
+            for w in block.words:
+                poly = np.array(w.polygon, dtype=np.int32)
+                x_min, y_min = np.min(poly, axis=0)
+                x_max, y_max = np.max(poly, axis=0)
+                boxes.append((x_min, y_min, x_max, y_max))
+
+            sorted_boxes = sort_boxes_reading_order_with_resolutions(boxes)
+
+            new_order = []
+            for bx in sorted_boxes:
+                for w in block.words:
+                    poly = np.array(w.polygon, dtype=np.int32)
+                    x_min, y_min = np.min(poly, axis=0)
+                    x_max, y_max = np.max(poly, axis=0)
+                    if (x_min, y_min, x_max, y_max) == bx:
+                        new_order.append(w)
+                        break
+
+            block.words = new_order
+
             for word in block.words:
-                polygon = np.array(word.polygon, dtype=np.int32)
-                x_min, y_min = np.min(polygon, axis=0)
-                x_max, y_max = np.max(polygon, axis=0)
+                poly = np.array(word.polygon, dtype=np.int32)
+                x_min, y_min = np.min(poly, axis=0)
+                x_max, y_max = np.max(poly, axis=0)
 
                 width = x_max - x_min
                 height = y_max - y_min
 
                 if width >= self.min_text_size and height >= self.min_text_size:
-                    region_image = self._extract_word_image(image_array, polygon)
+                    region_image = self._extract_word_image(image_array, poly)
                     if region_image is not None and region_image.size > 0:
                         all_words.append(word)
                         word_images.append(region_image)
+
         if profile:
             print(f"Extract {len(word_images)} crops: {time.time() - t0:.3f}s")
 
-        # Recognition
+        # ---- RECOGNITION ----
         if word_images:
             t0 = time.time()
-            # TRBA API returns List[Tuple[text, confidence]] for list input
             recognition_results = self.recognizer.predict(word_images)
             if profile:
                 print(f"Recognition: {time.time() - t0:.3f}s")
 
-            # Backward-compat: if recognizer returns list of strings
             for idx, word in enumerate(all_words):
                 res = recognition_results[idx]
                 if isinstance(res, tuple) and len(res) == 2:
                     text, confidence = res
                 else:
                     text, confidence = str(res), None
+
                 word.text = text
                 word.recognition_confidence = confidence
 
         if profile:
             print(f"Pipeline total: {time.time() - start_time:.3f}s")
-        return (detection_result, vis_image) if vis else detection_result
 
+        if vis:
+            pil = image if isinstance(image, Image.Image) else Image.fromarray(image_array)
+            vis_img = visualize(pil, detection_result)
+            return detection_result, vis_img
+
+        return detection_result
+    
     def process_batch(
         self,
         images: list[Union[str, np.ndarray, Image.Image]],
@@ -103,20 +276,14 @@ class OCRPipeline:
         results = []
         for img in images:
             res = self.process(img, recognize_text=recognize_text, vis=vis, profile=profile)
-            # For batch, return only Page objects for simplicity
             results.append(res[0] if vis else res)
         return results
 
     def get_text(self, page) -> str:
-        try:
-            blocks = getattr(page, "blocks", []) or []
-        except Exception:
-            return ""
         lines = []
-        for block in blocks:
-            words = getattr(block, "words", []) or []
-            texts = [getattr(w, "text", None) for w in words]
-            texts = [t for t in texts if t]
+        for block in page.blocks:
+            sorted_words = sorted(block.words, key=lambda w: w.x1)
+            texts = [w.text for w in sorted_words if getattr(w, "text", None)]
             if texts:
                 lines.append(" ".join(texts))
         return "\n".join(lines)

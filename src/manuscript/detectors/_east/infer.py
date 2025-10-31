@@ -26,7 +26,7 @@ class EASTInfer:
         target_size: int = 1280,
         expand_ratio_w: float = 0.9,
         expand_ratio_h: float = 0.9,
-        score_thresh: float = 0.6,
+        score_thresh: float = 0.95,
         iou_threshold: float = 0.2,
         score_geo_scale: float = 0.25,
         quantization: int = 2,
@@ -179,12 +179,12 @@ class EASTInfer:
         img_or_path: Union[str, Path, np.ndarray],
         vis: bool = False,
         profile: bool = False,
-    ) -> Union[Page, Tuple[Page, np.ndarray, np.ndarray]]:
+    ) -> Union[Page, Tuple[Page, np.ndarray]]:
         """
         :param img_or_path: путь или RGB ndarray
         :param vis: если True, возвращает также изображение с боксами и score map
         :param profile: если True, выводит время выполнения этапов
-        :return: Page или (Page, vis_image, score_map)
+        :return: Page или (Page, vis_image)
         """
         # 1) Read & RGB
         img = read_image(img_or_path)
@@ -224,6 +224,10 @@ class EASTInfer:
         if profile:
             print(f"  NMS: {time.time() - t0:.3f}s")
             print(f"    Boxes after NMS: {len(final_quads_nms)}")
+
+        # 5.1) Hard confidence filter
+        if len(final_quads_nms) > 0:
+            final_quads_nms = final_quads_nms[final_quads_nms[:, 8] >= self.score_thresh]
 
         # 6) Expand (inverse shrink)
         final_quads_nms_expanded = expand_boxes(
