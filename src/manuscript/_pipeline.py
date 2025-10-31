@@ -269,7 +269,12 @@ class OCRPipeline:
                 if isinstance(res, tuple) and len(res) == 2:
                     text, confidence = res
                 else:
-                    text, confidence = str(res), None
+                    text, confidence = res, None
+
+                if text is None:
+                    text = ""
+                else:
+                    text = str(text)
 
                 word.text = text
                 word.recognition_confidence = confidence

@@ -12,5 +12,4 @@ page = result["page"]
 img = result["vis_image"]
 
 # Show the result
-if img is not None:
-    img.show()
+img.show()
