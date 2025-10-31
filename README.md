@@ -32,12 +32,12 @@ print(f"CUDA доступна: {torch.cuda.is_available()}")
 ### OCR Pipeline
 
 ```python
-from manuscript.detectors import EASTInfer
+from manuscript.detectors import EAST
 from manuscript import TRBAInfer  
 from manuscript.pipeline import OCRPipeline
 
 # Инициализация компонентов
-detector = EASTInfer(score_thresh=0.7)
+detector = EAST(score_thresh=0.7)
 
 # TRBAInfer использует config.json для параметров модели
 # img_h, img_w, hidden_size берутся из конфига
@@ -73,10 +73,10 @@ for block in result.blocks:
 ### Детекция текста 
 
 ```python
-from manuscript.detectors import EASTInfer
+from manuscript.detectors import EAST
 
 # ????????????? ?????????
-detector = EASTInfer(score_thresh=0.9)
+detector = EAST(score_thresh=0.9)
 
 # ???????? ? ?????????????
 result = detector.predict("example/image.jpg", vis=True)

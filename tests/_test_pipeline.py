@@ -8,7 +8,7 @@ from PIL import Image
 from unittest.mock import Mock, MagicMock
 
 from manuscript import OCRPipeline
-from manuscript.detectors import EASTInfer
+from manuscript.detectors import EAST
 from manuscript.detectors._types import Page, Block, Word
 from manuscript.recognizers import TRBAInfer
 
@@ -18,8 +18,8 @@ class TestOCRPipeline:
 
     @pytest.fixture
     def mock_detector(self):
-        """Создает mock объект EASTInfer"""
-        detector = Mock(spec=EASTInfer)
+        """Создает mock объект EAST"""
+        detector = Mock(spec=EAST)
 
         # Создаем mock результат детекции
         mock_word = Mock()
@@ -261,6 +261,6 @@ class TestOCRPipelineImports:
 
     def test_pipeline_import_direct(self):
         """Тест прямого импорта OCRPipeline"""
-        from manuscript.pipeline import OCRPipeline
+        from manuscript._pipeline import OCRPipeline
 
         assert OCRPipeline is not None

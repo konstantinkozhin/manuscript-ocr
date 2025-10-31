@@ -13,7 +13,7 @@ except ImportError:  # pragma: no cover
     optuna_dashboard = None  # type: ignore
 
 from manuscript.recognizers import TRBAInfer
-from manuscript.recognizers.trba.training.metrics import (
+from manuscript.recognizers._trba.training.metrics import (
     character_error_rate,
     compute_accuracy,
 )

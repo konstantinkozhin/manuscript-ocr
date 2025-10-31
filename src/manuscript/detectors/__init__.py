@@ -1,3 +1,3 @@
-from ._east import EASTInfer
+from ._east import EAST, EASTInfer
 
-__all__ = ["EASTInfer"]
+__all__ = ["EAST", "EASTInfer"]

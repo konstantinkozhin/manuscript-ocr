@@ -1,5 +1,5 @@
 """
-Полный интеграционный тест для EASTInfer детектора
+Полный интеграционный тест для EAST детектора
 Тестирует все основные функции детектора текста EAST
 """
 
@@ -8,10 +8,10 @@ from pathlib import Path
 import torch
 from PIL import Image
 
-from manuscript.detectors import EASTInfer
+from manuscript.detectors import EAST
 
 
-class TestEASTInfer:
+class TestEAST:
     @pytest.fixture
     def example_image_path(self):
         repo_root = Path(__file__).parent.parent.parent
@@ -23,11 +23,11 @@ class TestEASTInfer:
         return str(image_path)
 
     def test_eastinfer_initialization(self):
-        """Тест 1: Инициализация EASTInfer"""
-        print("\n=== Тест инициализации EASTInfer ===")
+        """Тест 1: Инициализация EAST"""
+        print("\n=== Тест инициализации EAST ===")
 
         # Создаем детектор с параметрами по умолчанию
-        detector = EASTInfer(score_thresh=0.5)
+        detector = EAST(score_thresh=0.5)
 
         # Проверяем базовые атрибуты
         assert detector is not None
@@ -46,7 +46,7 @@ class TestEASTInfer:
         """Тест 2: Базовый inference без визуализации"""
         print("\n=== Тест базового inference ===")
 
-        detector = EASTInfer(score_thresh=0.3)
+        detector = EAST(score_thresh=0.3)
         result = detector.predict(example_image_path, vis=False)
         assert isinstance(result, dict)
         assert "page" in result
@@ -80,7 +80,7 @@ class TestEASTInfer:
         """Тест 3: Inference с визуализацией"""
         print("\n=== Тест inference с визуализацией ===")
 
-        detector = EASTInfer(score_thresh=0.3)
+        detector = EAST(score_thresh=0.3)
 
         # Выполняем детекцию с визуализацией
         result = detector.predict(example_image_path, vis=True)
@@ -112,7 +112,7 @@ class TestEASTInfer:
         results = []
 
         for thresh in thresholds:
-            detector = EASTInfer(score_thresh=thresh)
+            detector = EAST(score_thresh=thresh)
             result = detector.predict(example_image_path, vis=False)
             page = result["page"]
 
@@ -137,7 +137,7 @@ class TestEASTInfer:
         img_rgb = cv2.cvtColor(img_bgr, cv2.COLOR_BGR2RGB)
 
         # Тестируем с numpy input
-        detector = EASTInfer(score_thresh=0.5)
+        detector = EAST(score_thresh=0.5)
         result = detector.predict(img_rgb, vis=False)
         page = result["page"]
 
@@ -153,7 +153,7 @@ class TestEASTInfer:
         """Тест 6: Обработка ошибок"""
         print("\n=== Тест обработки ошибок ===")
 
-        detector = EASTInfer(score_thresh=0.5)
+        detector = EAST(score_thresh=0.5)
 
         # Тест несуществующего файла
         with pytest.raises(FileNotFoundError):

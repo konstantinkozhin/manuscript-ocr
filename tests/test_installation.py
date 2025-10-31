@@ -10,8 +10,8 @@ class TestInstallation:
     
     def test_basic_imports(self):
         """Тест базовых импортов детекторов"""
-        from manuscript.detectors import EASTInfer
-        assert EASTInfer is not None
+        from manuscript.detectors import EAST
+        assert EAST is not None
         
     def test_recognizers_imports(self):
         """Тест базовых импортов распознавателей"""

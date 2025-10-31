@@ -1,7 +1,7 @@
 import os
 import time
 from manuscript.recognizers import TRBAInfer
-from manuscript.recognizers.trba.training.metrics import (
+from manuscript.recognizers._trba.training.metrics import (
     character_error_rate,
     word_error_rate,
     compute_accuracy,
@@ -10,8 +10,8 @@ from manuscript.recognizers.trba.training.metrics import (
 # === Пути ===
 image_dir = r"C:\shared\orig_cyrillic\test"
 gt_path = r"C:\shared\orig_cyrillic\test.tsv"
-model_path=r"C:\Users\USER\Desktop\OCR_MODELS\exp1_model_64\best_acc_weights.pth",
-config_path=r"C:\Users\USER\Desktop\OCR_MODELS\exp1_model_64\config.json"
+model_path = (r"C:\Users\USER\Desktop\OCR_MODELS\exp1_model_64\best_acc_weights.pth",)
+config_path = r"C:\Users\USER\Desktop\OCR_MODELS\exp1_model_64\config.json"
 
 batch_size = 16
 

@@ -1,13 +1,13 @@
-from manuscript.detectors._east import EASTInfer
-from manuscript.recognizers.trba import TRBAInfer
-from manuscript.pipeline import OCRPipeline
+from manuscript.detectors import EAST
+from manuscript.recognizers import TRBAInfer
+from manuscript import OCRPipeline
 
 
 # Путь к изображению (укажите свой файл)
 image_path = r"C:\Users\pasha\OneDrive\Рабочий стол\i (1).jpg"
 
 # Инициализация детектора и распознавателя
-detector = EASTInfer()
+detector = EAST()
 recognizer = TRBAInfer()
 
 # Создание OCR-пайплайна

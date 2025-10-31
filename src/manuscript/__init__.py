@@ -1,1 +1,1 @@
-from .pipeline import OCRPipeline
+from ._pipeline import OCRPipeline

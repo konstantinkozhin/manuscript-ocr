@@ -1,7 +1,7 @@
-from manuscript.detectors import EASTInfer
+from manuscript.detectors import EAST
 
 # Model initialization
-model = EASTInfer()
+model = EAST()
 
 # Path to the image
 img_path = r"example\ocr_example_image.jpg"
@@ -12,4 +12,5 @@ page = result["page"]
 img = result["vis_image"]
 
 # Show the result
-img.show()
+if img is not None:
+    img.show()

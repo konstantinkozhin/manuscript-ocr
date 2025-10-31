@@ -5,7 +5,7 @@ import cv2
 from pathlib import Path
 import time
 from typing import List, Tuple
-from .detectors import EASTInfer
+from .detectors import EAST
 from .recognizers import TRBAInfer
 from PIL import ImageDraw
 from manuscript.detectors._east.utils import draw_quads
@@ -165,7 +165,7 @@ def sort_boxes_reading_order_with_resolutions(
 
 class OCRPipeline:
     def __init__(
-        self, detector: EASTInfer, recognizer: TRBAInfer, min_text_size: int = 5
+        self, detector: EAST, recognizer: TRBAInfer, min_text_size: int = 5
     ):
         self.detector = detector
         self.recognizer = recognizer

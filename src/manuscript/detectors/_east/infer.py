@@ -12,13 +12,13 @@ from torchvision import transforms
 
 from .._types import Word, Block, Page
 from .dataset import EASTDataset
-from .east import EAST
+from .east import EAST as EASTModel
 from .lanms import locality_aware_nms
 from .train_utils import _run_training
 from .utils import decode_quads_from_maps, draw_quads, read_image, expand_boxes
 
 
-class EASTInfer:
+class EAST:
     def __init__(
         self,
         weights_path: Optional[Union[str, Path]] = None,
@@ -35,6 +35,56 @@ class EASTInfer:
         anomaly_sigma_threshold: float = 5.0,
         anomaly_min_box_count: int = 30,
     ):
+        """
+        Initialize EAST text detector.
+
+        Parameters
+        ----------
+        weights_path : str or Path, optional
+            Path to pretrained model weights. If None, the weights will be
+            automatically downloaded to ``~/.east_quad_23_05.pth``.
+        device : str, optional
+            Compute device, e.g. ``"cuda"`` or ``"cpu"``. If None, selected
+            automatically.
+        target_size : int, optional
+            Input image size for inference. Images are resized to
+            ``(target_size, target_size)``. Default is 1280.
+        expand_ratio_w : float, optional
+            Horizontal expansion factor applied to detected boxes after NMS.
+            Default is 0.9.
+        expand_ratio_h : float, optional
+            Vertical expansion factor applied to detected boxes after NMS.
+            Default is 0.9.
+        score_thresh : float, optional
+            Confidence threshold for selecting candidate detections before NMS.
+            Default is 0.6.
+        iou_threshold : float, optional
+            IoU threshold for locality-aware NMS. Default is 0.2.
+        score_geo_scale : float, optional
+            Scale factor for decoding geometry/score maps. Default is 0.25.
+        quantization : int, optional
+            Quantization resolution for point coordinates during decoding.
+            Default is 2.
+        axis_aligned_output : bool, optional
+            If True, outputs axis-aligned rectangles instead of original quads.
+            Default is True.
+        remove_area_anomalies : bool, optional
+            If True, removes quads with extremely large area relative to the
+            distribution. Default is True.
+        anomaly_sigma_threshold : float, optional
+            Sigma threshold for anomaly area filtering. Default is 5.0.
+        anomaly_min_box_count : int, optional
+            Minimum number of boxes required before anomaly filtering.
+            Default is 30.
+
+        Notes
+        -----
+        The class provides two main public methods:
+
+        - ``predict`` — run inference on a single image and return detections.
+        - ``train`` — high-level training entrypoint to train an EAST model
+          on custom datasets.
+        """
         self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
 
         if weights_path is None:
@@ -48,7 +98,7 @@ class EASTInfer:
                 gdown.download(url, out, quiet=False)
             weights_path = out
 
-        self.model = EAST(
+        self.model = EASTModel(
             pretrained_backbone=False,
             pretrained_model_path=str(weights_path),
         ).to(self.device)
@@ -226,8 +276,8 @@ class EASTInfer:
         --------
         Perform inference with visualization:
 
-        >>> from manuscript.detectors import EASTInfer
-        >>> model = EASTInfer()
+        >>> from manuscript.detectors import EAST
+        >>> model = EAST()
         >>> img_path = r"example/ocr_example_image.jpg"
         >>> result = model.predict(img_path, vis=True)
         >>> page = result["page"]
@@ -429,7 +479,7 @@ class EASTInfer:
         --------
         Train on two datasets with validation:
 
-        >>> from manuscript.detectors import EASTInfer
+        >>> from manuscript.detectors import EAST
         >>>
         >>> train_images = [
         ...     "/data/archive/train_images",
@@ -448,7 +498,7 @@ class EASTInfer:
         ...     "/data/ddi/test.json"
         ... ]
         >>>
-        >>> best_model = EASTInfer.train(
+        >>> best_model = EAST.train(
         ...     train_images=train_images,
         ...     train_anns=train_anns,
         ...     val_images=val_images,
@@ -466,7 +516,7 @@ class EASTInfer:
         if device is None:
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-        model = EAST(
+        model = EASTModel(
             backbone_name="resnet101",
             pretrained_backbone=pretrained_backbone,
             freeze_first=freeze_first,

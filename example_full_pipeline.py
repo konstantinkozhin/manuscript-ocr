@@ -6,9 +6,9 @@
 import os
 import time
 import glob
-from src.manuscript.detectors._east import EASTInfer
-from src.manuscript.recognizers.trba import TRBAInfer
-from src.manuscript.pipeline import OCRPipeline
+from src.manuscript.detectors._east import EAST
+from src.manuscript.recognizers._trba import TRBAInfer
+from manuscript._pipeline import OCRPipeline
 
 
 def main():
@@ -45,7 +45,7 @@ def main():
     # Инициализация детектора
     print("Загрузка детектора EAST...")
     start_time = time.time()
-    detector = EASTInfer()
+    detector = EAST()
     detector_time = time.time() - start_time
     print(f"Детектор загружен за {detector_time:.2f} сек")
 
