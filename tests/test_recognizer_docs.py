@@ -22,17 +22,17 @@ def test_recognizer_doc_single_image(monkeypatch):
     def fake_predict(self, images, **kwargs):
         predict_called.update(kwargs)
         assert images == "data/word_images/word_001.jpg" or isinstance(images, list)
-        return [("hello", 0.95)]
+        return [{"text": "hello", "confidence": 0.95}]
 
     monkeypatch.setattr(trba_module.TRBA, "__init__", fake_init, raising=False)
     monkeypatch.setattr(trba_module.TRBA, "predict", fake_predict, raising=False)
 
     recognizer = TRBA()
     results = recognizer.predict("data/word_images/word_001.jpg")
-    text, confidence = results[0]
+    result = results[0]
 
-    assert text == "hello"
-    assert confidence == 0.95
+    assert result["text"] == "hello"
+    assert result["confidence"] == 0.95
 
 
 def test_recognizer_doc_batch_beam_search(monkeypatch):
@@ -46,9 +46,9 @@ def test_recognizer_doc_batch_beam_search(monkeypatch):
     def fake_predict(self, images, **kwargs):
         predict_called.update(kwargs)
         return [
-            ("word1", 0.92),
-            ("word2", 0.88),
-            ("word3", 0.95),
+            {"text": "word1", "confidence": 0.92},
+            {"text": "word2", "confidence": 0.88},
+            {"text": "word3", "confidence": 0.95},
         ]
 
     monkeypatch.setattr(trba_module.TRBA, "__init__", fake_init, raising=False)
@@ -93,7 +93,7 @@ def test_recognizer_doc_greedy_decoding(monkeypatch):
 
     def fake_predict(self, images, **kwargs):
         predict_called.update(kwargs)
-        return [("fast_text", 0.87)]
+        return [{"text": "fast_text", "confidence": 0.87}]
 
     monkeypatch.setattr(trba_module.TRBA, "__init__", fake_init, raising=False)
     monkeypatch.setattr(trba_module.TRBA, "predict", fake_predict, raising=False)
@@ -104,8 +104,9 @@ def test_recognizer_doc_greedy_decoding(monkeypatch):
 
     results = recognizer.predict(images=img_rgb, mode="greedy", batch_size=1)
 
-    text, confidence = results[0]
-    assert text == "fast_text"
+    result = results[0]
+    assert result["text"] == "fast_text"
+    assert result["confidence"] == 0.87
     assert predict_called.get("mode") == "greedy"
 
 

@@ -297,7 +297,7 @@ class TRBA:
         beam_size: int = 8,
         temperature: float = 1.7,
         alpha: float = 0.9,
-    ) -> List[Tuple[str, float]]:
+    ) -> List[Dict[str, Any]]:
         """
         Run text recognition on one or more word images.
 
@@ -334,11 +334,11 @@ class TRBA:
 
         Returns
         -------
-        list of (str, float) tuples
-            Recognition results as list of ``(text, confidence)`` pairs where:
+        list of dict
+            Recognition results as list of dictionaries, each containing:
 
-            - ``text`` is the recognized string
-            - ``confidence`` is recognition confidence score in [0, 1]
+            - ``"text"`` : str — recognized text
+            - ``"confidence"`` : float — recognition confidence in [0, 1]
 
             If input is a single image, returns a list with one element.
 
@@ -349,8 +349,7 @@ class TRBA:
         >>> from manuscript.recognizers import TRBA
         >>> recognizer = TRBA()
         >>> results = recognizer.predict("word_image.jpg")
-        >>> text, confidence = results[0]
-        >>> print(f"Text: '{text}' (confidence: {confidence:.3f})")
+        >>> print(f"Text: '{results[0]['text']}' (confidence: {results[0]['confidence']:.3f})")
 
         Batch processing with greedy decoding:
 
@@ -360,8 +359,8 @@ class TRBA:
         ...     batch_size=16,
         ...     mode="greedy"
         ... )
-        >>> for img_path, (text, conf) in zip(image_paths, results):
-        ...     print(f"{img_path}: '{text}' ({conf:.3f})")
+        >>> for img_path, result in zip(image_paths, results):
+        ...     print(f"{img_path}: '{result['text']}' ({result['confidence']:.3f})")
 
         Process numpy arrays:
 
@@ -369,6 +368,7 @@ class TRBA:
         >>> img = cv2.imread("word.jpg")
         >>> img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
         >>> results = recognizer.predict(img_rgb)
+        >>> print(results[0]["text"])
         """
 
         if not isinstance(images, list):
@@ -429,7 +429,7 @@ class TRBA:
                     else:
                         confidence = 0.0
 
-                    results.append((text, confidence))
+                    results.append({"text": text, "confidence": confidence})
 
         return results
 

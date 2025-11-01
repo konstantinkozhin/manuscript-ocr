@@ -163,7 +163,7 @@ def sort_boxes_reading_order_with_resolutions(
     return [mapping[b] for b in sorted_compressed]
 
 
-class OCRPipeline:
+class Pipeline:
     def __init__(self, detector: EAST, recognizer: TRBA, min_text_size: int = 5):
         self.detector = detector
         self.recognizer = recognizer
@@ -263,16 +263,18 @@ class OCRPipeline:
                 print(f"Recognition: {time.time() - t0:.3f}s")
 
             for idx, word in enumerate(all_words):
-                res = recognition_results[idx]
-                if isinstance(res, tuple) and len(res) == 2:
-                    text, confidence = res
-                else:
-                    text, confidence = res, None
+                result = recognition_results[idx]
 
-                if text is None:
-                    text = ""
+                # Поддержка нового формата (dict) и старого (tuple) для обратной совместимости
+                if isinstance(result, dict):
+                    text = result.get("text", "")
+                    confidence = result.get("confidence", None)
+                elif isinstance(result, tuple) and len(result) == 2:
+                    text, confidence = result
                 else:
-                    text = str(text)
+                    # Если только текст
+                    text = str(result) if result is not None else ""
+                    confidence = None
 
                 word.text = text
                 word.recognition_confidence = confidence

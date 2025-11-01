@@ -7,7 +7,7 @@
 Включает:
 - EAST для детекции
 - TRBA для распознавания слов
-- OCRPipeline — удобныsй интерфейс для полной обработки изображений
+- Pipeline — удобный интерфейс для полной обработки изображений
 
 ---
 
@@ -49,7 +49,7 @@ print(f"CUDA доступна: {torch.cuda.is_available()}")
 ```python
 from manuscript.detectors import EAST
 from manuscript.recognizers import TRBA
-from manuscript.pipeline import OCRPipeline
+from manuscript import Pipeline
 
 # Инициализация компонентов
 detector = EAST(score_thresh=0.7)
@@ -60,7 +60,7 @@ recognizer = TRBA(
     charset_path="path/to/charset.txt"
 )
 
-pipeline = OCRPipeline(detector, recognizer)
+pipeline = Pipeline(detector, recognizer)
 
 # Полная обработка изображения
 result = pipeline.process("path/to/image.jpg")

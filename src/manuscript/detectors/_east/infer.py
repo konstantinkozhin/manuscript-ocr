@@ -42,7 +42,7 @@ class EAST:
         ----------
         weights_path : str or Path, optional
             Path to pretrained model weights. If None, the weights will be
-            automatically downloaded to ``~/.east_quad_23_05.pth``.
+            automatically downloaded to ``~/.manuscript/east/east_quad_23_05.pth``.
         device : str, optional
             Compute device, e.g. ``"cuda"`` or ``"cpu"``. If None, selected
             automatically.
@@ -92,11 +92,13 @@ class EAST:
                 "https://github.com/konstantinkozhin/manuscript-ocr"
                 "/releases/download/v0.1.0/east_quad_23_05.pth"
             )
-            out = os.path.expanduser("~/.east_quad_23_05.pth")
-            if not os.path.exists(out):
+            weights_dir = Path.home() / ".manuscript" / "east"
+            weights_dir.mkdir(parents=True, exist_ok=True)
+            out = weights_dir / "east_quad_23_05.pth"
+            if not out.exists():
                 print(f"Downloading EAST weights from {url} …")
-                gdown.download(url, out, quiet=False)
-            weights_path = out
+                gdown.download(url, str(out), quiet=False)
+            weights_path = str(out)
 
         self.model = EASTModel(
             pretrained_backbone=False,

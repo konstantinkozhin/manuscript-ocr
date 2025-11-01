@@ -1,1 +1,3 @@
-from ._pipeline import OCRPipeline
+from ._pipeline import Pipeline
+
+__all__ = ["Pipeline"]

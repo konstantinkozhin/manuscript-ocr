@@ -11,10 +11,10 @@ recognizer = TRBA()
 # Распознаём одно изображение слова
 results = recognizer.predict("data/word_images/word_001.jpg")
 
-# Результат — список кортежей (текст, уверенность)
-text, confidence = results[0]
-print(f"Распознанный текст: '{text}'")
-print(f"Уверенность: {confidence:.3f}")
+# Результат — список словарей с ключами "text" и "confidence"
+result = results[0]
+print(f"Распознанный текст: '{result['text']}'")
+print(f"Уверенность: {result['confidence']:.3f}")
 ```
 
 ### **2. Пакетное распознавание с beam search**
@@ -47,8 +47,8 @@ results = recognizer.predict(
 )
 
 # Выводим результаты
-for img_path, (text, conf) in zip(image_paths, results):
-    print(f"{img_path}: '{text}' (confidence: {conf:.3f})")
+for img_path, result in zip(image_paths, results):
+    print(f"{img_path}: '{result['text']}' (confidence: {result['confidence']:.3f})")
 ```
 
 ### **3. Быстрое распознавание с greedy декодированием**
@@ -71,8 +71,8 @@ results = recognizer.predict(
     batch_size=1
 )
 
-text, confidence = results[0]
-print(f"Быстрое распознавание: '{text}' ({confidence:.3f})")
+result = results[0]
+print(f"Быстрое распознавание: '{result['text']}' ({result['confidence']:.3f})")
 ```
 
 ### **4. Обучение на своих данных**
