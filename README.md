@@ -3,84 +3,112 @@
 
 # Manuscript OCR
 
-Модуль для детекции и распознавания текста на исторических, архивных и рукописных документах.  
-Включает:
-- EAST для детекции
-- TRBA для распознавания слов
-- Pipeline — удобный интерфейс для полной обработки изображений
+Библиотека для детекции и распознавания текста на исторических, архивных и рукописных документах.
 
 ---
 
-## Installation
-
-### Для пользователей
-```bash
-pip install manuscript-ocr
-````
-
-### Для разработчиков
-
-```bash
-pip install -r requirements-dev.txt
-```
-
-> **Примечание:** `requirements-dev.txt` включает GPU-версию PyTorch, инструменты тестирования, форматирования и сборки.
-
-### GPU поддержка
+## Установка
 
 ```bash
 pip install manuscript-ocr
-pip install torch torchvision torchaudio --index-url https://download.pytorch.org/whl/cu118 --force-reinstall
 ```
 
-**Проверка GPU:**
-
-```python
-import torch
-print(f"CUDA доступна: {torch.cuda.is_available()}")
+Для GPU поддержки:
+```bash
+pip install torch torchvision --index-url https://download.pytorch.org/whl/cu118
 ```
 
 ---
 
-## Usage Examples
-
-### OCR Pipeline (полная обработка)
+## Быстрый старт
 
 ```python
+from manuscript import Pipeline
 from manuscript.detectors import EAST
 from manuscript.recognizers import TRBA
-from manuscript import Pipeline
 
-# Инициализация компонентов
-detector = EAST(score_thresh=0.7)
-
-recognizer = TRBA(
-    model_path="path/to/model.pth",
-    config_path="path/to/config.json",
-    charset_path="path/to/charset.txt"
-)
-
+# Инициализация
+detector = EAST()
+recognizer = TRBA()
 pipeline = Pipeline(detector, recognizer)
 
-# Полная обработка изображения
-result = pipeline.process("path/to/image.jpg")
+# Обработка изображения
+result = pipeline.predict("document.jpg")
 
-# Получение распознанного текста
+# Извлечение текста
 text = pipeline.get_text(result)
-print("Распознанный текст:", text)
-
-# Подробная информация о каждом слове
-for block in result.blocks:
-    for word in block.words:
-        print(f"Текст: '{word.text}' | "
-              f"Детекция: {word.detection_confidence:.3f} | "
-              f"Распознавание: {word.recognition_confidence:.3f}")
+print(text)
 ```
 
-➡ **Подробные примеры для детектора (`EAST`) вынесены в отдельный файл:**  
-📄 **[DETECTOR.md](./DETECTOR.md)**
+---
 
-➡ **Подробные примеры для распознавателя (`TRBA`) вынесены в отдельный файл:**  
-📄 **[RECOGNIZERS.md](./RECOGNIZERS.md)**
+## Документация
+
+Подробные примеры и руководства:
+
+- [Детектор (EAST)](./DETECTOR.md) - настройка и использование детектора текста
+- [Распознаватель (TRBA)](./RECOGNIZERS.md) - распознавание и обучение моделей
+- [Pipeline API](./docs/PIPELINE_API.md) - интеграция и создание кастомных компонентов
 
 ---
+
+## Основные возможности
+
+**Детекция текста (EAST)**
+- Высокая точность на рукописных документах
+- Поддержка произвольных четырехугольников
+- Настраиваемые параметры детекции
+
+**Распознавание (TRBA)**
+- Оптимизировано для исторических документов
+- Поддержка beam search и greedy декодирования
+- Возможность дообучения на своих данных
+
+**Pipeline**
+- Единый интерфейс для полного OCR
+- Автоматическая сортировка в порядке чтения
+- Гибкая настройка компонентов
+
+---
+
+## Примеры
+
+Детекция с сортировкой:
+```python
+detector = EAST()
+result = detector.predict("image.jpg", sort_reading_order=True)
+```
+
+Распознавание с beam search:
+```python
+recognizer = TRBA()
+results = recognizer.predict(images, mode="beam")
+for r in results:
+    print(f"{r['text']} (confidence: {r['confidence']:.2f})")
+```
+
+Визуализация:
+```python
+from manuscript import visualize_page, read_image
+
+img = read_image("document.jpg")
+vis = visualize_page(img, result["page"], show_order=True)
+vis.save("output.jpg")
+```
+
+---
+
+## Лицензия
+
+MIT
+
+---
+
+## Разработка
+
+```bash
+git clone https://github.com/konstantinkozhin/manuscript-ocr
+cd manuscript-ocr
+pip install -r requirements-dev.txt
+pytest tests/
+```

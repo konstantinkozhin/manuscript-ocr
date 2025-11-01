@@ -92,6 +92,134 @@ def draw_quads(
     return Image.fromarray(out)
 
 
+def visualize_page(
+    image,
+    page,
+    *,
+    show_order=False,
+    color=(0, 0, 255),
+    thickness=2,
+    dark_alpha=0.3,
+    blur_ksize=11,
+    line_color=(0, 255, 0),
+    number_color=(255, 255, 255),
+    number_bg=(0, 0, 0),
+) -> Image.Image:
+    """
+    Unified visualization function for Page objects with optional reading order display.
+
+    This function draws text detection boxes on the image using the same style as EAST detector,
+    with optional numbered boxes and connecting lines to show reading order.
+
+    Parameters
+    ----------
+    image : np.ndarray or PIL.Image.Image
+        Input image (RGB format preferred).
+    page : Page
+        Page object containing detected text blocks and words.
+    show_order : bool, optional
+        Whether to display reading order (numbered boxes with connecting lines), by default False.
+    color : tuple, optional
+        Color for polygon borders in RGB format, by default (0, 0, 255) - blue.
+    thickness : int, optional
+        Thickness of polygon borders in pixels, by default 2.
+    dark_alpha : float, optional
+        Blending factor for darkening background (0.0 to 1.0), by default 0.3.
+    blur_ksize : int, optional
+        Kernel size for Gaussian blur (must be odd), by default 11.
+    line_color : tuple, optional
+        Color for connecting lines in RGB format, by default (0, 255, 0) - green.
+    number_color : tuple, optional
+        Color for box numbers text in RGB format, by default (255, 255, 255) - white.
+    number_bg : tuple, optional
+        Background color for box numbers in RGB format, by default (0, 0, 0) - black.
+
+    Returns
+    -------
+    PIL.Image.Image
+        Visualized image with detection boxes and optional reading order annotations.
+
+    Examples
+    --------
+    Basic visualization without reading order:
+
+    >>> from manuscript import EAST, visualize_page
+    >>> detector = EAST()
+    >>> result = detector.predict("document.jpg")
+    >>> vis = visualize_page(result["vis_image"], result["page"])
+    >>> vis.save("output.jpg")
+
+    Visualization with reading order display:
+
+    >>> vis = visualize_page(
+    ...     result["vis_image"],
+    ...     result["page"],
+    ...     show_order=True,
+    ...     color=(255, 0, 0),
+    ...     thickness=3
+    ... )
+    """
+    from PIL import ImageDraw
+
+    # Convert to numpy array if PIL Image
+    if isinstance(image, Image.Image):
+        img = np.array(image.convert("RGB"))
+    else:
+        img = image.copy()
+
+    # Collect all quads and words in order
+    quads = []
+    words_in_order = []
+
+    for block in page.blocks:
+        for w in block.words:
+            poly = np.array(w.polygon).reshape(-1)
+            quads.append(poly)
+            words_in_order.append(w)
+
+    if len(quads) == 0:
+        return Image.fromarray(img) if isinstance(image, np.ndarray) else image
+
+    quads = np.stack(quads, axis=0)
+
+    # Draw polygons using EAST style
+    out = draw_quads(
+        image=img,
+        quads=quads,
+        color=color,
+        thickness=thickness,
+        dark_alpha=dark_alpha,
+        blur_ksize=blur_ksize,
+    )
+
+    # Add reading order visualization if requested
+    if show_order:
+        draw = ImageDraw.Draw(out)
+
+        # Calculate centers of all words
+        centers = []
+        for w in words_in_order:
+            xs = [p[0] for p in w.polygon]
+            ys = [p[1] for p in w.polygon]
+            centers.append((sum(xs) / len(xs), sum(ys) / len(ys)))
+
+        # Draw connecting lines between consecutive words
+        if len(centers) > 1:
+            for p, c in zip(centers, centers[1:]):
+                draw.line([p, c], fill=line_color, width=3)
+
+        # Draw numbered boxes at centers
+        for idx, c in enumerate(centers, start=1):
+            cx, cy = c
+            draw.rectangle(
+                [cx - 12, cy - 12, cx + 12, cy + 12],
+                fill=number_bg,
+            )
+            draw.text((cx - 6, cy - 8), str(idx), fill=number_color)
+
+    return out
+
+
 def draw_rboxes(image, rboxes, color=(0, 255, 0), thickness=2, alpha=0.5):
     img = image.copy()
     if rboxes is None or len(rboxes) == 0:
@@ -367,6 +495,153 @@ def read_image(img_or_path):
         raise TypeError(f"Unsupported type for image input: {type(img_or_path)}")
 
     return img
+
+
+def resolve_intersections(boxes):
+    """
+    Resolve intersecting boxes by shrinking them iteratively.
+
+    Parameters
+    ----------
+    boxes : list of tuple
+        List of boxes in format (x_min, y_min, x_max, y_max).
+
+    Returns
+    -------
+    list of tuple
+        List of resolved boxes.
+    """
+
+    def intersect(b1, b2):
+        return not (
+            b1[2] <= b2[0] or b2[2] <= b1[0] or b1[3] <= b2[1] or b2[3] <= b1[1]
+        )
+
+    resolved = list(boxes)
+    max_iterations = 50
+
+    for _ in range(max_iterations):
+        changed = False
+        for i in range(len(resolved)):
+            for j in range(i + 1, len(resolved)):
+                if intersect(resolved[i], resolved[j]):
+                    x0, y0, x1, y1 = resolved[i]
+                    x0b, y0b, x1b, y1b = resolved[j]
+
+                    resolved[i] = (
+                        x0,
+                        y0,
+                        int(x1 - (x1 - x0) * 0.1),
+                        int(y1 - (y1 - y0) * 0.1),
+                    )
+                    resolved[j] = (
+                        x0b,
+                        y0b,
+                        int(x1b - (x1b - x0b) * 0.1),
+                        int(y1b - (y1b - y0b) * 0.1),
+                    )
+                    changed = True
+        if not changed:
+            break
+
+    return resolved
+
+
+def sort_boxes_reading_order(boxes, y_tol_ratio=0.6, x_gap_ratio=np.inf):
+    """
+    Sort boxes in natural reading order (left-to-right, top-to-bottom).
+
+    Groups boxes into lines based on vertical proximity, then sorts each line
+    horizontally. This approximates the natural reading order for documents.
+
+    Parameters
+    ----------
+    boxes : list of tuple
+        List of boxes in format (x_min, y_min, x_max, y_max).
+    y_tol_ratio : float, optional
+        Vertical tolerance as a ratio of average box height for grouping boxes
+        into the same line, by default 0.6.
+    x_gap_ratio : float, optional
+        Maximum horizontal gap as a ratio of average box height for boxes to be
+        considered part of the same line, by default np.inf (no limit).
+
+    Returns
+    -------
+    list of tuple
+        Boxes sorted in reading order.
+
+    Examples
+    --------
+    >>> boxes = [(10, 10, 50, 30), (60, 10, 100, 30), (10, 50, 50, 70)]
+    >>> sorted_boxes = sort_boxes_reading_order(boxes)
+    """
+    if not boxes:
+        return []
+
+    avg_h = np.mean([b[3] - b[1] for b in boxes])
+    lines = []
+
+    for b in sorted(boxes, key=lambda b: (b[1] + b[3]) / 2):
+        cy = (b[1] + b[3]) / 2
+        placed = False
+
+        for ln in lines:
+            line_cy = np.mean([(v[1] + v[3]) / 2 for v in ln])
+            last_x1 = max(v[2] for v in ln)
+
+            if (
+                abs(cy - line_cy) <= avg_h * y_tol_ratio
+                and (b[0] - last_x1) <= avg_h * x_gap_ratio
+            ):
+                ln.append(b)
+                placed = True
+                break
+
+        if not placed:
+            lines.append([b])
+
+    lines.sort(key=lambda ln: np.mean([(b[1] + b[3]) / 2 for b in ln]))
+    for ln in lines:
+        ln.sort(key=lambda b: b[0])
+
+    return [b for ln in lines for b in ln]
+
+
+def sort_boxes_reading_order_with_resolutions(
+    boxes, y_tol_ratio=0.6, x_gap_ratio=np.inf
+):
+    """
+    Sort boxes in reading order after resolving intersections.
+
+    This function first resolves overlapping boxes by shrinking them, then applies
+    reading order sorting. Useful when boxes may overlap slightly.
+
+    Parameters
+    ----------
+    boxes : list of tuple
+        List of boxes in format (x_min, y_min, x_max, y_max).
+    y_tol_ratio : float, optional
+        Vertical tolerance for line grouping, by default 0.6.
+    x_gap_ratio : float, optional
+        Maximum horizontal gap for line continuity, by default np.inf.
+
+    Returns
+    -------
+    list of tuple
+        Boxes sorted in reading order with intersections resolved.
+
+    Examples
+    --------
+    >>> boxes = [(10, 10, 55, 30), (50, 10, 100, 30)]  # Overlapping
+    >>> sorted_boxes = sort_boxes_reading_order_with_resolutions(boxes)
+    """
+    compressed = resolve_intersections(boxes)
+    mapping = {c: o for c, o in zip(compressed, boxes)}
+
+    sorted_compressed = sort_boxes_reading_order(
+        compressed, y_tol_ratio=y_tol_ratio, x_gap_ratio=x_gap_ratio
+    )
+    return [mapping[b] for b in sorted_compressed]
 
 
 """

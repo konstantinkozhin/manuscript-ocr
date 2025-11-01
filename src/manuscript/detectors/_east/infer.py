@@ -15,7 +15,13 @@ from .dataset import EASTDataset
 from .east import EAST as EASTModel
 from .lanms import locality_aware_nms
 from .train_utils import _run_training
-from .utils import decode_quads_from_maps, draw_quads, read_image, expand_boxes
+from .utils import (
+    decode_quads_from_maps,
+    read_image,
+    expand_boxes,
+    visualize_page,
+    sort_boxes_reading_order_with_resolutions,
+)
 
 
 class EAST:
@@ -232,6 +238,7 @@ class EAST:
         vis: bool = False,
         profile: bool = False,
         return_maps: bool = False,
+        sort_reading_order: bool = False,
     ) -> Dict[str, Any]:
         """
         Run EAST inference and return detection results.
@@ -250,6 +257,9 @@ class EAST:
         return_maps : bool, optional
             If True, returns raw model score and geometry maps under keys
             ``"score_map"`` and ``"geo_map"``. Default is False.
+        sort_reading_order : bool, optional
+            If True, sorts detected words in natural reading order
+            (left-to-right, top-to-bottom). Default is False.
 
         Returns
         -------
@@ -351,16 +361,36 @@ class EAST:
             pts = quad[:8].reshape(4, 2)
             score = float(quad[8])
             words.append(Word(polygon=pts.tolist(), detection_confidence=score))
+
+        # 9) Optional sorting in reading order
+        if sort_reading_order and len(words) > 0:
+            # Convert to boxes (x_min, y_min, x_max, y_max) for sorting
+            boxes = []
+            for w in words:
+                poly = np.array(w.polygon, dtype=np.int32)
+                x_min, y_min = np.min(poly, axis=0)
+                x_max, y_max = np.max(poly, axis=0)
+                boxes.append((x_min, y_min, x_max, y_max))
+
+            # Sort boxes in reading order
+            sorted_boxes = sort_boxes_reading_order_with_resolutions(boxes)
+
+            # Reorder words based on sorted boxes
+            new_order = []
+            for bx in sorted_boxes:
+                for w in words:
+                    poly = np.array(w.polygon, dtype=np.int32)
+                    x_min, y_min = np.min(poly, axis=0)
+                    x_max, y_max = np.max(poly, axis=0)
+                    if (x_min, y_min, x_max, y_max) == bx:
+                        new_order.append(w)
+                        break
+            words = new_order
+
         page = Page(blocks=[Block(words=words)])
 
         # 10) Optional visualization
-        vis_img = (
-            draw_quads(
-                img, output_quads if self.axis_aligned_output else processed_quads
-            )
-            if vis
-            else None
-        )
+        vis_img = visualize_page(img, page, show_order=False) if vis else None
 
         result: Dict[str, Any] = {
             "page": page,

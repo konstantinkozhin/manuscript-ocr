@@ -27,7 +27,9 @@ avg_time = total_time / len(images)
 fps = 1.0 / avg_time if avg_time > 0 else float("inf")
 
 print("\n=== Результаты распознавания ===")
-for text, score in res:
+for result in res:
+    text = result["text"]
+    score = result["confidence"]
     print(f"Recognized: {text}, confidence: {score:.4f}")
 
 print(f"\nProcessed {len(images)} images in {total_time:.3f} sec")
@@ -45,7 +47,9 @@ avg_time = total_time / len(images)
 fps = 1.0 / avg_time if avg_time > 0 else float("inf")
 
 print("\n=== Результаты распознавания ===")
-for text, score in res:
+for result in res:
+    text = result["text"]
+    score = result["confidence"]
     print(f"Recognized: {text}, confidence: {score:.4f}")
 
 print(f"\nProcessed {len(images)} images in {total_time:.3f} sec")
