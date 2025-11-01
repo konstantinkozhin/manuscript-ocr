@@ -26,7 +26,7 @@ from ..data.transforms import (
     load_charset,
 )
 from .metrics import character_error_rate, compute_accuracy, word_error_rate
-from ..model.model import RCNN
+from ..model.model import TRBAModel
 from .utils import (
     load_checkpoint,
     save_checkpoint,
@@ -299,7 +299,7 @@ def run_training(cfg: Config, device: str = "cuda"):
     logger.info(f"Charset loaded: {num_classes} tokens")
 
     # --- модель ---
-    model = RCNN(
+    model = TRBAModel(
         num_classes=num_classes,
         hidden_size=hidden_size,
         sos_id=SOS,
@@ -314,6 +314,7 @@ def run_training(cfg: Config, device: str = "cuda"):
     pretrain_src = getattr(cfg, "pretrain_weights", "default")
     resume_path = getattr(cfg, "resume_path", None)
     if not resume_path:
+
         def _normalize_pretrain(v) -> str:
             if v is True:
                 return "default"
@@ -459,9 +460,11 @@ def run_training(cfg: Config, device: str = "cuda"):
 
     # register a pre-forward hook to keep frozen BN layers in eval mode
     if always_eval_modules:
+
         def _set_bn_eval(module, inputs):
             for bn in always_eval_modules:
                 bn.eval()
+
         model.register_forward_pre_hook(_set_bn_eval)
     for m in msgs:
         logger.info(f"Freeze policy applied: {m}")
@@ -692,7 +695,9 @@ def run_training(cfg: Config, device: str = "cuda"):
                 f"Failed to load optimizer/scheduler state from resume due to: {e}.\n"
                 f"Will load model weights only and continue."
             )
-            ckpt = load_checkpoint(resume_path, model, optimizer=None, scheduler=None, scaler=None)
+            ckpt = load_checkpoint(
+                resume_path, model, optimizer=None, scheduler=None, scaler=None
+            )
         start_epoch = int(ckpt.get("epoch", 0)) + 1
         global_step = int(ckpt.get("global_step", 0))
         best_val_loss = float(ckpt.get("best_val_loss", best_val_loss))
@@ -847,8 +852,7 @@ def run_training(cfg: Config, device: str = "cuda"):
                 for mode_name, hyps in hyps_single.items():
                     val_acc_single = compute_accuracy(refs_single, hyps)
                     val_cer_single = sum(
-                        character_error_rate(r, h)
-                        for r, h in zip(refs_single, hyps)
+                        character_error_rate(r, h) for r, h in zip(refs_single, hyps)
                     ) / max(1, len(refs_single))
                     val_wer_single = sum(
                         word_error_rate(r, h) for r, h in zip(refs_single, hyps)
@@ -864,14 +868,11 @@ def run_training(cfg: Config, device: str = "cuda"):
                     writer.add_scalar(f"WER{metric_suffix}", val_wer_single, epoch)
 
                     stats = aggregate_mode_stats[mode_name]
-                    correct_single = sum(
-                        1 for r, h in zip(refs_single, hyps) if r == h
-                    )
+                    correct_single = sum(1 for r, h in zip(refs_single, hyps) if r == h)
                     stats["total_correct"] += correct_single
                     stats["total_predictions"] += len(refs_single)
                     stats["total_cer_sum"] += sum(
-                        character_error_rate(r, h)
-                        for r, h in zip(refs_single, hyps)
+                        character_error_rate(r, h) for r, h in zip(refs_single, hyps)
                     )
                     stats["total_wer_sum"] += sum(
                         word_error_rate(r, h) for r, h in zip(refs_single, hyps)

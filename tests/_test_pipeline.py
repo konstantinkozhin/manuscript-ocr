@@ -10,7 +10,7 @@ from unittest.mock import Mock, MagicMock
 from manuscript import OCRPipeline
 from manuscript.detectors import EAST
 from manuscript.detectors._types import Page, Block, Word
-from manuscript.recognizers import TRBAInfer
+from manuscript.recognizers import TRBA
 
 
 class TestOCRPipeline:
@@ -46,8 +46,8 @@ class TestOCRPipeline:
 
     @pytest.fixture
     def mock_recognizer(self):
-        """Создает mock объект TRBAInfer"""
-        recognizer = Mock(spec=TRBAInfer)
+        """Создает mock объект TRBA"""
+        recognizer = Mock(spec=TRBA)
         recognizer.predict.return_value = "Тестовый текст"
         return recognizer
 

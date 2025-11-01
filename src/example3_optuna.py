@@ -12,7 +12,7 @@ try:
 except ImportError:  # pragma: no cover
     optuna_dashboard = None  # type: ignore
 
-from manuscript.recognizers import TRBAInfer
+from manuscript.recognizers import TRBA
 from manuscript.recognizers._trba.training.metrics import (
     character_error_rate,
     compute_accuracy,
@@ -98,7 +98,7 @@ def collect_images(image_dir: str) -> List[str]:
 
 
 def evaluate_avg_cer(
-    recognizer: TRBAInfer,
+    recognizer: TRBA,
     images: List[str],
     gt_map: Dict[str, str],
     batch_size: int,
@@ -152,7 +152,7 @@ def evaluate_avg_cer(
 
 
 def evaluate_metrics(
-    recognizer: TRBAInfer,
+    recognizer: TRBA,
     images: List[str],
     gt_map: Dict[str, str],
     batch_size: int,
@@ -282,7 +282,7 @@ def main():
     print(f"   Найдено {len(images)} изображений\n")
 
     print("🤖 Загрузка модели TRBA...")
-    recognizer = TRBAInfer(
+    recognizer = TRBA(
         model_path=MODEL_PATH,
         config_path=CONFIG_PATH,
         charset_path=CHARSET_PATH,

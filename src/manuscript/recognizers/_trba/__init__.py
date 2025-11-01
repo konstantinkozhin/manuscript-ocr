@@ -14,13 +14,13 @@ try:
 except ImportError:  # pragma: no cover - optional dependency for default weights
     gdown = None  # type: ignore[assignment]
 
-from .model.model import RCNN
+from .model.model import TRBAModel
 from .data.transforms import load_charset, get_val_transform, decode_tokens
 from .training.utils import load_checkpoint
 from .training.train import Config, run_training
 
 
-class TRBAInfer:
+class TRBA:
     _DEFAULT_PRESET_NAME = "exp_1_baseline"
     _DEFAULT_RELEASE_WEIGHTS_URL = (
         "https://github.com/konstantinkozhin/manuscript-ocr/"
@@ -42,6 +42,70 @@ class TRBAInfer:
         device: str = "auto",
         **kwargs: Any,
     ):
+        """
+        Initialize TRBA text recognition model.
+
+        Parameters
+        ----------
+        model_path : str or Path, optional
+            Path to the trained model checkpoint (.pth file). If ``None``,
+            default pretrained weights will be automatically downloaded to
+            ``~/.manuscript/trba/exp_1_baseline/weights.pth``.
+        charset_path : str or Path, optional
+            Path to character set file. If ``None``, uses the default charset
+            located at ``configs/charset.txt`` within the package.
+        config_path : str or Path, optional
+            Path to model configuration JSON file. If ``None``, attempts to
+            infer config path from model checkpoint location or downloads
+            default config when using default weights.
+        device : {"auto", "cuda", "cpu"}, optional
+            Compute device. If ``"auto"``, automatically selects CUDA if
+            available, otherwise CPU. Default is ``"auto"``.
+        **kwargs : dict, optional
+            Additional keyword arguments. Currently accepts ``weights_path``
+            as an alias for ``model_path`` for backward compatibility.
+
+        Raises
+        ------
+        FileNotFoundError
+            If specified model, config, or charset files do not exist.
+        ValueError
+            If both ``model_path`` and ``weights_path`` are provided with
+            different values.
+        RuntimeError
+            If gdown is not installed and default weights need to be
+            downloaded.
+
+        Notes
+        -----
+        The class provides two main public methods:
+
+        - ``predict`` — run text recognition inference on cropped word images.
+        - ``train`` — high-level training entrypoint to train a TRBA model
+          on custom datasets.
+
+        The model architecture is based on TRBA (Transformation + ResNet +
+        BiLSTM + Attention) for scene text recognition, adapted for historical
+        manuscript recognition.
+
+        Examples
+        --------
+        Create recognizer with default pretrained weights:
+
+        >>> from manuscript.recognizers import TRBA
+        >>> recognizer = TRBA()
+
+        Use custom trained model:
+
+        >>> recognizer = TRBA(
+        ...     model_path="path/to/model.pth",
+        ...     config_path="path/to/config.json"
+        ... )
+
+        Force CPU execution:
+
+        >>> recognizer = TRBA(device="cpu")
+        """
         weights_path = kwargs.pop("weights_path", None)
         if kwargs:
             unexpected = ", ".join(kwargs.keys())
@@ -178,8 +242,8 @@ class TRBAInfer:
         if not destination.exists():
             raise RuntimeError(f"Failed to download artifact from {url}")
 
-    def _load_model(self) -> RCNN:
-        model = RCNN(
+    def _load_model(self) -> TRBAModel:
+        model = TRBAModel(
             num_classes=len(self.itos),
             hidden_size=self.hidden_size,
             sos_id=self.sos_id,
@@ -234,6 +298,78 @@ class TRBAInfer:
         temperature: float = 1.7,
         alpha: float = 0.9,
     ) -> List[Tuple[str, float]]:
+        """
+        Run text recognition on one or more word images.
+
+        Parameters
+        ----------
+        images : str, Path, numpy.ndarray, PIL.Image, or list thereof
+            Single image or list of images to recognize. Each image can be:
+
+            - Path to image file (str or Path)
+            - RGB numpy array with shape ``(H, W, 3)`` in ``uint8``
+            - PIL Image object
+
+        batch_size : int, optional
+            Number of images to process simultaneously. Larger batches are
+            faster but require more memory. Default is 32.
+        mode : {"beam", "greedy"}, optional
+            Decoding strategy:
+
+            - ``"beam"`` — beam search decoding (slower, more accurate)
+            - ``"greedy"`` — greedy decoding (faster, less accurate)
+
+            Default is ``"beam"``.
+        beam_size : int, optional
+            Beam width for beam search decoding. Only used when
+            ``mode="beam"``. Larger values explore more hypotheses but are
+            slower. Default is 8.
+        temperature : float, optional
+            Temperature for probability scaling in beam search. Higher values
+            increase diversity. Only used when ``mode="beam"``. Default is 1.7.
+        alpha : float, optional
+            Length penalty coefficient for beam search. Penalizes shorter
+            sequences when < 1.0, favors longer when > 1.0. Only used when
+            ``mode="beam"``. Default is 0.9.
+
+        Returns
+        -------
+        list of (str, float) tuples
+            Recognition results as list of ``(text, confidence)`` pairs where:
+
+            - ``text`` is the recognized string
+            - ``confidence`` is recognition confidence score in [0, 1]
+
+            If input is a single image, returns a list with one element.
+
+        Examples
+        --------
+        Recognize single image with beam search:
+
+        >>> from manuscript.recognizers import TRBA
+        >>> recognizer = TRBA()
+        >>> results = recognizer.predict("word_image.jpg")
+        >>> text, confidence = results[0]
+        >>> print(f"Text: '{text}' (confidence: {confidence:.3f})")
+
+        Batch processing with greedy decoding:
+
+        >>> image_paths = ["word1.jpg", "word2.jpg", "word3.jpg"]
+        >>> results = recognizer.predict(
+        ...     image_paths,
+        ...     batch_size=16,
+        ...     mode="greedy"
+        ... )
+        >>> for img_path, (text, conf) in zip(image_paths, results):
+        ...     print(f"{img_path}: '{text}' ({conf:.3f})")
+
+        Process numpy arrays:
+
+        >>> import cv2
+        >>> img = cv2.imread("word.jpg")
+        >>> img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
+        >>> results = recognizer.predict(img_rgb)
+        """
 
         if not isinstance(images, list):
             images_list = [images]
@@ -336,6 +472,162 @@ class TRBAInfer:
         pretrain_weights: Optional[object] = "default",
         **extra_config: Any,
     ):
+        """
+        Train TRBA text recognition model on custom datasets.
+
+        Parameters
+        ----------
+        train_csvs : str, Path or sequence of paths
+            Path(s) to training CSV files. Each CSV should have columns:
+            ``image_path`` (relative to ``train_roots``) and ``text`` (ground
+            truth transcription).
+        train_roots : str, Path or sequence of paths
+            Root directory/directories containing training images. Must have
+            same length as ``train_csvs``.
+        val_csvs : str, Path, sequence of paths, or None, optional
+            Path(s) to validation CSV files with same format as ``train_csvs``.
+            If ``None``, no validation is performed. Default is ``None``.
+        val_roots : str, Path, sequence of paths, or None, optional
+            Root directory/directories for validation images. Must match length
+            of ``val_csvs`` if provided. Default is ``None``.
+        exp_dir : str or Path, optional
+            Experiment directory where checkpoints and logs will be saved.
+            If ``None``, auto-generated based on timestamp. Default is ``None``.
+        charset_path : str or Path, optional
+            Path to character set file. If ``None``, uses default charset from
+            package. Default is ``None``.
+        encoding : str, optional
+            Text encoding for reading CSV files. Default is ``"utf-8"``.
+        img_h : int, optional
+            Target height for input images (pixels). Default is 64.
+        img_w : int, optional
+            Target width for input images (pixels). Default is 256.
+        max_len : int, optional
+            Maximum sequence length for text recognition. Default is 25.
+        hidden_size : int, optional
+            Hidden dimension size for RNN encoder/decoder. Default is 256.
+        batch_size : int, optional
+            Training batch size. Default is 32.
+        epochs : int, optional
+            Number of training epochs. Default is 20.
+        lr : float, optional
+            Learning rate. Default is 1e-3.
+        optimizer : {"Adam", "SGD", "AdamW"}, optional
+            Optimizer type. Default is ``"Adam"``.
+        scheduler : {"ReduceLROnPlateau", "StepLR", "CosineAnnealingLR"}, optional
+            Learning rate scheduler type. Default is ``"ReduceLROnPlateau"``.
+        weight_decay : float, optional
+            L2 weight decay coefficient. Default is 0.0.
+        momentum : float, optional
+            Momentum for SGD optimizer. Default is 0.9.
+        eval_every : int, optional
+            Perform validation every N epochs. Default is 1.
+        val_size : int, optional
+            Maximum number of validation samples to use. Default is 3000.
+        train_proportions : sequence of float, optional
+            Sampling proportions for multiple training datasets. Must sum to 1.0
+            and match length of ``train_csvs``. If ``None``, datasets are
+            concatenated equally. Default is ``None``.
+        num_workers : int, optional
+            Number of data loading workers. Default is 0.
+        seed : int, optional
+            Random seed for reproducibility. Default is 42.
+        resume_path : str or Path, optional
+            Path to checkpoint file to resume training from. Default is ``None``.
+        save_every : int, optional
+            Save checkpoint every N epochs. If ``None``, only saves best model.
+            Default is ``None``.
+        dual_validate : bool, optional
+            If ``True``, validates with both greedy and beam search decoding.
+            Default is ``False``.
+        beam_size : int, optional
+            Beam width for beam search validation. Default is 8.
+        beam_alpha : float, optional
+            Length penalty for beam search. Default is 0.9.
+        beam_temperature : float, optional
+            Temperature for beam search. Default is 1.7.
+        device : {"cuda", "cpu"}, optional
+            Training device. Default is ``"cuda"``.
+        freeze_cnn : {"none", "all", "first", "last"}, optional
+            CNN freezing policy. Default is ``"none"``.
+        freeze_enc_rnn : {"none", "all", "first", "last"}, optional
+            Encoder RNN freezing policy. Default is ``"none"``.
+        freeze_attention : {"none", "all"}, optional
+            Attention module freezing policy. Default is ``"none"``.
+        pretrain_weights : str, Path, bool, or None, optional
+            Pretrained weights to initialize from:
+
+            - ``"default"`` or ``True`` — use release weights
+            - ``None`` or ``False`` — train from scratch
+            - str/Path — path or URL to custom weights file
+
+            Default is ``"default"``.
+        **extra_config : dict, optional
+            Additional configuration parameters passed to training config.
+
+        Returns
+        -------
+        str
+            Path to the best model checkpoint saved during training.
+
+        Examples
+        --------
+        Train on single dataset with validation:
+
+        >>> from manuscript.recognizers import TRBA
+        >>>
+        >>> best_model = TRBA.train(
+        ...     train_csvs="data/train.csv",
+        ...     train_roots="data/train_images",
+        ...     val_csvs="data/val.csv",
+        ...     val_roots="data/val_images",
+        ...     exp_dir="./experiments/trba_exp1",
+        ...     epochs=50,
+        ...     batch_size=64,
+        ...     img_h=64,
+        ...     img_w=256,
+        ... )
+        >>> print(f"Best model saved at: {best_model}")
+
+        Train on multiple datasets with custom proportions:
+
+        >>> train_csvs = ["data/dataset1/train.csv", "data/dataset2/train.csv"]
+        >>> train_roots = ["data/dataset1/images", "data/dataset2/images"]
+        >>> train_proportions = [0.7, 0.3]  # 70% from dataset1, 30% from dataset2
+        >>>
+        >>> best_model = TRBA.train(
+        ...     train_csvs=train_csvs,
+        ...     train_roots=train_roots,
+        ...     train_proportions=train_proportions,
+        ...     val_csvs="data/val.csv",
+        ...     val_roots="data/val_images",
+        ...     epochs=100,
+        ...     lr=5e-4,
+        ...     optimizer="AdamW",
+        ...     weight_decay=1e-4,
+        ... )
+
+        Resume training from checkpoint:
+
+        >>> best_model = TRBA.train(
+        ...     train_csvs="data/train.csv",
+        ...     train_roots="data/train_images",
+        ...     resume_path="experiments/trba_exp1/checkpoints/last.pth",
+        ...     epochs=100,
+        ... )
+
+        Fine-tune from pretrained weights with frozen CNN:
+
+        >>> best_model = TRBA.train(
+        ...     train_csvs="data/finetune.csv",
+        ...     train_roots="data/finetune_images",
+        ...     pretrain_weights="default",
+        ...     freeze_cnn="all",
+        ...     epochs=20,
+        ...     lr=1e-4,
+        ... )
+        """
+
         def _ensure_path_list(
             value: Optional[Union[str, Sequence[Optional[str]]]],
             field_name: str,

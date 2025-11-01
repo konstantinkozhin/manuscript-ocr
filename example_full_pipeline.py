@@ -7,7 +7,7 @@ import os
 import time
 import glob
 from src.manuscript.detectors._east import EAST
-from src.manuscript.recognizers._trba import TRBAInfer
+from src.manuscript.recognizers._trba import TRBA
 from manuscript._pipeline import OCRPipeline
 
 
@@ -52,7 +52,7 @@ def main():
     # Инициализация распознавателя
     print("Загрузка распознавателя TRBA...")
     start_time = time.time()
-    recognizer = TRBAInfer(
+    recognizer = TRBA(
         model_path=recognizer_model_path,
         config_path=config_path,
     )

@@ -1,3 +1,3 @@
-from ._trba import TRBAInfer
+from ._trba import TRBA
 
-__all__ = ["TRBAInfer"]
+__all__ = ["TRBA"]

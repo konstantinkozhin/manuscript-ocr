@@ -1,6 +1,6 @@
 import os
 import time
-from manuscript.recognizers import TRBAInfer
+from manuscript.recognizers import TRBA
 from manuscript.recognizers._trba.training.metrics import (
     character_error_rate,
     word_error_rate,
@@ -40,7 +40,7 @@ if not images:
 print(f"📁 Найдено {len(images)} изображений для распознавания")
 
 # === Инициализация модели ===
-recognizer = TRBAInfer(model_path=model_path, config_path=config_path)
+recognizer = TRBA(model_path=model_path, config_path=config_path)
 
 # === Распознаём ===
 start_time = time.perf_counter()

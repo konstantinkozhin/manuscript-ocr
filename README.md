@@ -48,13 +48,13 @@ print(f"CUDA доступна: {torch.cuda.is_available()}")
 
 ```python
 from manuscript.detectors import EAST
-from manuscript import TRBAInfer  
+from manuscript.recognizers import TRBA
 from manuscript.pipeline import OCRPipeline
 
 # Инициализация компонентов
 detector = EAST(score_thresh=0.7)
 
-recognizer = TRBAInfer(
+recognizer = TRBA(
     model_path="path/to/model.pth",
     config_path="path/to/config.json",
     charset_path="path/to/charset.txt"
@@ -77,7 +77,10 @@ for block in result.blocks:
               f"Распознавание: {word.recognition_confidence:.3f}")
 ```
 
-➡ **Подробные примеры для детектора (`EAST`) вынесены в отдельный файл:**
+➡ **Подробные примеры для детектора (`EAST`) вынесены в отдельный файл:**  
 📄 **[DETECTOR.md](./DETECTOR.md)**
+
+➡ **Подробные примеры для распознавателя (`TRBA`) вынесены в отдельный файл:**  
+📄 **[RECOGNIZERS.md](./RECOGNIZERS.md)**
 
 ---

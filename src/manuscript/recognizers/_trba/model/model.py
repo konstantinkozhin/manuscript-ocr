@@ -335,7 +335,7 @@ class BidirectionalLSTM(nn.Module):
         return out
 
 
-class RCNN(nn.Module):
+class TRBAModel(nn.Module):
     def __init__(
         self,
         num_classes,

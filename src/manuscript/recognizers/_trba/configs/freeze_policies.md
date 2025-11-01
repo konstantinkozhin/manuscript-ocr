@@ -1,6 +1,6 @@
 Политики заморозки весов (fine-tuning)
 
-- Параметры принимаются в `TRBAInfer.train(...)` и/или в `config.json`:
+- Параметры принимаются в `TRBA.train(...)` и/или в `config.json`:
   - `freeze_cnn`: "none" | "partial" | "full"
   - `freeze_enc_rnn`: "none" | "partial" | "full"
   - `freeze_attention`: "none" | "partial" | "full"
@@ -13,9 +13,9 @@
 Примеры:
 
 ```python
-from manuscript import TRBAInfer
+from manuscript.recognizers import TRBA
 
-summary = TRBAInfer.train(
+summary = TRBA.train(
     train_csvs=["train.tsv"],
     train_roots=["train"],
     val_csvs=["val.tsv"],
