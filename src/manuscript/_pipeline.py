@@ -177,7 +177,7 @@ class Pipeline:
 
     def process_batch(
         self,
-        images: list[Union[str, np.ndarray, Image.Image]],
+        images: List[Union[str, np.ndarray, Image.Image]],
         recognize_text: bool = True,
         vis: bool = False,
         profile: bool = False,
