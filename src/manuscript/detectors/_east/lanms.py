@@ -180,11 +180,24 @@ def locality_aware_nms(boxes, iou_threshold):
             if should_merge(poly, last_poly, iou_threshold):
                 aligned_poly = normalize_polygon(last_poly, poly)
                 total_weight = weight_sums[-1] + score
-                merged_polys[-1] = (
-                    last_poly * weight_sums[-1] + aligned_poly * score
-                ) / total_weight
-                weight_sums[-1] = total_weight
-                merged_scores[-1] = max(merged_scores[-1], score)
+
+                # Защита от деления на ноль
+                if total_weight > 1e-8:
+                    new_poly = (
+                        last_poly * weight_sums[-1] + aligned_poly * score
+                    ) / total_weight
+
+                    # Проверка на NaN/Inf
+                    if np.isfinite(new_poly).all():
+                        merged_polys[-1] = new_poly
+                        weight_sums[-1] = total_weight
+                        merged_scores[-1] = max(merged_scores[-1], score)
+                    else:
+                        # Если получились NaN/Inf, просто обновляем score
+                        merged_scores[-1] = max(merged_scores[-1], score)
+                else:
+                    # Если суммарный вес слишком мал, просто берем последний полигон
+                    merged_scores[-1] = max(merged_scores[-1], score)
                 continue
 
         merged_polys.append(poly.copy())
@@ -204,4 +217,9 @@ def locality_aware_nms(boxes, iou_threshold):
     final_boxes = np.concatenate(
         [kept_polys.reshape(kept_polys.shape[0], -1), kept_scores[:, None]], axis=1
     )
+
+    # Фильтруем боксы с NaN значениями
+    valid_mask = np.isfinite(final_boxes).all(axis=1)
+    final_boxes = final_boxes[valid_mask]
+
     return final_boxes.astype(np.float32)

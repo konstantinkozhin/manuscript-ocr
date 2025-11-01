@@ -409,14 +409,20 @@ def expand_boxes(
     n2 = sign * np.stack([edge2[..., 1], -edge2[..., 0]], axis=2) / (len2 + 1e-6)
     n_avg = n1 + n2
     norm = np.linalg.norm(n_avg, axis=2, keepdims=True)
-    n_avg = np.divide(n_avg, norm, out=np.zeros_like(n_avg), where=norm > 0)
+
+    # Normalize, but if norm is too small (degenerate case), use n1 as fallback
+    n_normalized = np.divide(n_avg, norm, out=np.zeros_like(n_avg), where=norm > 1e-6)
+    degenerate_mask = (norm <= 1e-6).squeeze(-1)  # shape: (N, 4)
+    n_normalized[degenerate_mask] = n1[
+        degenerate_mask
+    ]  # fallback to n1 when degenerate
 
     offset = np.minimum(len1, len2)
 
     scale_xy = np.array([1 + expand_w, 1 + expand_h], dtype=np.float32).reshape(1, 1, 2)
     delta = (scale_xy - 1.0) * offset
 
-    new_coords = p_curr + delta * n_avg
+    new_coords = p_curr + delta * n_normalized
 
     expanded = np.hstack([new_coords.reshape(-1, 8), scores])
     return expanded.astype(np.float32)

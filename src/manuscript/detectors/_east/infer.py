@@ -6,9 +6,9 @@ from typing import Union, Optional, List, Tuple, Sequence, Dict, Any
 import cv2
 import gdown
 import numpy as np
+import onnxruntime as ort
 import torch
 from torch.utils.data import ConcatDataset
-from torchvision import transforms
 
 from .._types import Word, Block, Page
 from .dataset import EASTDataset
@@ -42,16 +42,16 @@ class EAST:
         anomaly_min_box_count: int = 30,
     ):
         """
-        Initialize EAST text detector.
+        Initialize EAST text detector with ONNX Runtime.
 
         Parameters
         ----------
         weights_path : str or Path, optional
-            Path to pretrained model weights. If None, the weights will be
-            automatically downloaded to ``~/.manuscript/east/east_quad_23_05.pth``.
+            Path to ONNX model weights. If None, the model will be
+            automatically downloaded to ``~/.manuscript/east/east_quad_23_05.onnx``.
         device : str, optional
-            Compute device, e.g. ``"cuda"`` or ``"cpu"``. If None, selected
-            automatically.
+            Compute device: ``"cuda"`` or ``"cpu"``. If None, selected automatically.
+            Note: CUDA requires onnxruntime-gpu package.
         target_size : int, optional
             Input image size for inference. Images are resized to
             ``(target_size, target_size)``. Default is 1280.
@@ -90,27 +90,34 @@ class EAST:
         - ``predict`` — run inference on a single image and return detections.
         - ``train`` — high-level training entrypoint to train an EAST model
           on custom datasets.
+
+        The detector uses ONNX Runtime for fast inference on CPU and GPU.
+        For GPU acceleration, install: ``pip install onnxruntime-gpu``
         """
-        self.device = device or ("cuda" if torch.cuda.is_available() else "cpu")
+        self.device = device or ("cuda" if ort.get_device() == "GPU" else "cpu")
 
         if weights_path is None:
             url = (
                 "https://github.com/konstantinkozhin/manuscript-ocr"
-                "/releases/download/v0.1.0/east_quad_23_05.pth"
+                "/releases/download/v0.1.0/east_quad_23_05.onnx"
             )
             weights_dir = Path.home() / ".manuscript" / "east"
             weights_dir.mkdir(parents=True, exist_ok=True)
-            out = weights_dir / "east_quad_23_05.pth"
+            out = weights_dir / "east_quad_23_05.onnx"
             if not out.exists():
-                print(f"Downloading EAST weights from {url} …")
+                print(f"Downloading EAST ONNX model from {url} …")
                 gdown.download(url, str(out), quiet=False)
             weights_path = str(out)
 
-        self.model = EASTModel(
-            pretrained_backbone=False,
-            pretrained_model_path=str(weights_path),
-        ).to(self.device)
-        self.model.eval()
+        if not Path(weights_path).exists():
+            raise FileNotFoundError(f"ONNX model not found: {weights_path}")
+
+        providers = []
+        if self.device == "cuda":
+            providers.append("CUDAExecutionProvider")
+        providers.append("CPUExecutionProvider")
+
+        self.onnx_session = ort.InferenceSession(str(weights_path), providers=providers)
 
         self.target_size = target_size
         self.score_geo_scale = score_geo_scale
@@ -123,13 +130,6 @@ class EAST:
         self.remove_area_anomalies = remove_area_anomalies
         self.anomaly_sigma_threshold = anomaly_sigma_threshold
         self.anomaly_min_box_count = anomaly_min_box_count
-
-        self.tf = transforms.Compose(
-            [
-                transforms.ToTensor(),
-                transforms.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)),
-            ]
-        )
 
     def _scale_boxes_to_original(
         self, boxes: np.ndarray, orig_size: Tuple[int, int]
@@ -297,24 +297,25 @@ class EAST:
         >>> vis_img.show()
 
         """
-        # 1) Read & RGB
         img = read_image(img_or_path)
-
-        # 2) Resize + ToTensor + Normalize
         resized = cv2.resize(img, (self.target_size, self.target_size))
-        img_t = self.tf(resized).to(self.device)
 
-        # 3) Forward
         t0 = time.time()
-        with torch.no_grad():
-            out = self.model(img_t.unsqueeze(0))
 
-            score_map = out["score"][0].cpu().numpy().squeeze(0)
-            geo_map = out["geometry"][0].cpu().numpy()
+        img_norm = (resized.astype(np.float32) / 255.0 - 0.5) / 0.5
+        img_input = img_norm.transpose(2, 0, 1)[np.newaxis, :, :, :]
+
+        input_name = self.onnx_session.get_inputs()[0].name
+        output_names = [out.name for out in self.onnx_session.get_outputs()]
+
+        outputs = self.onnx_session.run(output_names, {input_name: img_input})
+
+        score_map = outputs[0].squeeze(0).squeeze(0)
+        geo_map = outputs[1].squeeze(0)
+
         if profile:
             print(f"  Model inference: {time.time() - t0:.3f}s")
 
-        # 4) Decode raw quads (с квантизацией на уровне точек)
         t0 = time.time()
         final_quads = decode_quads_from_maps(
             score_map=score_map,
@@ -713,3 +714,168 @@ class EAST:
             ),
         )
         return best_model
+
+    @staticmethod
+    def export_to_onnx(
+        weights_path: Union[str, Path],
+        output_path: Union[str, Path],
+        input_size: int = 1280,
+        opset_version: int = 14,
+        simplify: bool = True,
+    ) -> None:
+        """
+        Export EAST PyTorch model to ONNX format.
+
+        This method converts a trained EAST model from PyTorch to ONNX format,
+        which can be used for faster inference with ONNX Runtime. The exported
+        model can be loaded using ``EAST(weights_path="model.onnx", use_onnx=True)``.
+
+        Parameters
+        ----------
+        weights_path : str or Path
+            Path to the PyTorch model weights file (.pth).
+        output_path : str or Path
+            Path where the ONNX model will be saved (.onnx).
+        input_size : int, optional
+            Input image size (height and width). The model will accept
+            images of shape ``(batch, 3, input_size, input_size)``.
+            Default is 1280.
+        opset_version : int, optional
+            ONNX opset version to use for export. Default is 14.
+        simplify : bool, optional
+            If True, applies ONNX graph simplification using onnx-simplifier
+            to optimize the model. Requires ``onnx-simplifier`` package.
+            Default is True.
+
+        Returns
+        -------
+        None
+            The ONNX model is saved to ``output_path``.
+
+        Raises
+        ------
+        ImportError
+            If required packages (torch, onnx) are not installed.
+        FileNotFoundError
+            If ``weights_path`` does not exist.
+
+        Notes
+        -----
+        The exported ONNX model has two outputs:
+
+        - ``score_map``: Text confidence map with shape ``(batch, 1, H, W)``
+        - ``geo_map``: Geometry map with shape ``(batch, 8, H, W)``
+
+        The model supports dynamic batch size and image dimensions through
+        dynamic axes configuration.
+
+        Examples
+        --------
+        Export default EAST model to ONNX:
+
+        >>> from manuscript.detectors import EAST
+        >>> EAST.export_to_onnx(
+        ...     weights_path="east_resnet50.pth",
+        ...     output_path="east_model.onnx"
+        ... )
+        Exporting to ONNX (opset 14)...
+        [OK] ONNX model saved to: east_model.onnx
+        [OK] ONNX model is valid
+
+        Export with custom input size:
+
+        >>> EAST.export_to_onnx(
+        ...     weights_path="custom_weights.pth",
+        ...     output_path="custom_model.onnx",
+        ...     input_size=1024,
+        ...     simplify=False
+        ... )
+
+        Use the exported model for inference:
+
+        >>> detector = EAST(
+        ...     weights_path="east_model.onnx",
+        ...     use_onnx=True,
+        ...     device="cuda"
+        ... )
+        >>> result = detector.predict("image.jpg")
+
+        See Also
+        --------
+        EAST.__init__ : Initialize EAST detector with ONNX support using ``use_onnx=True``.
+        """
+
+        class EASTWrapper(torch.nn.Module):
+            def __init__(self, east_model):
+                super().__init__()
+                self.east = east_model
+
+            def forward(self, x):
+                output = self.east(x)
+                return output["score"], output["geometry"]
+
+        weights_path = Path(weights_path)
+        if not weights_path.exists():
+            raise FileNotFoundError(f"Weights file not found: {weights_path}")
+
+        print(f"Loading PyTorch model from {weights_path}...")
+        east_model = EASTModel(
+            pretrained_backbone=False,
+            pretrained_model_path=str(weights_path),
+        )
+        east_model.eval()
+
+        model = EASTWrapper(east_model)
+        model.eval()
+
+        dummy_input = torch.randn(1, 3, input_size, input_size)
+
+        print(f"Model architecture: {model.__class__.__name__}")
+        print(f"Input shape: {dummy_input.shape}")
+
+        with torch.no_grad():
+            score_map, geo_map = model(dummy_input)
+
+        print(f"Output shapes:")
+        print(f"  - score_map: {score_map.shape}")
+        print(f"  - geo_map: {geo_map.shape}")
+
+        print(f"\nExporting to ONNX (opset {opset_version})...")
+        torch.onnx.export(
+            model,
+            dummy_input,
+            str(output_path),
+            export_params=True,
+            opset_version=opset_version,
+            do_constant_folding=True,
+            input_names=["input"],
+            output_names=["score_map", "geo_map"],
+            dynamic_axes={
+                "input": {0: "batch_size", 2: "height", 3: "width"},
+                "score_map": {0: "batch_size", 2: "height", 3: "width"},
+                "geo_map": {0: "batch_size", 2: "height", 3: "width"},
+            },
+            verbose=False,
+        )
+
+        print(f"[OK] ONNX model saved to: {output_path}")
+
+        import onnx
+        import onnxsim
+
+        print("\nVerifying ONNX model...")
+        onnx_model = onnx.load(str(output_path))
+        onnx.checker.check_model(onnx_model)
+        print("[OK] ONNX model is valid")
+
+        if simplify:
+            print("\nSimplifying ONNX model...")
+            model_simplified, check = onnxsim.simplify(onnx_model)
+            if check:
+                onnx.save(model_simplified, str(output_path))
+                print("[OK] ONNX model simplified")
+            else:
+                print("[WARNING] Simplification failed, using original model")
+
+        file_size_mb = Path(output_path).stat().st_size / (1024 * 1024)
+        print(f"\n[OK] Export complete! Model size: {file_size_mb:.1f} MB")
