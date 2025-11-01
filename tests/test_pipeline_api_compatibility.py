@@ -318,3 +318,47 @@ def test_readme_example_works_with_dummy():
             assert word.text is not None
             assert word.detection_confidence is not None
             # recognition_confidence может быть None если распознаватель не вернул его
+
+
+def test_pipeline_default_initialization():
+    """
+    Тест что Pipeline() можно создать без параметров.
+    Должны автоматически инициализироваться EAST и TRBA.
+    """
+    # Создание без параметров
+    pipeline = Pipeline()
+
+    # Проверяем что детектор и распознаватель созданы
+    assert pipeline.detector is not None
+    assert pipeline.recognizer is not None
+
+    # Проверяем типы (должны быть EAST и TRBA)
+    from manuscript.detectors import EAST
+    from manuscript.recognizers import TRBA
+
+    assert isinstance(pipeline.detector, EAST)
+    assert isinstance(pipeline.recognizer, TRBA)
+
+    # Проверяем что min_text_size установлен по умолчанию
+    assert pipeline.min_text_size == 5
+
+
+def test_pipeline_partial_initialization():
+    """
+    Тест что Pipeline можно создать с одним параметром,
+    второй инициализируется по умолчанию.
+    """
+    from manuscript.detectors import EAST
+    from manuscript.recognizers import TRBA
+
+    # Только детектор
+    custom_detector = DummyDetector()
+    pipeline1 = Pipeline(detector=custom_detector)
+    assert pipeline1.detector is custom_detector
+    assert isinstance(pipeline1.recognizer, TRBA)
+
+    # Только распознаватель
+    custom_recognizer = DummyRecognizer()
+    pipeline2 = Pipeline(recognizer=custom_recognizer)
+    assert isinstance(pipeline2.detector, EAST)
+    assert pipeline2.recognizer is custom_recognizer

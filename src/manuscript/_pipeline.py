@@ -15,9 +15,42 @@ from .recognizers import TRBA
 
 
 class Pipeline:
-    def __init__(self, detector: EAST, recognizer: TRBA, min_text_size: int = 5):
-        self.detector = detector
-        self.recognizer = recognizer
+    def __init__(
+        self,
+        detector: Optional[EAST] = None,
+        recognizer: Optional[TRBA] = None,
+        min_text_size: int = 5,
+    ):
+        """
+        Initialize OCR pipeline.
+
+        Parameters
+        ----------
+        detector : EAST, optional
+            Text detector instance. If None, creates default EAST detector.
+        recognizer : TRBA, optional
+            Text recognizer instance. If None, creates default TRBA recognizer.
+        min_text_size : int, optional
+            Minimum text size in pixels. Default is 5.
+
+        Examples
+        --------
+        Create pipeline with default models:
+
+        >>> from manuscript import Pipeline
+        >>> pipeline = Pipeline()
+
+        Create pipeline with custom models:
+
+        >>> from manuscript import Pipeline
+        >>> from manuscript.detectors import EAST
+        >>> from manuscript.recognizers import TRBA
+        >>> detector = EAST(score_thresh=0.8)
+        >>> recognizer = TRBA(device="cuda")
+        >>> pipeline = Pipeline(detector=detector, recognizer=recognizer)
+        """
+        self.detector = detector if detector is not None else EAST()
+        self.recognizer = recognizer if recognizer is not None else TRBA()
         self.min_text_size = min_text_size
 
     def predict(

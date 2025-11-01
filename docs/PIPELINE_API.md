@@ -109,9 +109,13 @@ class MyRecognizer:
 ```python
 from manuscript import Pipeline
 
+# С пользовательскими компонентами
 detector = MyDetector()
 recognizer = MyRecognizer()
 pipeline = Pipeline(detector, recognizer)
+
+# Или с моделями по умолчанию
+pipeline = Pipeline()
 
 result = pipeline.predict("image.jpg")
 text = pipeline.get_text(result)
@@ -133,29 +137,40 @@ text = pipeline.get_text(result)
 
 ## Замена компонентов
 
-Pipeline позволяет легко заменять детектор или распознаватель:
+Pipeline позволяет легко заменять детектор или распознаватель, или использовать модели по умолчанию:
+
+```python
+from manuscript import Pipeline
+
+# Модели по умолчанию (автоматическая инициализация)
+pipeline = Pipeline()
+
+# Только детектор кастомный, распознаватель по умолчанию
+from my_package import MyCustomDetector
+pipeline = Pipeline(detector=MyCustomDetector())
+
+# Только распознаватель кастомный, детектор по умолчанию
+from my_package import MyCustomRecognizer
+pipeline = Pipeline(recognizer=MyCustomRecognizer())
+
+# Оба компонента кастомные
+pipeline = Pipeline(
+    detector=MyCustomDetector(),
+    recognizer=MyCustomRecognizer()
+)
+```
+
+Или с использованием встроенных моделей с параметрами:
 
 ```python
 from manuscript import Pipeline
 from manuscript.detectors import EAST
-from my_package import MyCustomRecognizer
-
-# Используем EAST для детекции, но свой распознаватель
-detector = EAST()
-recognizer = MyCustomRecognizer()
-
-pipeline = Pipeline(detector, recognizer)
-```
-
-Или наоборот:
-
-```python
 from manuscript.recognizers import TRBA
-from my_package import MyCustomDetector
 
-# Используем свой детектор, но TRBA для распознавания
-detector = MyCustomDetector()
-recognizer = TRBA()
+# EAST с повышенным порогом уверенности
+detector = EAST(score_thresh=0.8)
+# TRBA с GPU
+recognizer = TRBA(device="cuda")
 
 pipeline = Pipeline(detector, recognizer)
 ```
@@ -167,9 +182,21 @@ pipeline = Pipeline(detector, recognizer)
 Pipeline поддерживает дополнительные параметры:
 
 ```python
+from manuscript import Pipeline
+
+# С параметрами по умолчанию
+pipeline = Pipeline()
+
+# С минимальным размером текста
+pipeline = Pipeline(min_text_size=10)
+
+# С кастомными моделями и параметрами
+from manuscript.detectors import EAST
+from manuscript.recognizers import TRBA
+
 pipeline = Pipeline(
-    detector=detector,
-    recognizer=recognizer,
+    detector=EAST(score_thresh=0.7),
+    recognizer=TRBA(device="cuda"),
     min_text_size=5  # Минимальный размер бокса (в пикселях)
 )
 ```

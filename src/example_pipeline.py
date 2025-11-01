@@ -1,17 +1,11 @@
-from manuscript.detectors import EAST
-from manuscript.recognizers import TRBA
 from manuscript import Pipeline
 
 
 # Путь к изображению (укажите свой файл)
 image_path = r"C:\Users\pasha\OneDrive\Рабочий стол\i (1).jpg"
 
-# Инициализация детектора и распознавателя
-detector = EAST()
-recognizer = TRBA()
-
-# Создание OCR-пайплайна
-pipeline = Pipeline(detector=detector, recognizer=recognizer)
+# Создание OCR-пайплайна с моделями по умолчанию
+pipeline = Pipeline()
 
 # Обработка изображения и получение результата
 result, img = pipeline.predict(image_path, vis=True)
