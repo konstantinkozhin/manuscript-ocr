@@ -34,19 +34,8 @@ jobs:
       - name: Check for dependency conflicts
         run: pip check
 
-      - name: Test basic import
-        run: |
-          python -c "from manuscript.detectors import EASTInfer; print('Installation successful')"
-
-      - name: Test PyTorch version
-        run: |
-          python -c "import torch; print(f'PyTorch: {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
-
-      - name: Run installation tests
-        run: pytest tests/test_installation.py -v
-
       - name: Run all tests with coverage
-        run: pytest --cov=src --cov-report=xml
+        run: pytest tests/ -v --cov=src --cov-report=xml
 
   test-dev-installation:
     runs-on: ubuntu-latest
@@ -84,13 +73,8 @@ jobs:
       - name: Check for dependency conflicts
         run: pip check
 
-      - name: Test import with dev setup
-        run: |
-          python -c "from manuscript.detectors import EASTInfer; print('Dev installation successful')"
-
-      - name: Test GPU PyTorch installation
-        run: |
-          python -c "import torch; print(f'PyTorch: {torch.__version__}, CUDA: {torch.cuda.is_available()}')"
+      - name: Run all tests
+        run: pytest tests/ -v
 
       - name: Run code quality checks
         run: |
