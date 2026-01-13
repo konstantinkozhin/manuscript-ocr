@@ -878,8 +878,13 @@ class EAST(BaseModel):
                 return candidate
             return (Path.cwd() / p).resolve()
 
+        def _is_experiment_checkpoint(file_path: Path) -> bool:
+            parent = file_path.parent
+            return parent.name == "checkpoints" or (parent / "training_config.json").exists()
+
         def _resolve_resume_target(
             target: Union[str, Path],
+            default_experiment_dir: str,
         ) -> Tuple[str, Optional[Path]]:
             resolved = _resolve_path(target)
             if not resolved.exists():
@@ -889,12 +894,15 @@ class EAST(BaseModel):
 
             if resolved.is_file():
                 resume_state = resolved
-                checkpoints_dir = resolved.parent
-                if checkpoints_dir.name == "checkpoints":
-                    experiment_dir = checkpoints_dir.parent
+                if _is_experiment_checkpoint(resolved):
+                    checkpoints_dir = resolved.parent
+                    if checkpoints_dir.name == "checkpoints":
+                        experiment_dir = checkpoints_dir.parent
+                    else:
+                        experiment_dir = checkpoints_dir
+                    return os.path.abspath(os.fspath(experiment_dir)), resume_state
                 else:
-                    experiment_dir = checkpoints_dir
-                return os.path.abspath(os.fspath(experiment_dir)), resume_state
+                    return default_experiment_dir, resume_state
 
             experiment_dir = resolved
             checkpoints_dir = (
@@ -904,12 +912,15 @@ class EAST(BaseModel):
             resume_state = default_state if default_state.exists() else None
             return os.path.abspath(os.fspath(experiment_dir)), resume_state
 
+        default_experiment_dir = os.path.abspath(os.path.join(experiment_root, model_name))
         resume_state_path: Optional[Path] = None
         if resume_from is None:
-            experiment_dir = os.path.abspath(os.path.join(experiment_root, model_name))
+            experiment_dir = default_experiment_dir
             resume_flag = False
         else:
-            experiment_dir, resume_state_path = _resolve_resume_target(resume_from)
+            experiment_dir, resume_state_path = _resolve_resume_target(
+                resume_from, default_experiment_dir
+            )
             resume_flag = True
 
         best_model = _run_training(

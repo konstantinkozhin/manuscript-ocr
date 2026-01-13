@@ -2,7 +2,7 @@ import json
 import os
 import random
 from collections import OrderedDict
-from typing import Optional, Sequence
+from typing import Optional, Sequence, Dict, Any, Tuple
 
 import numpy as np
 import torch
@@ -16,6 +16,62 @@ from .lanms import locality_aware_nms
 from .loss import EASTLoss
 from .sam import SAMSolver
 from .utils import create_collage, decode_quads_from_maps
+
+
+def _is_full_state_checkpoint(checkpoint: Dict[str, Any]) -> bool:
+    required_keys = {"model_state", "optimizer_state", "scheduler_state"}
+    return isinstance(checkpoint, dict) and required_keys.issubset(checkpoint.keys())
+
+
+def _extract_model_state(checkpoint: Any) -> Dict[str, torch.Tensor]:
+    if isinstance(checkpoint, dict):
+        for key in ("model_state", "state_dict", "model"):
+            if key in checkpoint and isinstance(checkpoint[key], dict):
+                return checkpoint[key]
+        if all(isinstance(k, str) for k in checkpoint.keys()):
+            return checkpoint
+    return checkpoint
+
+
+def _check_architecture_compatibility(
+    model: torch.nn.Module,
+    loaded_state: Dict[str, torch.Tensor],
+) -> Tuple[bool, str]:
+    model_state = model.state_dict()
+    model_keys = set(model_state.keys())
+    loaded_keys = set(loaded_state.keys())
+    
+    common_keys = model_keys & loaded_keys
+    if not common_keys:
+        return False, "No common keys between model and loaded weights"
+    
+    shape_mismatches = []
+    for key in common_keys:
+        if model_state[key].shape != loaded_state[key].shape:
+            shape_mismatches.append(
+                f"{key}: model {model_state[key].shape} vs loaded {loaded_state[key].shape}"
+            )
+    
+    if shape_mismatches:
+        return False, f"Shape mismatches in keys: {shape_mismatches}"
+    
+    return True, ""
+
+
+def _load_weights_only(
+    model: torch.nn.Module,
+    weights_path: str,
+    device: torch.device,
+    strict: bool = False,
+) -> None:
+    checkpoint = torch.load(weights_path, map_location=device, weights_only=False)
+    state_dict = _extract_model_state(checkpoint)
+    
+    is_compatible, error_msg = _check_architecture_compatibility(model, state_dict)
+    if not is_compatible:
+        raise ValueError(f"Architecture mismatch: {error_msg}")
+    
+    model.load_state_dict(state_dict, strict=strict)
 
 
 def dice_coefficient(pred: torch.Tensor, target: torch.Tensor, eps: float = 1e-6):
@@ -219,18 +275,28 @@ def _run_training(
             raise FileNotFoundError(
                 f"Resume requested, but state file not found: {state_path}"
             )
-        checkpoint = torch.load(state_path, map_location=device)
-        model.load_state_dict(checkpoint["model_state"])
-        if use_ema and checkpoint.get("ema_state") is not None:
-            ema_model.load_state_dict(checkpoint["ema_state"])
-        optimizer.load_state_dict(checkpoint["optimizer_state"])
-        scheduler.load_state_dict(checkpoint["scheduler_state"])
-        scaler_state = checkpoint.get("scaler_state")
-        if scaler_state is not None:
-            scaler.load_state_dict(scaler_state)
-        best_val_loss = checkpoint.get("best_val_loss", best_val_loss)
-        patience = checkpoint.get("patience", patience)
-        start_epoch = checkpoint.get("epoch", 0) + 1
+        checkpoint = torch.load(state_path, map_location=device, weights_only=False)
+        
+        if _is_full_state_checkpoint(checkpoint):
+            model.load_state_dict(checkpoint["model_state"])
+            if use_ema and checkpoint.get("ema_state") is not None:
+                ema_model.load_state_dict(checkpoint["ema_state"])
+            optimizer.load_state_dict(checkpoint["optimizer_state"])
+            scheduler.load_state_dict(checkpoint["scheduler_state"])
+            scaler_state = checkpoint.get("scaler_state")
+            if scaler_state is not None:
+                scaler.load_state_dict(scaler_state)
+            best_val_loss = checkpoint.get("best_val_loss", best_val_loss)
+            patience = checkpoint.get("patience", patience)
+            start_epoch = checkpoint.get("epoch", 0) + 1
+        else:
+            state_dict = _extract_model_state(checkpoint)
+            is_compatible, error_msg = _check_architecture_compatibility(model, state_dict)
+            if not is_compatible:
+                raise ValueError(f"Architecture mismatch when loading weights: {error_msg}")
+            model.load_state_dict(state_dict, strict=False)
+            if use_ema:
+                ema_model.load_state_dict(state_dict, strict=False)
 
     writer = SummaryWriter(log_dir, purge_step=start_epoch if resume else None)
 
