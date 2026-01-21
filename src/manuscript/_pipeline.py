@@ -1,6 +1,6 @@
 import time
 from pathlib import Path
-from typing import Dict, List, Optional, Union
+from typing import Dict, List, Optional, Union, TYPE_CHECKING
 
 import numpy as np
 from PIL import Image
@@ -10,13 +10,17 @@ from .detectors import EAST
 from .recognizers import TRBA
 from .utils import read_image, visualize_page
 
+if TYPE_CHECKING:
+    from .correctors.base import BaseCorrector
+
 
 class Pipeline:
     """
-    High-level OCR pipeline combining text detection and recognition.
+    High-level OCR pipeline combining text detection, recognition, and correction.
 
-    The Pipeline class orchestrates EAST detector and TRBA recognizer to perform
-    complete OCR workflow: detection → crop extraction → recognition → result merging.
+    The Pipeline class orchestrates EAST detector, TRBA recognizer, and optional
+    text corrector to perform complete OCR workflow:
+    detection → crop extraction → recognition → correction → result merging.
 
     Attributes
     ----------
@@ -24,6 +28,8 @@ class Pipeline:
         Text detector instance
     recognizer : TRBA
         Text recognizer instance
+    corrector : BaseCorrector, optional
+        Text corrector instance (None to skip correction)
     min_text_size : int
         Minimum text box size in pixels (width and height)
     rotate_threshold : float
@@ -49,6 +55,13 @@ class Pipeline:
     >>> recognizer = TRBA(weights="trba_lite_g1", device="cuda")
     >>> pipeline = Pipeline(detector=detector, recognizer=recognizer)
 
+    Create pipeline with text correction:
+
+    >>> from manuscript import Pipeline
+    >>> from manuscript.correctors import DummyCorrector
+    >>> corrector = DummyCorrector()
+    >>> pipeline = Pipeline(corrector=corrector)
+
     Disable automatic rotation of vertical text:
 
     >>> pipeline = Pipeline(rotate_threshold=0)
@@ -58,6 +71,7 @@ class Pipeline:
         self,
         detector: Optional[EAST] = None,
         recognizer: Optional[TRBA] = None,
+        corrector: Optional["BaseCorrector"] = None,
         min_text_size: int = 5,
         rotate_threshold: float = 1.5,
     ):
@@ -70,6 +84,10 @@ class Pipeline:
             Text detector instance. If None, creates default EAST detector.
         recognizer : TRBA, optional
             Text recognizer instance. If None, creates default TRBA recognizer.
+        corrector : BaseCorrector, optional
+            Text corrector instance. If None, no text correction is applied.
+            The corrector receives a Page object after recognition and returns
+            a corrected Page object.
         min_text_size : int, optional
             Minimum text size in pixels. Boxes smaller than this will be
             filtered out before recognition. Default is 5.
@@ -82,6 +100,7 @@ class Pipeline:
         """
         self.detector = detector if detector is not None else EAST()
         self.recognizer = recognizer if recognizer is not None else TRBA()
+        self.corrector = corrector
         self.min_text_size = min_text_size
         self.rotate_threshold = rotate_threshold
 
@@ -216,6 +235,13 @@ class Pipeline:
             for word_obj, result in zip(word_objects, recognition_results):
                 word_obj.text = result["text"]
                 word_obj.recognition_confidence = result["confidence"]
+
+        # ---- CORRECTION ----
+        if self.corrector is not None:
+            t0 = time.time()
+            page = self.corrector.predict(page)
+            if profile:
+                print(f"Correction: {time.time() - t0:.3f}s")
 
         if profile:
             print(f"Pipeline total: {time.time() - start_time:.3f}s")
