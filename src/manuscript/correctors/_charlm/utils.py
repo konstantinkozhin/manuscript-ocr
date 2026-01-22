@@ -11,17 +11,14 @@ from tqdm import tqdm
 
 class CharLMCorrector:
     def __init__(self, model, c2i, i2c, device, max_len, mask_threshold=0.2,
-                 apply_threshold=0.95, max_edits=3, lexicon=None, min_word_len=4,
-                 substitutions=None, sub_threshold=100):
+                 apply_threshold=0.95, max_edits=3, lexicon=None, min_word_len=4):
         self.model, self.c2i, self.i2c = model, c2i, i2c
         self.device, self.max_len = device, max_len
         self.mask_threshold, self.apply_threshold = mask_threshold, apply_threshold
         self.max_edits = max_edits
         self.min_word_len = min_word_len
         self.lexicon = frozenset(lexicon) if lexicon else None
-        self.substitutions = substitutions if substitutions else {}
-        self.sub_threshold = sub_threshold
-        self._word_pattern = re.compile(r'([а-яёіѣѵА-ЯЁІѢѴ]+)|([^а-яёіѣѵА-ЯЁІѢѴ]+)', re.IGNORECASE)
+        self._word_pattern =  re.compile(r'(\w+)|(\W+)', re.UNICODE)
 
     def _tokenize(self, text):
         tokens = []
@@ -75,8 +72,7 @@ class CharLMCorrector:
         return reconstruct_word(
             self.model, word, self.c2i, self.i2c, self.device, self.max_len,
             self.mask_threshold, self.apply_threshold, self.max_edits,
-            return_trace=True, return_p_cur=True, lexicon=self.lexicon,
-            substitutions=self.substitutions, sub_threshold=self.sub_threshold
+            return_trace=True, return_p_cur=True, lexicon=self.lexicon
         )
 
     def _restore_case(self, original, corrected):
@@ -117,7 +113,7 @@ def evaluate_ocr_confidence(model, eval_pairs, c2i, device, max_len):
 
 def reconstruct_word(model, word, c2i, i2c, device, max_len, mask_threshold,
                      apply_threshold, max_edits, return_trace=False, return_p_cur=False, 
-                     lexicon=None, substitutions=None, sub_threshold=100):
+                     lexicon=None):
     model.eval()
     original_chars = list(word[:max_len])
     chars = original_chars.copy()
@@ -139,7 +135,6 @@ def reconstruct_word(model, word, c2i, i2c, device, max_len, mask_threshold,
     candidates = sorted([(i, p, v) for i, p, v in confidences if p < mask_threshold], key=lambda x: x[1])
 
     trace, edits = [], 0
-    substitutions = substitutions if substitutions else {}
     
     for i, p_cur, prob_vec in candidates:
         if edits >= max_edits:
@@ -147,16 +142,11 @@ def reconstruct_word(model, word, c2i, i2c, device, max_len, mask_threshold,
         best_id = prob_vec.argmax().item()
         best_p, best_char = prob_vec[best_id].item(), i2c[best_id]
         
-        sub_key = f"{chars[i]}→{best_char}"
-        sub_count = substitutions.get(sub_key, 0)
-        
         if best_char in ("<UNK>", "<PAD>", "<MASK>"):
             applied = False
         elif best_char == chars[i]:
             applied = False
         elif best_p < apply_threshold:
-            applied = False
-        elif sub_count < sub_threshold:
             applied = False
         elif best_char.lower() != best_char or chars[i].lower() != chars[i]:
             if best_char.lower() == chars[i].lower():

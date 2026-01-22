@@ -1,12 +1,6 @@
-"""
-Character-level language model corrector for OCR post-correction.
-
-This module provides a character-level Transformer-based MLM corrector
-that fixes OCR errors by analyzing character-level patterns.
-"""
-
 import json
 import os
+import re
 from pathlib import Path
 from typing import Optional, Union, List, Dict, Any
 
@@ -42,10 +36,10 @@ class CharLM(BaseModel):
     apply_threshold : float, optional
         Minimum model confidence required to apply a correction. Default is 0.95.
     max_edits : int, optional
-        Maximum number of edits per word. Default is 1.
+        Maximum number of edits per word. Default is 2.
     sub_threshold : int, optional
         Minimum substitution count in training data to allow correction.
-        Default is 50.
+        Default is 100.
     min_word_len : int, optional
         Minimum word length to attempt correction. Default is 4.
     **kwargs
@@ -58,27 +52,36 @@ class CharLM(BaseModel):
     >>> corrected_page = corrector.predict(page)
     """
 
-    default_weights_name = None  # No default pretrained model yet
-    pretrained_registry = {}
+    default_weights_name = "prefeform_charlm_g1"
+    pretrained_registry = {
+        "prefeform_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prefeform_charlm_g1.onnx",
+    }
 
-    vocab_registry = {}
-    substitutions_registry = {}
+    vocab_registry = {
+        "prefeform_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prefeform_charlm_g1.json",
+    }
+    
+    lexicon_registry = {
+        "prereform_words": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt",
+    }
 
     def __init__(
         self,
         weights: Optional[Union[str, Path]] = None,
         vocab: Optional[Union[str, Path]] = None,
-        substitutions: Optional[Union[str, Path]] = None,
+        lexicon: Optional[Union[str, Path, set]] = None,
         device: Optional[str] = None,
         mask_threshold: float = 0.05,
         apply_threshold: float = 0.95,
-        max_edits: int = 1,
-        sub_threshold: int = 50,
+        max_edits: int = 2,
         min_word_len: int = 4,
         max_len: int = 32,
         **kwargs,
     ):
-        # Skip BaseModel's weight resolution if weights not provided
+        # Используем default_weights_name если weights не указан
+        if weights is None and self.default_weights_name is not None:
+            weights = self.default_weights_name
+        
         if weights is None:
             self.device = device or "cpu"
             self.weights = None
@@ -90,27 +93,29 @@ class CharLM(BaseModel):
         self.mask_threshold = mask_threshold
         self.apply_threshold = apply_threshold
         self.max_edits = max_edits
-        self.sub_threshold = sub_threshold
         self.min_word_len = min_word_len
         self.max_len = max_len
 
-        # Vocabulary
-        self.vocab_path = self._resolve_vocab(vocab) if weights else None
+        # Компилируем регулярку один раз (как в оригинале)
+        self._word_pattern = re.compile(r'(\w+)|(\W+)', re.UNICODE)
+
+        self.vocab_path = self._resolve_vocab(vocab) if self.weights else None
         self.c2i = {}
         self.i2c = {}
 
-        # Substitutions dictionary
-        self.substitutions_path = self._resolve_substitutions(substitutions) if weights else None
-        self.substitutions = {}
+        self.lexicon = None
+        if lexicon is not None:
+            if isinstance(lexicon, set):
+                self.lexicon = frozenset(lexicon)
+            else:
+                lexicon_path = self._resolve_lexicon(lexicon)
+                if lexicon_path:
+                    self._load_lexicon(lexicon_path)
 
-        # ONNX session
         self.onnx_session = None
 
-        # Load vocab and substitutions if weights provided
         if self.weights and self.vocab_path:
             self._load_vocab()
-        if self.substitutions_path:
-            self._load_substitutions()
 
     def _resolve_vocab(self, vocab: Optional[str]) -> Optional[str]:
         """Resolve vocab path, inferring from weights location if needed."""
@@ -122,7 +127,12 @@ class CharLM(BaseModel):
                     vocab, default_name=None, registry=self.vocab_registry, description="vocab"
                 )
 
-        # Try same directory as weights
+        # Если vocab не указан, но есть default_weights_name - скачиваем vocab для него
+        if self.default_weights_name and self.default_weights_name in self.vocab_registry:
+            return self._resolve_extra_artifact(
+                self.default_weights_name, default_name=None, registry=self.vocab_registry, description="vocab"
+            )
+
         if self.weights:
             weights_path = Path(self.weights)
             vocab_candidate = weights_path.parent / "vocab.json"
@@ -131,23 +141,14 @@ class CharLM(BaseModel):
 
         return None
 
-    def _resolve_substitutions(self, substitutions: Optional[str]) -> Optional[str]:
-        """Resolve substitutions path, inferring from weights location if needed."""
-        if substitutions is not None:
-            if Path(substitutions).exists():
-                return str(Path(substitutions).absolute())
-            if substitutions in self.substitutions_registry:
-                return self._resolve_extra_artifact(
-                    substitutions, default_name=None, registry=self.substitutions_registry, description="substitutions"
-                )
-
-        # Try same directory as weights
-        if self.weights:
-            weights_path = Path(self.weights)
-            subs_candidate = weights_path.parent / "substitutions.json"
-            if subs_candidate.exists():
-                return str(subs_candidate.absolute())
-
+    def _resolve_lexicon(self, lexicon: str) -> Optional[str]:
+        """Resolve lexicon path from registry or local file."""
+        if Path(lexicon).exists():
+            return str(Path(lexicon).absolute())
+        if lexicon in self.lexicon_registry:
+            return self._resolve_extra_artifact(
+                lexicon, default_name=None, registry=self.lexicon_registry, description="lexicon"
+            )
         return None
 
     def _load_vocab(self):
@@ -161,13 +162,14 @@ class CharLM(BaseModel):
         self.c2i = {c: i for i, c in enumerate(chars)}
         self.i2c = {i: c for c, i in self.c2i.items()}
 
-    def _load_substitutions(self):
-        """Load substitutions dictionary from JSON file."""
-        if not self.substitutions_path or not Path(self.substitutions_path).exists():
+    def _load_lexicon(self, lexicon_path: str):
+        """Load lexicon (word list) from text file."""
+        if not Path(lexicon_path).exists():
             return
 
-        with open(self.substitutions_path, "r", encoding="utf-8") as f:
-            self.substitutions = json.load(f)
+        with open(lexicon_path, "r", encoding="utf-8") as f:
+            words = set(line.strip().lower() for line in f if line.strip())
+        self.lexicon = frozenset(words)
 
     def _initialize_session(self):
         """Initialize ONNX Runtime session (lazy loading)."""
@@ -195,11 +197,9 @@ class CharLM(BaseModel):
         Page
             Corrected Page object with updated word texts.
         """
-        # If no weights, return copy unchanged
         if self.weights is None or not self.c2i:
             return page.model_copy(deep=True)
 
-        # Initialize session
         if self.onnx_session is None:
             self._initialize_session()
 
@@ -208,7 +208,7 @@ class CharLM(BaseModel):
         for block in result.blocks:
             for line in block.lines:
                 for word in line.words:
-                    if word.text and len(word.text) >= self.min_word_len:
+                    if word.text:
                         corrected = self._correct_word(word.text)
                         word.text = corrected
 
@@ -216,11 +216,8 @@ class CharLM(BaseModel):
 
     def _correct_word(self, text: str) -> str:
         """Correct a single word using the CharLM model."""
-        import re
-        word_pattern = re.compile(r'([а-яёіѣѵА-ЯЁІѢѴ]+)|([^а-яёіѣѵА-ЯЁІѢѴ]+)', re.IGNORECASE)
-
         tokens = []
-        for m in word_pattern.finditer(text):
+        for m in self._word_pattern.finditer(text):
             word_part, other_part = m.groups()
             if word_part:
                 tokens.append((word_part, True))
@@ -235,6 +232,11 @@ class CharLM(BaseModel):
 
             word_lower = token.lower()
             if len(word_lower) < self.min_word_len:
+                result_parts.append(token)
+                continue
+
+            # Если слово уже в лексиконе - не трогаем
+            if self.lexicon and word_lower in self.lexicon:
                 result_parts.append(token)
                 continue
 
@@ -259,7 +261,6 @@ class CharLM(BaseModel):
         mask = self.c2i.get("<MASK>", 1)
         pad = self.c2i.get("<PAD>", 0)
 
-        # Build batch: mask each position one at a time
         batch = []
         for i in range(L):
             ids = [(self.c2i.get(ch, unk) if j != i else mask) for j, ch in enumerate(chars)]
@@ -268,15 +269,12 @@ class CharLM(BaseModel):
 
         batch_array = np.array(batch, dtype=np.int64)
 
-        # Run inference
         input_name = self.onnx_session.get_inputs()[0].name
         output_name = self.onnx_session.get_outputs()[0].name
         logits = self.onnx_session.run([output_name], {input_name: batch_array})[0]
 
-        # Softmax
         probs = self._softmax(logits, axis=-1)
 
-        # Analyze confidences
         confidences = []
         for i in range(L):
             char_id = self.c2i.get(chars[i], unk)
@@ -284,37 +282,56 @@ class CharLM(BaseModel):
             prob_vec = probs[i, i]
             confidences.append((i, p_cur, prob_vec))
 
-        # Find candidates below threshold
         candidates = sorted(
             [(i, p, v) for i, p, v in confidences if p < self.mask_threshold],
             key=lambda x: x[1]
         )
 
-        # Apply corrections
         edits = 0
         for i, p_cur, prob_vec in candidates:
             if edits >= self.max_edits:
                 break
 
             best_id = int(np.argmax(prob_vec))
-            best_p = prob_vec[best_id]
+            best_p = float(prob_vec[best_id])
             best_char = self.i2c.get(best_id, "<UNK>")
 
-            # Skip special tokens
+            # Логика 1-в-1 как в оригинальном reconstruct_word
             if best_char in ("<UNK>", "<PAD>", "<MASK>"):
-                continue
-            if best_char == chars[i]:
-                continue
-            if best_p < self.apply_threshold:
-                continue
+                applied = False
+            elif best_char == chars[i]:
+                applied = False
+            elif best_p < self.apply_threshold:
+                applied = False
+            elif best_char.lower() != best_char or chars[i].lower() != chars[i]:
+                # Один из символов не в нижнем регистре
+                if best_char.lower() == chars[i].lower():
+                    # Отличие только в регистре - не применяем
+                    applied = False
+                else:
+                    test_chars = chars.copy()
+                    test_chars[i] = best_char
+                    test_word = "".join(test_chars)
+                    if self.lexicon and test_word in self.lexicon:
+                        applied = True
+                    elif self.lexicon:
+                        applied = False
+                    else:
+                        applied = True
+            else:
+                test_chars = chars.copy()
+                test_chars[i] = best_char
+                test_word = "".join(test_chars)
+                if self.lexicon and test_word in self.lexicon:
+                    applied = True
+                elif self.lexicon:
+                    applied = False
+                else:
+                    applied = True
 
-            # Check substitution count
-            sub_key = f"{chars[i]}→{best_char}"
-            if self.substitutions.get(sub_key, 0) < self.sub_threshold:
-                continue
-
-            chars[i] = best_char
-            edits += 1
+            if applied:
+                chars[i] = best_char
+                edits += 1
 
         return "".join(chars)
 
@@ -343,23 +360,28 @@ class CharLM(BaseModel):
         *,
         exp_dir: str = "exp_charlm",
         max_words: int = 1_500_000,
+        max_pairs_edits: int = 3,
         max_len: int = 32,
         emb_size: int = 192,
-        n_layers: int = 6,
+        n_layers: int = 8,
         n_heads: int = 6,
-        ffn_size: int = 768,
+        ffn_size: int = 1024,
         dropout: float = 0.1,
         batch_size: int = 256,
-        epochs: int = 100,
+        accumulation_steps: int = 2,
+        use_amp: bool = True,
+        compile_model: bool = False,
+        epochs: int = 50,
         lr: float = 1e-3,
         weight_decay: float = 0.01,
         grad_clip: float = 1.0,
-        min_len: int = 5,
-        mask_prob: float = 0.0,
+        min_len: int = 3,
+        mask_prob: float = 0.3,
         span_min: int = 1,
         span_max: int = 3,
         spans_min: int = 1,
         spans_max: int = 2,
+        pairs_ratio: float = 0.8,
         eval_ratio: float = 0.01,
         seed: int = 42,
         checkpoint: Optional[str] = None,
@@ -382,22 +404,30 @@ class CharLM(BaseModel):
             Experiment directory. Default is "exp_charlm".
         max_words : int, optional
             Maximum words to use from words file. Default is 1_500_000.
+        max_pairs_edits : int, optional
+            Maximum number of character edits in pairs to include. Default is 3.
         max_len : int, optional
             Maximum sequence length. Default is 32.
         emb_size : int, optional
             Embedding size. Default is 192.
         n_layers : int, optional
-            Number of transformer layers. Default is 6.
+            Number of transformer layers. Default is 8.
         n_heads : int, optional
             Number of attention heads. Default is 6.
         ffn_size : int, optional
-            Feed-forward network size. Default is 768.
+            Feed-forward network size. Default is 1024.
         dropout : float, optional
             Dropout rate. Default is 0.1.
         batch_size : int, optional
             Batch size. Default is 256.
+        accumulation_steps : int, optional
+            Gradient accumulation steps. Default is 2.
+        use_amp : bool, optional
+            Use automatic mixed precision (AMP). Default is True.
+        compile_model : bool, optional
+            Use torch.compile for faster training. Default is False.
         epochs : int, optional
-            Number of epochs. Default is 100.
+            Number of epochs. Default is 50.
         lr : float, optional
             Learning rate. Default is 1e-3.
         weight_decay : float, optional
@@ -405,9 +435,9 @@ class CharLM(BaseModel):
         grad_clip : float, optional
             Gradient clipping. Default is 1.0.
         min_len : int, optional
-            Minimum word length. Default is 5.
+            Minimum word length. Default is 3.
         mask_prob : float, optional
-            Probability of using span masking. Default is 0.0.
+            Probability of using span masking. Default is 0.3.
         span_min : int, optional
             Minimum span length for masking. Default is 1.
         span_max : int, optional
@@ -416,6 +446,8 @@ class CharLM(BaseModel):
             Minimum number of spans. Default is 1.
         spans_max : int, optional
             Maximum number of spans. Default is 2.
+        pairs_ratio : float, optional
+            Ratio of OCR pairs in mixed dataset (0.8 = 80% pairs, 20% ngrams). Default is 0.8.
         eval_ratio : float, optional
             Evaluation set ratio. Default is 0.01.
         seed : int, optional
@@ -441,6 +473,7 @@ class CharLM(BaseModel):
             "pairs_path": pairs_path,
             "charset_path": charset_path,
             "max_words": max_words,
+            "max_pairs_edits": max_pairs_edits,
             "max_len": max_len,
             "emb_size": emb_size,
             "n_layers": n_layers,
@@ -448,6 +481,9 @@ class CharLM(BaseModel):
             "ffn_size": ffn_size,
             "dropout": dropout,
             "batch_size": batch_size,
+            "accumulation_steps": accumulation_steps,
+            "use_amp": use_amp,
+            "compile_model": compile_model,
             "epochs": epochs,
             "lr": lr,
             "weight_decay": weight_decay,
@@ -458,6 +494,7 @@ class CharLM(BaseModel):
             "span_max": span_max,
             "spans_min": spans_min,
             "spans_max": spans_max,
+            "pairs_ratio": pairs_ratio,
             "eval_ratio": eval_ratio,
             "seed": seed,
             "checkpoint": checkpoint,
@@ -466,7 +503,6 @@ class CharLM(BaseModel):
 
         run_training(config)
 
-        # Return path to final checkpoint
         return os.path.join(exp_dir, "checkpoints", f"charlm_epoch_{epochs}.pt")
 
     @staticmethod
@@ -476,9 +512,9 @@ class CharLM(BaseModel):
         output_path: Union[str, Path],
         max_len: int = 32,
         emb_size: int = 192,
-        n_layers: int = 6,
+        n_layers: int = 8,
         n_heads: int = 6,
-        ffn_size: int = 768,
+        ffn_size: int = 1024,
         opset_version: int = 14,
         simplify: bool = True,
     ) -> None:
@@ -498,11 +534,11 @@ class CharLM(BaseModel):
         emb_size : int, optional
             Embedding size. Default is 192.
         n_layers : int, optional
-            Number of transformer layers. Default is 6.
+            Number of transformer layers. Default is 8.
         n_heads : int, optional
             Number of attention heads. Default is 6.
         ffn_size : int, optional
-            Feed-forward network size. Default is 768.
+            Feed-forward network size. Default is 1024.
         opset_version : int, optional
             ONNX opset version. Default is 14.
         simplify : bool, optional
@@ -546,7 +582,7 @@ class CharLM(BaseModel):
             n_layers=n_layers,
             n_heads=n_heads,
             ffn_size=ffn_size,
-            dropout=0.0,  # No dropout for inference
+            dropout=0.0,
             pad_idx=pad_idx,
         )
         model.load_state_dict(state_dict)
