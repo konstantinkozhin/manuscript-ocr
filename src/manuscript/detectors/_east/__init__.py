@@ -40,9 +40,16 @@ class EAST(BaseModel):
 
     Parameters
     ----------
-    weights_path : str or Path, optional
-        Path to ONNX model weights. If None, the model will be
-        automatically downloaded to ``~/.manuscript/east/east_50_g1.onnx``.
+    weights : str or Path, optional
+        Path or identifier for ONNX model weights. Supports:
+
+        - Local file path: ``"path/to/model.onnx"``
+        - HTTP/HTTPS URL: ``"https://example.com/model.onnx"``
+        - GitHub release: ``"github://owner/repo/tag/file.onnx"``
+        - Google Drive: ``"gdrive:FILE_ID"``
+        - Preset name: ``"east_50_g1"``
+        - ``None``: auto-downloads default preset (east_50_g1)
+
     device : str, optional
         Compute device: ``"cuda"``, ``"coreml"``, or ``"cpu"``. If None,
         automatically selects CPU. For GPU/CoreML acceleration:

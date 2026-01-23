@@ -22,12 +22,26 @@ class CharLM(BaseModel):
     Parameters
     ----------
     weights : str or Path, optional
-        Path to ONNX model weights. Supports local path, URL, or preset name.
-        If None, uses default preset.
+        Path or identifier for ONNX model weights. Supports:
+
+        - Local file path: ``"path/to/model.onnx"``
+        - HTTP/HTTPS URL: ``"https://example.com/model.onnx"``
+        - GitHub release: ``"github://owner/repo/tag/file.onnx"``
+        - Google Drive: ``"gdrive:FILE_ID"``
+        - Preset name: ``"prereform_charlm_g1"`` or ``"modern_charlm_g1"`` (from pretrained_registry)
+        - ``None``: auto-downloads default preset (prereform_charlm_g1)
+
     vocab : str or Path, optional
         Path to vocabulary JSON file. If None, inferred from weights location.
-    substitutions : str or Path, optional
-        Path to substitutions JSON file. If None, inferred from weights location.
+    lexicon : str, Path, or set, optional
+        Word list for dictionary-based validation. Supports:
+
+        - Local file path: ``"path/to/words.txt"``
+        - Preset name: ``"prereform_words"`` or ``"modern_words"`` (from lexicon_registry)
+        - Python set: ``{"word1", "word2", ...}``
+        - ``None``: auto-downloads default lexicon for model preset
+          (prereform_words for prereform_charlm_g1, modern_words for modern_charlm_g1)
+
     device : {"cuda", "cpu"}, optional
         Compute device. Default is auto-detected.
     mask_threshold : float, optional
@@ -37,9 +51,6 @@ class CharLM(BaseModel):
         Minimum model confidence required to apply a correction. Default is 0.95.
     max_edits : int, optional
         Maximum number of edits per word. Default is 2.
-    sub_threshold : int, optional
-        Minimum substitution count in training data to allow correction.
-        Default is 100.
     min_word_len : int, optional
         Minimum word length to attempt correction. Default is 4.
     **kwargs
@@ -68,6 +79,11 @@ class CharLM(BaseModel):
         "modern_words": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_words.txt",
     }
 
+    default_lexicon_for_model = {
+        "prereform_charlm_g1": "prereform_words",
+        "modern_charlm_g1": "modern_words",
+    }
+
     def __init__(
         self,
         weights: Optional[Union[str, Path]] = None,
@@ -83,6 +99,9 @@ class CharLM(BaseModel):
     ):
         if weights is None and self.default_weights_name is not None:
             weights = self.default_weights_name
+        
+        # Remember original weights name for lexicon resolution
+        self._weights_preset = weights if weights in self.pretrained_registry else None
         
         if weights is None:
             self.device = device or "cpu"
@@ -112,6 +131,12 @@ class CharLM(BaseModel):
                 lexicon_path = self._resolve_lexicon(lexicon)
                 if lexicon_path:
                     self._load_lexicon(lexicon_path)
+        elif self._weights_preset and self._weights_preset in self.default_lexicon_for_model:
+            # Auto-load default lexicon for known model presets
+            default_lexicon_name = self.default_lexicon_for_model[self._weights_preset]
+            lexicon_path = self._resolve_lexicon(default_lexicon_name)
+            if lexicon_path:
+                self._load_lexicon(lexicon_path)
 
         self.onnx_session = None
 
@@ -256,7 +281,8 @@ class CharLM(BaseModel):
         if L == 0:
             return word
 
-        unk = self.c2i.get("<UNK>", 2)
+        # Use 0 as fallback for unknown tokens (safer than potentially out-of-bounds unk)
+        unk = self.c2i.get("<UNK>", 0)
         mask = self.c2i.get("<MASK>", 1)
         pad = self.c2i.get("<PAD>", 0)
 
@@ -273,10 +299,20 @@ class CharLM(BaseModel):
         logits = self.onnx_session.run([output_name], {input_name: batch_array})[0]
 
         probs = self._softmax(logits, axis=-1)
+        vocab_size = probs.shape[-1]
+
+        # Track which positions have unknown characters (should not be corrected)
+        unknown_positions = set()
+        for i, ch in enumerate(chars):
+            if ch not in self.c2i or self.c2i[ch] >= vocab_size:
+                unknown_positions.add(i)
 
         confidences = []
         for i in range(L):
-            char_id = self.c2i.get(chars[i], unk)
+            # Skip unknown characters
+            if i in unknown_positions:
+                continue
+            char_id = self.c2i[chars[i]]
             p_cur = probs[i, i, char_id]
             prob_vec = probs[i, i]
             confidences.append((i, p_cur, prob_vec))

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-23 18:42+0700\n"
+"POT-Creation-Date: 2026-01-23 20:09+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -33,19 +33,52 @@ msgid "Initialize EAST text detector with ONNX Runtime."
 msgstr "Инициализация текстового детектора EAST с использованием ONNX Runtime."
 
 #: ../../api/detectors.rst 44088b6b89d848abb581e53592cfa372
-#: 5de97b820c8349d5b500bb277b435501 75c9e3f4f05142bc9132bd4d0b5d7fbc
+#: 75c9e3f4f05142bc9132bd4d0b5d7fbc
 msgid "Parameters"
 msgstr "Параметры"
 
-#: 8e8a64905cf8447c8f8ed6af53f8583f manuscript.detectors._east.EAST:4 of
+#: 3d79844ab414481d9cf1f799adc06032 manuscript.detectors._east.EAST:5 of
 msgid ""
-"Path to ONNX model weights. If None, the model will be automatically "
-"downloaded to ``~/.manuscript/east/east_50_g1.onnx``."
+"Path or identifier for ONNX model weights. Supports:  - Local file path: "
+"``\"path/to/model.onnx\"`` - HTTP/HTTPS URL: "
+"``\"https://example.com/model.onnx\"`` - GitHub release: "
+"``\"github://owner/repo/tag/file.onnx\"`` - Google Drive: "
+"``\"gdrive:FILE_ID\"`` - Preset name: ``\"east_50_g1\"`` - ``None``: "
+"auto-downloads default preset (east_50_g1)"
 msgstr ""
-"Путь к весам модели ONNX. Если None, модель будет автоматически загружена"
-" в ``~/.manuscript/east/east_50_g1.onnx``."
+"Путь или идентификатор для весов модели ONNX. Поддерживает: локальный путь, "
+"HTTP/HTTPS URL, GitHub release, Google Drive, имя пресета (``\"east_50_g1\"``), "
+"``None`` — автозагрузка пресета по умолчанию (east_50_g1)"
 
-#: 330f327643c44cd8ab4615991c5c4ba1 manuscript.detectors._east.EAST:8 of
+#: e3cac75df34747978dc33365439a0b67 manuscript.detectors._east.EAST:5 of
+msgid "Path or identifier for ONNX model weights. Supports:"
+msgstr "Путь или идентификатор для весов модели ONNX. Поддерживает:"
+
+#: 9497c58bde8b417bbf20cfa8220db589 manuscript.detectors._east.EAST:7 of
+msgid "Local file path: ``\"path/to/model.onnx\"``"
+msgstr "Локальный путь: ``\"path/to/model.onnx\"``"
+
+#: 105143c67b92479c9b80145673fdb3ba manuscript.detectors._east.EAST:8 of
+msgid "HTTP/HTTPS URL: ``\"https://example.com/model.onnx\"``"
+msgstr "HTTP/HTTPS URL: ``\"https://example.com/model.onnx\"``"
+
+#: 6f3cb423915f4f56ae2a8f64e4a23929 manuscript.detectors._east.EAST:9 of
+msgid "GitHub release: ``\"github://owner/repo/tag/file.onnx\"``"
+msgstr "GitHub release: ``\"github://owner/repo/tag/file.onnx\"``"
+
+#: 4df45a27502e411586f6dda7117029f9 manuscript.detectors._east.EAST:10 of
+msgid "Google Drive: ``\"gdrive:FILE_ID\"``"
+msgstr "Google Drive: ``\"gdrive:FILE_ID\"``"
+
+#: d1f0db5ffbd94adda48b65cf941ead64 manuscript.detectors._east.EAST:11 of
+msgid "Preset name: ``\"east_50_g1\"``"
+msgstr "Имя пресета: ``\"east_50_g1\"`` (из pretrained_registry)"
+
+#: fdc209250a644319aa15011330912ec4 manuscript.detectors._east.EAST:12 of
+msgid "``None``: auto-downloads default preset (east_50_g1)"
+msgstr "``None``: автозагрузка пресета по умолчанию (east_50_g1)"
+
+#: 330f327643c44cd8ab4615991c5c4ba1 manuscript.detectors._east.EAST:15 of
 msgid ""
 "Compute device: ``\"cuda\"``, ``\"coreml\"``, or ``\"cpu\"``. If None, "
 "automatically selects CPU. For GPU/CoreML acceleration:  - CUDA (NVIDIA):"
@@ -58,7 +91,7 @@ msgstr ""
 "M1/M2/M3): ``pip install onnxruntime-silicon``  По умолчанию ``None`` "
 "(CPU)."
 
-#: a0260e63092a42bdbc1a72dc8a3b5cc2 manuscript.detectors._east.EAST:8 of
+#: a0260e63092a42bdbc1a72dc8a3b5cc2 manuscript.detectors._east.EAST:15 of
 msgid ""
 "Compute device: ``\"cuda\"``, ``\"coreml\"``, or ``\"cpu\"``. If None, "
 "automatically selects CPU. For GPU/CoreML acceleration:"
@@ -66,19 +99,19 @@ msgstr ""
 "Устройство вычислений: ``\"cuda\"``, ``\"coreml\"`` или ``\"cpu\"``. Если"
 " None, автоматически выбирается CPU. Для ускорения GPU/CoreML:"
 
-#: fa850b75ff974169b9b1afef2c11cf04 manuscript.detectors._east.EAST:11 of
+#: fa850b75ff974169b9b1afef2c11cf04 manuscript.detectors._east.EAST:18 of
 msgid "CUDA (NVIDIA): ``pip install onnxruntime-gpu``"
 msgstr "CUDA (NVIDIA): ``pip install onnxruntime-gpu``"
 
-#: 04d530309a3d47598cfa0149b70a35e7 manuscript.detectors._east.EAST:12 of
+#: 04d530309a3d47598cfa0149b70a35e7 manuscript.detectors._east.EAST:19 of
 msgid "CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``"
 msgstr "CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``"
 
-#: 7728aceac5bf478d964a7a96f9bdd98e manuscript.detectors._east.EAST:14 of
+#: 7728aceac5bf478d964a7a96f9bdd98e manuscript.detectors._east.EAST:21 of
 msgid "Default is ``None`` (CPU)."
 msgstr "По умолчанию ``None`` (CPU)."
 
-#: 9255633e2f3b493b99ac511370e76924 manuscript.detectors._east.EAST:17 of
+#: 9255633e2f3b493b99ac511370e76924 manuscript.detectors._east.EAST:24 of
 msgid ""
 "Input image size for inference. Images are resized to ``(target_size, "
 "target_size)``. Default is 1280."
@@ -86,7 +119,7 @@ msgstr ""
 "Размер входного изображения для инференса. Изображения приводятся к "
 "``(target_size, target_size)``. Значение по умолчанию — 1280."
 
-#: a961c89e527d4095a642b1d3121f2218 manuscript.detectors._east.EAST:21 of
+#: a961c89e527d4095a642b1d3121f2218 manuscript.detectors._east.EAST:28 of
 msgid ""
 "Horizontal expansion factor applied to detected boxes after NMS. Default "
 "is 0.7."
@@ -94,7 +127,7 @@ msgstr ""
 "Коэффициент горизонтального расширения, применяемый к боксам после NMS. "
 "По умолчанию 0.7."
 
-#: f0e4aa27e8b641f9aa06d73ec2894aef manuscript.detectors._east.EAST:25 of
+#: f0e4aa27e8b641f9aa06d73ec2894aef manuscript.detectors._east.EAST:32 of
 msgid ""
 "Vertical expansion factor applied to detected boxes after NMS. Default is"
 " 0.7."
@@ -102,7 +135,7 @@ msgstr ""
 "Коэффициент вертикального расширения, применяемый к боксам после NMS. По "
 "умолчанию 0.7."
 
-#: 6ba8fd53627f4820a761ad76fe7099a0 manuscript.detectors._east.EAST:29 of
+#: 6ba8fd53627f4820a761ad76fe7099a0 manuscript.detectors._east.EAST:36 of
 msgid ""
 "Power for non-linear box expansion. Controls how expansion scales with "
 "box size. - 1.0 = linear (small and large boxes expand equally) - <1.0 = "
@@ -115,7 +148,7 @@ msgstr ""
 "сильнее (например, 0.5, рекомендуется для детекции символов)  - >1.0 = "
 "большие боксы расширяются сильнее  Значение по умолчанию — 0.5."
 
-#: 47d7a7b6130440c39f7d74089af21f92 manuscript.detectors._east.EAST:36 of
+#: 47d7a7b6130440c39f7d74089af21f92 manuscript.detectors._east.EAST:43 of
 msgid ""
 "Confidence threshold for selecting candidate detections before NMS. "
 "Default is 0.7."
@@ -123,11 +156,11 @@ msgstr ""
 "Порог уверенности для отбора кандидатов перед NMS. Значение по умолчанию "
 "— 0.7."
 
-#: 5cad103afef34321af31684d9a8cfd6c manuscript.detectors._east.EAST:40 of
+#: 5cad103afef34321af31684d9a8cfd6c manuscript.detectors._east.EAST:47 of
 msgid "IoU threshold for locality-aware NMS merging phase. Default is 0.2."
 msgstr "Порог IoU для фазы объединения locality-aware NMS. По умолчанию 0.2."
 
-#: 1587fc2100b3409f825a079d7f3b77e3 manuscript.detectors._east.EAST:43 of
+#: 1587fc2100b3409f825a079d7f3b77e3 manuscript.detectors._east.EAST:50 of
 msgid ""
 "IoU threshold for standard NMS after locality-aware merging. If None, "
 "uses the same value as iou_threshold. Default is None."
@@ -135,19 +168,19 @@ msgstr ""
 "Порог IoU для стандартного NMS после locality-aware объединения. Если "
 "None, используется значение iou_threshold. По умолчанию None."
 
-#: 3eb03f003a7c4b3080481d55962a48d4 manuscript.detectors._east.EAST:47 of
+#: 3eb03f003a7c4b3080481d55962a48d4 manuscript.detectors._east.EAST:54 of
 msgid "Scale factor for decoding geometry/score maps. Default is 0.25."
 msgstr ""
 "Коэффициент масштабирования при декодировании карт геометрии/оценок. По "
 "умолчанию 0.25."
 
-#: b15d69f09d0e4de9a92ec80daaeaf050 manuscript.detectors._east.EAST:50 of
+#: b15d69f09d0e4de9a92ec80daaeaf050 manuscript.detectors._east.EAST:57 of
 msgid ""
 "Quantization resolution for point coordinates during decoding. Default is"
 " 2."
 msgstr "Разрешение квантования координат точек при декодировании. По умолчанию 2."
 
-#: 7a6cc343ace74d179753025a6bdfce95 manuscript.detectors._east.EAST:54 of
+#: 7a6cc343ace74d179753025a6bdfce95 manuscript.detectors._east.EAST:61 of
 msgid ""
 "If True, outputs axis-aligned rectangles instead of original quads. "
 "Default is True."
@@ -155,7 +188,7 @@ msgstr ""
 "Если True, возвращаются осево-ориентированные прямоугольники вместо "
 "исходных четырёхугольников. По умолчанию True."
 
-#: 82f3317bdc0a49deb7a63ab3ac28ac97 manuscript.detectors._east.EAST:58 of
+#: 82f3317bdc0a49deb7a63ab3ac28ac97 manuscript.detectors._east.EAST:65 of
 msgid ""
 "If True, removes quads with extremely large area relative to the "
 "distribution. Default is False."
@@ -163,17 +196,17 @@ msgstr ""
 "Если True, удаляет четырёхугольники с аномально большой площадью "
 "относительно распределения. По умолчанию False."
 
-#: 674f151cc0de4cc2ad16f535c383c964 manuscript.detectors._east.EAST:62 of
+#: 674f151cc0de4cc2ad16f535c383c964 manuscript.detectors._east.EAST:69 of
 msgid "Sigma threshold for anomaly area filtering. Default is 5.0."
 msgstr "Порог сигмы для фильтрации аномальных площадей. По умолчанию 5.0."
 
-#: 7e793b955f23480aae07a9e5fae22167 manuscript.detectors._east.EAST:65 of
+#: 7e793b955f23480aae07a9e5fae22167 manuscript.detectors._east.EAST:72 of
 msgid "Minimum number of boxes required before anomaly filtering. Default is 30."
 msgstr ""
 "Минимальное количество боксов перед применением фильтрации аномалий. По "
 "умолчанию 30."
 
-#: 15cc6e462e9043128125780e3d2b0dbf manuscript.detectors._east.EAST:69 of
+#: 15cc6e462e9043128125780e3d2b0dbf manuscript.detectors._east.EAST:76 of
 msgid ""
 "Enable Test-Time Augmentation (TTA). When enabled, inference is run on "
 "both the original and horizontally flipped image, and results are merged."
@@ -181,30 +214,30 @@ msgid ""
 " False."
 msgstr ""
 
-#: 738f62f946f941ff90580155e3565592 manuscript.detectors._east.EAST:75 of
+#: 738f62f946f941ff90580155e3565592 manuscript.detectors._east.EAST:82 of
 msgid ""
 "IoU threshold for merging boxes from original and flipped images during "
 "TTA. Boxes with IoU > threshold are considered matches and merged. "
 "Default is 0.1."
 msgstr ""
 
-#: 2840dec89d594d118e20884b5e469561 manuscript.detectors._east.EAST:81
+#: 2840dec89d594d118e20884b5e469561 manuscript.detectors._east.EAST:88
 #: manuscript.detectors._east.EAST.export:41
 #: manuscript.detectors._east.EAST.predict:42 of
 msgid "Notes"
 msgstr "Примечания"
 
-#: 067627fecf8c474e9b6ff887667a1ce0 manuscript.detectors._east.EAST:82 of
+#: 067627fecf8c474e9b6ff887667a1ce0 manuscript.detectors._east.EAST:89 of
 msgid "The class provides two main public methods:"
 msgstr "Класс предоставляет два основных публичных метода:"
 
-#: 663d2d36465f4fc2bef0525f652f6b69 manuscript.detectors._east.EAST:84 of
+#: 663d2d36465f4fc2bef0525f652f6b69 manuscript.detectors._east.EAST:91 of
 msgid "``predict`` — run inference on a single image and return detections."
 msgstr ""
 "``predict`` — выполняет инференс на одном изображении и возвращает "
 "детекции."
 
-#: bd743abac34c40b7a6f5159ae6578079 manuscript.detectors._east.EAST:85 of
+#: bd743abac34c40b7a6f5159ae6578079 manuscript.detectors._east.EAST:92 of
 msgid ""
 "``train`` — high-level training entrypoint to train an EAST model on "
 "custom datasets."
@@ -212,7 +245,7 @@ msgstr ""
 "``train`` — высокоуровневая точка входа для обучения модели EAST на "
 "пользовательских датасетах."
 
-#: f924be66866c4fdba373dc4f5e44888b manuscript.detectors._east.EAST:87 of
+#: f924be66866c4fdba373dc4f5e44888b manuscript.detectors._east.EAST:94 of
 msgid ""
 "The detector uses ONNX Runtime for fast inference on CPU and GPU. For GPU"
 " acceleration, install: ``pip install onnxruntime-gpu``"
@@ -220,12 +253,12 @@ msgstr ""
 "Детектор использует ONNX Runtime для быстрого инференса на CPU и GPU. Для"
 " ускорения на GPU установите: ``pip install onnxruntime-gpu``"
 
-#: 8f28e6175d6745bfa83bb32fcd71f5ee manuscript.detectors._east.EAST:93 of
+#: 8f28e6175d6745bfa83bb32fcd71f5ee manuscript.detectors._east.EAST:100 of
 msgid "Methods"
 msgstr "Методы"
 
 #: daa274dc4c574c938d4736237747d469
-#: manuscript.detectors._east.EAST:112:<autosummary>:1 of
+#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
 msgid ""
 ":py:obj:`__call__ <manuscript.detectors.EAST.__call__>`\\ \\(\\*args\\, "
 "\\*\\*kwargs\\)"
@@ -234,12 +267,12 @@ msgstr ""
 "\\*\\*kwargs\\)"
 
 #: 0f218785c8cb4d23978ccfb9414db8d1
-#: manuscript.detectors._east.EAST:112:<autosummary>:1 of
+#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
 msgid "Call self as a function."
 msgstr "Вызов объекта как функции."
 
 #: 38d17ed6ac12468ebbd119cb4a81a8e3
-#: manuscript.detectors._east.EAST:112:<autosummary>:1 of
+#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
 msgid ""
 ":py:obj:`export <manuscript.detectors.EAST.export>`\\ "
 "\\(weights\\_path\\, output\\_path\\[\\, ...\\]\\)"
@@ -248,12 +281,12 @@ msgstr ""
 "\\(weights\\_path\\, output\\_path\\[\\, ...\\]\\)"
 
 #: 6547c656e3e748349950d20a43ef1e24 manuscript.detectors._east.EAST.export:2
-#: manuscript.detectors._east.EAST:112:<autosummary>:1 of
+#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
 msgid "Export EAST PyTorch model to ONNX format."
 msgstr "Экспорт модели EAST из PyTorch в формат ONNX."
 
 #: d366ff5469e1442182c1ed835df62cc3
-#: manuscript.detectors._east.EAST:112:<autosummary>:1 of
+#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
 msgid ""
 ":py:obj:`predict <manuscript.detectors.EAST.predict>`\\ "
 "\\(img\\_or\\_path\\[\\, return\\_maps\\, ...\\]\\)"
@@ -262,12 +295,12 @@ msgstr ""
 "\\(img\\_or\\_path\\[\\, return\\_maps\\, ...\\]\\)"
 
 #: bb529eedcba945f9b16a587a1a361991 manuscript.detectors._east.EAST.predict:2
-#: manuscript.detectors._east.EAST:112:<autosummary>:1 of
+#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
 msgid "Run EAST inference and return detection results."
 msgstr "Запуск инференса EAST и возврат результатов детекции."
 
 #: d927f786eb7247cfa1f5f8d5ac6f92e3
-#: manuscript.detectors._east.EAST:112:<autosummary>:1 of
+#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
 msgid ""
 ":py:obj:`runtime_providers "
 "<manuscript.detectors.EAST.runtime_providers>`\\ \\(\\)"
@@ -276,12 +309,12 @@ msgstr ""
 "<manuscript.detectors.EAST.runtime_providers>`\\ \\(\\)"
 
 #: f6b7a0fa60fd4b0fa964cb3704754512
-#: manuscript.detectors._east.EAST:112:<autosummary>:1 of
+#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
 msgid "Get ONNX Runtime execution providers based on device."
 msgstr "Получение провайдеров выполнения ONNX Runtime в зависимости от устройства."
 
 #: ca43ca54ea274ffdb5e00d7ea1a35de0
-#: manuscript.detectors._east.EAST:112:<autosummary>:1 of
+#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
 msgid ""
 ":py:obj:`train <manuscript.detectors.EAST.train>`\\ \\(train\\_images\\, "
 "train\\_anns\\, val\\_images\\, ...\\)"
@@ -290,7 +323,7 @@ msgstr ""
 "train\\_anns\\, val\\_images\\, ...\\)"
 
 #: 073b7a21cfba42579a4342691a7505a5 manuscript.detectors._east.EAST.train:2
-#: manuscript.detectors._east.EAST:112:<autosummary>:1 of
+#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
 msgid "Train EAST model on custom datasets."
 msgstr "Обучение модели EAST на пользовательских датасетах."
 
@@ -849,4 +882,13 @@ msgid "Initialize EAST detector with ONNX support using ``use_onnx=True``."
 msgstr ""
 "Инициализация детектора EAST с поддержкой ONNX с использованием "
 "``use_onnx=True``."
+
+#~ msgid ""
+#~ "Path to ONNX model weights. If "
+#~ "None, the model will be automatically"
+#~ " downloaded to ``~/.manuscript/east/east_50_g1.onnx``."
+#~ msgstr ""
+#~ "Путь к весам модели ONNX. Если "
+#~ "None, модель будет автоматически загружена "
+#~ "в ``~/.manuscript/east/east_50_g1.onnx``."
 
