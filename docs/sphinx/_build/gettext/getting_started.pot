@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-22 17:48+0700\n"
+"POT-Creation-Date: 2026-01-23 18:42+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -102,21 +102,26 @@ msgid ":class:`~manuscript.recognizers.TRBA` - Text recognizer"
 msgstr ""
 
 #: ../../getting_started.rst:65
+#: fd06413ae672467ba4f4c2608e8ccaed
+msgid ":class:`~manuscript.correctors.CharLM` - Character-level text corrector"
+msgstr ""
+
+#: ../../getting_started.rst:66
 #: 688bc42cca7a4cb38017bb8e0cd95255
 msgid ":class:`~manuscript.data.Page` - Page data structure"
 msgstr ""
 
-#: ../../getting_started.rst:66
+#: ../../getting_started.rst:67
 #: 945d39529bc34e0bbb17b4647ca8d5a1
 msgid ":class:`~manuscript.data.Block` - Block data structure"
 msgstr ""
 
-#: ../../getting_started.rst:67
+#: ../../getting_started.rst:68
 #: 399815d594a94415956270810e4fa1ce
 msgid ":class:`~manuscript.data.Line` - Line data structure"
 msgstr ""
 
-#: ../../getting_started.rst:68
+#: ../../getting_started.rst:69
 #: 483fab9d2a6343bbb9ece0ad3a7ea5bf
 msgid ":class:`~manuscript.data.Word` - Word data structure"
 msgstr ""

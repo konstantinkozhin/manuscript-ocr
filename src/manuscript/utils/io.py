@@ -1,9 +1,11 @@
 from pathlib import Path
-from typing import Union
+from typing import Union, List
 
 import cv2
 import numpy as np
 from PIL import Image
+
+from manuscript.data import Word, Line, Block, Page
 
 
 def read_image(img_or_path: Union[str, Path, bytes, np.ndarray, Image.Image]) -> np.ndarray:
@@ -184,3 +186,92 @@ def _tensor_to_image(
         arr = arr[0]
     
     return arr
+
+
+def create_page_from_text(
+    lines: List[str],
+    confidence: float = 1.0,
+) -> Page:
+    """
+    Create a Page object from a list of text lines.
+
+    This utility function creates a simple Page structure from raw text,
+    useful for testing correctors or other text processing components
+    without requiring actual OCR detection/recognition.
+
+    Each line becomes a Line object with words split by whitespace.
+    Words are assigned dummy polygon coordinates for compatibility
+    with the data structures.
+
+    Parameters
+    ----------
+    lines : List[str]
+        List of text lines. Each line will be split into words.
+    confidence : float, optional
+        Confidence score to assign to all words (default 1.0).
+
+    Returns
+    -------
+    Page
+        Page object with one Block containing the provided lines.
+
+    Examples
+    --------
+    >>> from manuscript.utils import create_page_from_text
+    >>> page = create_page_from_text(["Hello world", "This is a test"])
+    >>> page.blocks[0].lines[0].words[0].text
+    'Hello'
+    >>> len(page.blocks[0].lines)
+    2
+
+    Use with corrector:
+
+    >>> from manuscript.correctors import CharLM
+    >>> from manuscript.utils import create_page_from_text
+    >>> 
+    >>> # Create page from text with potential OCR errors
+    >>> page = create_page_from_text(["Привѣтъ міръ"])
+    >>> 
+    >>> # Apply correction
+    >>> corrector = CharLM()
+    >>> corrected = corrector.predict(page)
+    >>> 
+    >>> # Get corrected text
+    >>> for line in corrected.blocks[0].lines:
+    ...     print(" ".join(w.text for w in line.words))
+    """
+    result_lines = []
+    y_offset = 0
+    line_height = 30
+    
+    for line_text in lines:
+        words_text = line_text.split()
+        if not words_text:
+            y_offset += line_height
+            continue
+            
+        words = []
+        x_offset = 0
+        
+        for word_text in words_text:
+            word_width = len(word_text) * 10
+            polygon = [
+                (float(x_offset), float(y_offset)),
+                (float(x_offset + word_width), float(y_offset)),
+                (float(x_offset + word_width), float(y_offset + line_height)),
+                (float(x_offset), float(y_offset + line_height)),
+            ]
+            word = Word(
+                polygon=polygon,
+                detection_confidence=confidence,
+                text=word_text,
+                recognition_confidence=confidence,
+            )
+            words.append(word)
+            x_offset += word_width + 10
+        
+        result_lines.append(Line(words=words))
+        y_offset += line_height + 5
+    
+    block = Block(lines=result_lines)
+    return Page(blocks=[block])

@@ -423,7 +423,9 @@ window.addEventListener("load", load);
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.rotate_threshold"><code class="docutils literal notranslate"><span class="pre">Pipeline.rotate_threshold</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
@@ -468,8 +470,24 @@ window.addEventListener("load", load);
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/correctors.html">Correctors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/correctors.html#charlm"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#manuscript.correctors.CharLM"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#available-presets">Available Presets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#quick-example">Quick Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#advanced-configuration">Advanced Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#using-custom-lexicon">Using Custom Lexicon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#training-custom-model">Training Custom Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#export-to-onnx">Export to ONNX</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/utils.html">Utilities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.read_image"><code class="docutils literal notranslate"><span class="pre">read_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
@@ -598,6 +616,15 @@ window.addEventListener("load", load);
 <span class="sd">    anomaly_min_box_count : int, optional</span>
 <span class="sd">        Minimum number of boxes required before anomaly filtering.</span>
 <span class="sd">        Default is 30.</span>
+<span class="sd">    use_tta : bool, optional</span>
+<span class="sd">        Enable Test-Time Augmentation (TTA). When enabled, inference is run</span>
+<span class="sd">        on both the original and horizontally flipped image, and results are</span>
+<span class="sd">        merged. This can improve detection of partially visible or edge text.</span>
+<span class="sd">        Default is False.</span>
+<span class="sd">    tta_iou_thresh : float, optional</span>
+<span class="sd">        IoU threshold for merging boxes from original and flipped images</span>
+<span class="sd">        during TTA. Boxes with IoU &gt; threshold are considered matches and</span>
+<span class="sd">        merged. Default is 0.1.</span>
 
 <span class="sd">    Notes</span>
 <span class="sd">    -----</span>
@@ -636,6 +663,8 @@ window.addEventListener("load", load);
         <span class="n">remove_area_anomalies</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">anomaly_sigma_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
         <span class="n">anomaly_min_box_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">30</span><span class="p">,</span>
+        <span class="n">use_tta</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
+        <span class="n">tta_iou_thresh</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
@@ -657,7 +686,11 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="o">.</span><span class="n">axis_aligned_output</span> <span class="o">=</span> <span class="n">axis_aligned_output</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">remove_area_anomalies</span> <span class="o">=</span> <span class="n">remove_area_anomalies</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">anomaly_sigma_threshold</span> <span class="o">=</span> <span class="n">anomaly_sigma_threshold</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">anomaly_min_box_count</span> <span class="o">=</span> <span class="n">anomaly_min_box_count</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">anomaly_min_box_count</span> <span class="o">=</span> <span class="n">anomaly_min_box_count</span>
+
+        <span class="c1"># TTA parameters</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">use_tta</span> <span class="o">=</span> <span class="n">use_tta</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">tta_iou_thresh</span> <span class="o">=</span> <span class="n">tta_iou_thresh</span></div>
 
 
     <span class="k">def</span><span class="w"> </span><span class="nf">_initialize_session</span><span class="p">(</span><span class="bp">self</span><span class="p">):</span>
@@ -774,6 +807,129 @@ window.addEventListener("load", load);
             <span class="k">return</span> <span class="n">quads</span>
         <span class="k">return</span> <span class="n">quads</span><span class="p">[</span><span class="n">keep</span><span class="p">]</span>
 
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_box_iou</span><span class="p">(</span>
+        <span class="n">box1</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="n">box2</span><span class="p">:</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Calculate IoU between two axis-aligned boxes.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        box1, box2 : tuple of (x0, y0, x1, y1)</span>
+<span class="sd">            Bounding box coordinates.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        float</span>
+<span class="sd">            Intersection over Union value in [0, 1].</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">x0</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">box1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">box2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+        <span class="n">y0</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">box1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span> <span class="n">box2</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">x1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">box1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">box2</span><span class="p">[</span><span class="mi">2</span><span class="p">])</span>
+        <span class="n">y1</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">box1</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span> <span class="n">box2</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span>
+
+        <span class="k">if</span> <span class="n">x1</span> <span class="o">&lt;=</span> <span class="n">x0</span> <span class="ow">or</span> <span class="n">y1</span> <span class="o">&lt;=</span> <span class="n">y0</span><span class="p">:</span>
+            <span class="k">return</span> <span class="mf">0.0</span>
+
+        <span class="n">inter</span> <span class="o">=</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)</span>
+        <span class="n">area1</span> <span class="o">=</span> <span class="p">(</span><span class="n">box1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">box1</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">box1</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">box1</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+        <span class="n">area2</span> <span class="o">=</span> <span class="p">(</span><span class="n">box2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">box2</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">box2</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">box2</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="n">inter</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span><span class="n">area1</span> <span class="o">+</span> <span class="n">area2</span> <span class="o">-</span> <span class="n">inter</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_merge_tta_boxes</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">boxes_orig</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">float</span><span class="p">]],</span>
+        <span class="n">boxes_flipped</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">float</span><span class="p">]],</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">],</span> <span class="nb">float</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Merge detection boxes from original and horizontally flipped images.</span>
+
+<span class="sd">        For each box in the original image, find matching box in flipped image</span>
+<span class="sd">        (based on IoU threshold). Matched boxes are merged by extending x-coordinates</span>
+<span class="sd">        and keeping y-coordinates from original, with averaged scores.</span>
+
+<span class="sd">        This approach keeps vertical positioning stable while potentially</span>
+<span class="sd">        extending horizontal coverage when both views detect overlapping regions.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        boxes_orig : list of ((x0, y0, x1, y1), score)</span>
+<span class="sd">            Boxes from original image detection.</span>
+<span class="sd">        boxes_flipped : list of ((x0, y0, x1, y1), score)</span>
+<span class="sd">            Boxes from flipped image detection (already transformed back</span>
+<span class="sd">            to original coordinate space).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        list of ((x0, y0, x1, y1), score)</span>
+<span class="sd">            Merged boxes - only boxes that have matches in both views.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">merged</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">box1</span><span class="p">,</span> <span class="n">score1</span> <span class="ow">in</span> <span class="n">boxes_orig</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">box2</span><span class="p">,</span> <span class="n">score2</span> <span class="ow">in</span> <span class="n">boxes_flipped</span><span class="p">:</span>
+                <span class="n">iou</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_box_iou</span><span class="p">(</span><span class="n">box1</span><span class="p">,</span> <span class="n">box2</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">iou</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tta_iou_thresh</span><span class="p">:</span>
+                    <span class="c1"># Merge: extend x-coordinates, keep y from original</span>
+                    <span class="n">merged_box</span> <span class="o">=</span> <span class="p">(</span>
+                        <span class="nb">min</span><span class="p">(</span><span class="n">box1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">box2</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>  <span class="c1"># x0: take minimum</span>
+                        <span class="n">box1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>                 <span class="c1"># y0: keep from original</span>
+                        <span class="nb">max</span><span class="p">(</span><span class="n">box1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">box2</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>  <span class="c1"># x1: take maximum</span>
+                        <span class="n">box1</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>                 <span class="c1"># y1: keep from original</span>
+                    <span class="p">)</span>
+                    <span class="n">avg_score</span> <span class="o">=</span> <span class="p">(</span><span class="n">score1</span> <span class="o">+</span> <span class="n">score2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
+                    <span class="n">merged</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">merged_box</span><span class="p">,</span> <span class="n">avg_score</span><span class="p">))</span>
+                    <span class="k">break</span>  <span class="c1"># Found match, move to next original box</span>
+
+        <span class="k">return</span> <span class="n">merged</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_run_inference_on_image</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">img</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Run ONNX inference on a single image.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        img : np.ndarray</span>
+<span class="sd">            RGB image with shape (H, W, 3).</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        tuple of (final_quads_nms, score_map, geo_map)</span>
+<span class="sd">            Detected quads after NMS and raw maps.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">resized</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_size</span><span class="p">))</span>
+
+        <span class="n">img_norm</span> <span class="o">=</span> <span class="p">(</span><span class="n">resized</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.0</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="mf">0.5</span>
+        <span class="n">img_input</span> <span class="o">=</span> <span class="n">img_norm</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span>
+
+        <span class="n">input_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_session</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
+        <span class="n">output_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">out</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_session</span><span class="o">.</span><span class="n">get_outputs</span><span class="p">()]</span>
+
+        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">output_names</span><span class="p">,</span> <span class="p">{</span><span class="n">input_name</span><span class="p">:</span> <span class="n">img_input</span><span class="p">})</span>
+
+        <span class="n">score_map</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+        <span class="n">geo_map</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+
+        <span class="n">final_quads</span> <span class="o">=</span> <span class="n">decode_quads_from_maps</span><span class="p">(</span>
+            <span class="n">score_map</span><span class="o">=</span><span class="n">score_map</span><span class="p">,</span>
+            <span class="n">geo_map</span><span class="o">=</span><span class="n">geo_map</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
+            <span class="n">score_thresh</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">score_thresh</span><span class="p">,</span>
+            <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">score_geo_scale</span><span class="p">,</span>
+            <span class="n">quantization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quantization</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="n">final_quads_nms</span> <span class="o">=</span> <span class="n">locality_aware_nms</span><span class="p">(</span>
+            <span class="n">final_quads</span><span class="p">,</span>
+            <span class="n">iou_threshold</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">iou_threshold</span><span class="p">,</span>
+            <span class="n">iou_threshold_standard</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">iou_threshold_standard</span><span class="p">,</span>
+        <span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">final_quads_nms</span><span class="p">,</span> <span class="n">score_map</span><span class="p">,</span> <span class="n">geo_map</span>
+
 <div class="viewcode-block" id="EAST.predict">
 <a class="viewcode-back" href="../../../api/detectors.html#manuscript.detectors.EAST.predict">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span>
@@ -830,6 +986,14 @@ window.addEventListener("load", load);
 <span class="sd">        (4) quad decoding, (5) NMS, (6) box expansion, (7) scaling coordinates</span>
 <span class="sd">        back to original size, (8) optional reading order sorting into lines.</span>
 
+<span class="sd">        **Test-Time Augmentation (TTA):**</span>
+
+<span class="sd">        When ``use_tta=True`` is set during initialization, the method runs</span>
+<span class="sd">        inference on both the original and horizontally flipped image, then</span>
+<span class="sd">        merges results. Boxes from both views are matched by IoU and merged</span>
+<span class="sd">        by taking the union of coordinates with averaged scores. This can</span>
+<span class="sd">        improve detection of text near image edges or partially visible text.</span>
+
 <span class="sd">        For visualization, use the external ``visualize_page`` utility:</span>
 
 <span class="sd">        &gt;&gt;&gt; from manuscript.utils import visualize_page</span>
@@ -863,44 +1027,79 @@ window.addEventListener("load", load);
             <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_session</span><span class="p">()</span>
 
         <span class="n">img</span> <span class="o">=</span> <span class="n">read_image</span><span class="p">(</span><span class="n">img_or_path</span><span class="p">)</span>
-        <span class="n">resized</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">resize</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">target_size</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">target_size</span><span class="p">))</span>
-
-        <span class="n">img_norm</span> <span class="o">=</span> <span class="p">(</span><span class="n">resized</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span> <span class="o">/</span> <span class="mf">255.0</span> <span class="o">-</span> <span class="mf">0.5</span><span class="p">)</span> <span class="o">/</span> <span class="mf">0.5</span>
-        <span class="n">img_input</span> <span class="o">=</span> <span class="n">img_norm</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">)[</span><span class="n">np</span><span class="o">.</span><span class="n">newaxis</span><span class="p">,</span> <span class="p">:,</span> <span class="p">:,</span> <span class="p">:]</span>
-
-        <span class="n">input_name</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_session</span><span class="o">.</span><span class="n">get_inputs</span><span class="p">()[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">name</span>
-        <span class="n">output_names</span> <span class="o">=</span> <span class="p">[</span><span class="n">out</span><span class="o">.</span><span class="n">name</span> <span class="k">for</span> <span class="n">out</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_session</span><span class="o">.</span><span class="n">get_outputs</span><span class="p">()]</span>
-
-        <span class="n">outputs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_session</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="n">output_names</span><span class="p">,</span> <span class="p">{</span><span class="n">input_name</span><span class="p">:</span> <span class="n">img_input</span><span class="p">})</span>
-
-        <span class="n">score_map</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">geo_map</span> <span class="o">=</span> <span class="n">outputs</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">squeeze</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
-
-        <span class="n">final_quads</span> <span class="o">=</span> <span class="n">decode_quads_from_maps</span><span class="p">(</span>
-            <span class="n">score_map</span><span class="o">=</span><span class="n">score_map</span><span class="p">,</span>
-            <span class="n">geo_map</span><span class="o">=</span><span class="n">geo_map</span><span class="o">.</span><span class="n">transpose</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
-            <span class="n">score_thresh</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">score_thresh</span><span class="p">,</span>
-            <span class="n">scale</span><span class="o">=</span><span class="mf">1.0</span> <span class="o">/</span> <span class="bp">self</span><span class="o">.</span><span class="n">score_geo_scale</span><span class="p">,</span>
-            <span class="n">quantization</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">quantization</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="n">final_quads_nms</span> <span class="o">=</span> <span class="n">locality_aware_nms</span><span class="p">(</span>
-            <span class="n">final_quads</span><span class="p">,</span>
-            <span class="n">iou_threshold</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">iou_threshold</span><span class="p">,</span>
-            <span class="n">iou_threshold_standard</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">iou_threshold_standard</span><span class="p">,</span>
-        <span class="p">)</span>
-
-        <span class="n">expanded</span> <span class="o">=</span> <span class="n">expand_boxes</span><span class="p">(</span>
-            <span class="n">final_quads_nms</span><span class="p">,</span>
-            <span class="n">expand_w</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expand_ratio_w</span><span class="p">,</span>
-            <span class="n">expand_h</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expand_ratio_h</span><span class="p">,</span>
-            <span class="n">expand_power</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expand_power</span><span class="p">,</span>
-        <span class="p">)</span>
-
         <span class="n">orig_h</span><span class="p">,</span> <span class="n">orig_w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
-        <span class="n">scaled_quads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale_boxes_to_original</span><span class="p">(</span><span class="n">expanded</span><span class="p">,</span> <span class="p">(</span><span class="n">orig_h</span><span class="p">,</span> <span class="n">orig_w</span><span class="p">))</span>
 
-        <span class="n">processed_quads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_fully_contained_boxes</span><span class="p">(</span><span class="n">scaled_quads</span><span class="p">)</span>
+        <span class="c1"># Run inference on original image</span>
+        <span class="n">final_quads_nms</span><span class="p">,</span> <span class="n">score_map</span><span class="p">,</span> <span class="n">geo_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_inference_on_image</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+
+        <span class="c1"># TTA: Run on horizontally flipped image and merge results</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_tta</span><span class="p">:</span>
+            <span class="c1"># Flip image horizontally</span>
+            <span class="n">img_flipped</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">fliplr</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span>
+            <span class="n">final_quads_flipped</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_inference_on_image</span><span class="p">(</span><span class="n">img_flipped</span><span class="p">)</span>
+
+            <span class="c1"># Scale both to original size first</span>
+            <span class="n">scaled_orig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale_boxes_to_original</span><span class="p">(</span><span class="n">final_quads_nms</span><span class="p">,</span> <span class="p">(</span><span class="n">orig_h</span><span class="p">,</span> <span class="n">orig_w</span><span class="p">))</span>
+            <span class="n">scaled_flipped</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale_boxes_to_original</span><span class="p">(</span><span class="n">final_quads_flipped</span><span class="p">,</span> <span class="p">(</span><span class="n">orig_h</span><span class="p">,</span> <span class="n">orig_w</span><span class="p">))</span>
+
+            <span class="c1"># Convert to axis-aligned boxes for IoU matching</span>
+            <span class="c1"># Keep track of original quads for non-axis-aligned output</span>
+            <span class="n">boxes_orig</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="n">quads_orig_list</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Store original quads</span>
+            <span class="k">for</span> <span class="n">quad</span> <span class="ow">in</span> <span class="n">scaled_orig</span><span class="p">:</span>
+                <span class="n">pts</span> <span class="o">=</span> <span class="n">quad</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">quad</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+                <span class="n">boxes_orig</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="nb">int</span><span class="p">(</span><span class="n">x0</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y0</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">x1</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y1</span><span class="p">)),</span> <span class="n">score</span><span class="p">))</span>
+                <span class="n">quads_orig_list</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">quad</span><span class="o">.</span><span class="n">copy</span><span class="p">())</span>
+
+            <span class="n">boxes_flipped</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">quad</span> <span class="ow">in</span> <span class="n">scaled_flipped</span><span class="p">:</span>
+                <span class="n">pts</span> <span class="o">=</span> <span class="n">quad</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+                <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">pts</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                <span class="c1"># Mirror x coordinates back</span>
+                <span class="n">x0_mirrored</span> <span class="o">=</span> <span class="n">orig_w</span> <span class="o">-</span> <span class="n">x1</span>
+                <span class="n">x1_mirrored</span> <span class="o">=</span> <span class="n">orig_w</span> <span class="o">-</span> <span class="n">x0</span>
+                <span class="n">score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">quad</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
+                <span class="n">boxes_flipped</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="nb">int</span><span class="p">(</span><span class="n">x0_mirrored</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y0</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">x1_mirrored</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y1</span><span class="p">)),</span> <span class="n">score</span><span class="p">))</span>
+
+            <span class="c1"># Find which original boxes have matches in flipped view</span>
+            <span class="n">matched_orig_indices</span> <span class="o">=</span> <span class="p">[]</span>
+            <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">box1</span><span class="p">,</span> <span class="n">score1</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">boxes_orig</span><span class="p">):</span>
+                <span class="k">for</span> <span class="n">box2</span><span class="p">,</span> <span class="n">score2</span> <span class="ow">in</span> <span class="n">boxes_flipped</span><span class="p">:</span>
+                    <span class="n">iou</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_box_iou</span><span class="p">(</span><span class="n">box1</span><span class="p">,</span> <span class="n">box2</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">iou</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">tta_iou_thresh</span><span class="p">:</span>
+                        <span class="n">matched_orig_indices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
+                        <span class="k">break</span>  <span class="c1"># Found match, move to next original box</span>
+
+            <span class="c1"># Filter to keep only matched quads (preserves original 4-point polygons)</span>
+            <span class="k">if</span> <span class="n">matched_orig_indices</span><span class="p">:</span>
+                <span class="n">matched_quads</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">stack</span><span class="p">(</span>
+                    <span class="p">[</span><span class="n">quads_orig_list</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">matched_orig_indices</span><span class="p">],</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span>
+                <span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="n">matched_quads</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">empty</span><span class="p">((</span><span class="mi">0</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+
+            <span class="c1"># Expand boxes</span>
+            <span class="n">expanded</span> <span class="o">=</span> <span class="n">expand_boxes</span><span class="p">(</span>
+                <span class="n">matched_quads</span><span class="p">,</span>
+                <span class="n">expand_w</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expand_ratio_w</span><span class="p">,</span>
+                <span class="n">expand_h</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expand_ratio_h</span><span class="p">,</span>
+                <span class="n">expand_power</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expand_power</span><span class="p">,</span>
+            <span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># No TTA: standard processing</span>
+            <span class="n">expanded</span> <span class="o">=</span> <span class="n">expand_boxes</span><span class="p">(</span>
+                <span class="n">final_quads_nms</span><span class="p">,</span>
+                <span class="n">expand_w</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expand_ratio_w</span><span class="p">,</span>
+                <span class="n">expand_h</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expand_ratio_h</span><span class="p">,</span>
+                <span class="n">expand_power</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">expand_power</span><span class="p">,</span>
+            <span class="p">)</span>
+            <span class="n">expanded</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale_boxes_to_original</span><span class="p">(</span><span class="n">expanded</span><span class="p">,</span> <span class="p">(</span><span class="n">orig_h</span><span class="p">,</span> <span class="n">orig_w</span><span class="p">))</span>
+
+        <span class="n">processed_quads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_fully_contained_boxes</span><span class="p">(</span><span class="n">expanded</span><span class="p">)</span>
         <span class="n">processed_quads</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_remove_area_anomalies</span><span class="p">(</span><span class="n">processed_quads</span><span class="p">)</span>
         <span class="n">output_quads</span> <span class="o">=</span> <span class="p">(</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_convert_to_axis_aligned</span><span class="p">(</span><span class="n">processed_quads</span><span class="p">)</span>
@@ -1213,8 +1412,13 @@ window.addEventListener("load", load);
                 <span class="k">return</span> <span class="n">candidate</span>
             <span class="k">return</span> <span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
 
+        <span class="k">def</span><span class="w"> </span><span class="nf">_is_experiment_checkpoint</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="n">parent</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">parent</span>
+            <span class="k">return</span> <span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;checkpoints&quot;</span> <span class="ow">or</span> <span class="p">(</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;training_config.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+
         <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_resume_target</span><span class="p">(</span>
             <span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
+            <span class="n">default_experiment_dir</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span>
         <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]]:</span>
             <span class="n">resolved</span> <span class="o">=</span> <span class="n">_resolve_path</span><span class="p">(</span><span class="n">target</span><span class="p">)</span>
             <span class="k">if</span> <span class="ow">not</span> <span class="n">resolved</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
@@ -1224,12 +1428,15 @@ window.addEventListener("load", load);
 
             <span class="k">if</span> <span class="n">resolved</span><span class="o">.</span><span class="n">is_file</span><span class="p">():</span>
                 <span class="n">resume_state</span> <span class="o">=</span> <span class="n">resolved</span>
-                <span class="n">checkpoints_dir</span> <span class="o">=</span> <span class="n">resolved</span><span class="o">.</span><span class="n">parent</span>
-                <span class="k">if</span> <span class="n">checkpoints_dir</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;checkpoints&quot;</span><span class="p">:</span>
-                    <span class="n">experiment_dir</span> <span class="o">=</span> <span class="n">checkpoints_dir</span><span class="o">.</span><span class="n">parent</span>
+                <span class="k">if</span> <span class="n">_is_experiment_checkpoint</span><span class="p">(</span><span class="n">resolved</span><span class="p">):</span>
+                    <span class="n">checkpoints_dir</span> <span class="o">=</span> <span class="n">resolved</span><span class="o">.</span><span class="n">parent</span>
+                    <span class="k">if</span> <span class="n">checkpoints_dir</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;checkpoints&quot;</span><span class="p">:</span>
+                        <span class="n">experiment_dir</span> <span class="o">=</span> <span class="n">checkpoints_dir</span><span class="o">.</span><span class="n">parent</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="n">experiment_dir</span> <span class="o">=</span> <span class="n">checkpoints_dir</span>
+                    <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">experiment_dir</span><span class="p">)),</span> <span class="n">resume_state</span>
                 <span class="k">else</span><span class="p">:</span>
-                    <span class="n">experiment_dir</span> <span class="o">=</span> <span class="n">checkpoints_dir</span>
-                <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">experiment_dir</span><span class="p">)),</span> <span class="n">resume_state</span>
+                    <span class="k">return</span> <span class="n">default_experiment_dir</span><span class="p">,</span> <span class="n">resume_state</span>
 
             <span class="n">experiment_dir</span> <span class="o">=</span> <span class="n">resolved</span>
             <span class="n">checkpoints_dir</span> <span class="o">=</span> <span class="p">(</span>
@@ -1239,12 +1446,15 @@ window.addEventListener("load", load);
             <span class="n">resume_state</span> <span class="o">=</span> <span class="n">default_state</span> <span class="k">if</span> <span class="n">default_state</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">experiment_dir</span><span class="p">)),</span> <span class="n">resume_state</span>
 
+        <span class="n">default_experiment_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">experiment_root</span><span class="p">,</span> <span class="n">model_name</span><span class="p">))</span>
         <span class="n">resume_state_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">resume_from</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
-            <span class="n">experiment_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">experiment_root</span><span class="p">,</span> <span class="n">model_name</span><span class="p">))</span>
+            <span class="n">experiment_dir</span> <span class="o">=</span> <span class="n">default_experiment_dir</span>
             <span class="n">resume_flag</span> <span class="o">=</span> <span class="kc">False</span>
         <span class="k">else</span><span class="p">:</span>
-            <span class="n">experiment_dir</span><span class="p">,</span> <span class="n">resume_state_path</span> <span class="o">=</span> <span class="n">_resolve_resume_target</span><span class="p">(</span><span class="n">resume_from</span><span class="p">)</span>
+            <span class="n">experiment_dir</span><span class="p">,</span> <span class="n">resume_state_path</span> <span class="o">=</span> <span class="n">_resolve_resume_target</span><span class="p">(</span>
+                <span class="n">resume_from</span><span class="p">,</span> <span class="n">default_experiment_dir</span>
+            <span class="p">)</span>
             <span class="n">resume_flag</span> <span class="o">=</span> <span class="kc">True</span>
 
         <span class="n">best_model</span> <span class="o">=</span> <span class="n">_run_training</span><span class="p">(</span>

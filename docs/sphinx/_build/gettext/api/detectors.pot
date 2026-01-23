@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-22 17:48+0700\n"
+"POT-Creation-Date: 2026-01-23 18:42+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -33,10 +33,10 @@ msgstr ""
 
 #: ../../api/detectors.rst:0
 #: 75c9e3f4f05142bc9132bd4d0b5d7fbc
-#: 5de97b820c8349d5b500bb277b435501
 #: 44088b6b89d848abb581e53592cfa372
-#: 8234c94e41534ed8a7233dbb1e30feaf
-#: 82d4fd0fbac641008325464ca4c5b86c
+#: 5de97b820c8349d5b500bb277b435501
+#: 5de97b820c8349d5b500bb277b435501
+#: 5de97b820c8349d5b500bb277b435501
 msgid "Parameters"
 msgstr ""
 
@@ -135,93 +135,103 @@ msgstr ""
 msgid "Minimum number of boxes required before anomaly filtering. Default is 30."
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:70
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:69
+#: 15cc6e462e9043128125780e3d2b0dbf
+msgid "Enable Test-Time Augmentation (TTA). When enabled, inference is run on both the original and horizontally flipped image, and results are merged. This can improve detection of partially visible or edge text. Default is False."
+msgstr ""
+
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:75
+#: 738f62f946f941ff90580155e3565592
+msgid "IoU threshold for merging boxes from original and flipped images during TTA. Boxes with IoU > threshold are considered matches and merged. Default is 0.1."
+msgstr ""
+
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:81
 #: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.export:41
 #: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.predict:42
 #: 2840dec89d594d118e20884b5e469561
-#: ade4e1752a6e47168a77f27c97774411
-#: c0f32979bf5c44c29e1348582a71b5a1
+#: 2840dec89d594d118e20884b5e469561
+#: 2840dec89d594d118e20884b5e469561
 msgid "Notes"
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:71
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:82
 #: 067627fecf8c474e9b6ff887667a1ce0
 msgid "The class provides two main public methods:"
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:73
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:84
 #: 663d2d36465f4fc2bef0525f652f6b69
 msgid "``predict`` — run inference on a single image and return detections."
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:74
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:85
 #: bd743abac34c40b7a6f5159ae6578079
 msgid "``train`` — high-level training entrypoint to train an EAST model on custom datasets."
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:76
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:87
 #: f924be66866c4fdba373dc4f5e44888b
 msgid "The detector uses ONNX Runtime for fast inference on CPU and GPU. For GPU acceleration, install: ``pip install onnxruntime-gpu``"
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:82
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:93
 #: 8f28e6175d6745bfa83bb32fcd71f5ee
 msgid "Methods"
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:101:<autosummary>:1
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:112:<autosummary>:1
 #: daa274dc4c574c938d4736237747d469
 msgid ":py:obj:`__call__ <manuscript.detectors.EAST.__call__>`\\ \\(\\*args\\, \\*\\*kwargs\\)"
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:101:<autosummary>:1
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:112:<autosummary>:1
 #: 0f218785c8cb4d23978ccfb9414db8d1
 msgid "Call self as a function."
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:101:<autosummary>:1
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:112:<autosummary>:1
 #: 38d17ed6ac12468ebbd119cb4a81a8e3
 msgid ":py:obj:`export <manuscript.detectors.EAST.export>`\\ \\(weights\\_path\\, output\\_path\\[\\, ...\\]\\)"
 msgstr ""
 
 #: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.export:2
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:101:<autosummary>:1
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:112:<autosummary>:1
 #: 6547c656e3e748349950d20a43ef1e24
-#: 16afe4db288f4ccf9306888d79f86be9
+#: 6547c656e3e748349950d20a43ef1e24
 msgid "Export EAST PyTorch model to ONNX format."
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:101:<autosummary>:1
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:112:<autosummary>:1
 #: d366ff5469e1442182c1ed835df62cc3
 msgid ":py:obj:`predict <manuscript.detectors.EAST.predict>`\\ \\(img\\_or\\_path\\[\\, return\\_maps\\, ...\\]\\)"
 msgstr ""
 
 #: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.predict:2
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:101:<autosummary>:1
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:112:<autosummary>:1
 #: bb529eedcba945f9b16a587a1a361991
-#: 68ba67e2ef9f49799cd2ebe7377884b3
+#: bb529eedcba945f9b16a587a1a361991
 msgid "Run EAST inference and return detection results."
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:101:<autosummary>:1
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:112:<autosummary>:1
 #: d927f786eb7247cfa1f5f8d5ac6f92e3
 msgid ":py:obj:`runtime_providers <manuscript.detectors.EAST.runtime_providers>`\\ \\(\\)"
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:101:<autosummary>:1
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:112:<autosummary>:1
 #: f6b7a0fa60fd4b0fa964cb3704754512
 msgid "Get ONNX Runtime execution providers based on device."
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:101:<autosummary>:1
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:112:<autosummary>:1
 #: ca43ca54ea274ffdb5e00d7ea1a35de0
 msgid ":py:obj:`train <manuscript.detectors.EAST.train>`\\ \\(train\\_images\\, train\\_anns\\, val\\_images\\, ...\\)"
 msgstr ""
 
 #: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.train:2
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:101:<autosummary>:1
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST:112:<autosummary>:1
 #: 073b7a21cfba42579a4342691a7505a5
-#: 861f6f2461ef4354a04a04eba9a65f77
+#: 073b7a21cfba42579a4342691a7505a5
 msgid "Train EAST model on custom datasets."
 msgstr ""
 
@@ -252,8 +262,8 @@ msgstr ""
 
 #: ../../api/detectors.rst:0
 #: 74af4ffe4576447687ce250ca01cca33
-#: 516fce903bc1478da45e3d07b73d0278
-#: 28e52a94474b4d4ea0a3e88ed5933e14
+#: 74af4ffe4576447687ce250ca01cca33
+#: 74af4ffe4576447687ce250ca01cca33
 msgid "Returns"
 msgstr ""
 
@@ -289,7 +299,7 @@ msgstr ""
 
 #: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.predict:-1
 #: b33cc4aa86cf483dab330572851a7a69
-#: ad707d7cf3f642f89d400e94a7fd18ea
+#: b33cc4aa86cf483dab330572851a7a69
 msgid "numpy.ndarray or None"
 msgstr ""
 
@@ -310,8 +320,8 @@ msgstr ""
 
 #: ../../api/detectors.rst:0
 #: 077212810899479e8d3019aeb9a2a6c6
-#: a8ae3a2d9aa44291aa6adaba48f94064
-#: de867db427e34252b22efb5128e04656
+#: 077212810899479e8d3019aeb9a2a6c6
+#: 077212810899479e8d3019aeb9a2a6c6
 msgid "Return type"
 msgstr ""
 
@@ -321,25 +331,35 @@ msgid "The method performs: (1) image loading, (2) resizing and normalization, (
 msgstr ""
 
 #: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.predict:48
+#: 145d2138d6f14f1aa29e4d3f723f33f4
+msgid "**Test-Time Augmentation (TTA):**"
+msgstr ""
+
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.predict:50
+#: ba6f9dab711d4e2f997b507070f1b777
+msgid "When ``use_tta=True`` is set during initialization, the method runs inference on both the original and horizontally flipped image, then merges results. Boxes from both views are matched by IoU and merged by taking the union of coordinates with averaged scores. This can improve detection of text near image edges or partially visible text."
+msgstr ""
+
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.predict:56
 #: c095f847463d44a6b93962472578e609
 msgid "For visualization, use the external ``visualize_page`` utility:"
 msgstr ""
 
 #: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.export:57
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.predict:55
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.predict:63
 #: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.train:122
 #: 96c29f29b20946568b75927215ab91bb
-#: 6b44e7e5e2e84cbdbeee0ce415ba93cc
-#: 965a3fadbaa34bcda88561fe27e93574
+#: 96c29f29b20946568b75927215ab91bb
+#: 96c29f29b20946568b75927215ab91bb
 msgid "Examples"
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.predict:56
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.predict:64
 #: 365844be83744b53a317230246a25636
 msgid "Perform inference and get structured output:"
 msgstr ""
 
-#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.predict:67
+#: ../../../../src/manuscript/detectors/_east/__init__.py:docstring of manuscript.detectors._east.EAST.predict:75
 #: 962da959068747c696ae1c312b2233b6
 msgid "Visualize results separately:"
 msgstr ""

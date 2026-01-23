@@ -423,7 +423,9 @@ window.addEventListener("load", load);
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.rotate_threshold"><code class="docutils literal notranslate"><span class="pre">Pipeline.rotate_threshold</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
@@ -468,8 +470,24 @@ window.addEventListener("load", load);
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/correctors.html">Correctors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/correctors.html#charlm"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#manuscript.correctors.CharLM"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#available-presets">Available Presets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#quick-example">Quick Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#advanced-configuration">Advanced Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#using-custom-lexicon">Using Custom Lexicon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#training-custom-model">Training Custom Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/correctors.html#export-to-onnx">Export to ONNX</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/utils.html">Utilities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.read_image"><code class="docutils literal notranslate"><span class="pre">read_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
@@ -602,6 +620,8 @@ window.addEventListener("load", load);
     <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
     <span class="n">thickness</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>
     <span class="n">show_order</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+    <span class="n">show_lines</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+    <span class="n">show_numbers</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
     <span class="n">line_color</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">165</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
     <span class="n">number_bg</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">,</span> <span class="mi">255</span><span class="p">),</span>
     <span class="n">number_color</span><span class="o">=</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
@@ -628,14 +648,15 @@ window.addEventListener("load", load);
 <span class="sd">        RGB color for word boundaries.</span>
 <span class="sd">    thickness : int, default=2</span>
 <span class="sd">        Line thickness for word boundaries.</span>
-<span class="sd">    dark_alpha : float, default=0.3</span>
-<span class="sd">        Alpha for darkening background (0=no darkening, 1=fully dark).</span>
-<span class="sd">    blur_ksize : int, default=5</span>
-<span class="sd">        Gaussian blur kernel size (0=no blur, must be odd).</span>
 <span class="sd">    show_order : bool, default=True</span>
-<span class="sd">        If True, display reading order with numbers and connecting lines.</span>
-<span class="sd">        Also colors different text lines with different colors and shows</span>
+<span class="sd">        If True, colors different text lines with different colors and shows</span>
 <span class="sd">        semi-transparent block boundaries with different colors per block.</span>
+<span class="sd">    show_lines : bool, default=False</span>
+<span class="sd">        If True and show_order=True, draw connecting lines between consecutive</span>
+<span class="sd">        words showing the reading sequence.</span>
+<span class="sd">    show_numbers : bool, default=False</span>
+<span class="sd">        If True and show_order=True, display numbered markers on each word</span>
+<span class="sd">        showing the reading order.</span>
 <span class="sd">    line_color : tuple of int, default=(255, 165, 0)</span>
 <span class="sd">        RGB color for connecting lines between words.</span>
 <span class="sd">    number_bg : tuple of int, default=(255, 255, 255)</span>
@@ -676,6 +697,16 @@ window.addEventListener("load", load);
 <span class="sd">    ...     show_order=True,</span>
 <span class="sd">    ...     color=(255, 0, 0),</span>
 <span class="sd">    ...     thickness=3</span>
+<span class="sd">    ... )</span>
+
+<span class="sd">    Show connecting lines and numbers between words:</span>
+
+<span class="sd">    &gt;&gt;&gt; vis = visualize_page(</span>
+<span class="sd">    ...     &quot;document.jpg&quot;,</span>
+<span class="sd">    ...     result[&quot;page&quot;],</span>
+<span class="sd">    ...     show_order=True,</span>
+<span class="sd">    ...     show_lines=True,</span>
+<span class="sd">    ...     show_numbers=True</span>
 <span class="sd">    ... )</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="c1"># Load image using universal reader</span>
@@ -752,10 +783,10 @@ window.addEventListener("load", load);
         <span class="n">x2</span><span class="p">,</span> <span class="n">y2</span> <span class="o">=</span> <span class="n">pts</span><span class="p">[:,</span> <span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">(),</span> <span class="n">pts</span><span class="p">[:,</span> <span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">max</span><span class="p">()</span>
         <span class="n">color_b</span> <span class="o">=</span> <span class="n">get_block_color</span><span class="p">(</span><span class="n">block_idx</span><span class="p">)</span>
         <span class="n">cv2</span><span class="o">.</span><span class="n">rectangle</span><span class="p">(</span>
-            <span class="n">block_layer</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x1</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y1</span><span class="p">)),</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x2</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y2</span><span class="p">)),</span> <span class="p">(</span><span class="o">*</span><span class="n">color_b</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span>
-        <span class="p">)</span>  <span class="c1"># alpha=50</span>
-
-    <span class="c1"># ----- WORD MASK (вырезаем слова из слоёв блоков) -----</span>
+            <span class="n">block_layer</span><span class="p">,</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x1</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y1</span><span class="p">)),</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x2</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y2</span><span class="p">)),</span> <span class="p">(</span><span class="o">*</span><span class="n">color_b</span><span class="p">,</span> <span class="mi">75</span><span class="p">),</span> <span class="o">-</span><span class="mi">1</span>
+        <span class="p">)</span>  <span class="c1"># alpha=75</span>
+    
+    <span class="c1"># ----- WORD MASK (cut out words from block layers) -----</span>
     <span class="n">word_mask</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">zeros</span><span class="p">((</span><span class="n">h</span><span class="p">,</span> <span class="n">w</span><span class="p">),</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">uint8</span><span class="p">)</span>
     <span class="k">for</span> <span class="n">quads</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
         <span class="k">for</span> <span class="n">quad</span> <span class="ow">in</span> <span class="n">quads</span><span class="p">:</span>
@@ -764,10 +795,10 @@ window.addEventListener("load", load);
 
     <span class="n">inv_word_mask</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">bitwise_not</span><span class="p">(</span><span class="n">word_mask</span><span class="p">)</span>
 
-    <span class="c1"># вырезаем слова → блоки НЕ покрывают слова</span>
+     <span class="c1"># cut out words → blocks DO NOT cover words</span>
     <span class="n">block_layer</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">3</span><span class="p">]</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">bitwise_and</span><span class="p">(</span><span class="n">block_layer</span><span class="p">[:,</span> <span class="p">:,</span> <span class="mi">3</span><span class="p">],</span> <span class="n">inv_word_mask</span><span class="p">)</span>
 
-    <span class="c1"># готовое изображение</span>
+    <span class="c1"># final image</span>
     <span class="n">base</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">img</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGBA&quot;</span><span class="p">)</span>
     <span class="n">block_img</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">block_layer</span><span class="p">,</span> <span class="n">mode</span><span class="o">=</span><span class="s2">&quot;RGBA&quot;</span><span class="p">)</span>
     <span class="n">out</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">alpha_composite</span><span class="p">(</span><span class="n">base</span><span class="p">,</span> <span class="n">block_img</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
@@ -791,18 +822,22 @@ window.addEventListener("load", load);
             <span class="n">ys</span> <span class="o">=</span> <span class="p">[</span><span class="n">p</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">*</span> <span class="n">scale</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">w</span><span class="o">.</span><span class="n">polygon</span><span class="p">]</span>
             <span class="n">centers</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="nb">sum</span><span class="p">(</span><span class="n">xs</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4</span><span class="p">,</span> <span class="nb">sum</span><span class="p">(</span><span class="n">ys</span><span class="p">)</span> <span class="o">/</span> <span class="mi">4</span><span class="p">))</span>
 
-        <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">centers</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
-            <span class="n">draw</span><span class="o">.</span><span class="n">line</span><span class="p">([</span><span class="n">p</span><span class="p">,</span> <span class="n">c</span><span class="p">],</span> <span class="n">fill</span><span class="o">=</span><span class="n">line_color</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
+        <span class="c1"># Draw connecting lines only if show_lines is True</span>
+        <span class="k">if</span> <span class="n">show_lines</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">p</span><span class="p">,</span> <span class="n">c</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="n">centers</span><span class="p">[</span><span class="mi">1</span><span class="p">:]):</span>
+                <span class="n">draw</span><span class="o">.</span><span class="n">line</span><span class="p">([</span><span class="n">p</span><span class="p">,</span> <span class="n">c</span><span class="p">],</span> <span class="n">fill</span><span class="o">=</span><span class="n">line_color</span><span class="p">,</span> <span class="n">width</span><span class="o">=</span><span class="mi">3</span><span class="p">)</span>
 
-        <span class="n">overlay</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;RGBA&quot;</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
-        <span class="n">d2</span> <span class="o">=</span> <span class="n">ImageDraw</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="n">overlay</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="ow">in</span> <span class="n">centers</span><span class="p">:</span>
-            <span class="n">d2</span><span class="o">.</span><span class="n">rectangle</span><span class="p">([</span><span class="n">cx</span> <span class="o">-</span> <span class="mi">12</span><span class="p">,</span> <span class="n">cy</span> <span class="o">-</span> <span class="mi">12</span><span class="p">,</span> <span class="n">cx</span> <span class="o">+</span> <span class="mi">12</span><span class="p">,</span> <span class="n">cy</span> <span class="o">+</span> <span class="mi">12</span><span class="p">],</span> <span class="n">fill</span><span class="o">=</span><span class="n">number_bg</span> <span class="o">+</span> <span class="p">(</span><span class="mi">140</span><span class="p">,))</span>
-        <span class="n">out</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">alpha_composite</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGBA&quot;</span><span class="p">),</span> <span class="n">overlay</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
+        <span class="c1"># Draw numbers only if show_numbers is True</span>
+        <span class="k">if</span> <span class="n">show_numbers</span><span class="p">:</span>
+            <span class="n">overlay</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">new</span><span class="p">(</span><span class="s2">&quot;RGBA&quot;</span><span class="p">,</span> <span class="n">out</span><span class="o">.</span><span class="n">size</span><span class="p">,</span> <span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+            <span class="n">d2</span> <span class="o">=</span> <span class="n">ImageDraw</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="n">overlay</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">cx</span><span class="p">,</span> <span class="n">cy</span> <span class="ow">in</span> <span class="n">centers</span><span class="p">:</span>
+                <span class="n">d2</span><span class="o">.</span><span class="n">rectangle</span><span class="p">([</span><span class="n">cx</span> <span class="o">-</span> <span class="mi">12</span><span class="p">,</span> <span class="n">cy</span> <span class="o">-</span> <span class="mi">12</span><span class="p">,</span> <span class="n">cx</span> <span class="o">+</span> <span class="mi">12</span><span class="p">,</span> <span class="n">cy</span> <span class="o">+</span> <span class="mi">12</span><span class="p">],</span> <span class="n">fill</span><span class="o">=</span><span class="n">number_bg</span> <span class="o">+</span> <span class="p">(</span><span class="mi">140</span><span class="p">,))</span>
+            <span class="n">out</span> <span class="o">=</span> <span class="n">Image</span><span class="o">.</span><span class="n">alpha_composite</span><span class="p">(</span><span class="n">out</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGBA&quot;</span><span class="p">),</span> <span class="n">overlay</span><span class="p">)</span><span class="o">.</span><span class="n">convert</span><span class="p">(</span><span class="s2">&quot;RGB&quot;</span><span class="p">)</span>
 
-        <span class="n">draw</span> <span class="o">=</span> <span class="n">ImageDraw</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
-            <span class="n">draw</span><span class="o">.</span><span class="n">text</span><span class="p">((</span><span class="n">cx</span> <span class="o">-</span> <span class="mi">6</span><span class="p">,</span> <span class="n">cy</span> <span class="o">-</span> <span class="mi">8</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">fill</span><span class="o">=</span><span class="n">number_color</span><span class="p">)</span>
+            <span class="n">draw</span> <span class="o">=</span> <span class="n">ImageDraw</span><span class="o">.</span><span class="n">Draw</span><span class="p">(</span><span class="n">out</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="p">(</span><span class="n">cx</span><span class="p">,</span> <span class="n">cy</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">centers</span><span class="p">,</span> <span class="mi">1</span><span class="p">):</span>
+                <span class="n">draw</span><span class="o">.</span><span class="n">text</span><span class="p">((</span><span class="n">cx</span> <span class="o">-</span> <span class="mi">6</span><span class="p">,</span> <span class="n">cy</span> <span class="o">-</span> <span class="mi">8</span><span class="p">),</span> <span class="nb">str</span><span class="p">(</span><span class="n">i</span><span class="p">),</span> <span class="n">fill</span><span class="o">=</span><span class="n">number_color</span><span class="p">)</span>
 
     <span class="k">return</span> <span class="n">out</span></div>
 

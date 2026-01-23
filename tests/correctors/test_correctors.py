@@ -2,7 +2,7 @@ import pytest
 from copy import deepcopy
 
 from manuscript.data import Word, Line, Block, Page
-from manuscript.correctors import DummyCorrector
+from manuscript.correctors import CharLM
 from manuscript.api.base import BaseModel as BaseCorrector
 
 
@@ -102,46 +102,46 @@ class TestBaseCorrector:
 
 
 # ============================================================================
-# Tests for DummyCorrector
+# Tests for CharLM
 # ============================================================================
 
 
-class TestDummyCorrector:
-    """Tests for DummyCorrector implementation."""
+class TestCharLM:
+    """Tests for CharLM corrector implementation."""
 
-    def test_dummy_corrector_creation(self):
-        """DummyCorrector can be instantiated with API-compatible signature."""
-        corrector = DummyCorrector(weights=None, device="cpu")
+    def test_charlm_creation(self):
+        """CharLM can be instantiated with API-compatible signature."""
+        corrector = CharLM(weights=None, device="cpu")
         assert corrector is not None
         assert hasattr(corrector, "device")
         assert hasattr(corrector, "weights")
 
-    def test_dummy_corrector_inherits_base(self):
-        """DummyCorrector inherits from BaseModel (used as corrector base)."""
-        corrector = DummyCorrector(weights=None)
+    def test_charlm_inherits_base(self):
+        """CharLM inherits from BaseModel (used as corrector base)."""
+        corrector = CharLM(weights=None)
         assert isinstance(corrector, BaseCorrector)
 
-    def test_dummy_corrector_returns_page(self):
-        """DummyCorrector.predict returns a Page object."""
-        corrector = DummyCorrector()
+    def test_charlm_returns_page(self):
+        """CharLM.predict returns a Page object."""
+        corrector = CharLM(weights=None)
         page = create_sample_page()
 
         result = corrector.predict(page)
 
         assert isinstance(result, Page)
 
-    def test_dummy_corrector_returns_copy(self):
-        """DummyCorrector returns a copy, not the same object."""
-        corrector = DummyCorrector()
+    def test_charlm_returns_copy(self):
+        """CharLM returns a copy, not the same object."""
+        corrector = CharLM(weights=None)
         page = create_sample_page()
 
         result = corrector.predict(page)
 
         assert result is not page
 
-    def test_dummy_corrector_deep_copy(self):
-        """DummyCorrector returns a deep copy."""
-        corrector = DummyCorrector()
+    def test_charlm_deep_copy(self):
+        """CharLM returns a deep copy."""
+        corrector = CharLM(weights=None)
         page = create_sample_page()
 
         result = corrector.predict(page)
@@ -150,9 +150,9 @@ class TestDummyCorrector:
 
         assert result.blocks[0].lines[0].words[0].text == "Hello"
 
-    def test_dummy_corrector_preserves_text(self):
-        """DummyCorrector preserves all text content."""
-        corrector = DummyCorrector()
+    def test_charlm_preserves_text_without_weights(self):
+        """CharLM without weights preserves all text content."""
+        corrector = CharLM(weights=None)
         page = create_sample_page()
 
         result = corrector.predict(page)
@@ -160,9 +160,9 @@ class TestDummyCorrector:
         assert result.blocks[0].lines[0].words[0].text == "Hello"
         assert result.blocks[0].lines[0].words[1].text == "World"
 
-    def test_dummy_corrector_preserves_structure(self):
-        """DummyCorrector preserves page structure."""
-        corrector = DummyCorrector()
+    def test_charlm_preserves_structure(self):
+        """CharLM preserves page structure."""
+        corrector = CharLM(weights=None)
         page = create_sample_page()
 
         result = corrector.predict(page)
@@ -171,9 +171,9 @@ class TestDummyCorrector:
         assert len(result.blocks[0].lines) == len(page.blocks[0].lines)
         assert len(result.blocks[0].lines[0].words) == len(page.blocks[0].lines[0].words)
 
-    def test_dummy_corrector_preserves_coordinates(self):
-        """DummyCorrector preserves polygon coordinates."""
-        corrector = DummyCorrector()
+    def test_charlm_preserves_coordinates(self):
+        """CharLM preserves polygon coordinates."""
+        corrector = CharLM(weights=None)
         page = create_sample_page()
 
         result = corrector.predict(page)
@@ -182,9 +182,9 @@ class TestDummyCorrector:
         result_polygon = result.blocks[0].lines[0].words[0].polygon
         assert result_polygon == original_polygon
 
-    def test_dummy_corrector_preserves_confidence(self):
-        """DummyCorrector preserves confidence scores."""
-        corrector = DummyCorrector()
+    def test_charlm_preserves_confidence(self):
+        """CharLM preserves confidence scores."""
+        corrector = CharLM(weights=None)
         page = create_sample_page()
 
         result = corrector.predict(page)
@@ -194,9 +194,9 @@ class TestDummyCorrector:
         assert result_word.detection_confidence == orig_word.detection_confidence
         assert result_word.recognition_confidence == orig_word.recognition_confidence
 
-    def test_dummy_corrector_empty_page(self):
-        """DummyCorrector handles empty page."""
-        corrector = DummyCorrector()
+    def test_charlm_empty_page(self):
+        """CharLM handles empty page."""
+        corrector = CharLM(weights=None)
         page = create_empty_page()
 
         result = corrector.predict(page)
@@ -204,9 +204,9 @@ class TestDummyCorrector:
         assert isinstance(result, Page)
         assert len(result.blocks) == 0
 
-    def test_dummy_corrector_callable(self):
-        """DummyCorrector can be called directly via __call__ alias."""
-        corrector = DummyCorrector(weights=None)
+    def test_charlm_callable(self):
+        """CharLM can be called directly via __call__ alias."""
+        corrector = CharLM(weights=None)
         page = create_sample_page()
 
         result = corrector(page)
@@ -214,9 +214,9 @@ class TestDummyCorrector:
         assert isinstance(result, Page)
         assert result.blocks[0].lines[0].words[0].text == "Hello"
 
-    def test_dummy_corrector_multiple_calls(self):
-        """DummyCorrector can be called multiple times."""
-        corrector = DummyCorrector()
+    def test_charlm_multiple_calls(self):
+        """CharLM can be called multiple times."""
+        corrector = CharLM(weights=None)
         page1 = create_sample_page()
         page2 = create_sample_page()
         page2.blocks[0].lines[0].words[0].text = "Different"
@@ -227,18 +227,29 @@ class TestDummyCorrector:
         assert result1.blocks[0].lines[0].words[0].text == "Hello"
         assert result2.blocks[0].lines[0].words[0].text == "Different"
 
-    def test_dummy_corrector_correct_alias(self):
-        """If present, DummyCorrector.correct() should be compatible with predict()."""
-        corrector = DummyCorrector(weights=None)
-        page = create_sample_page()
-
-        if hasattr(corrector, "correct"):
-            result = corrector.correct(page)
-        else:
-            result = corrector.predict(page)
-
-        assert isinstance(result, Page)
-        assert result.blocks[0].lines[0].words[0].text == "Hello"
+    def test_charlm_default_parameters(self):
+        """CharLM has sensible default parameters."""
+        corrector = CharLM(weights=None)
+        
+        assert hasattr(corrector, "mask_threshold")
+        assert hasattr(corrector, "apply_threshold")
+        assert hasattr(corrector, "max_edits")
+        assert hasattr(corrector, "min_word_len")
+        
+    def test_charlm_custom_thresholds(self):
+        """CharLM accepts custom threshold parameters."""
+        corrector = CharLM(
+            weights=None,
+            mask_threshold=0.1,
+            apply_threshold=0.9,
+            max_edits=3,
+            min_word_len=3
+        )
+        
+        assert corrector.mask_threshold == 0.1
+        assert corrector.apply_threshold == 0.9
+        assert corrector.max_edits == 3
+        assert corrector.min_word_len == 3
 
 
 # ============================================================================
@@ -250,22 +261,22 @@ class TestModuleImports:
     """Tests for module structure and imports."""
 
     def test_import_from_correctors(self):
-        """Can import DummyCorrector from manuscript.correctors."""
-        from manuscript.correctors import DummyCorrector
+        """Can import CharLM from manuscript.correctors."""
+        from manuscript.correctors import CharLM
 
-        assert DummyCorrector is not None
+        assert CharLM is not None
 
     def test_import_from_manuscript(self):
-        """Can import DummyCorrector from manuscript root."""
-        from manuscript import DummyCorrector
+        """Can import CharLM from manuscript root."""
+        from manuscript import CharLM
 
-        assert DummyCorrector is not None
+        assert CharLM is not None
 
     def test_correctors_in_all(self):
         """Correctors are in __all__."""
         import manuscript.correctors
 
-        assert "DummyCorrector" in manuscript.correctors.__all__
+        assert "CharLM" in manuscript.correctors.__all__
 
 
 # ============================================================================
@@ -371,3 +382,270 @@ class TestCustomCorrector:
         result = corrector.predict(page)
 
         assert result.blocks[0].lines[0].words[0].text == ">>Hello"
+
+
+# ============================================================================
+# Tests for CharLM specific functionality
+# ============================================================================
+
+
+class TestCharLMAdvanced:
+    """Advanced tests for CharLM corrector."""
+
+    def test_charlm_default_weights_name(self):
+        """CharLM has default_weights_name attribute."""
+        assert hasattr(CharLM, "default_weights_name")
+        assert CharLM.default_weights_name == "prereform_charlm_g1"
+
+    def test_charlm_pretrained_registry(self):
+        """CharLM has pretrained_registry with available presets."""
+        assert hasattr(CharLM, "pretrained_registry")
+        assert "prereform_charlm_g1" in CharLM.pretrained_registry
+        assert "modern_charlm_g1" in CharLM.pretrained_registry
+
+    def test_charlm_vocab_registry(self):
+        """CharLM has vocab_registry."""
+        assert hasattr(CharLM, "vocab_registry")
+        assert "prereform_charlm_g1" in CharLM.vocab_registry
+        assert "modern_charlm_g1" in CharLM.vocab_registry
+
+    def test_charlm_lexicon_registry(self):
+        """CharLM has lexicon_registry."""
+        assert hasattr(CharLM, "lexicon_registry")
+        assert "prereform_words" in CharLM.lexicon_registry
+        assert "modern_words" in CharLM.lexicon_registry
+
+    def test_charlm_without_weights_returns_copy(self):
+        """CharLM without weights returns a deep copy of the page."""
+        corrector = CharLM(weights=None)
+        page = create_sample_page()
+
+        result = corrector.predict(page)
+
+        assert result is not page
+        assert result.blocks[0].lines[0].words[0].text == page.blocks[0].lines[0].words[0].text
+
+    def test_charlm_accepts_lexicon_as_set(self):
+        """CharLM accepts lexicon as a set."""
+        lexicon = {"hello", "world"}
+        corrector = CharLM(weights=None, lexicon=lexicon)
+        
+        assert corrector.lexicon is not None
+        assert "hello" in corrector.lexicon
+        assert "world" in corrector.lexicon
+
+    def test_charlm_max_len_parameter(self):
+        """CharLM accepts max_len parameter."""
+        corrector = CharLM(weights=None, max_len=64)
+        
+        assert corrector.max_len == 64
+
+    def test_charlm_handles_multiple_blocks(self):
+        """CharLM handles pages with multiple blocks."""
+        corrector = CharLM(weights=None)
+        
+        word1 = Word(
+            polygon=[(10.0, 20.0), (100.0, 20.0), (100.0, 40.0), (10.0, 40.0)],
+            detection_confidence=0.95,
+            text="Block1",
+            recognition_confidence=0.98,
+        )
+        word2 = Word(
+            polygon=[(10.0, 60.0), (100.0, 60.0), (100.0, 80.0), (10.0, 80.0)],
+            detection_confidence=0.92,
+            text="Block2",
+            recognition_confidence=0.96,
+        )
+        line1 = Line(words=[word1])
+        line2 = Line(words=[word2])
+        block1 = Block(lines=[line1])
+        block2 = Block(lines=[line2])
+        page = Page(blocks=[block1, block2])
+
+        result = corrector.predict(page)
+
+        assert len(result.blocks) == 2
+        assert result.blocks[0].lines[0].words[0].text == "Block1"
+        assert result.blocks[1].lines[0].words[0].text == "Block2"
+
+    def test_charlm_handles_multiple_lines(self):
+        """CharLM handles blocks with multiple lines."""
+        corrector = CharLM(weights=None)
+        
+        word1 = Word(
+            polygon=[(10.0, 20.0), (100.0, 20.0), (100.0, 40.0), (10.0, 40.0)],
+            detection_confidence=0.95,
+            text="Line1",
+            recognition_confidence=0.98,
+        )
+        word2 = Word(
+            polygon=[(10.0, 50.0), (100.0, 50.0), (100.0, 70.0), (10.0, 70.0)],
+            detection_confidence=0.92,
+            text="Line2",
+            recognition_confidence=0.96,
+        )
+        line1 = Line(words=[word1])
+        line2 = Line(words=[word2])
+        block = Block(lines=[line1, line2])
+        page = Page(blocks=[block])
+
+        result = corrector.predict(page)
+
+        assert len(result.blocks[0].lines) == 2
+        assert result.blocks[0].lines[0].words[0].text == "Line1"
+        assert result.blocks[0].lines[1].words[0].text == "Line2"
+
+    def test_charlm_handles_words_without_text(self):
+        """CharLM handles words with None text."""
+        corrector = CharLM(weights=None)
+        
+        word = Word(
+            polygon=[(10.0, 20.0), (100.0, 20.0), (100.0, 40.0), (10.0, 40.0)],
+            detection_confidence=0.95,
+            text=None,
+            recognition_confidence=None,
+        )
+        line = Line(words=[word])
+        block = Block(lines=[line])
+        page = Page(blocks=[block])
+
+        result = corrector.predict(page)
+
+        assert result.blocks[0].lines[0].words[0].text is None
+
+    def test_charlm_handles_empty_text(self):
+        """CharLM handles words with empty text."""
+        corrector = CharLM(weights=None)
+        
+        word = Word(
+            polygon=[(10.0, 20.0), (100.0, 20.0), (100.0, 40.0), (10.0, 40.0)],
+            detection_confidence=0.95,
+            text="",
+            recognition_confidence=0.98,
+        )
+        line = Line(words=[word])
+        block = Block(lines=[line])
+        page = Page(blocks=[block])
+
+        result = corrector.predict(page)
+
+        assert result.blocks[0].lines[0].words[0].text == ""
+
+    def test_charlm_has_train_method(self):
+        """CharLM has static train method."""
+        assert hasattr(CharLM, "train")
+        assert callable(CharLM.train)
+
+    def test_charlm_has_export_method(self):
+        """CharLM has static export method."""
+        assert hasattr(CharLM, "export")
+        assert callable(CharLM.export)
+
+
+# ============================================================================
+# Tests for create_page_from_text utility
+# ============================================================================
+
+
+class TestCreatePageFromText:
+    """Tests for create_page_from_text utility function."""
+
+    def test_create_page_from_text_import(self):
+        """Can import create_page_from_text from manuscript.utils."""
+        from manuscript.utils import create_page_from_text
+        assert create_page_from_text is not None
+
+    def test_create_page_from_text_single_line(self):
+        """Creates page from single line."""
+        from manuscript.utils import create_page_from_text
+        
+        page = create_page_from_text(["Hello world"])
+        
+        assert isinstance(page, Page)
+        assert len(page.blocks) == 1
+        assert len(page.blocks[0].lines) == 1
+        assert len(page.blocks[0].lines[0].words) == 2
+        assert page.blocks[0].lines[0].words[0].text == "Hello"
+        assert page.blocks[0].lines[0].words[1].text == "world"
+
+    def test_create_page_from_text_multiple_lines(self):
+        """Creates page from multiple lines."""
+        from manuscript.utils import create_page_from_text
+        
+        page = create_page_from_text(["Line one", "Line two", "Line three"])
+        
+        assert len(page.blocks[0].lines) == 3
+        assert page.blocks[0].lines[0].words[0].text == "Line"
+        assert page.blocks[0].lines[1].words[0].text == "Line"
+        assert page.blocks[0].lines[2].words[0].text == "Line"
+
+    def test_create_page_from_text_empty_lines(self):
+        """Handles empty lines correctly."""
+        from manuscript.utils import create_page_from_text
+        
+        page = create_page_from_text(["Hello", "", "World"])
+        
+        # Empty lines are skipped
+        assert len(page.blocks[0].lines) == 2
+
+    def test_create_page_from_text_default_confidence(self):
+        """Uses default confidence of 1.0."""
+        from manuscript.utils import create_page_from_text
+        
+        page = create_page_from_text(["Test"])
+        
+        word = page.blocks[0].lines[0].words[0]
+        assert word.detection_confidence == 1.0
+        assert word.recognition_confidence == 1.0
+
+    def test_create_page_from_text_custom_confidence(self):
+        """Accepts custom confidence parameter."""
+        from manuscript.utils import create_page_from_text
+        
+        page = create_page_from_text(["Test"], confidence=0.5)
+        
+        word = page.blocks[0].lines[0].words[0]
+        assert word.detection_confidence == 0.5
+        assert word.recognition_confidence == 0.5
+
+    def test_create_page_from_text_has_valid_polygons(self):
+        """Words have valid polygon coordinates."""
+        from manuscript.utils import create_page_from_text
+        
+        page = create_page_from_text(["Test"])
+        
+        word = page.blocks[0].lines[0].words[0]
+        assert len(word.polygon) == 4
+        for x, y in word.polygon:
+            assert isinstance(x, float)
+            assert isinstance(y, float)
+
+    def test_create_page_from_text_empty_list(self):
+        """Handles empty list input."""
+        from manuscript.utils import create_page_from_text
+        
+        page = create_page_from_text([])
+        
+        assert len(page.blocks[0].lines) == 0
+
+    def test_create_page_from_text_cyrillic(self):
+        """Works with Cyrillic text."""
+        from manuscript.utils import create_page_from_text
+        
+        page = create_page_from_text(["Привет мир"])
+        
+        assert page.blocks[0].lines[0].words[0].text == "Привет"
+        assert page.blocks[0].lines[0].words[1].text == "мир"
+
+    def test_create_page_from_text_with_charlm(self):
+        """Integration test: create_page_from_text works with CharLM."""
+        from manuscript.utils import create_page_from_text
+        
+        page = create_page_from_text(["Hello world"])
+        corrector = CharLM(weights=None)
+        
+        result = corrector.predict(page)
+        
+        assert isinstance(result, Page)
+        assert result.blocks[0].lines[0].words[0].text == "Hello"
+        assert result.blocks[0].lines[0].words[1].text == "world"

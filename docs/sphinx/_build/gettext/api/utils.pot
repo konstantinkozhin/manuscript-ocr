@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-22 17:48+0700\n"
+"POT-Creation-Date: 2026-01-23 18:42+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -39,8 +39,9 @@ msgstr ""
 #: ../../api/utils.rst:0
 #: 5f78ed61106d4ab68fc3c3fbde6fc802
 #: 02738832d8d74453af11f450d94587c2
-#: 4598cb7fb6ef4118a6aaee85f85f5601
-#: 3c3da40dacf541af864c9db86ced83c3
+#: 02738832d8d74453af11f450d94587c2
+#: 02738832d8d74453af11f450d94587c2
+#: 02738832d8d74453af11f450d94587c2
 msgid "Parameters"
 msgstr ""
 
@@ -52,7 +53,8 @@ msgstr ""
 #: ../../api/utils.rst:0
 #: 00add7a2eb6f4f30ac03742b5a750e0a
 #: 50f91e92c6974454b404c947ef1d11a5
-#: 9432393127f64df8b503e360f59d98cd
+#: 50f91e92c6974454b404c947ef1d11a5
+#: 50f91e92c6974454b404c947ef1d11a5
 msgid "Returns"
 msgstr ""
 
@@ -64,8 +66,9 @@ msgstr ""
 #: ../../api/utils.rst:0
 #: 6f078fabf10749dbb3253ea19c1810c0
 #: 3e97cd731c8148df951397fd6390cadb
-#: 6a436f07ddf04a60a494e2fb3f004d28
-#: eef0b278d4184191bebe3c229f77f361
+#: 3e97cd731c8148df951397fd6390cadb
+#: 3e97cd731c8148df951397fd6390cadb
+#: 3e97cd731c8148df951397fd6390cadb
 msgid "Return type"
 msgstr ""
 
@@ -89,13 +92,50 @@ msgstr ""
 msgid "If bytes cannot be decoded into an image."
 msgstr ""
 
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.io.create_page_from_text:23
 #: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.io.read_image:20
 #: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.sorting.organize_page:29
-#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:53
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:56
 #: 4d7bb0944acb4481b1c3566889a6d255
 #: cf99ecf26ab34d53ad6b2d79dd14dedf
-#: e22e0c22da574143b1c7542c64852694
+#: cf99ecf26ab34d53ad6b2d79dd14dedf
+#: cf99ecf26ab34d53ad6b2d79dd14dedf
 msgid "Examples"
+msgstr ""
+
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.io.create_page_from_text:2
+#: bf6eed843d2e4eea9e05a3062d0301c5
+msgid "Create a Page object from a list of text lines."
+msgstr ""
+
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.io.create_page_from_text:4
+#: 1d1b521033aa43bdbb988b40e09495a9
+msgid "This utility function creates a simple Page structure from raw text, useful for testing correctors or other text processing components without requiring actual OCR detection/recognition."
+msgstr ""
+
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.io.create_page_from_text:8
+#: 778c387b761e449dab99738b03026f90
+msgid "Each line becomes a Line object with words split by whitespace. Words are assigned dummy polygon coordinates for compatibility with the data structures."
+msgstr ""
+
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.io.create_page_from_text:13
+#: d24b132b93ba451881e4eea31f99341d
+msgid "List of text lines. Each line will be split into words."
+msgstr ""
+
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.io.create_page_from_text:16
+#: 8b0d055184c74834a4732d6a7e7b2438
+msgid "Confidence score to assign to all words (default 1.0)."
+msgstr ""
+
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.io.create_page_from_text:19
+#: 5abd76d4a961424fb03ca7fd3a792321
+msgid "Page object with one Block containing the provided lines."
+msgstr ""
+
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.io.create_page_from_text:31
+#: ee7d731fbc7148adb1b0ad5b35a91640
+msgid "Use with corrector:"
 msgstr ""
 
 #: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:2
@@ -128,54 +168,59 @@ msgstr ""
 msgid "Line thickness for word boundaries."
 msgstr ""
 
-#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:24
-#: 52c879403af54597a12c3aa7bba401a1
-msgid "Alpha for darkening background (0=no darkening, 1=fully dark)."
-msgstr ""
-
-#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:26
-#: 0cfde423d4cb4f7cbaefb2087e0f64b8
-msgid "Gaussian blur kernel size (0=no blur, must be odd)."
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:25
+#: bd83a2bd44f0461c8d3c4d020f8aa15f
+msgid "If True, colors different text lines with different colors and shows semi-transparent block boundaries with different colors per block."
 msgstr ""
 
 #: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:29
-#: bd83a2bd44f0461c8d3c4d020f8aa15f
-msgid "If True, display reading order with numbers and connecting lines. Also colors different text lines with different colors and shows semi-transparent block boundaries with different colors per block."
+#: 40234cb52b954e11be89788713aa2ac5
+msgid "If True and show_order=True, draw connecting lines between consecutive words showing the reading sequence."
 msgstr ""
 
-#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:34
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:33
+#: d27f9ebe7e4349ccb021aeef9bbfcf7d
+msgid "If True and show_order=True, display numbered markers on each word showing the reading order."
+msgstr ""
+
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:37
 #: 8ef51d4c748c4803b0af7c67f55caee6
 msgid "RGB color for connecting lines between words."
 msgstr ""
 
-#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:37
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:40
 #: 3cca0959ea0e46e6ae1d7320daba7669
 msgid "Background color for order number boxes."
 msgstr ""
 
-#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:40
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:43
 #: b28687e0555f4456981210d30e4f0e72
 msgid "Text color for order numbers."
 msgstr ""
 
-#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:43
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:46
 #: 179c6f023d094554a0f4c59820431676
 msgid "Maximum size for the longer dimension of the output image. Image will be resized proportionally if larger. Set to None to keep original size."
 msgstr ""
 
-#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:48
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:51
 #: d316af35eb6143ab883321b70df4e6b5
 msgid "Visualized image with detection boxes and optional reading order annotations. When show_order=True, also includes semi-transparent block boundaries."
 msgstr ""
 
-#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:54
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:57
 #: 9eee4d60b73249f78ef89ebd60b28d0a
 msgid "Basic visualization without reading order:"
 msgstr ""
 
-#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:64
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:67
 #: 25639e67d4164102b3dc1c61c665686f
 msgid "Visualization with reading order and block boundaries:"
+msgstr ""
+
+#: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.visualization.visualize_page:80
+#: 8ef51d4c748c4803b0af7c67f55caee6
+msgid "Show connecting lines and numbers between words:"
 msgstr ""
 
 #: ../../../../src/manuscript/utils/__init__.py:docstring of manuscript.utils.sorting.organize_page:2

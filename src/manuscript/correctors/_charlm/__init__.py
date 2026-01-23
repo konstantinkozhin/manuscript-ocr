@@ -2,7 +2,7 @@ import json
 import os
 import re
 from pathlib import Path
-from typing import Optional, Union, List, Dict, Any
+from typing import Optional, Union
 
 import numpy as np
 import onnxruntime as ort
@@ -52,17 +52,20 @@ class CharLM(BaseModel):
     >>> corrected_page = corrector.predict(page)
     """
 
-    default_weights_name = "prefeform_charlm_g1"
+    default_weights_name = "prereform_charlm_g1"
     pretrained_registry = {
-        "prefeform_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prefeform_charlm_g1.onnx",
+        "prereform_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.onnx",
+        "modern_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.onnx",
     }
 
     vocab_registry = {
-        "prefeform_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prefeform_charlm_g1.json",
+        "prereform_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.json",
+        "modern_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.json",
     }
     
     lexicon_registry = {
         "prereform_words": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt",
+        "modern_words": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_words.txt",
     }
 
     def __init__(
@@ -78,7 +81,6 @@ class CharLM(BaseModel):
         max_len: int = 32,
         **kwargs,
     ):
-        # Используем default_weights_name если weights не указан
         if weights is None and self.default_weights_name is not None:
             weights = self.default_weights_name
         
@@ -96,7 +98,6 @@ class CharLM(BaseModel):
         self.min_word_len = min_word_len
         self.max_len = max_len
 
-        # Компилируем регулярку один раз (как в оригинале)
         self._word_pattern = re.compile(r'(\w+)|(\W+)', re.UNICODE)
 
         self.vocab_path = self._resolve_vocab(vocab) if self.weights else None
@@ -106,7 +107,7 @@ class CharLM(BaseModel):
         self.lexicon = None
         if lexicon is not None:
             if isinstance(lexicon, set):
-                self.lexicon = frozenset(lexicon)
+                self.lexicon = frozenset(w.lower() for w in lexicon)
             else:
                 lexicon_path = self._resolve_lexicon(lexicon)
                 if lexicon_path:
@@ -127,7 +128,6 @@ class CharLM(BaseModel):
                     vocab, default_name=None, registry=self.vocab_registry, description="vocab"
                 )
 
-        # Если vocab не указан, но есть default_weights_name - скачиваем vocab для него
         if self.default_weights_name and self.default_weights_name in self.vocab_registry:
             return self._resolve_extra_artifact(
                 self.default_weights_name, default_name=None, registry=self.vocab_registry, description="vocab"
@@ -235,7 +235,6 @@ class CharLM(BaseModel):
                 result_parts.append(token)
                 continue
 
-            # Если слово уже в лексиконе - не трогаем
             if self.lexicon and word_lower in self.lexicon:
                 result_parts.append(token)
                 continue
@@ -296,7 +295,6 @@ class CharLM(BaseModel):
             best_p = float(prob_vec[best_id])
             best_char = self.i2c.get(best_id, "<UNK>")
 
-            # Логика 1-в-1 как в оригинальном reconstruct_word
             if best_char in ("<UNK>", "<PAD>", "<MASK>"):
                 applied = False
             elif best_char == chars[i]:
@@ -304,9 +302,7 @@ class CharLM(BaseModel):
             elif best_p < self.apply_threshold:
                 applied = False
             elif best_char.lower() != best_char or chars[i].lower() != chars[i]:
-                # Один из символов не в нижнем регистре
                 if best_char.lower() == chars[i].lower():
-                    # Отличие только в регистре - не применяем
                     applied = False
                 else:
                     test_chars = chars.copy()
@@ -556,7 +552,6 @@ class CharLM(BaseModel):
         if not vocab_path.exists():
             raise FileNotFoundError(f"Vocab not found: {vocab_path}")
 
-        # Load vocab
         print(f"Loading vocab from {vocab_path}...")
         with open(vocab_path, "r", encoding="utf-8") as f:
             chars = json.load(f)
@@ -566,7 +561,6 @@ class CharLM(BaseModel):
 
         print(f"Vocab size: {vocab_size}")
 
-        # Load model
         print(f"Loading checkpoint from {weights_path}...")
         checkpoint = torch.load(str(weights_path), map_location="cpu")
         if isinstance(checkpoint, dict) and "model" in checkpoint:
@@ -574,7 +568,6 @@ class CharLM(BaseModel):
         else:
             state_dict = checkpoint
 
-        # Create model
         model = CharTransformerMLM(
             vocab_size=vocab_size,
             emb_size=emb_size,
@@ -594,7 +587,6 @@ class CharLM(BaseModel):
         print(f"Layers: {n_layers}")
         print(f"Heads: {n_heads}")
 
-        # Export to ONNX
         dummy_input = torch.zeros(1, max_len, dtype=torch.long)
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
@@ -616,7 +608,6 @@ class CharLM(BaseModel):
 
         print(f"[OK] ONNX model saved to: {output_path}")
 
-        # Simplify if requested
         if simplify:
             try:
                 import onnx

@@ -1,10 +1,31 @@
+# Translations template for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-23 18:42+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
 #: ../../api/utils.rst:2 e60be4a167104ebbbfb12ab898e97d14
 msgid "Utilities"
 msgstr "Утилиты"
 
 #: ../../api/utils.rst:4 df7a37714c9d490384bdebd05d77bc62
 msgid "Utility functions for image processing, visualization, and more."
-msgstr "Вспомогательные функции для обработки изображений, визуализации и других задач."
+msgstr ""
+"Вспомогательные функции для обработки изображений, визуализации и других "
+"задач."
 
 #: f2eb893694c549f784e24a35a42146d3 manuscript.utils:1 of
 msgid "Common utilities for manuscript-ocr."
@@ -12,10 +33,11 @@ msgstr "Общие утилиты для manuscript-ocr."
 
 #: f67a00a511514ec8aa892d21015d56ee manuscript.utils.io.read_image:2 of
 msgid "Universal image reading with support for multiple input types."
-msgstr "Универсальное чтение изображений с поддержкой различных типов входных данных."
+msgstr ""
+"Универсальное чтение изображений с поддержкой различных типов входных "
+"данных."
 
 #: ../../api/utils.rst 02738832d8d74453af11f450d94587c2
-#: 3c3da40dacf541af864c9db86ced83c3 4598cb7fb6ef4118a6aaee85f85f5601
 #: 5f78ed61106d4ab68fc3c3fbde6fc802
 msgid "Parameters"
 msgstr "Параметры"
@@ -26,13 +48,13 @@ msgid ""
 " supports Unicode paths (e.g., Cyrillic) - Bytes buffer (e.g., from HTTP "
 "response) - NumPy array (already loaded image) - PIL Image object"
 msgstr ""
-"Источник изображения в одном из следующих форматов:  - путь к файлу "
-"(str или Path) — поддерживаются Unicode-пути (например, кириллица)  - "
-"буфер байтов (например, из HTTP-ответа)  - массив NumPy (уже загруженное "
+"Источник изображения в одном из следующих форматов:  - путь к файлу (str "
+"или Path) — поддерживаются Unicode-пути (например, кириллица)  - буфер "
+"байтов (например, из HTTP-ответа)  - массив NumPy (уже загруженное "
 "изображение)  - объект PIL Image"
 
 #: ../../api/utils.rst 00add7a2eb6f4f30ac03742b5a750e0a
-#: 50f91e92c6974454b404c947ef1d11a5 9432393127f64df8b503e360f59d98cd
+#: 50f91e92c6974454b404c947ef1d11a5
 msgid "Returns"
 msgstr "Возвращает"
 
@@ -41,8 +63,7 @@ msgid "RGB image as numpy array with shape (H, W, 3) and dtype uint8."
 msgstr "RGB-изображение в виде массива NumPy с формой (H, W, 3) и типом uint8."
 
 #: ../../api/utils.rst 3e97cd731c8148df951397fd6390cadb
-#: 6a436f07ddf04a60a494e2fb3f004d28 6f078fabf10749dbb3253ea19c1810c0
-#: eef0b278d4184191bebe3c229f77f361
+#: 6f078fabf10749dbb3253ea19c1810c0
 msgid "Return type"
 msgstr "Тип возвращаемого значения"
 
@@ -52,7 +73,9 @@ msgstr "Вызывает исключения"
 
 #: 705d32bd5781494d9cc9b4ba7976a536 manuscript.utils.io.read_image:15 of
 msgid "If the image file cannot be read with either OpenCV or PIL."
-msgstr "Если файл изображения не удаётся прочитать ни с помощью OpenCV, ни с помощью PIL."
+msgstr ""
+"Если файл изображения не удаётся прочитать ни с помощью OpenCV, ни с "
+"помощью PIL."
 
 #: 021f19c472024e919798f89c9010dbbf manuscript.utils.io.read_image:16 of
 msgid "If the input type is not supported."
@@ -63,17 +86,60 @@ msgid "If bytes cannot be decoded into an image."
 msgstr "Если байты не могут быть декодированы в изображение."
 
 #: 4d7bb0944acb4481b1c3566889a6d255 cf99ecf26ab34d53ad6b2d79dd14dedf
-#: e22e0c22da574143b1c7542c64852694 manuscript.utils.io.read_image:20
-#: manuscript.utils.sorting.organize_page:29
-#: manuscript.utils.visualization.visualize_page:53 of
+#: manuscript.utils.io.create_page_from_text:23
+#: manuscript.utils.io.read_image:20 manuscript.utils.sorting.organize_page:29
+#: manuscript.utils.visualization.visualize_page:56 of
 msgid "Examples"
 msgstr "Примеры"
 
-#: bf6eed843d2e4eea9e05a3062d0301c5 manuscript.utils.visualization.visualize_page:2 of
+#: bf6eed843d2e4eea9e05a3062d0301c5 manuscript.utils.io.create_page_from_text:2
+#: of
+msgid "Create a Page object from a list of text lines."
+msgstr ""
+
+#: 1d1b521033aa43bdbb988b40e09495a9 manuscript.utils.io.create_page_from_text:4
+#: of
+msgid ""
+"This utility function creates a simple Page structure from raw text, "
+"useful for testing correctors or other text processing components without"
+" requiring actual OCR detection/recognition."
+msgstr ""
+
+#: 778c387b761e449dab99738b03026f90 manuscript.utils.io.create_page_from_text:8
+#: of
+msgid ""
+"Each line becomes a Line object with words split by whitespace. Words are"
+" assigned dummy polygon coordinates for compatibility with the data "
+"structures."
+msgstr ""
+
+#: d24b132b93ba451881e4eea31f99341d
+#: manuscript.utils.io.create_page_from_text:13 of
+msgid "List of text lines. Each line will be split into words."
+msgstr ""
+
+#: 8b0d055184c74834a4732d6a7e7b2438
+#: manuscript.utils.io.create_page_from_text:16 of
+msgid "Confidence score to assign to all words (default 1.0)."
+msgstr ""
+
+#: 5abd76d4a961424fb03ca7fd3a792321
+#: manuscript.utils.io.create_page_from_text:19 of
+msgid "Page object with one Block containing the provided lines."
+msgstr ""
+
+#: ee7d731fbc7148adb1b0ad5b35a91640
+#: manuscript.utils.io.create_page_from_text:31 of
+msgid "Use with corrector:"
+msgstr ""
+
+#: bf6eed843d2e4eea9e05a3062d0301c5
+#: manuscript.utils.visualization.visualize_page:2 of
 msgid "Visualize a Page object with detected words/blocks."
 msgstr "Визуализация объекта Page с обнаруженными словами и блоками."
 
-#: e6b0d678ef534c84958751033686a862 manuscript.utils.visualization.visualize_page:4 of
+#: e6b0d678ef534c84958751033686a862
+#: manuscript.utils.visualization.visualize_page:4 of
 msgid ""
 "This function draws all words from the Page structure on the image, "
 "optionally showing reading order with numbered markers and connecting "
@@ -86,67 +152,83 @@ msgstr ""
 "полупрозрачными ограничивающими рамками, при этом каждый блок имеет свой "
 "цвет."
 
-#: 153c024f2ebc459eb158f56796ecfa3d manuscript.utils.visualization.visualize_page:10 of
+#: 153c024f2ebc459eb158f56796ecfa3d
+#: manuscript.utils.visualization.visualize_page:10 of
 msgid ""
 "Input image. Can be: - Path to image file (str or Path) - supports "
 "Unicode paths - RGB numpy array with shape (H, W, 3) - PIL Image object"
 msgstr ""
-"Входное изображение. Может быть:  - путь к файлу изображения (str или Path) "
-"— поддерживаются Unicode-пути  - RGB-массив NumPy с формой (H, W, 3)  - "
-"объект PIL Image"
+"Входное изображение. Может быть:  - путь к файлу изображения (str или "
+"Path) — поддерживаются Unicode-пути  - RGB-массив NumPy с формой (H, W, "
+"3)  - объект PIL Image"
 
-#: 101f238a7e354f0584c4a95fb4b7d698 manuscript.utils.visualization.visualize_page:16 of
+#: 101f238a7e354f0584c4a95fb4b7d698
+#: manuscript.utils.visualization.visualize_page:16 of
 msgid "Page object from manuscript.data containing detected blocks/words."
 msgstr "Объект Page из manuscript.data, содержащий обнаруженные блоки и слова."
 
-#: a2ed16989ba5411e87c47016f6b22082 manuscript.utils.visualization.visualize_page:19 of
+#: a2ed16989ba5411e87c47016f6b22082
+#: manuscript.utils.visualization.visualize_page:19 of
 msgid "RGB color for word boundaries."
 msgstr "RGB-цвет для границ слов."
 
-#: 91451a391e8e495da3ea0d0319456a04 manuscript.utils.visualization.visualize_page:22 of
+#: 91451a391e8e495da3ea0d0319456a04
+#: manuscript.utils.visualization.visualize_page:22 of
 msgid "Line thickness for word boundaries."
 msgstr "Толщина линий для границ слов."
 
-#: 52c879403af54597a12c3aa7bba401a1 manuscript.utils.visualization.visualize_page:24 of
-msgid "Alpha for darkening background (0=no darkening, 1=fully dark)."
-msgstr "Альфа-коэффициент затемнения фона (0 — без затемнения, 1 — полностью тёмный)."
-
-#: 0cfde423d4cb4f7cbaefb2087e0f64b8 manuscript.utils.visualization.visualize_page:26 of
-msgid "Gaussian blur kernel size (0=no blur, must be odd)."
-msgstr "Размер ядра гауссова размытия (0 — без размытия, должен быть нечётным)."
-
-#: bd83a2bd44f0461c8d3c4d020f8aa15f manuscript.utils.visualization.visualize_page:29 of
+#: bd83a2bd44f0461c8d3c4d020f8aa15f
+#: manuscript.utils.visualization.visualize_page:25 of
+#, fuzzy
 msgid ""
-"If True, display reading order with numbers and connecting lines. Also "
-"colors different text lines with different colors and shows semi-"
-"transparent block boundaries with different colors per block."
+"If True, colors different text lines with different colors and shows "
+"semi-transparent block boundaries with different colors per block."
 msgstr ""
 "Если True, отображает порядок чтения с номерами и соединяющими линиями. "
 "Также раскрашивает разные текстовые строки в разные цвета и показывает "
 "полупрозрачные границы блоков с разными цветами для каждого блока."
 
-#: 8ef51d4c748c4803b0af7c67f55caee6 manuscript.utils.visualization.visualize_page:34 of
+#: 40234cb52b954e11be89788713aa2ac5
+#: manuscript.utils.visualization.visualize_page:29 of
+msgid ""
+"If True and show_order=True, draw connecting lines between consecutive "
+"words showing the reading sequence."
+msgstr ""
+
+#: d27f9ebe7e4349ccb021aeef9bbfcf7d
+#: manuscript.utils.visualization.visualize_page:33 of
+msgid ""
+"If True and show_order=True, display numbered markers on each word "
+"showing the reading order."
+msgstr ""
+
+#: 8ef51d4c748c4803b0af7c67f55caee6
+#: manuscript.utils.visualization.visualize_page:37 of
 msgid "RGB color for connecting lines between words."
 msgstr "RGB-цвет для соединяющих линий между словами."
 
-#: 3cca0959ea0e46e6ae1d7320daba7669 manuscript.utils.visualization.visualize_page:37 of
+#: 3cca0959ea0e46e6ae1d7320daba7669
+#: manuscript.utils.visualization.visualize_page:40 of
 msgid "Background color for order number boxes."
 msgstr "Цвет фона для блоков с номерами порядка."
 
-#: b28687e0555f4456981210d30e4f0e72 manuscript.utils.visualization.visualize_page:40 of
+#: b28687e0555f4456981210d30e4f0e72
+#: manuscript.utils.visualization.visualize_page:43 of
 msgid "Text color for order numbers."
 msgstr "Цвет текста для номеров порядка."
 
-#: 179c6f023d094554a0f4c59820431676 manuscript.utils.visualization.visualize_page:43 of
+#: 179c6f023d094554a0f4c59820431676
+#: manuscript.utils.visualization.visualize_page:46 of
 msgid ""
 "Maximum size for the longer dimension of the output image. Image will be "
 "resized proportionally if larger. Set to None to keep original size."
 msgstr ""
-"Максимальный размер большей стороны выходного изображения. Если изображение "
-"больше, оно будет пропорционально уменьшено. Установите None, чтобы "
-"сохранить исходный размер."
+"Максимальный размер большей стороны выходного изображения. Если "
+"изображение больше, оно будет пропорционально уменьшено. Установите None,"
+" чтобы сохранить исходный размер."
 
-#: d316af35eb6143ab883321b70df4e6b5 manuscript.utils.visualization.visualize_page:48 of
+#: d316af35eb6143ab883321b70df4e6b5
+#: manuscript.utils.visualization.visualize_page:51 of
 msgid ""
 "Visualized image with detection boxes and optional reading order "
 "annotations. When show_order=True, also includes semi-transparent block "
@@ -156,32 +238,43 @@ msgstr ""
 "аннотациями порядка чтения. При show_order=True также включает "
 "полупрозрачные границы блоков."
 
-#: 9eee4d60b73249f78ef89ebd60b28d0a manuscript.utils.visualization.visualize_page:54 of
+#: 9eee4d60b73249f78ef89ebd60b28d0a
+#: manuscript.utils.visualization.visualize_page:57 of
 msgid "Basic visualization without reading order:"
 msgstr "Базовая визуализация без порядка чтения:"
 
-#: 25639e67d4164102b3dc1c61c665686f manuscript.utils.visualization.visualize_page:64 of
+#: 25639e67d4164102b3dc1c61c665686f
+#: manuscript.utils.visualization.visualize_page:67 of
 msgid "Visualization with reading order and block boundaries:"
 msgstr "Визуализация с порядком чтения и границами блоков:"
 
+#: 8ef51d4c748c4803b0af7c67f55caee6
+#: manuscript.utils.visualization.visualize_page:80 of
+#, fuzzy
+msgid "Show connecting lines and numbers between words:"
+msgstr "RGB-цвет для соединяющих линий между словами."
+
 #: 6323b9b2217a4fd9907fd950f6873690 manuscript.utils.sorting.organize_page:2 of
 msgid "Organize words in a Page into structured Blocks, Lines, and reading order."
-msgstr "Организация слов на странице Page в структурированные блоки, строки и порядок чтения."
+msgstr ""
+"Организация слов на странице Page в структурированные блоки, строки и "
+"порядок чтения."
 
 #: 86a1dc27a4064a83ab87c69aafa4dc42 manuscript.utils.sorting.organize_page:4 of
 msgid ""
-"Takes a Page with unorganized words and returns a new Page where: - Words "
-"are grouped into columns (Blocks) - Each Block contains Lines of Words - "
-"Words within Lines are ordered left-to-right - Lines within Blocks are "
+"Takes a Page with unorganized words and returns a new Page where: - Words"
+" are grouped into columns (Blocks) - Each Block contains Lines of Words -"
+" Words within Lines are ordered left-to-right - Lines within Blocks are "
 "ordered top-to-bottom - Blocks are ordered left-to-right (for columns)"
 msgstr ""
-"Принимает Page с неорганизованными словами и возвращает новый Page, где:  "
-"- слова сгруппированы в колонки (Blocks)  - каждый блок содержит строки "
-"слов  - слова внутри строк упорядочены слева направо  - строки внутри "
+"Принимает Page с неорганизованными словами и возвращает новый Page, где:"
+"  - слова сгруппированы в колонки (Blocks)  - каждый блок содержит строки"
+" слов  - слова внутри строк упорядочены слева направо  - строки внутри "
 "блоков упорядочены сверху вниз  - блоки упорядочены слева направо (для "
 "колонок)"
 
-#: 11306559a0534bc282ea0deb25cdc077 manuscript.utils.sorting.organize_page:12 of
+#: 11306559a0534bc282ea0deb25cdc077 manuscript.utils.sorting.organize_page:12
+#: of
 msgid ""
 "Input Page object. Can contain either: - Words in unstructured "
 "blocks/lines - Direct list of words without proper organization"
@@ -189,53 +282,73 @@ msgstr ""
 "Входной объект Page. Может содержать:  - слова в неструктурированных "
 "блоках/строках  - прямой список слов без корректной организации"
 
-#: 57bd2e763a85491e87f33a70a85af8ef manuscript.utils.sorting.organize_page:17 of
+#: 57bd2e763a85491e87f33a70a85af8ef manuscript.utils.sorting.organize_page:17
+#: of
 msgid ""
-"Maximum number of column splits to attempt when segmenting. Higher values "
-"allow more columns to be detected. Default is 10."
+"Maximum number of column splits to attempt when segmenting. Higher values"
+" allow more columns to be detected. Default is 10."
 msgstr ""
 "Максимальное количество попыток разбиения на колонки при сегментации. "
 "Большие значения позволяют обнаруживать больше колонок. По умолчанию 10."
 
-#: 0c2945803d4e48f2bdb09c2791e235b8 manuscript.utils.sorting.organize_page:21 of
+#: 0c2945803d4e48f2bdb09c2791e235b8 manuscript.utils.sorting.organize_page:21
+#: of
 msgid ""
 "If True, segments the page into columns (separate Blocks). If False, "
 "treats entire page as single column. Default is True."
 msgstr ""
-"Если True, сегментирует страницу на колонки (отдельные блоки). Если False, "
-"рассматривает всю страницу как одну колонку. По умолчанию True."
+"Если True, сегментирует страницу на колонки (отдельные блоки). Если "
+"False, рассматривает всю страницу как одну колонку. По умолчанию True."
 
-#: 5abd76d4a961424fb03ca7fd3a792321 manuscript.utils.sorting.organize_page:25 of
+#: 5abd76d4a961424fb03ca7fd3a792321 manuscript.utils.sorting.organize_page:25
+#: of
 msgid "New Page object with organized Blocks, Lines, and reading order set."
-msgstr "Новый объект Page с организованными блоками, строками и установленным порядком чтения."
+msgstr ""
+"Новый объект Page с организованными блоками, строками и установленным "
+"порядком чтения."
 
-#: 70194d16e5c24718bddaaf51de9039fb manuscript.utils.sorting.organize_page:45 of
+#: 70194d16e5c24718bddaaf51de9039fb manuscript.utils.sorting.organize_page:45
+#: of
 msgid "Notes"
 msgstr "Примечания"
 
-#: b81326a53ad846c6b96aa373fa5c8150 manuscript.utils.sorting.organize_page:46 of
+#: b81326a53ad846c6b96aa373fa5c8150 manuscript.utils.sorting.organize_page:46
+#: of
 msgid ""
-"This function extracts all words from the input Page (regardless of their "
-"current organization), converts them to bounding boxes, performs column "
+"This function extracts all words from the input Page (regardless of their"
+" current organization), converts them to bounding boxes, performs column "
 "segmentation and line sorting, then rebuilds a clean Page structure."
 msgstr ""
-"Эта функция извлекает все слова из входного Page (независимо от их текущей "
-"организации), преобразует их в ограничивающие прямоугольники, выполняет "
-"сегментацию на колонки и сортировку строк, а затем заново строит чистую "
-"структуру Page."
+"Эта функция извлекает все слова из входного Page (независимо от их "
+"текущей организации), преобразует их в ограничивающие прямоугольники, "
+"выполняет сегментацию на колонки и сортировку строк, а затем заново "
+"строит чистую структуру Page."
 
-#: 40234cb52b954e11be89788713aa2ac5 manuscript.utils.sorting.organize_page:50 of
+#: 40234cb52b954e11be89788713aa2ac5 manuscript.utils.sorting.organize_page:50
+#: of
 msgid ""
 "The function preserves all Word attributes (polygon, confidence, text, "
 "etc.) while updating the `order` field for reading sequence."
 msgstr ""
-"Функция сохраняет все атрибуты Word (полигон, уверенность, текст и т. д.), "
-"обновляя при этом поле `order`, отвечающее за последовательность чтения."
+"Функция сохраняет все атрибуты Word (полигон, уверенность, текст и т. "
+"д.), обновляя при этом поле `order`, отвечающее за последовательность "
+"чтения."
 
 #: 7b9463585fdc4f05bc31112c113a2728 manuscript.utils.training.set_seed:2 of
 msgid "Set random seed for reproducibility across random, numpy, and PyTorch."
-msgstr "Установка случайного зерна для воспроизводимости в random, NumPy и PyTorch."
+msgstr ""
+"Установка случайного зерна для воспроизводимости в random, NumPy и "
+"PyTorch."
 
 #: bf104521e4fa4ca491362330d01761cf manuscript.utils.training.set_seed:19 of
 msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
 msgstr ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
+
+#~ msgid "Alpha for darkening background (0=no darkening, 1=fully dark)."
+#~ msgstr ""
+#~ "Альфа-коэффициент затемнения фона (0 — "
+#~ "без затемнения, 1 — полностью тёмный)."
+
+#~ msgid "Gaussian blur kernel size (0=no blur, must be odd)."
+#~ msgstr "Размер ядра гауссова размытия (0 — без размытия, должен быть нечётным)."
+

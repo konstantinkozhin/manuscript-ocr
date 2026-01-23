@@ -10,4 +10,5 @@ This section contains the complete API reference for manuscript-ocr.
    data
    detectors
    recognizers
+   correctors
    utils

@@ -17,7 +17,7 @@ class CharLMCorrector:
         self.mask_threshold, self.apply_threshold = mask_threshold, apply_threshold
         self.max_edits = max_edits
         self.min_word_len = min_word_len
-        self.lexicon = frozenset(lexicon) if lexicon else None
+        self.lexicon = frozenset(w.lower() for w in lexicon) if lexicon else None
         self._word_pattern =  re.compile(r'(\w+)|(\W+)', re.UNICODE)
 
     def _tokenize(self, text):

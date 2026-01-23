@@ -11,7 +11,7 @@ from .recognizers import TRBA
 from .utils import read_image, visualize_page
 
 if TYPE_CHECKING:
-    from .correctors.base import BaseCorrector
+    from .api.base import BaseModel as BaseCorrector
 
 
 class Pipeline:
@@ -58,8 +58,8 @@ class Pipeline:
     Create pipeline with text correction:
 
     >>> from manuscript import Pipeline
-    >>> from manuscript.correctors import DummyCorrector
-    >>> corrector = DummyCorrector()
+    >>> from manuscript.correctors import CharLM
+    >>> corrector = CharLM()
     >>> pipeline = Pipeline(corrector=corrector)
 
     Disable automatic rotation of vertical text:

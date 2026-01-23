@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-22 17:48+0700\n"
+"POT-Creation-Date: 2026-01-23 18:42+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -28,23 +28,23 @@ msgstr ""
 
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:2
 #: 2d87fad7f27a4822b49aaa46f66ed267
-msgid "High-level OCR pipeline combining text detection and recognition."
+msgid "High-level OCR pipeline combining text detection, recognition, and correction."
 msgstr ""
 
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:4
 #: cd185d2b4dc04d7a9d811d3823a9210c
-msgid "The Pipeline class orchestrates EAST detector and TRBA recognizer to perform complete OCR workflow: detection → crop extraction → recognition → result merging."
+msgid "The Pipeline class orchestrates EAST detector, TRBA recognizer, and optional text corrector to perform complete OCR workflow: detection → crop extraction → recognition → correction → result merging."
 msgstr ""
 
 #: ../../api/pipeline.rst:0
 #: cdc564c856e14cfea6d730b0268ef313
 #: 3ede7f80830e42139f1292d536a58194
-#: ba22211f5902416288649f7a13cb0e03
-#: 9723374a09ff40ec917d9425f9761a69
+#: 3ede7f80830e42139f1292d536a58194
+#: 3ede7f80830e42139f1292d536a58194
 msgid "Parameters"
 msgstr ""
 
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:9
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:10
 #: 8876c58ba5a045769a26744a0d553912
 msgid "Text detector instance"
 msgstr ""
@@ -53,79 +53,111 @@ msgstr ""
 #: 186b8b99a62546eaa5562b6fb66c2712
 #: 1fb299a54ffa4ba9b33a48512bf14844
 #: 669a9cf28fea495c99282680cca446b8
+#: 6809fa36fc50488891cf43d82bfdcce9
+#: 6809fa36fc50488891cf43d82bfdcce9
 msgid "type"
 msgstr ""
 
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:11
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:12
 #: 3328da0140fd4e079be03bb6a39a6643
 msgid "EAST"
 msgstr ""
 
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:15
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:16
 #: 093c7309ec354c818e905fa80a30b53b
 msgid "Text recognizer instance"
 msgstr ""
 
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:17
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:18
 #: d826ccc09ba24e889bf5089fad564e06
 msgid "TRBA"
 msgstr ""
 
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:21
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:22
+#: 0c427a8698144017a72bbdcd1f2a8252
+msgid "Text corrector instance (None to skip correction)"
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:24
+#: 17202c1591284074bcad246a1cd1af2d
+msgid "BaseCorrector, optional"
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:28
 #: 96ba6537af0d42be9514d49ed40caaa6
 msgid "Minimum text box size in pixels (width and height)"
 msgstr ""
 
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:23
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:30
 #: d94486be6f894f59aaeba36225e41201
 msgid "int"
 msgstr ""
 
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:26
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:34
+#: 858de9a136ab476db5e4306d90fed542
+msgid "Aspect ratio threshold for automatic rotation of vertical text crops. If ``height > width * rotate_threshold``, crop is rotated 90° clockwise."
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:37
+#: 35fa19f11c2642b087799666b5fc987f
+msgid "float"
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:40
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline.get_text:12
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline.predict:34
 #: 8438486b869649b1821afb4a226ea692
-#: d2ebbf7e513b4cd68e90affc6e145e5b
-#: 9dd53eb3c6cc4204b805e6c561872a70
+#: 8438486b869649b1821afb4a226ea692
+#: 8438486b869649b1821afb4a226ea692
 msgid "Examples"
 msgstr ""
 
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:27
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:41
 #: db672cea5ed54e2489118269241ffcfa
 msgid "Create pipeline with default models:"
 msgstr ""
 
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:35
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:49
 #: c19b729c69b8428190b26de413ff0513
 msgid "Create pipeline with custom models:"
 msgstr ""
 
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:47
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:58
+#: db672cea5ed54e2489118269241ffcfa
+msgid "Create pipeline with text correction:"
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:65
+#: 628276393f5245cd94ae2f3b246e7e1d
+msgid "Disable automatic rotation of vertical text:"
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:72
 #: 5b2c21634a5b4884aeb5b4dca0094148
 msgid "Methods"
 msgstr ""
 
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:63:<autosummary>:1
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:88:<autosummary>:1
 #: ef7baf45570b4147b0db2a0816c7e432
 msgid ":py:obj:`get_text <manuscript._pipeline.Pipeline.get_text>`\\ \\(page\\)"
 msgstr ""
 
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline.get_text:2
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:63:<autosummary>:1
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:88:<autosummary>:1
 #: 588dadb4acac4149bd3db7f28ff3dd60
-#: 905374099cb94e7fbd0c980c154f02b1
+#: 588dadb4acac4149bd3db7f28ff3dd60
 msgid "Extract plain text from Page object."
 msgstr ""
 
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:63:<autosummary>:1
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:88:<autosummary>:1
 #: 6bd9688bb7ee43bda5b810996c9070ee
 msgid ":py:obj:`predict <manuscript._pipeline.Pipeline.predict>`\\ \\(image\\[\\, recognize\\_text\\, vis\\, profile\\]\\)"
 msgstr ""
 
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline.predict:2
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:63:<autosummary>:1
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:88:<autosummary>:1
 #: 0c560f843e0446f6b5f25446333612a8
-#: 45b1be1f138f431c8371317d59b8bb8a
+#: 0c560f843e0446f6b5f25446333612a8
 msgid "Run OCR pipeline on a single image."
 msgstr ""
 
@@ -145,8 +177,18 @@ msgid "Text recognizer instance. If None, creates default TRBA recognizer."
 msgstr ""
 
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline.__init__:11
+#: 5b612c6e344e48afb095c365940cb34d
+msgid "Text corrector instance. If None, no text correction is applied. The corrector receives a Page object after recognition and returns a corrected Page object."
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline.__init__:16
 #: db01750898d542a89b762f4cf006a822
 msgid "Minimum text size in pixels. Boxes smaller than this will be filtered out before recognition. Default is 5."
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline.__init__:20
+#: 54631db26561421a98a2ac2faaa6951a
+msgid "Aspect ratio threshold for automatic rotation of vertical text. If ``height > width * rotate_threshold``, the crop is rotated 90 degrees clockwise to convert vertical text to horizontal. Set to ``None`` or ``0`` to disable automatic rotation. Default is 1.5."
 msgstr ""
 
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline.predict:5
@@ -171,7 +213,7 @@ msgstr ""
 
 #: ../../api/pipeline.rst:0
 #: 7804d8370f2d45139d167824407d28cd
-#: 6765cd4aa1194ad59731067593c9c5bb
+#: 7804d8370f2d45139d167824407d28cd
 msgid "Returns"
 msgstr ""
 
@@ -202,7 +244,7 @@ msgstr ""
 
 #: ../../api/pipeline.rst:0
 #: 6809fa36fc50488891cf43d82bfdcce9
-#: ad4991a2ae514e9188a6978349f5e499
+#: 6809fa36fc50488891cf43d82bfdcce9
 msgid "Return type"
 msgstr ""
 

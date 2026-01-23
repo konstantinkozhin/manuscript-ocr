@@ -1,3 +1,22 @@
+# Translations template for PROJECT.
+# Copyright (C) 2026 ORGANIZATION
+# This file is distributed under the same license as the PROJECT project.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PROJECT VERSION\n"
+"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
+"POT-Creation-Date: 2026-01-23 18:42+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
 #: ../../getting_started.rst:2 fa8322693daf4619ac92dee1370a7f76
 msgid "Getting Started"
 msgstr "Начало работы"
@@ -66,18 +85,24 @@ msgstr ":class:`~manuscript.detectors.EAST` — детектор текста"
 msgid ":class:`~manuscript.recognizers.TRBA` - Text recognizer"
 msgstr ":class:`~manuscript.recognizers.TRBA` — модель распознавания текста"
 
-#: ../../getting_started.rst:65 688bc42cca7a4cb38017bb8e0cd95255
+#: ../../getting_started.rst:65 fd06413ae672467ba4f4c2608e8ccaed
+#, fuzzy
+msgid ":class:`~manuscript.correctors.CharLM` - Character-level text corrector"
+msgstr ":class:`~manuscript.detectors.EAST` — детектор текста"
+
+#: ../../getting_started.rst:66 688bc42cca7a4cb38017bb8e0cd95255
 msgid ":class:`~manuscript.data.Page` - Page data structure"
 msgstr ":class:`~manuscript.data.Page` — структура данных страницы"
 
-#: ../../getting_started.rst:66 945d39529bc34e0bbb17b4647ca8d5a1
+#: ../../getting_started.rst:67 945d39529bc34e0bbb17b4647ca8d5a1
 msgid ":class:`~manuscript.data.Block` - Block data structure"
 msgstr ":class:`~manuscript.data.Block` — структура данных блока"
 
-#: ../../getting_started.rst:67 399815d594a94415956270810e4fa1ce
+#: ../../getting_started.rst:68 399815d594a94415956270810e4fa1ce
 msgid ":class:`~manuscript.data.Line` - Line data structure"
 msgstr ":class:`~manuscript.data.Line` — структура данных строки"
 
-#: ../../getting_started.rst:68 483fab9d2a6343bbb9ece0ad3a7ea5bf
+#: ../../getting_started.rst:69 483fab9d2a6343bbb9ece0ad3a7ea5bf
 msgid ":class:`~manuscript.data.Word` - Word data structure"
 msgstr ":class:`~manuscript.data.Word` — структура данных слова"
+

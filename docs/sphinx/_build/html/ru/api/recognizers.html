@@ -22,7 +22,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Алфавитный указатель" href="../genindex.html" />
     <link rel="search" title="Поиск" href="../search.html" />
-    <link rel="next" title="Утилиты" href="utils.html" />
+    <link rel="next" title="Корректоры" href="correctors.html" />
     <link rel="prev" title="Детекторы" href="detectors.html" /> 
 </head>
 
@@ -62,7 +62,9 @@
 <li class="toctree-l3"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.rotate_threshold"><code class="docutils literal notranslate"><span class="pre">Pipeline.rotate_threshold</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
@@ -107,8 +109,24 @@
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="correctors.html">Корректоры</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="correctors.html#charlm"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#manuscript.correctors.CharLM"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#overview">Обзор</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#available-presets">Доступные пресеты</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#quick-example">Быстрый пример</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#basic-usage">Базовое использование</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#advanced-configuration">Расширенная конфигурация</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#using-custom-lexicon">Использование пользовательского лексикона</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#training-custom-model">Обучение пользовательской модели</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#export-to-onnx">Экспорт в ONNX</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="utils.html">Утилиты</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.read_image"><code class="docutils literal notranslate"><span class="pre">read_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
@@ -508,7 +526,7 @@
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Нижняя область">
         <a href="detectors.html" class="btn btn-neutral float-left" title="Детекторы" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Предыдущая</a>
-        <a href="utils.html" class="btn btn-neutral float-right" title="Утилиты" accesskey="n" rel="next">Следующая <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="correctors.html" class="btn btn-neutral float-right" title="Корректоры" accesskey="n" rel="next">Следующая <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

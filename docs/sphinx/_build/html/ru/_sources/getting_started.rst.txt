@@ -62,6 +62,7 @@ Main Components
 - :class:`~manuscript.Pipeline` - High-level OCR pipeline
 - :class:`~manuscript.detectors.EAST` - Text detector
 - :class:`~manuscript.recognizers.TRBA` - Text recognizer
+- :class:`~manuscript.correctors.CharLM` - Character-level text corrector
 - :class:`~manuscript.data.Page` - Page data structure
 - :class:`~manuscript.data.Block` - Block data structure
 - :class:`~manuscript.data.Line` - Line data structure

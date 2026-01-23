@@ -1,0 +1,520 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: manuscript-ocr \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-23 18:42+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../api/correctors.rst:2
+#: df1c2572333d4afb9670d5079bcaf06c
+msgid "Correctors"
+msgstr ""
+
+#: ../../api/correctors.rst:4
+#: 55e4bc26572e4012ba6cdd2503d81fff
+msgid "Character-level text corrector for post-processing OCR results."
+msgstr ""
+
+#: ../../api/correctors.rst:7
+#: 42cdb0e5812b435e932d08621c69c2e7
+msgid "``CharLM``"
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:2
+#: c5de954811364ccdbb8b45bfcf80dafe
+msgid "Character-level language model corrector using ONNX Runtime."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:4
+#: ed05ac22bdb042a2a55033b1df970e95
+msgid "CharLM uses a Transformer-based masked language model to correct OCR errors at the character level. It analyzes character confidence and applies corrections based on learned substitution patterns."
+msgstr ""
+
+#: ../../api/correctors.rst:0
+#: b5161db6c21b48a3a8acd48da6af18a0
+#: 2274db3e17f34b10ac1f3a819708dae5
+#: 518c7400927d46bf8f7ce2db74a0ffc6
+#: 0fa2b43a223d4b808b4d704ca2ef8129
+#: 426d5b19d17d44a48bd825f5f6023c9b
+msgid "Parameters"
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:9
+#: ac384a2d61dd476d89bdb14625975002
+msgid "Path to ONNX model weights. Supports local path, URL, or preset name. If None, uses default preset."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:13
+#: 94cb8c2dc077496ba4cae7070cb159a3
+msgid "Path to vocabulary JSON file. If None, inferred from weights location."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:15
+#: 525b9b39c1734691bfda62990a5fe28f
+msgid "Path to substitutions JSON file. If None, inferred from weights location."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:18
+#: 6b6a0eb48f984a539978bed40ec87104
+msgid "Compute device. Default is auto-detected."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:21
+#: 55564d2926124e9d8ce0e4c92bc37b05
+msgid "Confidence threshold below which characters are considered for correction. Default is 0.05."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:25
+#: 9b91b3bb3ccc4c73ba79e1e1baed3026
+msgid "Minimum model confidence required to apply a correction. Default is 0.95."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:28
+#: c486b9ad5f6f4dc48501ff9b47054a65
+msgid "Maximum number of edits per word. Default is 2."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:30
+#: 24ef7a453e08412c8c0e6096691d590b
+msgid "Minimum substitution count in training data to allow correction. Default is 100."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:34
+#: d5d7135b16894d289fe89ea6def58727
+msgid "Minimum word length to attempt correction. Default is 4."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:37
+#: 3014c51f410e4cae9701d25eda06e8a0
+msgid "Additional configuration options."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:40
+#: df4ba6e428b446d0aab3a0e7b3154b0a
+msgid "Examples"
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:48
+#: 731b1d6167b549d1b7febb8869248bd9
+msgid "Methods"
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:67:<autosummary>:1
+#: b16917b529a2437fad2642b0cf411077
+msgid ":py:obj:`__call__ <manuscript.correctors.CharLM.__call__>`\\ \\(\\*args\\, \\*\\*kwargs\\)"
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:67:<autosummary>:1
+#: 837d16d998434950a2b9a2e0f444b0aa
+msgid "Call self as a function."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:67:<autosummary>:1
+#: 941e76954d6345f49035340a8b5d7234
+msgid ":py:obj:`export <manuscript.correctors.CharLM.export>`\\ \\(weights\\_path\\, vocab\\_path\\, output\\_path\\)"
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.export:2
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:67:<autosummary>:1
+#: dc95c8fe1d6b4013bb7db09406323a70
+#: d93ac0183dbe41188239716df996813c
+msgid "Export CharLM PyTorch model to ONNX format."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:67:<autosummary>:1
+#: 6da18e32be81477e8d23cf3c8015cfe3
+msgid ":py:obj:`predict <manuscript.correctors.CharLM.predict>`\\ \\(page\\)"
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.predict:2
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:67:<autosummary>:1
+#: 1b654eb2ed224e63989c1814f4af8174
+#: f8c3550fce3741829710560230b9aa47
+msgid "Apply character-level correction to a Page."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:67:<autosummary>:1
+#: 093fd402b9224d23b7792c2a6b785a19
+msgid ":py:obj:`runtime_providers <manuscript.correctors.CharLM.runtime_providers>`\\ \\(\\)"
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:67:<autosummary>:1
+#: 8bff041b550f45ada56e01a4483a664f
+msgid "Get ONNX Runtime execution providers based on device."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:67:<autosummary>:1
+#: 060321c713764794883811fd3df2b2ed
+msgid ":py:obj:`train <manuscript.correctors.CharLM.train>`\\ \\(\\[words\\_path\\, text\\_path\\, pairs\\_path\\, ...\\]\\)"
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:2
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:67:<autosummary>:1
+#: 3de6d7a310084324b29e693ecfd1193e
+#: c1abe4c186bd4f5a8b0f1f4fb4459907
+msgid "Train CharLM character-level language model."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.predict:5
+#: 4279f57f27174b698f4a6e86ca8cc7bc
+msgid "Input Page object with recognized text."
+msgstr ""
+
+#: ../../api/correctors.rst:0
+#: 764855ffbf7f448f9660b78b14d92868
+#: da1a196a05f34d9fa988025d3091353a
+msgid "Returns"
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.predict:8
+#: 7ab08ea443f3421bb20123f68487042e
+msgid "Corrected Page object with updated word texts."
+msgstr ""
+
+#: ../../api/correctors.rst:0
+#: ebaaa96821c949269a763535bd174d30
+#: d87f73bb0c82496d9c688f1b188cc69c
+#: 423b83bcd49c46f48fbd371b6b9b9ec8
+msgid "Return type"
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:5
+#: 0969424692e444ee8d6582410f07633c
+msgid "Path to words file (one word per line)."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:8
+#: ea11491a10704a3fae71b21a83772d2b
+msgid "Path to text file for n-gram dataset."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:11
+#: 53c633bffdc64c01acaacc64a924275a
+msgid "Path to CSV file with incorrect/correct pairs."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:14
+#: aeb5af6c876748cbb353fc742f768623
+msgid "Path to charset file (allowed characters)."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:17
+#: cc9d67d7b31f484687ceb394643a20b0
+msgid "Experiment directory. Default is \"exp_charlm\"."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:20
+#: 5b2faa8426f8479497e3c193332d9a6f
+msgid "Maximum words to use from words file. Default is 1_500_000."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:23
+#: b6a360864af94eae980f887e693881b3
+msgid "Maximum number of character edits in pairs to include. Default is 3."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.export:14
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:26
+#: eb60c9dc3c704cb180ff8eb4075b910b
+#: 59ae6676011f4939a80e4dcd0ac952c0
+msgid "Maximum sequence length. Default is 32."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.export:17
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:29
+#: b8606f4730eb4ae38d0831f7e20fc8a0
+#: 00ca42a90866400e9a3f565db5229156
+msgid "Embedding size. Default is 192."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.export:20
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:32
+#: 61faea28dde04581969f8f1ecb254bd1
+#: 41164c26be6e41f0bca76d069793c240
+msgid "Number of transformer layers. Default is 8."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.export:23
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:35
+#: 844b460c9ccb42d59719e37b959a2551
+#: 217bd8d123d14ff2bf9ccf82aa3d4fc4
+msgid "Number of attention heads. Default is 6."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.export:26
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:38
+#: 7d2ed0f55ef44869a7295dc3c495f765
+#: 7e1d3bd0a1eb490198fe22b5a280c2df
+msgid "Feed-forward network size. Default is 1024."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:41
+#: 8acd0ca2438545f895a5cfcfb20dc5e7
+msgid "Dropout rate. Default is 0.1."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:44
+#: 2f8f3e9bd57a4f5b8cb42d4b7128521c
+msgid "Batch size. Default is 256."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:47
+#: 7cd1df500eed4ee9bb41599f39e26f96
+msgid "Gradient accumulation steps. Default is 2."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:50
+#: abb5f995228c434991f1da00ca0408a6
+msgid "Use automatic mixed precision (AMP). Default is True."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:53
+#: aaa8de3acd854d29901d97c159404d60
+msgid "Use torch.compile for faster training. Default is False."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:56
+#: 0a60cf1155914bb88085774648ea9971
+msgid "Number of epochs. Default is 50."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:59
+#: e4c381b5c96a4105a4d99401d33c70b5
+msgid "Learning rate. Default is 1e-3."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:62
+#: 43f5dc07205e45e4b2e3e821c2a918cc
+msgid "Weight decay. Default is 0.01."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:65
+#: 171e4f45dd48474fa934fcf64ce6f1a8
+msgid "Gradient clipping. Default is 1.0."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:68
+#: 5ad1a263df55474f842f618125a6d94b
+msgid "Minimum word length. Default is 3."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:71
+#: ae3ee187515a44ea8fa3db22e430faf4
+msgid "Probability of using span masking. Default is 0.3."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:74
+#: e71ed185b8c54fc78ed02706ccf82c82
+msgid "Minimum span length for masking. Default is 1."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:77
+#: 0458d3a51f6040759c3f0b4f0219c5c3
+msgid "Maximum span length for masking. Default is 3."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:80
+#: ad99c1a9dec4469ead8a4c90ce0c7fd4
+msgid "Minimum number of spans. Default is 1."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:83
+#: c5568b740aaf427b81859a3d805e4397
+msgid "Maximum number of spans. Default is 2."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:86
+#: bb0b4d51479d4d7eaef815f34da3b3cd
+msgid "Ratio of OCR pairs in mixed dataset (0.8 = 80% pairs, 20% ngrams). Default is 0.8."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:89
+#: 28471128b969413a88adc4567f1873b0
+msgid "Evaluation set ratio. Default is 0.01."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:92
+#: 88fb0a9379494aaa93bfe5dfcaf9aa2e
+msgid "Random seed. Default is 42."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:95
+#: 9d7f713b67c6438a86412865193fccef
+msgid "Path to checkpoint to resume from."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:98
+#: c4913c9accb2439ea32c7b4663fcaeac
+msgid "Additional config options."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.train:100
+#: 21de48849bca43ea971719100f779d40
+msgid "Path to the final checkpoint."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.export:5
+#: aebe7443feaf4020b37d57f1b8a9df7c
+msgid "Path to PyTorch checkpoint (.pt file)."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.export:8
+#: d35c7ce3fc3243fab7c19620a46eba4a
+msgid "Path to vocabulary JSON file."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.export:11
+#: 5ec68f1088ae4c468a7b841e44ade9ba
+msgid "Path to save ONNX model."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.export:29
+#: 343b948b96c347bc812fc3b466d2b153
+msgid "ONNX opset version. Default is 14."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.export:32
+#: e4ec4e6140f146668bb8b6bdd3127c8f
+msgid "Apply ONNX simplification. Default is True."
+msgstr ""
+
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM.export:48
+#: fc5a49ee790d4b288dce7108acbaa050
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
+msgstr ""
+
+#: ../../api/correctors.rst:15
+#: 22e1998743f148c6ac5850166ebeb479
+msgid "Overview"
+msgstr ""
+
+#: ../../api/correctors.rst:17
+#: 2f01cdfaf641421ab9f572b6620b1556
+msgid "``CharLM`` is a character-level masked language model corrector that uses a Transformer architecture to fix OCR errors. It analyzes character-level context and applies corrections based on learned patterns."
+msgstr ""
+
+#: ../../api/correctors.rst:21
+#: c2abf805598a4bf0b1acafacf2e458a8
+msgid "**Key features:**"
+msgstr ""
+
+#: ../../api/correctors.rst:23
+#: 7aaa7d4b13b04a7abfe1841bf7f5ffe7
+msgid "Character-level Transformer-based correction"
+msgstr ""
+
+#: ../../api/correctors.rst:24
+#: 2af1881f1ee5496ba93c4e465b0a8486
+msgid "Configurable confidence thresholds"
+msgstr ""
+
+#: ../../api/correctors.rst:25
+#: 4df8ce1d2221420497976ea8f0849dc9
+msgid "Support for custom vocabularies and lexicons"
+msgstr ""
+
+#: ../../api/correctors.rst:26
+#: ce081dfe30d54dfcb5146c6599b149e4
+msgid "ONNX Runtime inference for fast correction"
+msgstr ""
+
+#: ../../api/correctors.rst:27
+#: f6ceb9848ce24fdda6ef8aa8eaf81edf
+msgid "Optional lexicon filtering to preserve known words"
+msgstr ""
+
+#: ../../api/correctors.rst:30
+#: 4740eb8173af4153a60c514dc607d682
+msgid "Available Presets"
+msgstr ""
+
+#: ../../api/correctors.rst:32
+#: 7872935569f343a191156f872ec2bbf2
+msgid "The following pretrained models are available:"
+msgstr ""
+
+#: ../../api/correctors.rst:38
+#: b38a067142e0427da416a5b6013cfca0
+msgid "Preset Name"
+msgstr ""
+
+#: ../../api/correctors.rst:39
+#: 1f65f0144f914c42a1323116cb2ca07b
+msgid "Description"
+msgstr ""
+
+#: ../../api/correctors.rst:40
+#: 80c3f86b7fc14135bdff56ad8331152f
+msgid "``prereform_charlm_g1``"
+msgstr ""
+
+#: ../../api/correctors.rst:41
+#: f80ae5c5b6e94f7e9e51d46f9d721ca9
+msgid "Pre-reform Russian text (default)"
+msgstr ""
+
+#: ../../api/correctors.rst:42
+#: 24daeac8c3684df18831b5f5fedc0d71
+msgid "``modern_charlm_g1``"
+msgstr ""
+
+#: ../../api/correctors.rst:43
+#: f091769cd58e427fb4c09d9f7b1c0253
+msgid "Modern Russian text"
+msgstr ""
+
+#: ../../api/correctors.rst:46
+#: a2d323996ebc4434b7a9c9e350ca82a7
+msgid "Quick Example"
+msgstr ""
+
+#: ../../api/correctors.rst:48
+#: 320c39e8203f48588ea43aaea73cf228
+msgid "Use ``create_page_from_text`` to quickly test correction on text:"
+msgstr ""
+
+#: ../../api/correctors.rst:68
+#: 5bc2143c01044a28bff007ef59bb4390
+msgid "Basic Usage"
+msgstr ""
+
+#: ../../api/correctors.rst:86
+#: 618ca5ab9f19430a914f39d0a0c37d29
+msgid "Advanced Configuration"
+msgstr ""
+
+#: ../../api/correctors.rst:103
+#: 4972267db3394ef4be2356c2548eb281
+msgid "Using Custom Lexicon"
+msgstr ""
+
+#: ../../api/correctors.rst:105
+#: fac4ee6cbd7746069c1df76517be0554
+msgid "You can provide a lexicon (word list) to prevent corrections of known words:"
+msgstr ""
+
+#: ../../api/correctors.rst:131
+#: 4f955a647fc54328bea3634068f00942
+msgid "Training Custom Model"
+msgstr ""
+
+#: ../../api/correctors.rst:133
+#: 94af31612faa4d7d90bee7df332245ee
+msgid "You can train CharLM on your own data:"
+msgstr ""
+
+#: ../../api/correctors.rst:156
+#: e878bed651464f128a497fca51644feb
+msgid "Export to ONNX"
+msgstr ""

@@ -4,7 +4,7 @@ import random
 import csv
 import torch
 import torch.nn.functional as F
-from torch.utils.data import DataLoader, ConcatDataset, Dataset
+from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 from collections import Counter
 import Levenshtein
@@ -121,7 +121,6 @@ def train(config=None):
             logger.log(f"  {sub}: {count}")
         substitutions = sorted_subs
 
-    datasets = []
     ngram_dataset = None
     pairs_dataset = None
     

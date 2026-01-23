@@ -424,7 +424,9 @@ window.addEventListener("load", load);
 <li class="toctree-l3"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.rotate_threshold"><code class="docutils literal notranslate"><span class="pre">Pipeline.rotate_threshold</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
@@ -469,8 +471,24 @@ window.addEventListener("load", load);
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="api/correctors.html">Корректоры</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/correctors.html#charlm"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#manuscript.correctors.CharLM"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#overview">Обзор</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#available-presets">Доступные пресеты</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#quick-example">Быстрый пример</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#basic-usage">Базовое использование</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#advanced-configuration">Расширенная конфигурация</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#using-custom-lexicon">Использование пользовательского лексикона</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#training-custom-model">Обучение пользовательской модели</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#export-to-onnx">Экспорт в ONNX</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="api/utils.html">Утилиты</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.read_image"><code class="docutils literal notranslate"><span class="pre">read_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
@@ -530,6 +548,8 @@ window.addEventListener("load", load);
       <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline.__init__">__init__() (метод manuscript._pipeline.Pipeline)</a>
 
       <ul>
+        <li><a href="api/correctors.html#manuscript.correctors.CharLM.__init__">(метод manuscript.correctors.CharLM)</a>
+</li>
         <li><a href="api/data.html#manuscript.data.Block.__init__">(метод manuscript.data.Block)</a>
 </li>
         <li><a href="api/detectors.html#manuscript.detectors.EAST.__init__">(метод manuscript.detectors.EAST)</a>
@@ -555,11 +575,17 @@ window.addEventListener("load", load);
 <h2 id="C">C</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/correctors.html#manuscript.correctors.CharLM">CharLM (класс в manuscript.correctors)</a>
+</li>
       <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.charset_registry">charset_registry (атрибут manuscript.recognizers.TRBA)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.config_registry">config_registry (атрибут manuscript.recognizers.TRBA)</a>
+</li>
+      <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline.corrector">corrector (атрибут manuscript._pipeline.Pipeline)</a>
+</li>
+      <li><a href="api/utils.html#manuscript.utils.create_page_from_text">create_page_from_text() (в модуле manuscript.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -567,9 +593,11 @@ window.addEventListener("load", load);
 <h2 id="D">D</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/detectors.html#manuscript.detectors.EAST.default_weights_name">default_weights_name (атрибут manuscript.detectors.EAST)</a>
+      <li><a href="api/correctors.html#manuscript.correctors.CharLM.default_weights_name">default_weights_name (атрибут manuscript.correctors.CharLM)</a>
 
       <ul>
+        <li><a href="api/detectors.html#manuscript.detectors.EAST.default_weights_name">(атрибут manuscript.detectors.EAST)</a>
+</li>
         <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name">(атрибут manuscript.recognizers.TRBA)</a>
 </li>
       </ul></li>
@@ -587,11 +615,11 @@ window.addEventListener("load", load);
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/detectors.html#manuscript.detectors.EAST">EAST (класс в manuscript.detectors)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/detectors.html#manuscript.detectors.EAST.export">export() (статический метод manuscript.detectors.EAST)</a>
+      <li><a href="api/correctors.html#manuscript.correctors.CharLM.export">export() (статический метод manuscript.correctors.CharLM)</a>
 
       <ul>
+        <li><a href="api/detectors.html#manuscript.detectors.EAST.export">(статический метод manuscript.detectors.EAST)</a>
+</li>
         <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.export">(статический метод manuscript.recognizers.TRBA)</a>
 </li>
       </ul></li>
@@ -609,10 +637,12 @@ window.addEventListener("load", load);
 <h2 id="L">L</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data.html#manuscript.data.Line">Line (класс в manuscript.data)</a>
+      <li><a href="api/correctors.html#manuscript.correctors.CharLM.lexicon_registry">lexicon_registry (атрибут manuscript.correctors.CharLM)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/data.html#manuscript.data.Line">Line (класс в manuscript.data)</a>
+</li>
       <li><a href="api/data.html#manuscript.data.Block.lines">lines (атрибут manuscript.data.Block)</a>
 </li>
   </ul></td>
@@ -708,6 +738,8 @@ window.addEventListener("load", load);
       <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline.predict">predict() (метод manuscript._pipeline.Pipeline)</a>
 
       <ul>
+        <li><a href="api/correctors.html#manuscript.correctors.CharLM.predict">(метод manuscript.correctors.CharLM)</a>
+</li>
         <li><a href="api/detectors.html#manuscript.detectors.EAST.predict">(метод manuscript.detectors.EAST)</a>
 </li>
         <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.predict">(метод manuscript.recognizers.TRBA)</a>
@@ -715,9 +747,11 @@ window.addEventListener("load", load);
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/detectors.html#manuscript.detectors.EAST.pretrained_registry">pretrained_registry (атрибут manuscript.detectors.EAST)</a>
+      <li><a href="api/correctors.html#manuscript.correctors.CharLM.pretrained_registry">pretrained_registry (атрибут manuscript.correctors.CharLM)</a>
 
       <ul>
+        <li><a href="api/detectors.html#manuscript.detectors.EAST.pretrained_registry">(атрибут manuscript.detectors.EAST)</a>
+</li>
         <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry">(атрибут manuscript.recognizers.TRBA)</a>
 </li>
       </ul></li>
@@ -729,11 +763,13 @@ window.addEventListener("load", load);
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/utils.html#manuscript.utils.read_image">read_image() (в модуле manuscript.utils)</a>
 </li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#id3">recognition_confidence (атрибут manuscript.data.Word)</a>, <a href="api/data.html#manuscript.data.Word.recognition_confidence">[1]</a>
 </li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline.recognizer">recognizer (атрибут manuscript._pipeline.Pipeline)</a>
+</li>
+      <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline.rotate_threshold">rotate_threshold (атрибут manuscript._pipeline.Pipeline)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -751,9 +787,11 @@ window.addEventListener("load", load);
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#id2">text (атрибут manuscript.data.Word)</a>, <a href="api/data.html#manuscript.data.Word.text">[1]</a>
 </li>
-      <li><a href="api/detectors.html#manuscript.detectors.EAST.train">train() (статический метод manuscript.detectors.EAST)</a>
+      <li><a href="api/correctors.html#manuscript.correctors.CharLM.train">train() (статический метод manuscript.correctors.CharLM)</a>
 
       <ul>
+        <li><a href="api/detectors.html#manuscript.detectors.EAST.train">(статический метод manuscript.detectors.EAST)</a>
+</li>
         <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.train">(статический метод manuscript.recognizers.TRBA)</a>
 </li>
       </ul></li>
@@ -768,6 +806,10 @@ window.addEventListener("load", load);
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/utils.html#manuscript.utils.visualize_page">visualize_page() (в модуле manuscript.utils)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/correctors.html#manuscript.correctors.CharLM.vocab_registry">vocab_registry (атрибут manuscript.correctors.CharLM)</a>
 </li>
   </ul></td>
 </tr></table>

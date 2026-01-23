@@ -423,7 +423,9 @@ window.addEventListener("load", load);
 <li class="toctree-l3"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.rotate_threshold"><code class="docutils literal notranslate"><span class="pre">Pipeline.rotate_threshold</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
@@ -468,8 +470,24 @@ window.addEventListener("load", load);
 </li>
 </ul>
 </li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/correctors.html">Correctors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/correctors.html#charlm"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/correctors.html#manuscript.correctors.CharLM"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/correctors.html#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/correctors.html#available-presets">Available Presets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/correctors.html#quick-example">Quick Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/correctors.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/correctors.html#advanced-configuration">Advanced Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/correctors.html#using-custom-lexicon">Using Custom Lexicon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/correctors.html#training-custom-model">Training Custom Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/correctors.html#export-to-onnx">Export to ONNX</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/utils.html">Utilities</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.read_image"><code class="docutils literal notranslate"><span class="pre">read_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
@@ -506,7 +524,7 @@ window.addEventListener("load", load);
   <h1>Source code for manuscript._pipeline</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
@@ -516,15 +534,19 @@ window.addEventListener("load", load);
 <span class="kn">from</span><span class="w"> </span><span class="nn">.recognizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRBA</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_image</span><span class="p">,</span> <span class="n">visualize_page</span>
 
+<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">.api.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span> <span class="k">as</span> <span class="n">BaseCorrector</span>
+
 
 <div class="viewcode-block" id="Pipeline">
 <a class="viewcode-back" href="../../api/pipeline.html#manuscript._pipeline.Pipeline">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Pipeline</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    High-level OCR pipeline combining text detection and recognition.</span>
+<span class="sd">    High-level OCR pipeline combining text detection, recognition, and correction.</span>
 
-<span class="sd">    The Pipeline class orchestrates EAST detector and TRBA recognizer to perform</span>
-<span class="sd">    complete OCR workflow: detection → crop extraction → recognition → result merging.</span>
+<span class="sd">    The Pipeline class orchestrates EAST detector, TRBA recognizer, and optional</span>
+<span class="sd">    text corrector to perform complete OCR workflow:</span>
+<span class="sd">    detection → crop extraction → recognition → correction → result merging.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -532,8 +554,13 @@ window.addEventListener("load", load);
 <span class="sd">        Text detector instance</span>
 <span class="sd">    recognizer : TRBA</span>
 <span class="sd">        Text recognizer instance</span>
+<span class="sd">    corrector : BaseCorrector, optional</span>
+<span class="sd">        Text corrector instance (None to skip correction)</span>
 <span class="sd">    min_text_size : int</span>
 <span class="sd">        Minimum text box size in pixels (width and height)</span>
+<span class="sd">    rotate_threshold : float</span>
+<span class="sd">        Aspect ratio threshold for automatic rotation of vertical text crops.</span>
+<span class="sd">        If ``height &gt; width * rotate_threshold``, crop is rotated 90° clockwise.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
@@ -553,6 +580,17 @@ window.addEventListener("load", load);
 <span class="sd">    &gt;&gt;&gt; detector = EAST(weights=&quot;east_50_g1&quot;, score_thresh=0.8)</span>
 <span class="sd">    &gt;&gt;&gt; recognizer = TRBA(weights=&quot;trba_lite_g1&quot;, device=&quot;cuda&quot;)</span>
 <span class="sd">    &gt;&gt;&gt; pipeline = Pipeline(detector=detector, recognizer=recognizer)</span>
+
+<span class="sd">    Create pipeline with text correction:</span>
+
+<span class="sd">    &gt;&gt;&gt; from manuscript import Pipeline</span>
+<span class="sd">    &gt;&gt;&gt; from manuscript.correctors import CharLM</span>
+<span class="sd">    &gt;&gt;&gt; corrector = CharLM()</span>
+<span class="sd">    &gt;&gt;&gt; pipeline = Pipeline(corrector=corrector)</span>
+
+<span class="sd">    Disable automatic rotation of vertical text:</span>
+
+<span class="sd">    &gt;&gt;&gt; pipeline = Pipeline(rotate_threshold=0)</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Pipeline.__init__">
@@ -561,7 +599,9 @@ window.addEventListener("load", load);
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">detector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EAST</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">recognizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TRBA</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">corrector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;BaseCorrector&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">min_text_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+        <span class="n">rotate_threshold</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.5</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize OCR pipeline.</span>
@@ -572,13 +612,25 @@ window.addEventListener("load", load);
 <span class="sd">            Text detector instance. If None, creates default EAST detector.</span>
 <span class="sd">        recognizer : TRBA, optional</span>
 <span class="sd">            Text recognizer instance. If None, creates default TRBA recognizer.</span>
+<span class="sd">        corrector : BaseCorrector, optional</span>
+<span class="sd">            Text corrector instance. If None, no text correction is applied.</span>
+<span class="sd">            The corrector receives a Page object after recognition and returns</span>
+<span class="sd">            a corrected Page object.</span>
 <span class="sd">        min_text_size : int, optional</span>
 <span class="sd">            Minimum text size in pixels. Boxes smaller than this will be</span>
 <span class="sd">            filtered out before recognition. Default is 5.</span>
+<span class="sd">        rotate_threshold : float, optional</span>
+<span class="sd">            Aspect ratio threshold for automatic rotation of vertical text.</span>
+<span class="sd">            If ``height &gt; width * rotate_threshold``, the crop is rotated</span>
+<span class="sd">            90 degrees clockwise to convert vertical text to horizontal.</span>
+<span class="sd">            Set to ``None`` or ``0`` to disable automatic rotation.</span>
+<span class="sd">            Default is 1.5.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">detector</span> <span class="k">if</span> <span class="n">detector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">EAST</span><span class="p">()</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span> <span class="o">=</span> <span class="n">recognizer</span> <span class="k">if</span> <span class="n">recognizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">TRBA</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">min_text_size</span> <span class="o">=</span> <span class="n">min_text_size</span></div>
+        <span class="bp">self</span><span class="o">.</span><span class="n">corrector</span> <span class="o">=</span> <span class="n">corrector</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">min_text_size</span> <span class="o">=</span> <span class="n">min_text_size</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">rotate_threshold</span> <span class="o">=</span> <span class="n">rotate_threshold</span></div>
 
 
 <div class="viewcode-block" id="Pipeline.predict">
@@ -715,6 +767,13 @@ window.addEventListener("load", load);
                 <span class="n">word_obj</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
                 <span class="n">word_obj</span><span class="o">.</span><span class="n">recognition_confidence</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;confidence&quot;</span><span class="p">]</span>
 
+        <span class="c1"># ---- CORRECTION ----</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">corrector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">corrector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Correction: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+
         <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pipeline total: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
 
@@ -795,9 +854,42 @@ window.addEventListener("load", load);
 
             <span class="n">region_image</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">y1</span><span class="p">:</span><span class="n">y2</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span><span class="n">x2</span><span class="p">]</span>
 
+            <span class="k">if</span> <span class="n">region_image</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="n">region_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_crop</span><span class="p">(</span><span class="n">region_image</span><span class="p">)</span>
+
             <span class="k">return</span> <span class="n">region_image</span> <span class="k">if</span> <span class="n">region_image</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
         <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span> </div>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_prepare_crop</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">crop</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepare crop for recognition, rotating vertical text if needed.</span>
+
+<span class="sd">        If the crop height is significantly greater than width (based on</span>
+<span class="sd">        ``rotate_threshold``), the image is rotated 90 degrees clockwise</span>
+<span class="sd">        to convert vertical text to horizontal orientation.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        crop : np.ndarray</span>
+<span class="sd">            Cropped word image (H, W, 3) or (H, W)</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        np.ndarray</span>
+<span class="sd">            Prepared crop, possibly rotated</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotate_threshold</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">crop</span>
+
+        <span class="n">height</span><span class="p">,</span> <span class="n">width</span> <span class="o">=</span> <span class="n">crop</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+
+        <span class="k">if</span> <span class="n">height</span> <span class="o">&gt;</span> <span class="n">width</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotate_threshold</span><span class="p">:</span>
+            <span class="n">crop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rot90</span><span class="p">(</span><span class="n">crop</span><span class="p">,</span> <span class="n">k</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">crop</span> </div>
 
 </pre></div>
 

@@ -116,6 +116,66 @@ class MyRecognizer:
 
 ---
 
+## Требования к Корректору
+
+Класс корректора должен реализовать метод `predict`, который принимает объект Page и возвращает исправленный Page:
+
+```python
+def predict(self, page: Page) -> Page:
+    """
+    Параметры:
+    - page: объект Page с распознанным текстом
+    
+    Возвращает:
+    - Page: объект Page с исправленным текстом
+    """
+    pass
+```
+
+**Пример:**
+
+```python
+from manuscript.data import Page
+
+class MyCorrector:
+    def predict(self, page: Page) -> Page:
+        result = page.model_copy(deep=True)
+        for block in result.blocks:
+            for line in block.lines:
+                for word in line.words:
+                    if word.text:
+                        # Ваша логика коррекции
+                        word.text = self._correct(word.text)
+        return result
+    
+    def _correct(self, text: str) -> str:
+        # Логика коррекции текста
+        return text
+```
+
+### Встроенный корректор CharLM
+
+CharLM — это символьная языковая модель на основе Transformer для исправления OCR-ошибок:
+
+```python
+from manuscript.correctors import CharLM
+
+# С настройками по умолчанию
+corrector = CharLM()
+
+# С пользовательскими параметрами
+corrector = CharLM(
+    weights="prereform_charlm_g1",  # или "modern_charlm_g1"
+    mask_threshold=0.05,            # порог уверенности для коррекции
+    apply_threshold=0.95,           # минимальная уверенность модели
+    max_edits=2,                    # макс. правок на слово
+    min_word_len=4,                 # мин. длина слова для коррекции
+    lexicon="prereform_words"       # лексикон известных слов
+)
+```
+
+---
+
 ## Примеры совместимых реализаций
 
 ### Полный пример детектора
