@@ -90,5 +90,7 @@ pipeline = Pipeline(detector=detector, recognizer=recognizer)
 
 ## Документация
 
+**[Полная документация](https://konstantinkozhin.github.io/manuscript-ocr)** (English & Русский)
+
 Подробные примеры и руководства:
 - [Pipeline API](./docs/PIPELINE_API.md) - интеграция и создание кастомных компонентов

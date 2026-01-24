@@ -13,6 +13,7 @@ of handwritten manuscripts and documents.
    :caption: Contents:
 
    getting_started
+   pipeline_usage
    structure
    api/index
 

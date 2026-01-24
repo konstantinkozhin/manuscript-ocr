@@ -1,0 +1,576 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Pipeline Usage Guide &mdash; manuscript-ocr 0.1.9 documentation</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/language_switcher.css?v=d768f156" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=8618f531"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/language_switcher.js?v=db730534"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="genindex.html" />
+    <link rel="search" title="Search" href="search.html" />
+    <link rel="next" title="Library Structure" href="structure.html" />
+    <link rel="prev" title="Getting Started" href="getting_started.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            manuscript-ocr
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#main-components">Main Components</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Pipeline Usage Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#detector-requirements">Detector Requirements</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#result-structure">Result Structure</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#recognizer-requirements">Recognizer Requirements</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#corrector-requirements">Corrector Requirements</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#built-in-charlm-corrector">Built-in CharLM Corrector</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#compatible-implementation-examples">Compatible Implementation Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#complete-detector-example">Complete Detector Example</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#using-custom-components">Using Custom Components</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#pipeline-usage-examples">Pipeline Usage Examples</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#basic-usage">Basic Usage</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#detection-only-without-recognition">Detection Only (Without Recognition)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#with-visualization">With Visualization</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#intermediate-results">Intermediate Results</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#export-import-page-to-json">Export/Import Page to JSON</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#with-profiling">With Profiling</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#batch-processing">Batch Processing</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#component-configuration">Component Configuration</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#replacing-detector-or-recognizer">Replacing Detector or Recognizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#built-in-model-configuration">Built-in Model Configuration</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#size-filtering">Size Filtering</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#automatic-rotation-control">Automatic Rotation Control</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Library Structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="structure.html#module-descriptions">Module Descriptions</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html">Pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.rotate_threshold"><code class="docutils literal notranslate"><span class="pre">Pipeline.rotate_threshold</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/data.html">Data Structures</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#data-model">Data Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#module-manuscript.data">API Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Word"><code class="docutils literal notranslate"><span class="pre">Word</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Page"><code class="docutils literal notranslate"><span class="pre">Page</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/detectors.html">Detectors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/recognizers.html">Recognizers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/correctors.html">Correctors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/correctors.html#charlm"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#manuscript.correctors.CharLM"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#available-presets">Available Presets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#quick-example">Quick Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#advanced-configuration">Advanced Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#using-custom-lexicon">Using Custom Lexicon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#training-custom-model">Training Custom Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#export-to-onnx">Export to ONNX</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html">Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.read_image"><code class="docutils literal notranslate"><span class="pre">read_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">manuscript-ocr</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Pipeline Usage Guide</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/pipeline_usage.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pipeline-usage-guide">
+<h1>Pipeline Usage Guide<a class="headerlink" href="#pipeline-usage-guide" title="Link to this heading"></a></h1>
+<p>The Pipeline class in <code class="docutils literal notranslate"><span class="pre">manuscript-ocr</span></code> is designed to work with <strong>any</strong> detectors, recognizers, and correctors that implement a simple interface.</p>
+<section id="detector-requirements">
+<h2>Detector Requirements<a class="headerlink" href="#detector-requirements" title="Link to this heading"></a></h2>
+<p>A detector class must implement a <code class="docutils literal notranslate"><span class="pre">predict</span></code> method that takes an image and returns a dictionary with a <code class="docutils literal notranslate"><span class="pre">&quot;page&quot;</span></code> key:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    - image: file path (str) or numpy array (H, W, 3) in uint8</span>
+
+<span class="sd">    Returns dictionary:</span>
+<span class="sd">    {</span>
+<span class="sd">        &quot;page&quot;: Page  # Page object with detection results</span>
+<span class="sd">    }</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<section id="result-structure">
+<h3>Result Structure<a class="headerlink" href="#result-structure" title="Link to this heading"></a></h3>
+<p>The result must contain a <code class="docutils literal notranslate"><span class="pre">Page</span></code> object with hierarchy:
+<strong>Page</strong> → <strong>Block</strong> → <strong>Line</strong> → <strong>Word</strong></p>
+<p>See <code class="docutils literal notranslate"><span class="pre">src/manuscript/data/structures.py</span></code> for detailed structure documentation.</p>
+<p><strong>Minimal example of creating a Page:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Word</span><span class="p">,</span> <span class="n">Line</span><span class="p">,</span> <span class="n">Block</span><span class="p">,</span> <span class="n">Page</span>
+
+<span class="c1"># Create a word with coordinates and detection confidence</span>
+<span class="n">word</span> <span class="o">=</span> <span class="n">Word</span><span class="p">(</span>
+    <span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
+    <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.95</span>
+<span class="p">)</span>
+
+<span class="c1"># Group words into a line</span>
+<span class="n">line</span> <span class="o">=</span> <span class="n">Line</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="p">[</span><span class="n">word</span><span class="p">])</span>
+
+<span class="c1"># Group lines into a block</span>
+<span class="n">block</span> <span class="o">=</span> <span class="n">Block</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="p">[</span><span class="n">line</span><span class="p">])</span>
+
+<span class="c1"># Create a page</span>
+<span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="p">(</span><span class="n">blocks</span><span class="o">=</span><span class="p">[</span><span class="n">block</span><span class="p">])</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="recognizer-requirements">
+<h2>Recognizer Requirements<a class="headerlink" href="#recognizer-requirements" title="Link to this heading"></a></h2>
+<p>A recognizer class must implement a <code class="docutils literal notranslate"><span class="pre">predict</span></code> method that takes a list of images and returns a list of results:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">images</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    - images: list of numpy arrays (RGB word images)</span>
+
+<span class="sd">    Returns list of dictionaries:</span>
+<span class="sd">    [</span>
+<span class="sd">        {&quot;text&quot;: &quot;word1&quot;, &quot;confidence&quot;: 0.95},</span>
+<span class="sd">        {&quot;text&quot;: &quot;word2&quot;, &quot;confidence&quot;: 0.92},</span>
+<span class="sd">        ...</span>
+<span class="sd">    ]</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyRecognizer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">images</span><span class="p">):</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
+            <span class="c1"># Your recognition logic</span>
+            <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;recognized_text&quot;</span>
+            <span class="n">confidence</span> <span class="o">=</span> <span class="mf">0.92</span>
+            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span> <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="n">confidence</span><span class="p">})</span>
+        <span class="k">return</span> <span class="n">results</span>
+</pre></div>
+</div>
+</section>
+<section id="corrector-requirements">
+<h2>Corrector Requirements<a class="headerlink" href="#corrector-requirements" title="Link to this heading"></a></h2>
+<p>A corrector class must implement a <code class="docutils literal notranslate"><span class="pre">predict</span></code> method that takes a Page object and returns a corrected Page:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parameters:</span>
+<span class="sd">    - page: Page object with recognized text</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">    - Page: Page object with corrected text</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">pass</span>
+</pre></div>
+</div>
+<p><strong>Example:</strong></p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyCorrector</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
+                        <span class="c1"># Your correction logic</span>
+                        <span class="n">word</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_correct</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+        <span class="c1"># Text correction logic</span>
+        <span class="k">return</span> <span class="n">text</span>
+</pre></div>
+</div>
+<section id="built-in-charlm-corrector">
+<h3>Built-in CharLM Corrector<a class="headerlink" href="#built-in-charlm-corrector" title="Link to this heading"></a></h3>
+<p>CharLM is a Transformer-based character-level language model for correcting OCR errors:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharLM</span>
+
+<span class="c1"># With default settings</span>
+<span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">()</span>
+
+<span class="c1"># With custom parameters</span>
+<span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">(</span>
+    <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;prereform_charlm_g1&quot;</span><span class="p">,</span>  <span class="c1"># or &quot;modern_charlm_g1&quot;</span>
+    <span class="n">mask_threshold</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>            <span class="c1"># confidence threshold for correction</span>
+    <span class="n">apply_threshold</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>           <span class="c1"># minimum model confidence</span>
+    <span class="n">max_edits</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>                    <span class="c1"># max edits per word</span>
+    <span class="n">min_word_len</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>                 <span class="c1"># min word length for correction</span>
+    <span class="n">lexicon</span><span class="o">=</span><span class="s2">&quot;prereform_words&quot;</span>       <span class="c1"># lexicon of known words</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="compatible-implementation-examples">
+<h2>Compatible Implementation Examples<a class="headerlink" href="#compatible-implementation-examples" title="Link to this heading"></a></h2>
+<section id="complete-detector-example">
+<h3>Complete Detector Example<a class="headerlink" href="#complete-detector-example" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Word</span><span class="p">,</span> <span class="n">Line</span><span class="p">,</span> <span class="n">Block</span><span class="p">,</span> <span class="n">Page</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyDetector</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
+        <span class="c1"># Your image detection logic</span>
+        <span class="c1"># ...</span>
+
+        <span class="c1"># Create result</span>
+        <span class="n">words</span> <span class="o">=</span> <span class="p">[</span>
+            <span class="n">Word</span><span class="p">(</span>
+                <span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
+                <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.95</span>
+            <span class="p">),</span>
+            <span class="n">Word</span><span class="p">(</span>
+                <span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">110</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">110</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
+                <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.92</span>
+            <span class="p">),</span>
+        <span class="p">]</span>
+
+        <span class="n">line</span> <span class="o">=</span> <span class="n">Line</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="n">words</span><span class="p">)</span>
+        <span class="n">block</span> <span class="o">=</span> <span class="n">Block</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="p">[</span><span class="n">line</span><span class="p">])</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="p">(</span><span class="n">blocks</span><span class="o">=</span><span class="p">[</span><span class="n">block</span><span class="p">])</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;page&quot;</span><span class="p">:</span> <span class="n">page</span><span class="p">}</span>
+</pre></div>
+</div>
+</section>
+<section id="using-custom-components">
+<h3>Using Custom Components<a class="headerlink" href="#using-custom-components" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">my_package</span><span class="w"> </span><span class="kn">import</span> <span class="n">MyDetector</span><span class="p">,</span> <span class="n">MyRecognizer</span><span class="p">,</span> <span class="n">MyCorrector</span>
+
+<span class="c1"># Use custom detector and recognizer</span>
+<span class="n">detector</span> <span class="o">=</span> <span class="n">MyDetector</span><span class="p">()</span>
+<span class="n">recognizer</span> <span class="o">=</span> <span class="n">MyRecognizer</span><span class="p">()</span>
+<span class="n">corrector</span> <span class="o">=</span> <span class="n">MyCorrector</span><span class="p">()</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">detector</span><span class="o">=</span><span class="n">detector</span><span class="p">,</span>
+    <span class="n">recognizer</span><span class="o">=</span><span class="n">recognizer</span><span class="p">,</span>
+    <span class="n">corrector</span><span class="o">=</span><span class="n">corrector</span>
+<span class="p">)</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="pipeline-usage-examples">
+<h2>Pipeline Usage Examples<a class="headerlink" href="#pipeline-usage-examples" title="Link to this heading"></a></h2>
+<section id="basic-usage">
+<h3>Basic Usage<a class="headerlink" href="#basic-usage" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="c1"># Initialize with default models</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">()</span>
+
+<span class="c1"># Process image</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">)</span>
+<span class="n">page</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">]</span>
+
+<span class="c1"># Extract text</span>
+<span class="n">text</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="detection-only-without-recognition">
+<h3>Detection Only (Without Recognition)<a class="headerlink" href="#detection-only-without-recognition" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">,</span> <span class="n">recognize_text</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
+<span class="n">page</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">]</span>
+
+<span class="c1"># Words have polygon and detection_confidence, but no text</span>
+<span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">page</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
+    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Polygon: </span><span class="si">{</span><span class="n">word</span><span class="o">.</span><span class="n">polygon</span><span class="si">}</span><span class="s2">, Confidence: </span><span class="si">{</span><span class="n">word</span><span class="o">.</span><span class="n">detection_confidence</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="with-visualization">
+<h3>With Visualization<a class="headerlink" href="#with-visualization" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">,</span> <span class="n">vis_img</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">,</span> <span class="n">vis</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">vis_img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;output_visualization.jpg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="intermediate-results">
+<h3>Intermediate Results<a class="headerlink" href="#intermediate-results" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharLM</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">corrector</span><span class="o">=</span><span class="n">CharLM</span><span class="p">())</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">)</span>
+
+<span class="c1"># Result after detection (before recognition)</span>
+<span class="n">detection_page</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">last_detection_page</span>
+
+<span class="c1"># Result after recognition (before correction)</span>
+<span class="n">recognition_page</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">last_recognition_page</span>
+
+<span class="c1"># Result after correction (None if corrector not used)</span>
+<span class="n">correction_page</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">last_correction_page</span>
+</pre></div>
+</div>
+</section>
+<section id="export-import-page-to-json">
+<h3>Export/Import Page to JSON<a class="headerlink" href="#export-import-page-to-json" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">]</span>
+
+<span class="c1"># Save to file</span>
+<span class="n">page</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s2">&quot;result.json&quot;</span><span class="p">)</span>
+
+<span class="c1"># Get as string</span>
+<span class="n">json_str</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
+
+<span class="c1"># Load from file</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span>
+<span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s2">&quot;result.json&quot;</span><span class="p">)</span>
+
+<span class="c1"># Load from string</span>
+<span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s1">&#39;{&quot;blocks&quot;: [...]}&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="with-profiling">
+<h3>With Profiling<a class="headerlink" href="#with-profiling" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Prints execution time for each stage</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="c1"># Output:</span>
+<span class="c1"># Detection: 0.123s</span>
+<span class="c1"># Load image for crops: 0.005s</span>
+<span class="c1"># Extract 45 crops: 0.012s</span>
+<span class="c1"># Recognition: 0.234s</span>
+<span class="c1"># Pipeline total: 0.374s</span>
+</pre></div>
+</div>
+</section>
+<section id="batch-processing">
+<h3>Batch Processing<a class="headerlink" href="#batch-processing" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">images</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;page1.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;page2.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;page3.jpg&quot;</span><span class="p">]</span>
+<span class="n">results</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">process_batch</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
+
+<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="component-configuration">
+<h2>Component Configuration<a class="headerlink" href="#component-configuration" title="Link to this heading"></a></h2>
+<section id="replacing-detector-or-recognizer">
+<h3>Replacing Detector or Recognizer<a class="headerlink" href="#replacing-detector-or-recognizer" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="c1"># Only custom detector, default recognizer</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">my_package</span><span class="w"> </span><span class="kn">import</span> <span class="n">MyCustomDetector</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">detector</span><span class="o">=</span><span class="n">MyCustomDetector</span><span class="p">())</span>
+
+<span class="c1"># Only custom recognizer, default detector</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">my_package</span><span class="w"> </span><span class="kn">import</span> <span class="n">MyCustomRecognizer</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">recognizer</span><span class="o">=</span><span class="n">MyCustomRecognizer</span><span class="p">())</span>
+
+<span class="c1"># Both components custom</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">detector</span><span class="o">=</span><span class="n">MyCustomDetector</span><span class="p">(),</span> <span class="n">recognizer</span><span class="o">=</span><span class="n">MyCustomRecognizer</span><span class="p">())</span>
+</pre></div>
+</div>
+</section>
+<section id="built-in-model-configuration">
+<h3>Built-in Model Configuration<a class="headerlink" href="#built-in-model-configuration" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.recognizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRBA</span>
+
+<span class="c1"># EAST with settings</span>
+<span class="n">detector</span> <span class="o">=</span> <span class="n">EAST</span><span class="p">(</span>
+    <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;east_50_g1&quot;</span><span class="p">,</span>        <span class="c1"># weight selection</span>
+    <span class="n">score_thresh</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>            <span class="c1"># confidence threshold</span>
+    <span class="n">nms_thresh</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>              <span class="c1"># NMS threshold</span>
+    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span>                 <span class="c1"># device (cpu/cuda)</span>
+<span class="p">)</span>
+
+<span class="c1"># TRBA with settings</span>
+<span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">(</span>
+    <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;trba_lite_g1&quot;</span><span class="p">,</span>      <span class="c1"># weight selection</span>
+    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span>                <span class="c1"># GPU for acceleration</span>
+<span class="p">)</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">detector</span><span class="p">,</span> <span class="n">recognizer</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="size-filtering">
+<h3>Size Filtering<a class="headerlink" href="#size-filtering" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ignore text blocks smaller than 10 pixels</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">min_text_size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="automatic-rotation-control">
+<h3>Automatic Rotation Control<a class="headerlink" href="#automatic-rotation-control" title="Link to this heading"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Enable automatic rotation of vertical text (default)</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">rotate_threshold</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
+
+<span class="c1"># Disable automatic rotation</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">rotate_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="getting_started.html" class="btn btn-neutral float-left" title="Getting Started" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="structure.html" class="btn btn-neutral float-right" title="Library Structure" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Konstantin Kozhin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

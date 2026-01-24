@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-22 17:48+0700\n"
+"POT-Creation-Date: 2026-01-24 15:11+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -51,260 +51,334 @@ msgstr ""
 msgid "This package contains the core data structures used to represent OCR results throughout the manuscript-ocr library."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:2
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:1
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Line:1
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page:1
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:1
+#: dc152a576f9d434ab3f46dda2f42abc5
+#: 3dbdc77475924186a4385f06b453d69d
+#: a57dcdb6a55a4b099029560eec52c420
+#: 59eb6eb9e1934b16ad30d81f066058aa
+msgid "Bases: :py:class:`~pydantic.BaseModel`"
+msgstr ""
+
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:2
 #: 6a2a2acbe04e4655b9ce1eb2d2878935
 msgid "A single detected or recognized word."
 msgstr ""
 
 #: ../../api/data.rst:0
 #: 5f928c1b0caf477589bf7daaf1f57f78
-#: 4a7523af001b47b09334f6eece39b1b6
-#: e1b24c0e0e2449ce9841c478890f602e
+#: 5f928c1b0caf477589bf7daaf1f57f78
+#: 5f928c1b0caf477589bf7daaf1f57f78
+#: 5f928c1b0caf477589bf7daaf1f57f78
+#: 5f928c1b0caf477589bf7daaf1f57f78
 msgid "Parameters"
 msgstr ""
 
 #: ../../api/data.rst:0
 #: 7ddfd4afb34d46bb910a1fd025220a41
-#: d1a6699655764ce5904f3b012070f527
-#: 729e43668ed24cfb97deea8330c72c39
+#: 7ddfd4afb34d46bb910a1fd025220a41
+#: 7ddfd4afb34d46bb910a1fd025220a41
+#: 7ddfd4afb34d46bb910a1fd025220a41
+#: 7ddfd4afb34d46bb910a1fd025220a41
 msgid "Return type"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:6
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:6
 #: d0b44da053ef4bcda146c05618d00b57
 msgid "Polygon vertices (x, y), ordered clockwise. For quadrilateral text regions: TL → TR → BR → BL (Top-Left, Top-Right, Bottom-Right, Bottom-Left)."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:0
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Line:0
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Page:0
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:0
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:0
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Line:0
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page:0
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:0
 #: 4d24d6513f4443d09bdb54b1bd4411a2
-#: 367cccd1e7714a118fb2e4ad8722af01
-#: 93c2ef01b6134ac2b4a3c8e77982754e
-#: 04f4bcfefe714581822c82ed4b4d9fd1
-#: 95c166c140f5432b8048f5d7496a51e6
-#: dc5a13d001b64352b9645c6d9ef34aad
-#: 7798ba190d394bf29d7f10cb69b48703
-#: 4f533c0aa6cd48999ff395ffcac71818
+#: 4d24d6513f4443d09bdb54b1bd4411a2
+#: 4d24d6513f4443d09bdb54b1bd4411a2
+#: 4d24d6513f4443d09bdb54b1bd4411a2
+#: 4d24d6513f4443d09bdb54b1bd4411a2
+#: 4d24d6513f4443d09bdb54b1bd4411a2
+#: 4d24d6513f4443d09bdb54b1bd4411a2
 #: c1a3f5fe7bde4ff699025d3e84b82c4b
 #: 7d9a80fd68f547b69d8a425b23bd8d55
-#: bcd914bdbdf846f7a17ec06600b63463
+#: 4d24d6513f4443d09bdb54b1bd4411a2
+#: 4d24d6513f4443d09bdb54b1bd4411a2
 msgid "type"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:9
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:9
 #: 4de1f552dd81421abf338ac608664179
 msgid "List[Tuple[float, float]]"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:13
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:13
 #: 01381a3e64914d329ffdbdf189f80ca7
 msgid "Text detection confidence score from detector (0.0 to 1.0)."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:15
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:15
 #: 8e58692c82aa40b888811c252187e97a
 msgid "float"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:19
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:19
 #: 7bb3debc90e64cd38c53377033bc2265
 msgid "Recognized text content (populated by OCR pipeline). None if only detection was performed."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:22
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:22
 #: f6f0b82ced854547a60e4b1fab9447b2
 msgid "str, optional"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:26
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:26
 #: 1e029020c27945ba90ff6866c92c0974
 msgid "Text recognition confidence score from recognizer (0.0 to 1.0). None if only detection was performed."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:29
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:29
 #: 0c8fee60be9448e7b09554d272397e04
 msgid "float, optional"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:33
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:33
 #: 88fe300e7b31412e92b25eedf3c2ff02
 msgid "Word position inside the line after sorting. None before sorting."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:22
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Line:14
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:35
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:22
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Line:14
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:35
 #: e294185782684841a19468d47bbb0b3f
-#: e9f3795286be4f76a1d25eb0bac0d84e
-#: 129425d3abd443c792d2f97a5f1c0dca
+#: e294185782684841a19468d47bbb0b3f
+#: e294185782684841a19468d47bbb0b3f
 msgid "int, optional"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:25
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Line:17
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Page:14
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:38
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:25
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Line:17
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page:14
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page.from_json:12
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page.to_json:15
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:38
 #: f45e6cb5a1424bd6a01bea82f72f7565
-#: 0c3b10dc77194041afd7b4d5d537bb02
-#: f275ad7cf80b4028a6a9f2467b05a3fd
-#: b51a3ebf2f734b10907da6958be334a0
+#: f45e6cb5a1424bd6a01bea82f72f7565
+#: f45e6cb5a1424bd6a01bea82f72f7565
+#: f45e6cb5a1424bd6a01bea82f72f7565
+#: f45e6cb5a1424bd6a01bea82f72f7565
+#: f45e6cb5a1424bd6a01bea82f72f7565
 msgid "Examples"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:38
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Line:30
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Page:27
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:51
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:38
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Line:30
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page:27
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:51
 #: 55b50b9618ff469e94d89195e4fd21c0
-#: 7f97c3cb792c4a84876c1d3cfa71a702
-#: 109a7fa2694045c18170b4d14b1aaeb8
-#: ab2119a0a44e4d1bb3383ad43fe2385b
+#: 55b50b9618ff469e94d89195e4fd21c0
+#: 55b50b9618ff469e94d89195e4fd21c0
+#: 55b50b9618ff469e94d89195e4fd21c0
 msgid "Methods"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:56:<autosummary>:1
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:56:<autosummary>:1
 #: 4ec7b14177a0422784e5481ff7426b1e
 msgid ":py:obj:`__call__ <manuscript.data.Word.__call__>`\\ \\(\\*args\\, \\*\\*kwargs\\)"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:43:<autosummary>:1
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Line:35:<autosummary>:1
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Page:42:<autosummary>:1
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:56:<autosummary>:1
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:43:<autosummary>:1
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Line:35:<autosummary>:1
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page:44:<autosummary>:1
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:56:<autosummary>:1
 #: 008bac94182b4bad8e88bcdbf94d1705
-#: 3e22ca32a28f427990787d83cb6954a0
-#: 695854b1be2f446194c24850a2a6abeb
-#: de37b2c007724bc4a2505d2dce2413a6
+#: 008bac94182b4bad8e88bcdbf94d1705
+#: 008bac94182b4bad8e88bcdbf94d1705
+#: 008bac94182b4bad8e88bcdbf94d1705
 msgid "Call self as a function."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:58
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:58
 #: fae28d4f49274ac6bdb7dacf78948016
 msgid "**detection_confidence**"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:46
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Line:37
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:59
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:46
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Line:37
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:59
 #: 941be45aa4684cdba40068d5861f13f6
-#: e3ccbc42dc2b4468a2691f21131f8879
-#: 405fccf9996249148d321c3cd46d746a
+#: 941be45aa4684cdba40068d5861f13f6
+#: 941be45aa4684cdba40068d5861f13f6
 msgid "**order**"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:60
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:60
 #: 1d7a744fb21b4600aecb188fb0fa31cc
 msgid "**polygon**"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:61
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:61
 #: cc736be991e440e697197d3265e1fb49
 msgid "**recognition_confidence**"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Word:62
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Word:62
 #: 46c1555f6d954f7381426fa47a998046
 msgid "**text**"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Line:2
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Line:2
 #: b4131da1f89f4f03bea6266d32e3f6d4
 msgid "A single text line containing one or more words."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Line:6
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Line:6
 #: 286a35e67c0d4452b0c51330398c6a9f
 msgid "List of words in the line."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Line:8
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Line:8
 #: a3ed8c12bce64b4dae45588d4527cf77
 msgid "List[Word]"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Line:12
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Line:12
 #: c2f003f68892435888d07c81218d94e0
 msgid "Line position inside a block or page after sorting. None before sorting."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Line:35:<autosummary>:1
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Line:35:<autosummary>:1
 #: 12b1a26391f54dafa7a42440a0fde962
 msgid ":py:obj:`__call__ <manuscript.data.Line.__call__>`\\ \\(\\*args\\, \\*\\*kwargs\\)"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:2
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:2
 #: 6a7bab3022d343d5836ef75f29795641
 msgid "A logical text block (e.g., paragraph, column)."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:6
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:6
 #: c294892ac6914542b345135a63a90eb3
 msgid "List of text lines in the block."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:8
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:8
 #: c029d7abedca4f72acf75576985c9c45
 msgid "List[Line]"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:12
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:12
 #: 685ba200c2c24475a5f8a62ad3ef0ddf
 msgid "Legacy: Direct list of words without line structure. Used for backward compatibility. If both `lines` and `words` are empty, creates a single line from words."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:16
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:16
 #: 67957f72b212482e9f372060ca65b779
 msgid "List[Word], optional"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:20
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:20
 #: ad4669882d2f4b15a463e362d06561b3
 msgid "Block reading-order position after sorting. None before sorting."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:43:<autosummary>:1
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:43:<autosummary>:1
 #: 87fd6a60b26b48f18c327d97eb1ba909
 msgid ":py:obj:`__call__ <manuscript.data.Block.__call__>`\\ \\(\\*args\\, \\*\\*kwargs\\)"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:45
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:45
 #: 257a9bbc43d147fca1e9fe827407ca10
 msgid "**lines**"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block:47
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block:47
 #: 743e8070307445d384758235f3e8290c
 msgid "**words**"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Block.__init__:2
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Block.__init__:2
 #: 00b70f194f2d4236a1198d2b237e3068
 msgid "Initialize Block with backward compatibility for words-only input."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Page:2
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page:2
 #: bf7e3c0eda4b4448822a6629de5e4644
 msgid "A document page containing blocks of text."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Page:4
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page:4
 #: 341b0549afd24777a06e03d325b8dd55
 msgid "For a full visual diagram of the data model, see: ``DATA_MODEL.md`` located in the same module directory."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Page:9
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page:9
 #: db6a81b2f11440cbb4a00ac22616c927
 msgid "List of text blocks on the page."
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Page:11
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page:11
 #: ec5f42c13dc641b5a1e87b7dbc31134b
 msgid "List[Block]"
 msgstr ""
 
-#: ../../../../src/manuscript/data/structures.py:docstring of manuscript.data.structures.Page:42:<autosummary>:1
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page:44:<autosummary>:1
 #: 2813969f01a14e6d88e694464aa9ea16
 msgid ":py:obj:`__call__ <manuscript.data.Page.__call__>`\\ \\(\\*args\\, \\*\\*kwargs\\)"
+msgstr ""
+
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page:44:<autosummary>:1
+#: 2813969f01a14e6d88e694464aa9ea16
+msgid ":py:obj:`from_json <manuscript.data.Page.from_json>`\\ \\(source\\)"
+msgstr ""
+
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page.from_json:2
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page:44:<autosummary>:1
+#: 2ee70a03dc0148efbb9efcf0f5b89812
+#: ca59973b437449eb8d9ec85358c3d93f
+msgid "Load Page from JSON file or string."
+msgstr ""
+
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page:44:<autosummary>:1
+#: 2813969f01a14e6d88e694464aa9ea16
+msgid ":py:obj:`to_json <manuscript.data.Page.to_json>`\\ \\(\\[path\\, indent\\]\\)"
+msgstr ""
+
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page.to_json:2
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page:44:<autosummary>:1
+#: 5aa0837f648a48c2bd9edd7334f14540
+#: 3ae73dc942204dda97dcdb773b55f1c1
+msgid "Export Page to JSON."
+msgstr ""
+
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page.from_json:5
+#: 43eec7831da74d7bb672249ec87b8d1b
+msgid "Path to JSON file or JSON string."
+msgstr ""
+
+#: ../../api/data.rst:0
+#: 7ddfd4afb34d46bb910a1fd025220a41
+#: 7ddfd4afb34d46bb910a1fd025220a41
+msgid "Returns"
+msgstr ""
+
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page.from_json:8
+#: 1618b69ce00143929e1736c732b8f8bb
+msgid "Loaded Page object."
+msgstr ""
+
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page.to_json:5
+#: f8bd8b1d8f3e4a109d1fe13ac4500237
+msgid "If provided, saves JSON to file."
+msgstr ""
+
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page.to_json:8
+#: ab4b9896b1fa4ecd8e444fa97eeeac70
+msgid "JSON indentation. Default is 2."
+msgstr ""
+
+#: ../../../../src/manuscript/data/__init__.py:docstring of manuscript.data.structures.Page.to_json:11
+#: ea7a066bad6e415394c4fbc661012af9
+msgid "JSON string representation."
 msgstr ""

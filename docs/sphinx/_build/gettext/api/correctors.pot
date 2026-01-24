@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-23 20:09+0700\n"
+"POT-Creation-Date: 2026-01-24 15:11+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -31,6 +31,11 @@ msgstr ""
 msgid "``CharLM``"
 msgstr ""
 
+#: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:1
+#: c60bd8ee50024611989dc924d840bb56
+msgid "Bases: :py:class:`~manuscript.api.base.BaseModel`"
+msgstr ""
+
 #: ../../../../src/manuscript/correctors/_charlm/__init__.py:docstring of manuscript.correctors._charlm.CharLM:2
 #: c5de954811364ccdbb8b45bfcf80dafe
 msgid "Character-level language model corrector using ONNX Runtime."
@@ -43,10 +48,10 @@ msgstr ""
 
 #: ../../api/correctors.rst:0
 #: b5161db6c21b48a3a8acd48da6af18a0
-#: 2274db3e17f34b10ac1f3a819708dae5
-#: 2274db3e17f34b10ac1f3a819708dae5
-#: 2274db3e17f34b10ac1f3a819708dae5
-#: 2274db3e17f34b10ac1f3a819708dae5
+#: b5161db6c21b48a3a8acd48da6af18a0
+#: b5161db6c21b48a3a8acd48da6af18a0
+#: b5161db6c21b48a3a8acd48da6af18a0
+#: b5161db6c21b48a3a8acd48da6af18a0
 msgid "Parameters"
 msgstr ""
 

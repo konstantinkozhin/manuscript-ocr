@@ -1,0 +1,174 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: manuscript-ocr \n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-01-24 15:20+0700\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: ../../pipeline_usage.rst:2
+#: 749ebab203ae4312a2aa1e06dee503f8
+msgid "Pipeline Usage Guide"
+msgstr ""
+
+#: ../../pipeline_usage.rst:4
+#: 759a0014fd16405da017c26fc8bd2721
+msgid "The Pipeline class in ``manuscript-ocr`` is designed to work with **any** detectors, recognizers, and correctors that implement a simple interface."
+msgstr ""
+
+#: ../../pipeline_usage.rst:7
+#: 58dbd801c9ab4c62a31ed3757636cb0f
+msgid "Detector Requirements"
+msgstr ""
+
+#: ../../pipeline_usage.rst:9
+#: 51464a20c6f047fe85b4b5440335d104
+msgid "A detector class must implement a ``predict`` method that takes an image and returns a dictionary with a ``\"page\"`` key:"
+msgstr ""
+
+#: ../../pipeline_usage.rst:26
+#: 048cfac6195e49b8aaeefe51fc6ee517
+msgid "Result Structure"
+msgstr ""
+
+#: ../../pipeline_usage.rst:28
+#: 37ea3cc944aa4ea9af6c2307647dbc35
+msgid "The result must contain a ``Page`` object with hierarchy: **Page** → **Block** → **Line** → **Word**"
+msgstr ""
+
+#: ../../pipeline_usage.rst:31
+#: 18aef502b46d4f59bfd5f2606b15447a
+msgid "See ``src/manuscript/data/structures.py`` for detailed structure documentation."
+msgstr ""
+
+#: ../../pipeline_usage.rst:33
+#: b90308bf8c8f40e7980be0a0f456ca2c
+msgid "**Minimal example of creating a Page:**"
+msgstr ""
+
+#: ../../pipeline_usage.rst:55
+#: c4a946d46bcd45ca8730fbf254a9c58a
+msgid "Recognizer Requirements"
+msgstr ""
+
+#: ../../pipeline_usage.rst:57
+#: b258c20f03b849d098d95f9875ba146d
+msgid "A recognizer class must implement a ``predict`` method that takes a list of images and returns a list of results:"
+msgstr ""
+
+#: ../../pipeline_usage.rst:75
+#: ../../pipeline_usage.rst:106
+#: 57290a52c0534ecc921f3f06b917b831
+#: 0ea9dc0c79b84a7688ea398f6de3619b
+msgid "**Example:**"
+msgstr ""
+
+#: ../../pipeline_usage.rst:90
+#: 0e6e408313b14111b8d87fb9c87eaaf0
+msgid "Corrector Requirements"
+msgstr ""
+
+#: ../../pipeline_usage.rst:92
+#: 180f57646709468f99cc1afc75a1db3d
+msgid "A corrector class must implement a ``predict`` method that takes a Page object and returns a corrected Page:"
+msgstr ""
+
+#: ../../pipeline_usage.rst:128
+#: a0a8b520513143d28bb704fe869fffcc
+msgid "Built-in CharLM Corrector"
+msgstr ""
+
+#: ../../pipeline_usage.rst:130
+#: d1de0ac43c2d42a88265779c29f6e4ac
+msgid "CharLM is a Transformer-based character-level language model for correcting OCR errors:"
+msgstr ""
+
+#: ../../pipeline_usage.rst:150
+#: f4017de256e04facb36d26d7d8f561e7
+msgid "Compatible Implementation Examples"
+msgstr ""
+
+#: ../../pipeline_usage.rst:153
+#: 9a5b73d1a02d458a954b24dec52002e1
+msgid "Complete Detector Example"
+msgstr ""
+
+#: ../../pipeline_usage.rst:183
+#: bb6bdd70c18d4e31b2a4492b96ef826f
+msgid "Using Custom Components"
+msgstr ""
+
+#: ../../pipeline_usage.rst:204
+#: 0a0d71ae6d9647019b28791fe8bfa424
+msgid "Pipeline Usage Examples"
+msgstr ""
+
+#: ../../pipeline_usage.rst:207
+#: d107aadc327143119caeb1e45ea414ba
+msgid "Basic Usage"
+msgstr ""
+
+#: ../../pipeline_usage.rst:225
+#: 601b2696cdf644b384419086280e01d6
+msgid "Detection Only (Without Recognition)"
+msgstr ""
+
+#: ../../pipeline_usage.rst:239
+#: b157162aedfd44348a6c8249632ff8d4
+msgid "With Visualization"
+msgstr ""
+
+#: ../../pipeline_usage.rst:247
+#: 1fbe81289f864b5a81e55d9c8c22ab98
+msgid "Intermediate Results"
+msgstr ""
+
+#: ../../pipeline_usage.rst:266
+#: d97a6f890f8245e292f8a00e4bec14ac
+msgid "Export/Import Page to JSON"
+msgstr ""
+
+#: ../../pipeline_usage.rst:286
+#: 16ac42f164b2422ab0fa994e9af12396
+msgid "With Profiling"
+msgstr ""
+
+#: ../../pipeline_usage.rst:300
+#: 92c18771ce2b49528656d856969728c1
+msgid "Batch Processing"
+msgstr ""
+
+#: ../../pipeline_usage.rst:312
+#: e8b84c7c3e364ecc8f427b0cead84e45
+msgid "Component Configuration"
+msgstr ""
+
+#: ../../pipeline_usage.rst:315
+#: ab515d2c6d6148e48e4a090d7f41f3c0
+msgid "Replacing Detector or Recognizer"
+msgstr ""
+
+#: ../../pipeline_usage.rst:333
+#: b1d9302dd84448aa8552ee914f813759
+msgid "Built-in Model Configuration"
+msgstr ""
+
+#: ../../pipeline_usage.rst:358
+#: a3d31024d10443c4b196f5fba3fd179d
+msgid "Size Filtering"
+msgstr ""
+
+#: ../../pipeline_usage.rst:366
+#: 6e3224244c5249a1a683989ef8b15f97
+msgid "Automatic Rotation Control"
+msgstr ""

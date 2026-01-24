@@ -73,7 +73,7 @@ class CharLM(BaseModel):
         "prereform_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.json",
         "modern_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.json",
     }
-    
+
     lexicon_registry = {
         "prereform_words": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt",
         "modern_words": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_words.txt",
@@ -99,10 +99,10 @@ class CharLM(BaseModel):
     ):
         if weights is None and self.default_weights_name is not None:
             weights = self.default_weights_name
-        
+
         # Remember original weights name for lexicon resolution
         self._weights_preset = weights if weights in self.pretrained_registry else None
-        
+
         if weights is None:
             self.device = device or "cpu"
             self.weights = None
@@ -117,7 +117,7 @@ class CharLM(BaseModel):
         self.min_word_len = min_word_len
         self.max_len = max_len
 
-        self._word_pattern = re.compile(r'(\w+)|(\W+)', re.UNICODE)
+        self._word_pattern = re.compile(r"(\w+)|(\W+)", re.UNICODE)
 
         self.vocab_path = self._resolve_vocab(vocab) if self.weights else None
         self.c2i = {}
@@ -131,7 +131,10 @@ class CharLM(BaseModel):
                 lexicon_path = self._resolve_lexicon(lexicon)
                 if lexicon_path:
                     self._load_lexicon(lexicon_path)
-        elif self._weights_preset and self._weights_preset in self.default_lexicon_for_model:
+        elif (
+            self._weights_preset
+            and self._weights_preset in self.default_lexicon_for_model
+        ):
             # Auto-load default lexicon for known model presets
             default_lexicon_name = self.default_lexicon_for_model[self._weights_preset]
             lexicon_path = self._resolve_lexicon(default_lexicon_name)
@@ -150,12 +153,20 @@ class CharLM(BaseModel):
                 return str(Path(vocab).absolute())
             if vocab in self.vocab_registry:
                 return self._resolve_extra_artifact(
-                    vocab, default_name=None, registry=self.vocab_registry, description="vocab"
+                    vocab,
+                    default_name=None,
+                    registry=self.vocab_registry,
+                    description="vocab",
                 )
 
-        if self.default_weights_name and self.default_weights_name in self.vocab_registry:
+        # Use actual weights preset (if any), otherwise fall back to default
+        preset_to_use = self._weights_preset or self.default_weights_name
+        if preset_to_use and preset_to_use in self.vocab_registry:
             return self._resolve_extra_artifact(
-                self.default_weights_name, default_name=None, registry=self.vocab_registry, description="vocab"
+                preset_to_use,
+                default_name=None,
+                registry=self.vocab_registry,
+                description="vocab",
             )
 
         if self.weights:
@@ -172,7 +183,10 @@ class CharLM(BaseModel):
             return str(Path(lexicon).absolute())
         if lexicon in self.lexicon_registry:
             return self._resolve_extra_artifact(
-                lexicon, default_name=None, registry=self.lexicon_registry, description="lexicon"
+                lexicon,
+                default_name=None,
+                registry=self.lexicon_registry,
+                description="lexicon",
             )
         return None
 
@@ -276,7 +290,7 @@ class CharLM(BaseModel):
 
     def _correct_single_word(self, word: str) -> str:
         """Apply MLM-based correction to a single lowercase word."""
-        chars = list(word[:self.max_len])
+        chars = list(word[: self.max_len])
         L = len(chars)
         if L == 0:
             return word
@@ -288,7 +302,10 @@ class CharLM(BaseModel):
 
         batch = []
         for i in range(L):
-            ids = [(self.c2i.get(ch, unk) if j != i else mask) for j, ch in enumerate(chars)]
+            ids = [
+                (self.c2i.get(ch, unk) if j != i else mask)
+                for j, ch in enumerate(chars)
+            ]
             ids += [pad] * (self.max_len - len(ids))
             batch.append(ids)
 
@@ -296,7 +313,18 @@ class CharLM(BaseModel):
 
         input_name = self.onnx_session.get_inputs()[0].name
         output_name = self.onnx_session.get_outputs()[0].name
-        logits = self.onnx_session.run([output_name], {input_name: batch_array})[0]
+        try:
+            logits = self.onnx_session.run([output_name], {input_name: batch_array})[0]
+        except Exception as e:
+            # If ONNX inference fails (e.g., vocab mismatch), log warning and return original word
+            import warnings
+
+            warnings.warn(
+                f"Corrector inference error for word '{word}': {e}. "
+                "Returning original text. This may indicate a vocab/weights mismatch.",
+                RuntimeWarning,
+            )
+            return word
 
         probs = self._softmax(logits, axis=-1)
         vocab_size = probs.shape[-1]
@@ -319,7 +347,7 @@ class CharLM(BaseModel):
 
         candidates = sorted(
             [(i, p, v) for i, p, v in confidences if p < self.mask_threshold],
-            key=lambda x: x[1]
+            key=lambda x: x[1],
         )
 
         edits = 0

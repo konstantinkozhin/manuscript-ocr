@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-22 17:48+0700\n"
+"POT-Creation-Date: 2026-01-24 15:20+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -36,22 +36,22 @@ msgstr ""
 msgid "**manuscript-ocr** is a Python library for OCR (Optical Character Recognition) of handwritten manuscripts and documents."
 msgstr ""
 
-#: ../../index.rst:20
+#: ../../index.rst:21
 #: fb0c804143e54800a8c64a588bb0894b
 msgid "Indices and tables"
 msgstr ""
 
-#: ../../index.rst:22
+#: ../../index.rst:23
 #: 5a15798717dd4d73a2ffa34b1640cf79
 msgid ":ref:`genindex`"
 msgstr ""
 
-#: ../../index.rst:23
+#: ../../index.rst:24
 #: cfd617c8dd894e4ebb5808dcf66867c1
 msgid ":ref:`modindex`"
 msgstr ""
 
-#: ../../index.rst:24
+#: ../../index.rst:25
 #: fee9c07bfe564d3aa63d3232418d433a
 msgid ":ref:`search`"
 msgstr ""

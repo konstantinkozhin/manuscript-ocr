@@ -15,8 +15,8 @@
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=e81ed7fe"></script>
-      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/translations.js?v=cd1d70c9"></script>
       <script src="../_static/language_switcher.js?v=db730534"></script>
     <script src="../_static/js/theme.js"></script>
@@ -53,6 +53,40 @@
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#main-components">Основные компоненты</a></li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../pipeline_usage.html">Руководство по использованию Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#detector-requirements">Требования к детектору</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#result-structure">Структура результата</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#recognizer-requirements">Требования к распознавателю</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#corrector-requirements">Требования к корректору</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#built-in-charlm-corrector">Встроенный корректор CharLM</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#compatible-implementation-examples">Примеры совместимых реализаций</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#complete-detector-example">Полный пример детектора</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#using-custom-components">Использование кастомных компонентов</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#pipeline-usage-examples">Примеры использования Pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#basic-usage">Базовое использование</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#detection-only-without-recognition">Только детекция (без распознавания)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#with-visualization">С визуализацией</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#intermediate-results">Промежуточные результаты</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#export-import-page-to-json">Экспорт/импорт Page в JSON</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#with-profiling">С профилированием</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#batch-processing">Пакетная обработка</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#component-configuration">Настройка компонентов</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#replacing-detector-or-recognizer">Замена детектора или распознавателя</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#built-in-model-configuration">Настройка встроенных моделей</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#size-filtering">Фильтрация по размеру</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#automatic-rotation-control">Управление автоматическим поворотом</a></li>
+</ul>
+</li>
+</ul>
+</li>
 <li class="toctree-l1"><a class="reference internal" href="../structure.html">Структура библиотеки</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../structure.html#module-descriptions">Описание модулей</a></li>
 </ul>
@@ -68,6 +102,9 @@
 <li class="toctree-l4"><a class="reference internal" href="#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -85,26 +122,26 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="detectors.html">Детекторы</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="recognizers.html">Распознаватели</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -166,23 +203,10 @@
 <p>Основной высокоуровневый интерфейс для OCR-обработки.</p>
 <span class="target" id="module-manuscript._pipeline"></span><dl class="py class">
 <dt class="sig sig-object py" id="manuscript._pipeline.Pipeline">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">manuscript._pipeline.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recognizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_text_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotate_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/_pipeline.html#Pipeline"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript._pipeline.Pipeline" title="Ссылка на это определение"></a></dt>
-<dd><p>Базовые классы: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
-<p>High-level OCR pipeline combining text detection, recognition, and correction.</p>
-<p>The Pipeline class orchestrates EAST detector, TRBA recognizer, and optional
-text corrector to perform complete OCR workflow:
-detection → crop extraction → recognition → correction → result merging.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Параметры<span class="colon">:</span></dt>
-<dd class="field-odd"><ul class="simple">
-<li><p><strong>detector</strong> (<a class="reference internal" href="detectors.html#manuscript.detectors.EAST" title="manuscript.detectors._east.EAST"><em>EAST</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>recognizer</strong> (<a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA" title="manuscript.recognizers._trba.TRBA"><em>TRBA</em></a><em> | </em><em>None</em>)</p></li>
-<li><p><strong>corrector</strong> (<em>BaseCorrector</em><em> | </em><em>None</em>)</p></li>
-<li><p><strong>min_text_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
-<li><p><strong>rotate_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
-</ul>
-</dd>
-</dl>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manuscript._pipeline.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recognizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_text_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">rotate_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/_pipeline.html#Pipeline"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript._pipeline.Pipeline" title="Ссылка на это определение"></a></dt>
+<dd><p>Базовые классы: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(в Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<p>Высокоуровневый OCR-конвейер, объединяющий детекцию, распознавание и коррекцию текста.</p>
+<p>Класс Pipeline координирует детектор EAST, распознаватель TRBA и опциональный корректор текста для выполнения полного OCR-процесса: детекция → извлечение кропов → распознавание → коррекция → объединение результатов.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="manuscript._pipeline.Pipeline.detector">
 <span class="sig-name descname"><span class="pre">detector</span></span><a class="headerlink" href="#manuscript._pipeline.Pipeline.detector" title="Ссылка на это определение"></a></dt>
@@ -208,10 +232,10 @@ detection → crop extraction → recognition → correction → result merging.
 <dl class="py attribute">
 <dt class="sig sig-object py" id="manuscript._pipeline.Pipeline.corrector">
 <span class="sig-name descname"><span class="pre">corrector</span></span><a class="headerlink" href="#manuscript._pipeline.Pipeline.corrector" title="Ссылка на это определение"></a></dt>
-<dd><p>Text corrector instance (None to skip correction)</p>
+<dd><p>Экземпляр корректора текста (None для пропуска коррекции)</p>
 <dl class="field-list simple">
 <dt class="field-odd">тип<span class="colon">:</span></dt>
-<dd class="field-odd"><p>BaseCorrector, optional</p>
+<dd class="field-odd"><p>BaseCorrector, опционально</p>
 </dd>
 </dl>
 </dd></dl>
@@ -222,7 +246,7 @@ detection → crop extraction → recognition → correction → result merging.
 <dd><p>Минимальный размер текстового бокса в пикселях (ширина и высота)</p>
 <dl class="field-list simple">
 <dt class="field-odd">тип<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)">int</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -230,11 +254,10 @@ detection → crop extraction → recognition → correction → result merging.
 <dl class="py attribute">
 <dt class="sig sig-object py" id="manuscript._pipeline.Pipeline.rotate_threshold">
 <span class="sig-name descname"><span class="pre">rotate_threshold</span></span><a class="headerlink" href="#manuscript._pipeline.Pipeline.rotate_threshold" title="Ссылка на это определение"></a></dt>
-<dd><p>Aspect ratio threshold for automatic rotation of vertical text crops.
-If <code class="docutils literal notranslate"><span class="pre">height</span> <span class="pre">&gt;</span> <span class="pre">width</span> <span class="pre">*</span> <span class="pre">rotate_threshold</span></code>, crop is rotated 90° clockwise.</p>
+<dd><p>Порог соотношения сторон для автоматического поворота вертикального текста. Если <code class="docutils literal notranslate"><span class="pre">height</span> <span class="pre">&gt;</span> <span class="pre">width</span> <span class="pre">*</span> <span class="pre">rotate_threshold</span></code>, изображение поворачивается на 90° по часовой стрелке.</p>
 <dl class="field-list simple">
 <dt class="field-odd">тип<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)">float</a></p>
 </dd>
 </dl>
 </dd></dl>
@@ -257,17 +280,38 @@ If <code class="docutils literal notranslate"><span class="pre">height</span> <s
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">detector</span><span class="o">=</span><span class="n">detector</span><span class="p">,</span> <span class="n">recognizer</span><span class="o">=</span><span class="n">recognizer</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Create pipeline with text correction:</p>
+<p>Создание конвейера с коррекцией текста:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharLM</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">corrector</span><span class="o">=</span><span class="n">corrector</span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Disable automatic rotation of vertical text:</p>
+<p>Отключение автоматического поворота вертикального текста:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">rotate_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 </pre></div>
 </div>
+<dl class="field-list simple">
+<dt class="field-odd">Атрибуты<span class="colon">:</span></dt>
+<dd class="field-odd"><dl class="simple">
+<dt><a class="reference internal" href="#manuscript._pipeline.Pipeline.last_correction_page" title="manuscript._pipeline.Pipeline.last_correction_page"><code class="xref py py-obj docutils literal notranslate"><span class="pre">last_correction_page</span></code></a></dt><dd><p>Страница после коррекции.</p>
+</dd>
+<dt><a class="reference internal" href="#manuscript._pipeline.Pipeline.last_detection_page" title="manuscript._pipeline.Pipeline.last_detection_page"><code class="xref py py-obj docutils literal notranslate"><span class="pre">last_detection_page</span></code></a></dt><dd><p>Страница после детекции (до распознавания).</p>
+</dd>
+<dt><a class="reference internal" href="#manuscript._pipeline.Pipeline.last_recognition_page" title="manuscript._pipeline.Pipeline.last_recognition_page"><code class="xref py py-obj docutils literal notranslate"><span class="pre">last_recognition_page</span></code></a></dt><dd><p>Страница после распознавания (до коррекции).</p>
+</dd>
+</dl>
+</dd>
+<dt class="field-even">Параметры<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>detector</strong> (<a class="reference internal" href="detectors.html#manuscript.detectors.EAST" title="manuscript.detectors._east.EAST"><em>EAST</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>recognizer</strong> (<a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA" title="manuscript.recognizers._trba.TRBA"><em>TRBA</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>corrector</strong> (<em>BaseCorrector</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>min_text_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>rotate_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
 <p class="rubric">Методы</p>
 <table class="autosummary longtable docutils align-default">
 <tbody>
@@ -291,8 +335,8 @@ If <code class="docutils literal notranslate"><span class="pre">height</span> <s
 <li><p><strong>corrector</strong> (<em>BaseCorrector</em><em>, </em><em>optional</em>) – Text corrector instance. If None, no text correction is applied.
 The corrector receives a Page object after recognition and returns
 a corrected Page object.</p></li>
-<li><p><strong>min_text_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Минимальный размер текста в пикселях. Боксы меньшего размера будут отфильтрованы перед распознаванием. По умолчанию 5.</p></li>
-<li><p><strong>rotate_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Aspect ratio threshold for automatic rotation of vertical text.
+<li><p><strong>min_text_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Минимальный размер текста в пикселях. Боксы меньшего размера будут отфильтрованы перед распознаванием. По умолчанию 5.</p></li>
+<li><p><strong>rotate_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Aspect ratio threshold for automatic rotation of vertical text.
 If <code class="docutils literal notranslate"><span class="pre">height</span> <span class="pre">&gt;</span> <span class="pre">width</span> <span class="pre">*</span> <span class="pre">rotate_threshold</span></code>, the crop is rotated
 90 degrees clockwise to convert vertical text to horizontal.
 Set to <code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">0</span></code> to disable automatic rotation.
@@ -309,17 +353,17 @@ Default is 1.5.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Параметры<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>image</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, or </em><em>PIL.Image</em>) – Входное изображение. Может быть:  - путь к файлу изображения (str или Path)  - RGB-массив NumPy формы (H, W, 3) в формате uint8  - объект PIL Image</p></li>
-<li><p><strong>recognize_text</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True, выполняет детекцию и распознавание. Если False, выполняет только детекцию. По умолчанию True.</p></li>
-<li><p><strong>vis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True, возвращает изображение визуализации вместе с результатами. По умолчанию False.</p></li>
-<li><p><strong>profile</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True, выводит информацию о времени выполнения каждого этапа конвейера. По умолчанию False.</p></li>
+<li><p><strong>image</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(в NumPy v2.4)"><em>numpy.ndarray</em></a><em>, or </em><em>PIL.Image</em>) – Входное изображение. Может быть:  - путь к файлу изображения (str или Path)  - RGB-массив NumPy формы (H, W, 3) в формате uint8  - объект PIL Image</p></li>
+<li><p><strong>recognize_text</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True, выполняет детекцию и распознавание. Если False, выполняет только детекцию. По умолчанию True.</p></li>
+<li><p><strong>vis</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True, возвращает изображение визуализации вместе с результатами. По умолчанию False.</p></li>
+<li><p><strong>profile</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True, выводит информацию о времени выполнения каждого этапа конвейера. По умолчанию False.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Результат<span class="colon">:</span></dt>
 <dd class="field-even"><p>Если vis=False:  словарь с ключами:  - «page» : объект Page с результатами детекции/распознавания  Если vis=True:  кортеж (result_dict, vis_image)</p>
 </dd>
 <dt class="field-odd">Тип результата<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)">tuple</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(в Python v3.14)">dict</a> or <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(в Python v3.14)">tuple</a></p>
 </dd>
 </dl>
 <p class="rubric">Примеры</p>
@@ -359,7 +403,7 @@ Default is 1.5.</p></li>
 <dd class="field-even"><p>Извлечённый текст, в котором строки разделены переводами строки.</p>
 </dd>
 <dt class="field-odd">Тип результата<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)">str</a></p>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)">str</a></p>
 </dd>
 </dl>
 <p class="rubric">Примеры</p>
@@ -369,6 +413,24 @@ Default is 1.5.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </pre></div>
 </div>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="manuscript._pipeline.Pipeline.last_detection_page">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_detection_page</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.structures.Page"><span class="pre">Page</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(в Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#manuscript._pipeline.Pipeline.last_detection_page" title="Ссылка на это определение"></a></dt>
+<dd><p>Страница после детекции (до распознавания). None, если predict() не вызывался.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="manuscript._pipeline.Pipeline.last_recognition_page">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_recognition_page</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.structures.Page"><span class="pre">Page</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(в Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#manuscript._pipeline.Pipeline.last_recognition_page" title="Ссылка на это определение"></a></dt>
+<dd><p>Страница после распознавания (до коррекции). None, если predict() не вызывался.</p>
+</dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="manuscript._pipeline.Pipeline.last_correction_page">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_correction_page</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.structures.Page"><span class="pre">Page</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(в Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#manuscript._pipeline.Pipeline.last_correction_page" title="Ссылка на это определение"></a></dt>
+<dd><p>Страница после коррекции. None, если корректор не используется или predict() не вызывался.</p>
 </dd></dl>
 
 </dd></dl>

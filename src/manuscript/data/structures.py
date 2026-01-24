@@ -1,5 +1,7 @@
 from pydantic import BaseModel, Field
 from typing import List, Tuple, Optional
+from pathlib import Path
+import json
 
 
 class Word(BaseModel):
@@ -33,10 +35,11 @@ class Word(BaseModel):
     >>> print(word.text)
     Hello
     """
+
     polygon: List[Tuple[float, float]] = Field(
         ...,
         min_length=4,
-        description="Polygon vertices (x, y), ordered clockwise. For quadrilateral text regions: TL → TR → BR → BL."
+        description="Polygon vertices (x, y), ordered clockwise. For quadrilateral text regions: TL → TR → BR → BL.",
     )
     detection_confidence: float = Field(
         ..., ge=0.0, le=1.0, description="Text detection confidence score from detector"
@@ -45,11 +48,14 @@ class Word(BaseModel):
         None, description="Recognized text content (populated by OCR pipeline)"
     )
     recognition_confidence: Optional[float] = Field(
-        None, ge=0.0, le=1.0, description="Text recognition confidence score from recognizer"
+        None,
+        ge=0.0,
+        le=1.0,
+        description="Text recognition confidence score from recognizer",
     )
     order: Optional[int] = Field(
         None,
-        description="Word position inside the line after sorting. None before sorting."
+        description="Word position inside the line after sorting. None before sorting.",
     )
 
 
@@ -67,18 +73,19 @@ class Line(BaseModel):
     Examples
     --------
     >>> line = Line(words=[
-    ...     Word(polygon=[(10, 20), (50, 20), (50, 40), (10, 40)], 
+    ...     Word(polygon=[(10, 20), (50, 20), (50, 40), (10, 40)],
     ...          detection_confidence=0.95, text="Hello"),
-    ...     Word(polygon=[(60, 20), (110, 20), (110, 40), (60, 40)], 
+    ...     Word(polygon=[(60, 20), (110, 20), (110, 40), (60, 40)],
     ...          detection_confidence=0.97, text="World"),
     ... ])
     >>> print(len(line.words))
     2
     """
+
     words: List[Word]
     order: Optional[int] = Field(
         None,
-        description="Line position inside a block or page after sorting. None before sorting."
+        description="Line position inside a block or page after sorting. None before sorting.",
     )
 
 
@@ -108,14 +115,15 @@ class Block(BaseModel):
     >>> print(len(block.lines))
     2
     """
+
     lines: List[Line] = Field(default_factory=list)
     words: List[Word] = Field(
         default_factory=list,
-        description="Legacy: Direct list of words. Use 'lines' for structured output."
+        description="Legacy: Direct list of words. Use 'lines' for structured output.",
     )
     order: Optional[int] = Field(
         None,
-        description="Block reading-order position after sorting. None before sorting."
+        description="Block reading-order position after sorting. None before sorting.",
     )
 
     def __init__(self, **data):
@@ -149,4 +157,59 @@ class Page(BaseModel):
     >>> print(len(page.blocks))
     1
     """
+
     blocks: List[Block]
+
+    def to_json(self, path: Optional[str | Path] = None, indent: int = 2) -> str:
+        """
+        Export Page to JSON.
+
+        Parameters
+        ----------
+        path : str or Path, optional
+            If provided, saves JSON to file.
+        indent : int, optional
+            JSON indentation. Default is 2.
+
+        Returns
+        -------
+        str
+            JSON string representation.
+
+        Examples
+        --------
+        >>> page.to_json("result.json")  # save to file
+        >>> json_str = page.to_json()    # get as string
+        """
+        data = self.model_dump()
+        json_str = json.dumps(data, ensure_ascii=False, indent=indent)
+        if path:
+            Path(path).write_text(json_str, encoding="utf-8")
+        return json_str
+
+    @classmethod
+    def from_json(cls, source: str | Path) -> "Page":
+        """
+        Load Page from JSON file or string.
+
+        Parameters
+        ----------
+        source : str or Path
+            Path to JSON file or JSON string.
+
+        Returns
+        -------
+        Page
+            Loaded Page object.
+
+        Examples
+        --------
+        >>> page = Page.from_json("result.json")
+        >>> page = Page.from_json('{"blocks": [...]}')
+        """
+        path = Path(source)
+        if path.exists():
+            data = json.loads(path.read_text(encoding="utf-8"))
+        else:
+            data = json.loads(source)
+        return cls.model_validate(data)

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-23 18:42+0700\n"
+"POT-Creation-Date: 2026-01-24 15:11+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,6 +26,11 @@ msgstr ""
 msgid "The main high-level interface for OCR processing."
 msgstr ""
 
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:1
+#: 6e99ef95e96941a39e4a8d9cbb2d64cc
+msgid "Bases: :py:class:`object`"
+msgstr ""
+
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:2
 #: 2d87fad7f27a4822b49aaa46f66ed267
 msgid "High-level OCR pipeline combining text detection, recognition, and correction."
@@ -34,14 +39,6 @@ msgstr ""
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:4
 #: cd185d2b4dc04d7a9d811d3823a9210c
 msgid "The Pipeline class orchestrates EAST detector, TRBA recognizer, and optional text corrector to perform complete OCR workflow: detection → crop extraction → recognition → correction → result merging."
-msgstr ""
-
-#: ../../api/pipeline.rst:0
-#: cdc564c856e14cfea6d730b0268ef313
-#: 3ede7f80830e42139f1292d536a58194
-#: 3ede7f80830e42139f1292d536a58194
-#: 3ede7f80830e42139f1292d536a58194
-msgid "Parameters"
 msgstr ""
 
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:10
@@ -132,30 +129,73 @@ msgstr ""
 msgid "Disable automatic rotation of vertical text:"
 msgstr ""
 
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:0
+#: 82e7beeb15cf4dacbe9516af2ed9605f
+msgid "Attributes"
+msgstr ""
+
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:72
+#: feb7a4f50cd2472f915d597761272ed0
+msgid ":obj:`last_correction_page <last_correction_page>`"
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:73
+#: 17202c1591284074bcad246a1cd1af2d
+msgid "Page after correction."
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:75
+#: cd6d555ef31b43509c792f285e0c592d
+msgid ":obj:`last_detection_page <last_detection_page>`"
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:76
+#: fc30767828c94cf0a8e54732dcf70cd8
+msgid "Page after detection (before recognition)."
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:78
+#: 71eabece1ad941cb814f6365d59ae84a
+msgid ":obj:`last_recognition_page <last_recognition_page>`"
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:79
+#: e5b8fa97bf40405d86a71c3c63f70de0
+msgid "Page after recognition (before correction)."
+msgstr ""
+
+#: ../../api/pipeline.rst:0
+#: cdc564c856e14cfea6d730b0268ef313
+#: cdc564c856e14cfea6d730b0268ef313
+#: cdc564c856e14cfea6d730b0268ef313
+#: cdc564c856e14cfea6d730b0268ef313
+msgid "Parameters"
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:82
 #: 5b2c21634a5b4884aeb5b4dca0094148
 msgid "Methods"
 msgstr ""
 
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:88:<autosummary>:1
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:98:<autosummary>:1
 #: ef7baf45570b4147b0db2a0816c7e432
 msgid ":py:obj:`get_text <manuscript._pipeline.Pipeline.get_text>`\\ \\(page\\)"
 msgstr ""
 
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline.get_text:2
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:88:<autosummary>:1
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:98:<autosummary>:1
 #: 588dadb4acac4149bd3db7f28ff3dd60
 #: 588dadb4acac4149bd3db7f28ff3dd60
 msgid "Extract plain text from Page object."
 msgstr ""
 
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:88:<autosummary>:1
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:98:<autosummary>:1
 #: 6bd9688bb7ee43bda5b810996c9070ee
 msgid ":py:obj:`predict <manuscript._pipeline.Pipeline.predict>`\\ \\(image\\[\\, recognize\\_text\\, vis\\, profile\\]\\)"
 msgstr ""
 
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline.predict:2
-#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:88:<autosummary>:1
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline:98:<autosummary>:1
 #: 0c560f843e0446f6b5f25446333612a8
 #: 0c560f843e0446f6b5f25446333612a8
 msgid "Run OCR pipeline on a single image."
@@ -276,4 +316,19 @@ msgstr ""
 #: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline.get_text:8
 #: 71c04ff9226b4c4793635df4447aaba3
 msgid "Extracted text with lines separated by newlines."
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline.last_detection_page:2
+#: b549aee0acec410db00b4f737e6f1699
+msgid "Page after detection (before recognition). None if predict() not called."
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline.last_recognition_page:2
+#: 2ba3b1660e1242beb93c5d98b09cd792
+msgid "Page after recognition (before correction). None if predict() not called."
+msgstr ""
+
+#: ../../../../src/manuscript/_pipeline.py:docstring of manuscript._pipeline.Pipeline.last_correction_page:2
+#: 67555da059c54b7aa1339d48ec1636af
+msgid "Page after correction. None if corrector not used or predict() not called."
 msgstr ""

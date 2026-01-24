@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-22 17:48+0700\n"
+"POT-Creation-Date: 2026-01-24 15:11+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -53,17 +53,22 @@ msgstr ""
 "Этот пакет содержит основные структуры данных, используемые для "
 "представления результатов OCR во всей библиотеке manuscript-ocr."
 
+#: 3dbdc77475924186a4385f06b453d69d 59eb6eb9e1934b16ad30d81f066058aa
+#: a57dcdb6a55a4b099029560eec52c420 dc152a576f9d434ab3f46dda2f42abc5
+#: manuscript.data.structures.Block:1 manuscript.data.structures.Line:1
+#: manuscript.data.structures.Page:1 manuscript.data.structures.Word:1 of
+msgid "Bases: :py:class:`~pydantic.BaseModel`"
+msgstr ""
+
 #: 6a2a2acbe04e4655b9ce1eb2d2878935 manuscript.data.structures.Word:2 of
 msgid "A single detected or recognized word."
 msgstr "Одно обнаруженное или распознанное слово."
 
-#: ../../api/data.rst 4a7523af001b47b09334f6eece39b1b6
-#: 5f928c1b0caf477589bf7daaf1f57f78 e1b24c0e0e2449ce9841c478890f602e
+#: ../../api/data.rst 5f928c1b0caf477589bf7daaf1f57f78
 msgid "Parameters"
 msgstr "Параметры"
 
-#: ../../api/data.rst 729e43668ed24cfb97deea8330c72c39
-#: 7ddfd4afb34d46bb910a1fd025220a41 d1a6699655764ce5904f3b012070f527
+#: ../../api/data.rst 7ddfd4afb34d46bb910a1fd025220a41
 msgid "Return type"
 msgstr "Тип возвращаемого значения"
 
@@ -77,12 +82,8 @@ msgstr ""
 "четырёхугольных текстовых областей: TL → TR → BR → BL (верхний левый, "
 "верхний правый, нижний правый, нижний левый)."
 
-#: 04f4bcfefe714581822c82ed4b4d9fd1 367cccd1e7714a118fb2e4ad8722af01
-#: 4d24d6513f4443d09bdb54b1bd4411a2 4f533c0aa6cd48999ff395ffcac71818
-#: 7798ba190d394bf29d7f10cb69b48703 7d9a80fd68f547b69d8a425b23bd8d55
-#: 93c2ef01b6134ac2b4a3c8e77982754e 95c166c140f5432b8048f5d7496a51e6
-#: bcd914bdbdf846f7a17ec06600b63463 c1a3f5fe7bde4ff699025d3e84b82c4b
-#: dc5a13d001b64352b9645c6d9ef34aad manuscript.data.structures.Block
+#: 4d24d6513f4443d09bdb54b1bd4411a2 7d9a80fd68f547b69d8a425b23bd8d55
+#: c1a3f5fe7bde4ff699025d3e84b82c4b manuscript.data.structures.Block
 #: manuscript.data.structures.Line manuscript.data.structures.Page
 #: manuscript.data.structures.Word of
 msgid "type"
@@ -128,23 +129,22 @@ msgstr "float, необязательный"
 msgid "Word position inside the line after sorting. None before sorting."
 msgstr "Позиция слова внутри строки после сортировки. None до сортировки."
 
-#: 129425d3abd443c792d2f97a5f1c0dca e294185782684841a19468d47bbb0b3f
-#: e9f3795286be4f76a1d25eb0bac0d84e manuscript.data.structures.Block:22
+#: e294185782684841a19468d47bbb0b3f manuscript.data.structures.Block:22
 #: manuscript.data.structures.Line:14 manuscript.data.structures.Word:35 of
 msgid "int, optional"
 msgstr "int, необязательный"
 
-#: 0c3b10dc77194041afd7b4d5d537bb02 b51a3ebf2f734b10907da6958be334a0
-#: f275ad7cf80b4028a6a9f2467b05a3fd f45e6cb5a1424bd6a01bea82f72f7565
-#: manuscript.data.structures.Block:25 manuscript.data.structures.Line:17
-#: manuscript.data.structures.Page:14 manuscript.data.structures.Word:38 of
+#: f45e6cb5a1424bd6a01bea82f72f7565 manuscript.data.structures.Block:25
+#: manuscript.data.structures.Line:17 manuscript.data.structures.Page:14
+#: manuscript.data.structures.Page.from_json:12
+#: manuscript.data.structures.Page.to_json:15
+#: manuscript.data.structures.Word:38 of
 msgid "Examples"
 msgstr "Примеры"
 
-#: 109a7fa2694045c18170b4d14b1aaeb8 55b50b9618ff469e94d89195e4fd21c0
-#: 7f97c3cb792c4a84876c1d3cfa71a702 ab2119a0a44e4d1bb3383ad43fe2385b
-#: manuscript.data.structures.Block:38 manuscript.data.structures.Line:30
-#: manuscript.data.structures.Page:27 manuscript.data.structures.Word:51 of
+#: 55b50b9618ff469e94d89195e4fd21c0 manuscript.data.structures.Block:38
+#: manuscript.data.structures.Line:30 manuscript.data.structures.Page:27
+#: manuscript.data.structures.Word:51 of
 msgid "Methods"
 msgstr "Методы"
 
@@ -157,11 +157,10 @@ msgstr ""
 ":py:obj:`__call__ <manuscript.data.Word.__call__>`\\ \\(\\*args\\, "
 "\\*\\*kwargs\\)"
 
-#: 008bac94182b4bad8e88bcdbf94d1705 3e22ca32a28f427990787d83cb6954a0
-#: 695854b1be2f446194c24850a2a6abeb de37b2c007724bc4a2505d2dce2413a6
+#: 008bac94182b4bad8e88bcdbf94d1705
 #: manuscript.data.structures.Block:43:<autosummary>:1
 #: manuscript.data.structures.Line:35:<autosummary>:1
-#: manuscript.data.structures.Page:42:<autosummary>:1
+#: manuscript.data.structures.Page:44:<autosummary>:1
 #: manuscript.data.structures.Word:56:<autosummary>:1 of
 msgid "Call self as a function."
 msgstr "Вызов объекта как функции."
@@ -170,8 +169,7 @@ msgstr "Вызов объекта как функции."
 msgid "**detection_confidence**"
 msgstr "**detection_confidence**"
 
-#: 405fccf9996249148d321c3cd46d746a 941be45aa4684cdba40068d5861f13f6
-#: e3ccbc42dc2b4468a2691f21131f8879 manuscript.data.structures.Block:46
+#: 941be45aa4684cdba40068d5861f13f6 manuscript.data.structures.Block:46
 #: manuscript.data.structures.Line:37 manuscript.data.structures.Word:59 of
 msgid "**order**"
 msgstr "**order**"
@@ -202,7 +200,9 @@ msgstr "List[Word]"
 
 #: c2f003f68892435888d07c81218d94e0 manuscript.data.structures.Line:12 of
 msgid "Line position inside a block or page after sorting. None before sorting."
-msgstr "Позиция строки внутри блока или страницы после сортировки. None до сортировки."
+msgstr ""
+"Позиция строки внутри блока или страницы после сортировки. None до "
+"сортировки."
 
 #: 12b1a26391f54dafa7a42440a0fde962
 #: manuscript.data.structures.Line:35:<autosummary>:1 of
@@ -286,10 +286,71 @@ msgid "List[Block]"
 msgstr "List[Block]"
 
 #: 2813969f01a14e6d88e694464aa9ea16
-#: manuscript.data.structures.Page:42:<autosummary>:1 of
+#: manuscript.data.structures.Page:44:<autosummary>:1 of
 msgid ""
 ":py:obj:`__call__ <manuscript.data.Page.__call__>`\\ \\(\\*args\\, "
 "\\*\\*kwargs\\)"
 msgstr ""
 ":py:obj:`__call__ <manuscript.data.Page.__call__>`\\ \\(\\*args\\, "
 "\\*\\*kwargs\\)"
+
+#: 2813969f01a14e6d88e694464aa9ea16
+#: manuscript.data.structures.Page:44:<autosummary>:1 of
+#, fuzzy
+msgid ":py:obj:`from_json <manuscript.data.Page.from_json>`\\ \\(source\\)"
+msgstr ""
+":py:obj:`__call__ <manuscript.data.Page.__call__>`\\ \\(\\*args\\, "
+"\\*\\*kwargs\\)"
+
+#: 2ee70a03dc0148efbb9efcf0f5b89812 ca59973b437449eb8d9ec85358c3d93f
+#: manuscript.data.structures.Page.from_json:2
+#: manuscript.data.structures.Page:44:<autosummary>:1 of
+msgid "Load Page from JSON file or string."
+msgstr "Загрузить Page из JSON-файла или строки."
+
+#: 2813969f01a14e6d88e694464aa9ea16
+#: manuscript.data.structures.Page:44:<autosummary>:1 of
+#, fuzzy
+msgid ""
+":py:obj:`to_json <manuscript.data.Page.to_json>`\\ \\(\\[path\\, "
+"indent\\]\\)"
+msgstr ""
+":py:obj:`__call__ <manuscript.data.Page.__call__>`\\ \\(\\*args\\, "
+"\\*\\*kwargs\\)"
+
+#: 3ae73dc942204dda97dcdb773b55f1c1 5aa0837f648a48c2bd9edd7334f14540
+#: manuscript.data.structures.Page.to_json:2
+#: manuscript.data.structures.Page:44:<autosummary>:1 of
+msgid "Export Page to JSON."
+msgstr "Экспорт Page в JSON."
+
+#: 43eec7831da74d7bb672249ec87b8d1b manuscript.data.structures.Page.from_json:5
+#: of
+msgid "Path to JSON file or JSON string."
+msgstr "Путь к JSON-файлу или JSON-строка."
+
+#: ../../api/data.rst 7ddfd4afb34d46bb910a1fd025220a41
+#, fuzzy
+msgid "Returns"
+msgstr "Тип возвращаемого значения"
+
+#: 1618b69ce00143929e1736c732b8f8bb manuscript.data.structures.Page.from_json:8
+#: of
+msgid "Loaded Page object."
+msgstr "Загруженный объект Page."
+
+#: f8bd8b1d8f3e4a109d1fe13ac4500237 manuscript.data.structures.Page.to_json:5
+#: of
+msgid "If provided, saves JSON to file."
+msgstr "Если указан, сохраняет JSON в файл."
+
+#: ab4b9896b1fa4ecd8e444fa97eeeac70 manuscript.data.structures.Page.to_json:8
+#: of
+msgid "JSON indentation. Default is 2."
+msgstr "Отступ JSON. По умолчанию 2."
+
+#: ea7a066bad6e415394c4fbc661012af9 manuscript.data.structures.Page.to_json:11
+#: of
+msgid "JSON string representation."
+msgstr "Строковое представление JSON."
+

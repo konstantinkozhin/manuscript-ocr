@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-23 20:09+0700\n"
+"POT-Creation-Date: 2026-01-24 15:11+0700\n"
 "PO-Revision-Date: 2026-01-23 19:00+0700\n"
 "Last-Translator: Konstantin Kozhin <konstantin.kozhin@gmail.com>\n"
 "Language: ru\n"
@@ -32,6 +32,10 @@ msgstr "Символьный корректор текста для постоб
 msgid "``CharLM``"
 msgstr "``CharLM``"
 
+#: c60bd8ee50024611989dc924d840bb56 manuscript.correctors._charlm.CharLM:1 of
+msgid "Bases: :py:class:`~manuscript.api.base.BaseModel`"
+msgstr ""
+
 #: c5de954811364ccdbb8b45bfcf80dafe manuscript.correctors._charlm.CharLM:2 of
 msgid "Character-level language model corrector using ONNX Runtime."
 msgstr "Символьная языковая модель-корректор на базе ONNX Runtime."
@@ -46,8 +50,7 @@ msgstr ""
 " исправления OCR-ошибок на уровне символов. Анализирует уверенность в "
 "символах и применяет исправления на основе выученных шаблонов замен."
 
-#: ../../api/correctors.rst 2274db3e17f34b10ac1f3a819708dae5
-#: b5161db6c21b48a3a8acd48da6af18a0
+#: ../../api/correctors.rst b5161db6c21b48a3a8acd48da6af18a0
 msgid "Parameters"
 msgstr "Параметры"
 
@@ -61,8 +64,8 @@ msgid ""
 "``\"modern_charlm_g1\"`` (from pretrained_registry) - ``None``: auto-"
 "downloads default preset (prereform_charlm_g1)"
 msgstr ""
-"Путь или идентификатор для весов модели ONNX. Поддерживает: локальный путь, "
-"HTTP/HTTPS URL, GitHub release, Google Drive, имя пресета "
+"Путь или идентификатор для весов модели ONNX. Поддерживает: локальный "
+"путь, HTTP/HTTPS URL, GitHub release, Google Drive, имя пресета "
 "(``\"prereform_charlm_g1\"`` или ``\"modern_charlm_g1\"``), ``None`` — "
 "автозагрузка пресета по умолчанию (prereform_charlm_g1)"
 
@@ -91,8 +94,8 @@ msgid ""
 "Preset name: ``\"prereform_charlm_g1\"`` or ``\"modern_charlm_g1\"`` "
 "(from pretrained_registry)"
 msgstr ""
-"Имя пресета: ``\"prereform_charlm_g1\"`` или ``\"modern_charlm_g1\"`` "
-"(из pretrained_registry)"
+"Имя пресета: ``\"prereform_charlm_g1\"`` или ``\"modern_charlm_g1\"`` (из"
+" pretrained_registry)"
 
 #: 09cb04eef9374aafa4ca0548fae13417 manuscript.correctors._charlm.CharLM:16 of
 msgid "``None``: auto-downloads default preset (prereform_charlm_g1)"
@@ -112,10 +115,10 @@ msgid ""
 "preset   (prereform_words for prereform_charlm_g1, modern_words for "
 "modern_charlm_g1)"
 msgstr ""
-"Список слов для валидации по словарю. Поддерживает: локальный путь, имя пресета "
-"(``\"prereform_words\"`` или ``\"modern_words\"``), Python set, ``None`` — "
-"автозагрузка лексикона для пресета модели (prereform_words для prereform_charlm_g1, "
-"modern_words для modern_charlm_g1)"
+"Список слов для валидации по словарю. Поддерживает: локальный путь, имя "
+"пресета (``\"prereform_words\"`` или ``\"modern_words\"``), Python set, "
+"``None`` — автозагрузка лексикона для пресета модели (prereform_words для"
+" prereform_charlm_g1, modern_words для modern_charlm_g1)"
 
 #: a7644fa9876d4247b81820a650d4381a manuscript.correctors._charlm.CharLM:22 of
 msgid "Word list for dictionary-based validation. Supports:"
@@ -144,9 +147,8 @@ msgid ""
 "(prereform_words for prereform_charlm_g1, modern_words for "
 "modern_charlm_g1)"
 msgstr ""
-"``None``: автозагрузка лексикона для пресета модели "
-"(prereform_words для prereform_charlm_g1, modern_words для "
-"modern_charlm_g1)"
+"``None``: автозагрузка лексикона для пресета модели (prereform_words для "
+"prereform_charlm_g1, modern_words для modern_charlm_g1)"
 
 #: 6b6a0eb48f984a539978bed40ec87104 manuscript.correctors._charlm.CharLM:31 of
 msgid "Compute device. Default is auto-detected."

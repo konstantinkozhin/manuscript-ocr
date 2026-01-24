@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-23 18:42+0700\n"
+"POT-Creation-Date: 2026-01-24 15:11+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -29,30 +29,27 @@ msgstr "Конвейер"
 msgid "The main high-level interface for OCR processing."
 msgstr "Основной высокоуровневый интерфейс для OCR-обработки."
 
+#: 6e99ef95e96941a39e4a8d9cbb2d64cc manuscript._pipeline.Pipeline:1 of
+msgid "Bases: :py:class:`object`"
+msgstr "Базовый класс: :py:class:`object`"
+
 #: 2d87fad7f27a4822b49aaa46f66ed267 manuscript._pipeline.Pipeline:2 of
-#, fuzzy
 msgid ""
 "High-level OCR pipeline combining text detection, recognition, and "
 "correction."
 msgstr ""
-"Высокоуровневый OCR-конвейер, объединяющий детекцию и распознавание "
-"текста."
+"Высокоуровневый OCR-конвейер, объединяющий детекцию, распознавание и "
+"коррекцию текста."
 
 #: cd185d2b4dc04d7a9d811d3823a9210c manuscript._pipeline.Pipeline:4 of
-#, fuzzy
 msgid ""
 "The Pipeline class orchestrates EAST detector, TRBA recognizer, and "
 "optional text corrector to perform complete OCR workflow: detection → "
 "crop extraction → recognition → correction → result merging."
 msgstr ""
-"Класс Pipeline координирует детектор EAST и распознаватель TRBA для "
-"выполнения полного OCR-процесса: детекция → извлечение кропов → "
-"распознавание → объединение результатов."
-
-#: ../../api/pipeline.rst 3ede7f80830e42139f1292d536a58194
-#: cdc564c856e14cfea6d730b0268ef313
-msgid "Parameters"
-msgstr "Параметры"
+"Класс Pipeline координирует детектор EAST, распознаватель TRBA и "
+"опциональный корректор текста для выполнения полного OCR-процесса: "
+"детекция → извлечение кропов → распознавание → коррекция → объединение результатов."
 
 #: 8876c58ba5a045769a26744a0d553912 manuscript._pipeline.Pipeline:10 of
 msgid "Text detector instance"
@@ -78,11 +75,11 @@ msgstr "TRBA"
 
 #: 0c427a8698144017a72bbdcd1f2a8252 manuscript._pipeline.Pipeline:22 of
 msgid "Text corrector instance (None to skip correction)"
-msgstr ""
+msgstr "Экземпляр корректора текста (None для пропуска коррекции)"
 
 #: 17202c1591284074bcad246a1cd1af2d manuscript._pipeline.Pipeline:24 of
 msgid "BaseCorrector, optional"
-msgstr ""
+msgstr "BaseCorrector, опционально"
 
 #: 96ba6537af0d42be9514d49ed40caaa6 manuscript._pipeline.Pipeline:28 of
 msgid "Minimum text box size in pixels (width and height)"
@@ -97,10 +94,12 @@ msgid ""
 "Aspect ratio threshold for automatic rotation of vertical text crops. If "
 "``height > width * rotate_threshold``, crop is rotated 90° clockwise."
 msgstr ""
+"Порог соотношения сторон для автоматического поворота вертикального текста. "
+"Если ``height > width * rotate_threshold``, изображение поворачивается на 90° по часовой стрелке."
 
 #: 35fa19f11c2642b087799666b5fc987f manuscript._pipeline.Pipeline:37 of
 msgid "float"
-msgstr ""
+msgstr "float"
 
 #: 8438486b869649b1821afb4a226ea692 manuscript._pipeline.Pipeline:40
 #: manuscript._pipeline.Pipeline.get_text:12
@@ -117,30 +116,61 @@ msgid "Create pipeline with custom models:"
 msgstr "Создание конвейера с пользовательскими моделями:"
 
 #: db672cea5ed54e2489118269241ffcfa manuscript._pipeline.Pipeline:58 of
-#, fuzzy
 msgid "Create pipeline with text correction:"
-msgstr "Создание конвейера с моделями по умолчанию:"
+msgstr "Создание конвейера с коррекцией текста:"
 
 #: 628276393f5245cd94ae2f3b246e7e1d manuscript._pipeline.Pipeline:65 of
 msgid "Disable automatic rotation of vertical text:"
-msgstr ""
+msgstr "Отключение автоматического поворота вертикального текста:"
 
-#: 5b2c21634a5b4884aeb5b4dca0094148 manuscript._pipeline.Pipeline:72 of
+#: 82e7beeb15cf4dacbe9516af2ed9605f manuscript._pipeline.Pipeline of
+msgid "Attributes"
+msgstr "Атрибуты"
+
+#: feb7a4f50cd2472f915d597761272ed0 manuscript._pipeline.Pipeline:72 of
+msgid ":obj:`last_correction_page <last_correction_page>`"
+msgstr ":obj:`last_correction_page <last_correction_page>`"
+
+#: 17202c1591284074bcad246a1cd1af2d manuscript._pipeline.Pipeline:73 of
+msgid "Page after correction."
+msgstr "Страница после коррекции."
+
+#: cd6d555ef31b43509c792f285e0c592d manuscript._pipeline.Pipeline:75 of
+msgid ":obj:`last_detection_page <last_detection_page>`"
+msgstr ":obj:`last_detection_page <last_detection_page>`"
+
+#: fc30767828c94cf0a8e54732dcf70cd8 manuscript._pipeline.Pipeline:76 of
+msgid "Page after detection (before recognition)."
+msgstr "Страница после детекции (до распознавания)."
+
+#: 71eabece1ad941cb814f6365d59ae84a manuscript._pipeline.Pipeline:78 of
+msgid ":obj:`last_recognition_page <last_recognition_page>`"
+msgstr ":obj:`last_recognition_page <last_recognition_page>`"
+
+#: e5b8fa97bf40405d86a71c3c63f70de0 manuscript._pipeline.Pipeline:79 of
+msgid "Page after recognition (before correction)."
+msgstr "Страница после распознавания (до коррекции)."
+
+#: ../../api/pipeline.rst cdc564c856e14cfea6d730b0268ef313
+msgid "Parameters"
+msgstr "Параметры"
+
+#: 5b2c21634a5b4884aeb5b4dca0094148 manuscript._pipeline.Pipeline:82 of
 msgid "Methods"
 msgstr "Методы"
 
 #: ef7baf45570b4147b0db2a0816c7e432
-#: manuscript._pipeline.Pipeline:88:<autosummary>:1 of
+#: manuscript._pipeline.Pipeline:98:<autosummary>:1 of
 msgid ":py:obj:`get_text <manuscript._pipeline.Pipeline.get_text>`\\ \\(page\\)"
 msgstr ":py:obj:`get_text <manuscript._pipeline.Pipeline.get_text>`\\ \\(page\\)"
 
 #: 588dadb4acac4149bd3db7f28ff3dd60 manuscript._pipeline.Pipeline.get_text:2
-#: manuscript._pipeline.Pipeline:88:<autosummary>:1 of
+#: manuscript._pipeline.Pipeline:98:<autosummary>:1 of
 msgid "Extract plain text from Page object."
 msgstr "Извлечение обычного текста из объекта Page."
 
 #: 6bd9688bb7ee43bda5b810996c9070ee
-#: manuscript._pipeline.Pipeline:88:<autosummary>:1 of
+#: manuscript._pipeline.Pipeline:98:<autosummary>:1 of
 msgid ""
 ":py:obj:`predict <manuscript._pipeline.Pipeline.predict>`\\ "
 "\\(image\\[\\, recognize\\_text\\, vis\\, profile\\]\\)"
@@ -149,7 +179,7 @@ msgstr ""
 "\\(image\\[\\, recognize\\_text\\, vis\\, profile\\]\\)"
 
 #: 0c560f843e0446f6b5f25446333612a8 manuscript._pipeline.Pipeline.predict:2
-#: manuscript._pipeline.Pipeline:88:<autosummary>:1 of
+#: manuscript._pipeline.Pipeline:98:<autosummary>:1 of
 msgid "Run OCR pipeline on a single image."
 msgstr "Запуск OCR-конвейера на одном изображении."
 
@@ -287,4 +317,19 @@ msgstr "Объект Page с результатами распознавания
 #: 71c04ff9226b4c4793635df4447aaba3 manuscript._pipeline.Pipeline.get_text:8 of
 msgid "Extracted text with lines separated by newlines."
 msgstr "Извлечённый текст, в котором строки разделены переводами строки."
+
+#: b549aee0acec410db00b4f737e6f1699
+#: manuscript._pipeline.Pipeline.last_detection_page:2 of
+msgid "Page after detection (before recognition). None if predict() not called."
+msgstr "Страница после детекции (до распознавания). None, если predict() не вызывался."
+
+#: 2ba3b1660e1242beb93c5d98b09cd792
+#: manuscript._pipeline.Pipeline.last_recognition_page:2 of
+msgid "Page after recognition (before correction). None if predict() not called."
+msgstr "Страница после распознавания (до коррекции). None, если predict() не вызывался."
+
+#: 67555da059c54b7aa1339d48ec1636af
+#: manuscript._pipeline.Pipeline.last_correction_page:2 of
+msgid "Page after correction. None if corrector not used or predict() not called."
+msgstr "Страница после коррекции. None, если корректор не используется или predict() не вызывался."
 

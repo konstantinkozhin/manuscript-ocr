@@ -104,6 +104,10 @@ class Pipeline:
         self.min_text_size = min_text_size
         self.rotate_threshold = rotate_threshold
 
+        self._last_detection_page: Optional[Page] = None
+        self._last_recognition_page: Optional[Page] = None
+        self._last_correction_page: Optional[Page] = None
+
     def predict(
         self,
         image: Union[str, Path, np.ndarray, Image.Image],
@@ -173,6 +177,7 @@ class Pipeline:
             image, return_maps=False, sort_reading_order=True
         )
         page: Page = detection_result["page"]
+        self._last_detection_page = page.model_copy(deep=True)
 
         if profile:
             print(f"Detection: {time.time() - t0:.3f}s")
@@ -236,12 +241,17 @@ class Pipeline:
                 word_obj.text = result["text"]
                 word_obj.recognition_confidence = result["confidence"]
 
+        self._last_recognition_page = page.model_copy(deep=True)
+
         # ---- CORRECTION ----
         if self.corrector is not None:
             t0 = time.time()
             page = self.corrector.predict(page)
+            self._last_correction_page = page.model_copy(deep=True)
             if profile:
                 print(f"Correction: {time.time() - t0:.3f}s")
+        else:
+            self._last_correction_page = None
 
         if profile:
             print(f"Pipeline total: {time.time() - start_time:.3f}s")
@@ -288,6 +298,18 @@ class Pipeline:
                 if texts:
                     lines.append(" ".join(texts))
         return "\n".join(lines)
+
+    @property
+    def last_detection_page(self) -> Optional[Page]:
+        return self._last_detection_page
+
+    @property
+    def last_recognition_page(self) -> Optional[Page]:
+        return self._last_recognition_page
+
+    @property
+    def last_correction_page(self) -> Optional[Page]:
+        return self._last_correction_page
 
     def _extract_word_image(
         self, image: np.ndarray, polygon: np.ndarray
@@ -354,4 +376,4 @@ class Pipeline:
         if height > width * self.rotate_threshold:
             crop = np.rot90(crop, k=-1)
 
-        return crop 
+        return crop

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-23 20:09+0700\n"
+"POT-Creation-Date: 2026-01-24 15:11+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language: ru\n"
@@ -28,12 +28,15 @@ msgstr "Детекторы"
 msgid "Text detection models."
 msgstr "Модели детекции текста."
 
+#: 27968e3a4b784493a05a3089e93b1531 manuscript.detectors._east.EAST:1 of
+msgid "Bases: :py:class:`~manuscript.api.base.BaseModel`"
+msgstr ""
+
 #: d6cf8296b80b47eca6180c0a7c64c7ed manuscript.detectors._east.EAST:2 of
 msgid "Initialize EAST text detector with ONNX Runtime."
 msgstr "Инициализация текстового детектора EAST с использованием ONNX Runtime."
 
-#: ../../api/detectors.rst 44088b6b89d848abb581e53592cfa372
-#: 75c9e3f4f05142bc9132bd4d0b5d7fbc
+#: ../../api/detectors.rst 75c9e3f4f05142bc9132bd4d0b5d7fbc
 msgid "Parameters"
 msgstr "Параметры"
 
@@ -46,9 +49,10 @@ msgid ""
 "``\"gdrive:FILE_ID\"`` - Preset name: ``\"east_50_g1\"`` - ``None``: "
 "auto-downloads default preset (east_50_g1)"
 msgstr ""
-"Путь или идентификатор для весов модели ONNX. Поддерживает: локальный путь, "
-"HTTP/HTTPS URL, GitHub release, Google Drive, имя пресета (``\"east_50_g1\"``), "
-"``None`` — автозагрузка пресета по умолчанию (east_50_g1)"
+"Путь или идентификатор для весов модели ONNX. Поддерживает: локальный "
+"путь, HTTP/HTTPS URL, GitHub release, Google Drive, имя пресета "
+"(``\"east_50_g1\"``), ``None`` — автозагрузка пресета по умолчанию "
+"(east_50_g1)"
 
 #: e3cac75df34747978dc33365439a0b67 manuscript.detectors._east.EAST:5 of
 msgid "Path or identifier for ONNX model weights. Supports:"
@@ -327,6 +331,171 @@ msgstr ""
 msgid "Train EAST model on custom datasets."
 msgstr "Обучение модели EAST на пользовательских датасетах."
 
+#: c2b6d62c382d4738aef123d164d92532 manuscript.detectors._east.EAST.export:4 of
+msgid ""
+"This method converts a trained EAST model from PyTorch to ONNX format, "
+"which can be used for faster inference with ONNX Runtime. The exported "
+"model can be loaded using ``EAST(weights_path=\"model.onnx\", "
+"use_onnx=True)``."
+msgstr ""
+"Этот метод конвертирует обученную модель EAST из PyTorch в формат ONNX, "
+"который может использоваться для более быстрого инференса с ONNX Runtime."
+" Экспортированную модель можно загрузить с помощью "
+"``EAST(weights_path=\"model.onnx\", use_onnx=True)``."
+
+#: 9cdb3a4d1be54d4ebb44616b39431609 manuscript.detectors._east.EAST.export:9 of
+msgid "Path to the PyTorch model weights file (.pth)."
+msgstr "Путь к файлу весов модели PyTorch (.pth)."
+
+#: c68eb4ba7a1d477d83e3245dea00cde9 manuscript.detectors._east.EAST.export:12
+#: of
+msgid "Path where the ONNX model will be saved (.onnx)."
+msgstr "Путь, по которому будет сохранена модель ONNX (.onnx)."
+
+#: 6c7089d494364417865f9d2f53f21f53 manuscript.detectors._east.EAST.export:15
+#: of
+msgid ""
+"Backbone architecture of the model. If None, will be automatically "
+"detected from the checkpoint. Must match the architecture used during "
+"training. Default is None (auto-detect)."
+msgstr ""
+"Архитектура backbone модели. Если None, будет автоматически определена из"
+" чекпоинта. Должна совпадать с архитектурой, использованной при обучении."
+" По умолчанию None (автоопределение)."
+
+#: e57588dccce449f69980f97916f705a4 manuscript.detectors._east.EAST.export:20
+#: of
+msgid ""
+"Input image size (height and width). The model will accept images of "
+"shape ``(batch, 3, input_size, input_size)``. Default is 1280."
+msgstr ""
+"Размер входного изображения (высота и ширина). Модель принимает "
+"изображения формы ``(batch, 3, input_size, input_size)``. По умолчанию "
+"1280."
+
+#: a597915823674239b9d51df83fe58ad3 manuscript.detectors._east.EAST.export:25
+#: of
+msgid "ONNX opset version to use for export. Default is 14."
+msgstr "Версия opset ONNX для экспорта. По умолчанию 14."
+
+#: 4ce7249fab64462b927e87a4917b04c4 manuscript.detectors._east.EAST.export:28
+#: of
+msgid ""
+"If True, applies ONNX graph simplification using onnx-simplifier to "
+"optimize the model. Requires ``onnx-simplifier`` package. Default is "
+"True."
+msgstr ""
+"Если True, применяется упрощение графа ONNX с помощью onnx-simplifier для"
+" оптимизации модели. Требуется пакет ``onnx-simplifier``. По умолчанию "
+"True."
+
+#: ../../api/detectors.rst 74af4ffe4576447687ce250ca01cca33
+msgid "Returns"
+msgstr "Возвращает"
+
+#: f68e0f994906482b9257aa41c8b5155f manuscript.detectors._east.EAST.export:33
+#: of
+msgid "The ONNX model is saved to ``output_path``."
+msgstr "Модель ONNX сохраняется в ``output_path``."
+
+#: ../../api/detectors.rst 077212810899479e8d3019aeb9a2a6c6
+msgid "Return type"
+msgstr "Тип возвращаемого значения"
+
+#: ../../api/detectors.rst fc94c23625f4418fb56b000497232786
+msgid "Raises"
+msgstr "Исключения"
+
+#: c13f8bc7d0c64b21bb2620acfe3872f2 manuscript.detectors._east.EAST.export:36
+#: of
+msgid "If required packages (torch, onnx) are not installed."
+msgstr "Если необходимые пакеты (torch, onnx) не установлены."
+
+#: 412e53b3758b4dd1b2f456ff80bffc9e manuscript.detectors._east.EAST.export:37
+#: of
+msgid "If ``weights_path`` does not exist."
+msgstr "Если ``weights_path`` не существует."
+
+#: 34d9be185c1f462eb7eba94884baa574 manuscript.detectors._east.EAST.export:38
+#: of
+msgid "If backbone_name doesn't match the checkpoint architecture."
+msgstr "Если backbone_name не соответствует архитектуре чекпоинта."
+
+#: 8256e1bc169f42f78f637fc7491cdecc manuscript.detectors._east.EAST.export:42
+#: of
+msgid "The exported ONNX model has two outputs:"
+msgstr "Экспортированная модель ONNX имеет два выхода:"
+
+#: 86a231684eb64759b37eab1fc71b4af2 manuscript.detectors._east.EAST.export:44
+#: of
+msgid "``score_map``: Text confidence map with shape ``(batch, 1, H, W)``"
+msgstr "``score_map``: карта уверенности текста формы ``(batch, 1, H, W)``"
+
+#: c8a24738748c4a3bb62d6ac7f6491008 manuscript.detectors._east.EAST.export:45
+#: of
+msgid "``geo_map``: Geometry map with shape ``(batch, 8, H, W)``"
+msgstr "``geo_map``: карта геометрии формы ``(batch, 8, H, W)``"
+
+#: f3e78ba39a31408dbd46bcdb73b9618a manuscript.detectors._east.EAST.export:47
+#: of
+msgid ""
+"The model supports dynamic batch size and image dimensions through "
+"dynamic axes configuration."
+msgstr ""
+"Модель поддерживает динамический размер батча и размеры изображения через"
+" настройку динамических осей."
+
+#: 99b968790e794e3cb6e0f0028ce19e3d manuscript.detectors._east.EAST.export:50
+#: of
+msgid "**Automatic Backbone Detection:**"
+msgstr "**Автоматическое определение backbone:**"
+
+#: 76df155d749449f8ac4fa162384d7e50 manuscript.detectors._east.EAST.export:52
+#: of
+msgid ""
+"The method automatically detects the backbone architecture from the "
+"checkpoint by analyzing the number of parameters in layer4. This prevents"
+" mismatches between checkpoint and architecture that could lead to "
+"incorrect exports."
+msgstr ""
+"Метод автоматически определяет архитектуру backbone из чекпоинта, "
+"анализируя количество параметров в layer4. Это предотвращает "
+"несоответствия между чекпоинтом и архитектурой, которые могли бы привести"
+" к некорректному экспорту."
+
+#: 96c29f29b20946568b75927215ab91bb manuscript.detectors._east.EAST.export:57
+#: manuscript.detectors._east.EAST.predict:63
+#: manuscript.detectors._east.EAST.train:122 of
+msgid "Examples"
+msgstr "Примеры"
+
+#: 1bdb5444cf2a4b2d887837760fc32e5d manuscript.detectors._east.EAST.export:58
+#: of
+msgid "Export with automatic backbone detection:"
+msgstr "Экспорт с автоматическим определением backbone:"
+
+#: caab3a41a80840329938fe09edffe612 manuscript.detectors._east.EAST.export:69
+#: of
+msgid "Export with explicit backbone:"
+msgstr "Экспорт с явным указанием backbone:"
+
+#: 96173d5958784c5a88847ad2b4cf40d6 manuscript.detectors._east.EAST.export:79
+#: of
+msgid "Use the exported model for inference:"
+msgstr "Использование экспортированной модели для инференса:"
+
+#: 31caf8df307d4fefa9a8148ac65c67d2 manuscript.detectors._east.EAST.export:90
+#: of
+msgid ":py:obj:`EAST.__init__`"
+msgstr ":py:obj:`EAST.__init__`"
+
+#: 2dd12d56ee394826806996b6dcce13cf manuscript.detectors._east.EAST.export:91
+#: of
+msgid "Initialize EAST detector with ONNX support using ``use_onnx=True``."
+msgstr ""
+"Инициализация детектора EAST с поддержкой ONNX с использованием "
+"``use_onnx=True``."
+
 #: c45b1bca2ce24192b96f2863b2850f41 manuscript.detectors._east.EAST.predict:5
 #: of
 msgid ""
@@ -378,10 +547,6 @@ msgstr ""
 "``split_into_columns=True``. Большие значения позволяют обнаруживать "
 "больше колонок. Используется только при ``sort_reading_order=True`` и "
 "``split_into_columns=True``. По умолчанию 10."
-
-#: ../../api/detectors.rst 74af4ffe4576447687ce250ca01cca33
-msgid "Returns"
-msgstr "Возвращает"
 
 #: 4915cea5333349799512bd6136587ae2 manuscript.detectors._east.EAST.predict:29
 #: of
@@ -453,10 +618,6 @@ msgstr "``\"geo_map\"``"
 msgid "Raw geometry map if ``return_maps=True``."
 msgstr "Необработанная карта геометрии, если ``return_maps=True``."
 
-#: ../../api/detectors.rst 077212810899479e8d3019aeb9a2a6c6
-msgid "Return type"
-msgstr "Тип возвращаемого значения"
-
 #: 241950b0eed74a68a02ac9fea859b2e6 manuscript.detectors._east.EAST.predict:43
 #: of
 msgid ""
@@ -490,12 +651,6 @@ msgstr ""
 #: of
 msgid "For visualization, use the external ``visualize_page`` utility:"
 msgstr "Для визуализации используйте внешнюю утилиту ``visualize_page``:"
-
-#: 96c29f29b20946568b75927215ab91bb manuscript.detectors._east.EAST.export:57
-#: manuscript.detectors._east.EAST.predict:63
-#: manuscript.detectors._east.EAST.train:122 of
-msgid "Examples"
-msgstr "Примеры"
 
 #: 365844be83744b53a317230246a25636 manuscript.detectors._east.EAST.predict:64
 #: of
@@ -731,157 +886,6 @@ msgstr "Лучшие веса модели (EMA, если включено, ин
 #: of
 msgid "Train on two datasets with validation:"
 msgstr "Обучение на двух датасетах с валидацией:"
-
-#: c2b6d62c382d4738aef123d164d92532 manuscript.detectors._east.EAST.export:4 of
-msgid ""
-"This method converts a trained EAST model from PyTorch to ONNX format, "
-"which can be used for faster inference with ONNX Runtime. The exported "
-"model can be loaded using ``EAST(weights_path=\"model.onnx\", "
-"use_onnx=True)``."
-msgstr ""
-"Этот метод конвертирует обученную модель EAST из PyTorch в формат ONNX, "
-"который может использоваться для более быстрого инференса с ONNX Runtime."
-" Экспортированную модель можно загрузить с помощью "
-"``EAST(weights_path=\"model.onnx\", use_onnx=True)``."
-
-#: 9cdb3a4d1be54d4ebb44616b39431609 manuscript.detectors._east.EAST.export:9 of
-msgid "Path to the PyTorch model weights file (.pth)."
-msgstr "Путь к файлу весов модели PyTorch (.pth)."
-
-#: c68eb4ba7a1d477d83e3245dea00cde9 manuscript.detectors._east.EAST.export:12
-#: of
-msgid "Path where the ONNX model will be saved (.onnx)."
-msgstr "Путь, по которому будет сохранена модель ONNX (.onnx)."
-
-#: 6c7089d494364417865f9d2f53f21f53 manuscript.detectors._east.EAST.export:15
-#: of
-msgid ""
-"Backbone architecture of the model. If None, will be automatically "
-"detected from the checkpoint. Must match the architecture used during "
-"training. Default is None (auto-detect)."
-msgstr ""
-"Архитектура backbone модели. Если None, будет автоматически определена из"
-" чекпоинта. Должна совпадать с архитектурой, использованной при обучении."
-" По умолчанию None (автоопределение)."
-
-#: e57588dccce449f69980f97916f705a4 manuscript.detectors._east.EAST.export:20
-#: of
-msgid ""
-"Input image size (height and width). The model will accept images of "
-"shape ``(batch, 3, input_size, input_size)``. Default is 1280."
-msgstr ""
-"Размер входного изображения (высота и ширина). Модель принимает "
-"изображения формы ``(batch, 3, input_size, input_size)``. По умолчанию "
-"1280."
-
-#: a597915823674239b9d51df83fe58ad3 manuscript.detectors._east.EAST.export:25
-#: of
-msgid "ONNX opset version to use for export. Default is 14."
-msgstr "Версия opset ONNX для экспорта. По умолчанию 14."
-
-#: 4ce7249fab64462b927e87a4917b04c4 manuscript.detectors._east.EAST.export:28
-#: of
-msgid ""
-"If True, applies ONNX graph simplification using onnx-simplifier to "
-"optimize the model. Requires ``onnx-simplifier`` package. Default is "
-"True."
-msgstr ""
-"Если True, применяется упрощение графа ONNX с помощью onnx-simplifier для"
-" оптимизации модели. Требуется пакет ``onnx-simplifier``. По умолчанию "
-"True."
-
-#: f68e0f994906482b9257aa41c8b5155f manuscript.detectors._east.EAST.export:33
-#: of
-msgid "The ONNX model is saved to ``output_path``."
-msgstr "Модель ONNX сохраняется в ``output_path``."
-
-#: ../../api/detectors.rst fc94c23625f4418fb56b000497232786
-msgid "Raises"
-msgstr "Исключения"
-
-#: c13f8bc7d0c64b21bb2620acfe3872f2 manuscript.detectors._east.EAST.export:36
-#: of
-msgid "If required packages (torch, onnx) are not installed."
-msgstr "Если необходимые пакеты (torch, onnx) не установлены."
-
-#: 412e53b3758b4dd1b2f456ff80bffc9e manuscript.detectors._east.EAST.export:37
-#: of
-msgid "If ``weights_path`` does not exist."
-msgstr "Если ``weights_path`` не существует."
-
-#: 34d9be185c1f462eb7eba94884baa574 manuscript.detectors._east.EAST.export:38
-#: of
-msgid "If backbone_name doesn't match the checkpoint architecture."
-msgstr "Если backbone_name не соответствует архитектуре чекпоинта."
-
-#: 8256e1bc169f42f78f637fc7491cdecc manuscript.detectors._east.EAST.export:42
-#: of
-msgid "The exported ONNX model has two outputs:"
-msgstr "Экспортированная модель ONNX имеет два выхода:"
-
-#: 86a231684eb64759b37eab1fc71b4af2 manuscript.detectors._east.EAST.export:44
-#: of
-msgid "``score_map``: Text confidence map with shape ``(batch, 1, H, W)``"
-msgstr "``score_map``: карта уверенности текста формы ``(batch, 1, H, W)``"
-
-#: c8a24738748c4a3bb62d6ac7f6491008 manuscript.detectors._east.EAST.export:45
-#: of
-msgid "``geo_map``: Geometry map with shape ``(batch, 8, H, W)``"
-msgstr "``geo_map``: карта геометрии формы ``(batch, 8, H, W)``"
-
-#: f3e78ba39a31408dbd46bcdb73b9618a manuscript.detectors._east.EAST.export:47
-#: of
-msgid ""
-"The model supports dynamic batch size and image dimensions through "
-"dynamic axes configuration."
-msgstr ""
-"Модель поддерживает динамический размер батча и размеры изображения через"
-" настройку динамических осей."
-
-#: 99b968790e794e3cb6e0f0028ce19e3d manuscript.detectors._east.EAST.export:50
-#: of
-msgid "**Automatic Backbone Detection:**"
-msgstr "**Автоматическое определение backbone:**"
-
-#: 76df155d749449f8ac4fa162384d7e50 manuscript.detectors._east.EAST.export:52
-#: of
-msgid ""
-"The method automatically detects the backbone architecture from the "
-"checkpoint by analyzing the number of parameters in layer4. This prevents"
-" mismatches between checkpoint and architecture that could lead to "
-"incorrect exports."
-msgstr ""
-"Метод автоматически определяет архитектуру backbone из чекпоинта, "
-"анализируя количество параметров в layer4. Это предотвращает "
-"несоответствия между чекпоинтом и архитектурой, которые могли бы привести"
-" к некорректному экспорту."
-
-#: 1bdb5444cf2a4b2d887837760fc32e5d manuscript.detectors._east.EAST.export:58
-#: of
-msgid "Export with automatic backbone detection:"
-msgstr "Экспорт с автоматическим определением backbone:"
-
-#: caab3a41a80840329938fe09edffe612 manuscript.detectors._east.EAST.export:69
-#: of
-msgid "Export with explicit backbone:"
-msgstr "Экспорт с явным указанием backbone:"
-
-#: 96173d5958784c5a88847ad2b4cf40d6 manuscript.detectors._east.EAST.export:79
-#: of
-msgid "Use the exported model for inference:"
-msgstr "Использование экспортированной модели для инференса:"
-
-#: 31caf8df307d4fefa9a8148ac65c67d2 manuscript.detectors._east.EAST.export:90
-#: of
-msgid ":py:obj:`EAST.__init__`"
-msgstr ":py:obj:`EAST.__init__`"
-
-#: 2dd12d56ee394826806996b6dcce13cf manuscript.detectors._east.EAST.export:91
-#: of
-msgid "Initialize EAST detector with ONNX support using ``use_onnx=True``."
-msgstr ""
-"Инициализация детектора EAST с поддержкой ONNX с использованием "
-"``use_onnx=True``."
 
 #~ msgid ""
 #~ "Path to ONNX model weights. If "

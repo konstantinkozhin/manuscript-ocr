@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-22 17:48+0700\n"
+"POT-Creation-Date: 2026-01-24 15:11+0700\n"
 "PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
 "Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -26,695 +26,700 @@ msgstr ""
 msgid "Text recognition models."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:2
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:1
+#: 3f3051c976164512881c90eab5526fa3
+msgid "Bases: :py:class:`~manuscript.api.base.BaseModel`"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:2
 #: afb502db8cb048c98ba0088c947c5370
 msgid "Initialize TRBA text recognition model with ONNX Runtime."
 msgstr ""
 
 #: ../../api/recognizers.rst:0
 #: e86586814c6c4f7aabd4cf310d21b335
-#: 4ad439ba8b0f41a5ab683c9ed675ebfb
-#: f637928e095f4d878a3929e2b5b24d03
-#: ff171249cd1449ca80a81045180c6cda
-#: e68830844d014edb89377812a5d33d0b
+#: e86586814c6c4f7aabd4cf310d21b335
+#: e86586814c6c4f7aabd4cf310d21b335
+#: e86586814c6c4f7aabd4cf310d21b335
+#: e86586814c6c4f7aabd4cf310d21b335
 msgid "Parameters"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:5
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:5
 #: 55ac49d69dae42618914c9093d6b5da3
 msgid "Path or identifier for ONNX model weights. Supports:  - Local file path: ``\"path/to/model.onnx\"`` - HTTP/HTTPS URL: ``\"https://example.com/model.onnx\"`` - GitHub release: ``\"github://owner/repo/tag/file.onnx\"`` - Google Drive: ``\"gdrive:FILE_ID\"`` - Preset name: ``\"trba_lite_g1\"`` or ``\"trba_base_g1\"`` (from pretrained_registry) - ``None``: auto-downloads default preset (trba_lite_g1)"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:5
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:5
 #: f6c79c133f334666bea06893d932178c
 msgid "Path or identifier for ONNX model weights. Supports:"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:7
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:7
 #: 9361305b42bb4aa58d944a28d3e2d5fd
 msgid "Local file path: ``\"path/to/model.onnx\"``"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:8
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:8
 #: ae71a43141cb408c90e033106468a337
 msgid "HTTP/HTTPS URL: ``\"https://example.com/model.onnx\"``"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:9
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:9
 #: 0686defc183041f3b4f45633aefa2baf
 msgid "GitHub release: ``\"github://owner/repo/tag/file.onnx\"``"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:10
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:10
 #: 2efc083fd0ec47e08f070d37400ad5b0
 msgid "Google Drive: ``\"gdrive:FILE_ID\"``"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:11
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:11
 #: aa535dbc55db475eb4dd219c95aeed64
 msgid "Preset name: ``\"trba_lite_g1\"`` or ``\"trba_base_g1\"`` (from pretrained_registry)"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:12
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:12
 #: e22b3c16db284ff187280bef0c09639e
 msgid "``None``: auto-downloads default preset (trba_lite_g1)"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:15
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:15
 #: ab6c6f52e9554c47a2bf6831cdb78e1e
 msgid "Path or identifier for model configuration JSON. Same URL schemes as ``weights``. If ``None``, attempts to infer from weights location or uses default config for preset models."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:20
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:20
 #: 1f9bb7e4487544ba94154a89ee1cfa70
 msgid "Path or identifier for character set file. If ``None``, attempts to find charset near weights or falls back to package default."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:24
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:24
 #: a64bce2291924fe5a8af7f482284b589
 msgid "Compute device. If ``None``, automatically selects CPU. For GPU/CoreML acceleration:  - CUDA (NVIDIA): ``pip install onnxruntime-gpu`` - CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``  Default is ``None`` (CPU)."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:24
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:24
 #: 5e3e3765ac5a4a6dbdb1332fbe75ffd6
 msgid "Compute device. If ``None``, automatically selects CPU. For GPU/CoreML acceleration:"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:27
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:27
 #: bbbfbd8922ef4070818fd769fc00c354
 msgid "CUDA (NVIDIA): ``pip install onnxruntime-gpu``"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:28
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:28
 #: 3922f2a30e9a4bf2af878bdcb1ade375
 msgid "CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:30
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:30
 #: f8ebd94132f042c192def0e46159812f
 msgid "Default is ``None`` (CPU)."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:33
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:33
 #: bc8550cdfc7644309c0c86d693b47ad6
 msgid "Additional configuration options (reserved for future use)."
 msgstr ""
 
 #: ../../api/recognizers.rst:0
 #: d8b57dcece1247e9a530472cb0dbdafa
-#: f2561ae0bf85411e9a1fb23065febde3
+#: d8b57dcece1247e9a530472cb0dbdafa
 msgid "Raises"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:35
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:35
 #: 61b7f7fd17b8414da4c2d307b855b8c0
 msgid "If specified files do not exist."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:36
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:36
 #: 3199e07cf9334d4f924e2fc2c26698b4
 msgid "If weights format is invalid."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:39
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:38
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:39
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:38
 #: 5e6650e14c7b490394475adeea45ef40
-#: e4033d34cf1442e7b9c097e207808287
+#: 5e6650e14c7b490394475adeea45ef40
 msgid "Notes"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:40
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:40
 #: d7d54a9a3a5a427e814ddab819db1a21
 msgid "The class provides three main public methods:"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:42
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:42
 #: d4164cdc0c284f8282362af5eed46eb6
 msgid "``predict`` — run text recognition inference on cropped word images."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:43
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:43
 #: b2c5590f3eec478881983488b591d560
 msgid "``train`` — high-level training entrypoint to train a TRBA model on custom datasets."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:45
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:45
 #: 2f0b9eb248ec4bac960662d59fa59071
 msgid "``export`` — static method to export PyTorch model to ONNX format."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:47
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:47
 #: 73ff9beefc1946d1b36b13addd629f85
 msgid "Model uses ONNX Runtime for fast inference on CPU and GPU. For GPU acceleration, install: ``pip install onnxruntime-gpu``"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:51
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:56
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:25
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:153
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:51
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:56
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:25
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:153
 #: 1506d2f029c743a899b18c3dcc3595ab
-#: b834bb5bcf0a482daabdd8531fd9b1b3
-#: 434c7990e2994dd1af080e82ac94f05b
-#: 4c8531573ec54b388abb05ddda7fe420
+#: 1506d2f029c743a899b18c3dcc3595ab
+#: 1506d2f029c743a899b18c3dcc3595ab
+#: 1506d2f029c743a899b18c3dcc3595ab
 msgid "Examples"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:52
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:52
 #: ca13dd8c1c41444a9363e0f61e03a5b3
 msgid "Create recognizer with default preset (auto-downloads):"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:57
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:57
 #: 82c09839ce1a47e1ba5d2df1560ff037
 msgid "Load from local ONNX file:"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:61
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:61
 #: 708dcfbeee0946c7a6aa23091b6ec5f5
 msgid "Load from GitHub release:"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:68
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:68
 #: fced8ca66eae455dbf40d05c1d145129
 msgid "Force CPU execution:"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:75
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:75
 #: db6adf7203e04f4a98465697d4bb8b31
 msgid "Methods"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
 #: fb355a8b53204d488f755216e4582c4d
 msgid ":py:obj:`__call__ <manuscript.recognizers.TRBA.__call__>`\\ \\(\\*args\\, \\*\\*kwargs\\)"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
 #: d6763d6771a84ff2a84c1ee78b04973f
 msgid "Call self as a function."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
 #: 79e1b1d889a84949a1b4bb96bd86e566
 msgid ":py:obj:`export <manuscript.recognizers.TRBA.export>`\\ \\(weights\\_path\\, config\\_path\\, ...\\[\\, ...\\]\\)"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:2
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:2
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
 #: a6fcc08ad59f42a9a712c1540c97b36c
-#: 1a36d4f70c7742718175420de474004f
+#: a6fcc08ad59f42a9a712c1540c97b36c
 msgid "Export TRBA PyTorch model to ONNX format."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
 #: 29920d2212e248bfaf4a82f175e19f90
 msgid ":py:obj:`predict <manuscript.recognizers.TRBA.predict>`\\ \\(images\\[\\, batch\\_size\\]\\)"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:2
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:2
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
 #: 3100eb7539bb45ddb64b6658f66489cb
-#: 1052a4435fe7475081fce3e2bea7d839
+#: 3100eb7539bb45ddb64b6658f66489cb
 msgid "Run text recognition on one or more word images."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
 #: 7bb15e5ad0604596b2fa9012aa96ad3d
 msgid ":py:obj:`runtime_providers <manuscript.recognizers.TRBA.runtime_providers>`\\ \\(\\)"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
 #: 237f0749971c43b4b0c7955dcf4f0c7a
 msgid "Get ONNX Runtime execution providers based on device."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
 #: 60aef1429f8e4d9aac9d6566e2b13f91
 msgid ":py:obj:`train <manuscript.recognizers.TRBA.train>`\\ \\(train\\_csvs\\, train\\_roots\\[\\, val\\_csvs\\, ...\\]\\)"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:2
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:2
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA:94:<autosummary>:1
 #: 72d106844b144c678e14769456446c49
-#: a80d3433d6684e80b90fc195ebe77da4
+#: 72d106844b144c678e14769456446c49
 msgid "Train TRBA text recognition model on custom datasets."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:5
-#: 746895dbe7e44f1cb4f2d8c137b7fff8
-msgid "Single image or list of images to recognize. Each image can be:  - Path to image file (str or Path) - RGB numpy array with shape ``(H, W, 3)`` in ``uint8`` - PIL Image object"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:5
-#: ff1647a92af342eba4a699c233ba8244
-msgid "Single image or list of images to recognize. Each image can be:"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:7
-#: d5bc3d4892bc4fa7b7d67765ccc9bdc7
-msgid "Path to image file (str or Path)"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:8
-#: 5eefec848c164313bcdc71efd19e4c12
-msgid "RGB numpy array with shape ``(H, W, 3)`` in ``uint8``"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:9
-#: 4c63f09787904284a42e704753095fce
-msgid "PIL Image object"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:12
-#: 8598eed10a8d4ad5b951c3ac828fb405
-msgid "Number of images to process simultaneously. Larger batches are faster but require more memory. Default is 32."
-msgstr ""
-
-#: ../../api/recognizers.rst:0
-#: 50e89b902ebb4b84b7375a5a177c38dd
-#: 0356189338314162ada5e19c6c84bc55
-#: c4d0aa85f04e493b92723a834c562d62
-msgid "Returns"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:16
-#: 3111f762caeb4408907469617972fb58
-msgid "Recognition results as list of dictionaries, each containing:  - ``\"text\"`` : str — recognized text - ``\"confidence\"`` : float — recognition confidence in [0, 1]  If input is a single image, returns a list with one element."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:16
-#: 27664f8ab5db4243aaa7d3a99c86d0cd
-msgid "Recognition results as list of dictionaries, each containing:"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:18
-#: 82f90593391d45878eaefd3606610917
-msgid "``\"text\"`` : str — recognized text"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:19
-#: 2f1b6bb26ed5475fa605e62b2e99d140
-msgid "``\"confidence\"`` : float — recognition confidence in [0, 1]"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:21
-#: 60598501ca8143058a1cbb12087ac1ce
-msgid "If input is a single image, returns a list with one element."
-msgstr ""
-
-#: ../../api/recognizers.rst:0
-#: b1742a6ac7df45f3b9dc49de00c679a2
-#: 3ab4169df2fd405597dc954dab1638a1
-#: 4177f07eb73842e19d4115f0ccfd967d
-msgid "Return type"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:26
-#: e8f397496fa44fe095edf4eac36d3e6f
-msgid "Recognize single image:"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:33
-#: 64d7b3a3da0d4d00a74906301e2c122c
-msgid "Process numpy arrays:"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:5
-#: 37b389db51794b82a7fc3ac026dd0d04
-msgid "Path(s) to training CSV files. Each CSV should have columns: ``image_path`` (relative to ``train_roots``) and ``text`` (ground truth transcription)."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:10
-#: 2310fd8b9b9a4069a5b8e1478a971e32
-msgid "Root directory/directories containing training images. Must have same length as ``train_csvs``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:14
-#: 419d3b0ec3f0413c840e34e298e208a8
-msgid "Path(s) to validation CSV files with same format as ``train_csvs``. If ``None``, no validation is performed. Default is ``None``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:18
-#: bf66fd563dc343d895aae6570677b655
-msgid "Root directory/directories for validation images. Must match length of ``val_csvs`` if provided. Default is ``None``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:22
-#: 916bf34c469348a38a08f1f119abd365
-msgid "Experiment directory where checkpoints and logs will be saved. If ``None``, auto-generated based on timestamp. Default is ``None``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:26
-#: ad365bfb5fb049368432e0b40595f56a
-msgid "Path to character set file. If ``None``, uses default charset from package. Default is ``None``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:30
-#: e38f8165e1b24ebca4149b232be42b79
-msgid "Text encoding for reading CSV files. Default is ``\"utf-8\"``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:33
-#: 2ce65bbb0bd643459301ad7dd5afd54c
-msgid "Target height for input images (pixels). Default is 64."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:36
-#: 570ebbfcc52b4c5f9f57479ba6601b6e
-msgid "Target width for input images (pixels). Default is 256."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:39
-#: e8bb7e052c974392a15a62606a2bff0a
-msgid "Maximum sequence length for text recognition. Default is 25."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:42
-#: e3ff68bd7f0645a79df751a08867ea02
-msgid "Hidden dimension size for RNN encoder/decoder. Default is 256."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:45
-#: 7521193d4cfa426fb546ffdc5cf9b092
-msgid "Number of Bidirectional LSTM layers in the encoder. Default is 2."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:48
-#: 88dee22476384b5c850e7546294d445d
-msgid "Number of input channels for CNN backbone (3 for RGB, 1 for grayscale). Default is 3."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:51
-#: 0171d4b19fd24a889dddd45c6788e4f5
-msgid "Number of output channels from CNN backbone. Default is 512."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:54
-#: 8bfb5fc85b604e68a90ef183b7033534
-msgid "CNN backbone variant. ``\"seresnet31\"`` keeps the standard SE-ResNet-31, while ``\"seresnet31-lite\"`` enables a depthwise-lite version. Default is ``\"seresnet31\"``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:58
-#: 76893019451e41d3a79d8b807b70f1d0
-msgid "Initial weight for CTC loss during training (CTC always used for stability): ``loss = attn_loss * (1 - ctc_weight) + ctc_loss * ctc_weight``. CTC weight decays over epochs. Default is 0.3."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:63
-#: 38d929a6c78c4a52b1e34db93fbd4b4e
-msgid "Number of epochs for CTC weight to decay to minimum. Default is 50."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:66
-#: f898d26e57454c4ba821ef546d8d66c3
-msgid "Minimum value for CTC weight after decay. Default is 0.0."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:69
-#: dde8484f8a7946768cd785289e0bc844
-msgid "Maximum gradient norm for clipping (prevents gradient explosion/NaN). Default is 5.0."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:73
-#: 481135019bb641a0b5a9dd06e1925f98
-msgid "Training batch size. Default is 32."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:76
-#: de8dcebbd82748a19fa2a4c2b2ccebba
-msgid "Number of training epochs. Default is 20."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:79
-#: 6e7b27d52992458a87c863e51f88ba95
-msgid "Learning rate. Default is 1e-3."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:82
-#: f568922bfec94778b38359cb414b362b
-msgid "Optimizer type. Default is ``\"AdamW\"``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:85
-#: 5dd87cee4401430fad4c691cd7a40844
-msgid "Learning rate scheduler type:  - ``\"OneCycleLR\"`` — one-cycle policy with cosine annealing (default, recommended) - ``\"ReduceLROnPlateau\"`` — reduce LR on validation loss plateau - ``\"CosineAnnealingLR\"`` — cosine annealing over epochs - ``\"None\"`` or ``None`` — constant learning rate  Default is ``\"OneCycleLR\"``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:85
-#: f95f68999cc24f3ca7f3529c96bc7132
-msgid "Learning rate scheduler type:"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:87
-#: 761459ec3d074da8a35d886f166c87b2
-msgid "``\"OneCycleLR\"`` — one-cycle policy with cosine annealing (default, recommended)"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:88
-#: 5a890e951e9b4c5980f755eb0699267d
-msgid "``\"ReduceLROnPlateau\"`` — reduce LR on validation loss plateau"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:89
-#: fd3ab7362c3e4448b0f45da7bf997b22
-msgid "``\"CosineAnnealingLR\"`` — cosine annealing over epochs"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:90
-#: 81380a804d3d4148a0916b104589eca5
-msgid "``\"None\"`` or ``None`` — constant learning rate"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:92
-#: 63dcbdd48a4c4d1d894c904c87fb1d68
-msgid "Default is ``\"OneCycleLR\"``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:95
-#: f26b02fdeb1840c7aa30c1264507d4c7
-msgid "L2 weight decay coefficient. Default is 0.0."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:98
-#: f3f4f848d7a94aa1ada883939e96137a
-msgid "Momentum for SGD optimizer. Default is 0.9."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:101
-#: 9acbf8178fc74e03a4483efb984d8b4b
-msgid "Perform validation every N epochs. Default is 1."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:104
-#: 89e28fea00c040f483758b50c2e10ac5
-msgid "Maximum number of validation samples to use. Default is 3000."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:107
-#: 50893a1ace8647b8a5f0e0d450f6782b
-msgid "Sampling proportions for multiple training datasets. Must sum to 1.0 and match length of ``train_csvs``. If ``None``, datasets are concatenated equally. Default is ``None``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:112
-#: c52af6d006bd421a8440ca6a7065d83e
-msgid "Number of data loading workers. Default is 0."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:115
-#: 9876a05ac99a4cb2b9ac49dd2ce372fe
-msgid "Random seed for reproducibility. Default is 42."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:118
-#: 9d8e247f6c3446e695b822995c5008ca
-msgid "Path to checkpoint file to resume training from. Default is ``None``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:121
-#: 081ab97c6e29431795e52f217a93e062
-msgid "Save checkpoint every N epochs. If ``None``, only saves best model. Default is ``None``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:125
-#: e2b7f6e281594d4085cfc369f9992bb4
-msgid "Training device. Default is ``\"cuda\"``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:128
-#: e06d63a25d8044dfb3a1ab36984847ed
-msgid "CNN freezing policy. Default is ``\"none\"``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:131
-#: 2c799a79bcbf4d22b51c9ddc558f8f6c
-msgid "Encoder RNN freezing policy. Default is ``\"none\"``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:134
-#: 25362a5888004f92904ed0dc806019f3
-msgid "Attention module freezing policy. Default is ``\"none\"``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:137
-#: ad4a403a8cd943fdb4616efe5bdb14c7
-msgid "Pretrained weights to initialize from:  - ``\"default\"`` or ``True`` — use release weights - ``None`` or ``False`` — train from scratch - str/Path — path or URL to custom weights file  Default is ``\"default\"``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:137
-#: 16c69854680d4b9eada7c06d60de9aef
-msgid "Pretrained weights to initialize from:"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:139
-#: fa8511c3e3224e5290ef0ea3cb273c6a
-msgid "``\"default\"`` or ``True`` — use release weights"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:140
-#: 4ab74046b3104cf88d9e59f78c6e7d94
-msgid "``None`` or ``False`` — train from scratch"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:141
-#: 04026795c9e149ecbf1dbeece3c6c1b6
-msgid "str/Path — path or URL to custom weights file"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:143
-#: d161c2d77b0840338e763730c0758819
-msgid "Default is ``\"default\"``."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:146
-#: 2f481eb6470349b79c58a62d5b4150f0
-msgid "Additional configuration parameters passed to training config."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:149
-#: 485b50c6e69d482f9c908ff798910707
-msgid "Path to the best model checkpoint saved during training."
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:154
-#: d782e9cd114542d08e3739cff5a4ff59
-msgid "Train on single dataset with validation:"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:171
-#: 9f86e9e9ab0a4185bf84f16098fdfbc5
-msgid "Train on multiple datasets with custom proportions:"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:189
-#: 273ebf0627ad42e6b23ed0ee4a9bd31b
-msgid "Resume training from checkpoint:"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:198
-#: 2b6f0e1d3a52463e98d3196ed11f6468
-msgid "Fine-tune from pretrained weights with frozen CNN:"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:209
-#: 0b79901e84ad4a81b4659dd00f53599b
-msgid "Train with CTC for stability (always enabled):"
-msgstr ""
-
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:4
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:4
 #: 76e3c91f850443bda6ff6463d7cf0e04
 msgid "This method converts a trained TRBA model from PyTorch to ONNX format, which can be used for faster inference with ONNX Runtime. The exported model can be loaded using ``TRBA(weights=\"model.onnx\")``."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:9
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:9
 #: df40efcaf5804ca1a5ae9475cfe4ac81
 msgid "Path to the PyTorch model weights file (.pth)."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:12
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:12
 #: 74945d3856e24884b5c4a84f89d50032
 msgid "Path to the model configuration JSON file. Used to determine model architecture (img_h, img_w, max_len, hidden_size, etc.)."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:16
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:16
 #: 1e8d8459aae44073930f28c848d99592
 msgid "Path to the charset file (charset.txt). Used to determine num_classes for the model."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:20
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:20
 #: e212b4e2e7d74cfd9e0fbdac4c9d445d
 msgid "Path where the ONNX model will be saved (.onnx)."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:23
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:23
 #: 63874bceb8cc44e08040045eb58ed6f2
 msgid "ONNX opset version to use for export. Default is 14."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:26
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:26
 #: a869110974ca45bd945bfee26bf8fc66
 msgid "If True, applies ONNX graph simplification using onnx-simplifier to optimize the model. Requires ``onnx-simplifier`` package. Default is True."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:31
+#: ../../api/recognizers.rst:0
+#: 50e89b902ebb4b84b7375a5a177c38dd
+#: 50e89b902ebb4b84b7375a5a177c38dd
+#: 50e89b902ebb4b84b7375a5a177c38dd
+msgid "Returns"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:31
 #: e1477b8ffd1840e8a1a2d66f391b13be
 msgid "The ONNX model is saved to ``output_path``."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:34
+#: ../../api/recognizers.rst:0
+#: b1742a6ac7df45f3b9dc49de00c679a2
+#: b1742a6ac7df45f3b9dc49de00c679a2
+#: b1742a6ac7df45f3b9dc49de00c679a2
+msgid "Return type"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:34
 #: c44ccd12f897446da65878c366b42561
 msgid "If required packages (torch, onnx) are not installed."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:35
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:35
 #: e6f5e5181a344e0b83e93a14006f2c32
 msgid "If ``weights_path`` or ``config_path`` do not exist."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:39
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:39
 #: 47870fe874f741c6a8e14d076cd1a147
 msgid "The exported ONNX model has one output:"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:41
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:41
 #: 00f5a10de4d64b6aae70521628778bab
 msgid "``logits``: Character predictions with shape ``(batch, max_length+1, num_classes)``"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:43
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:43
 #: 653f4a612dbb47bc8c5418e07b730d18
 msgid "The model uses greedy decoding (argmax) and supports dynamic batch size. The sequence length is fixed to ``max_length + 1`` from the config (same as PyTorch inference mode for compatibility)."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:47
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:47
 #: fa0e43b0448348b4bdb8ded51bf2065a
 msgid "Architecture exported: - CNN backbone (SE-ResNet-31 or SE-ResNet-31-Lite) - Bidirectional LSTM encoder - Attention decoder (greedy decoding)"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:52
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:52
 #: 6fb429753ba7472aac1b8f814da2e7c1
 msgid "Note: Only the attention decoder is exported. CTC head is used only during training and is not included in the ONNX model."
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:57
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:57
 #: 08d3ae74e45e4c2f907f2a0473158482
 msgid "Export TRBA model to ONNX:"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:72
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:72
 #: cfaf6f713d80417c91abb1a588dda7f5
 msgid "Export with custom opset:"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:83
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:83
 #: 5e67a43c0d5444b2b15b5be8c530ecbd
 msgid "Use the exported model for inference:"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:90
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:90
 #: a7c253256dfe4f208c7a6d2e96d569fb
 msgid ":py:obj:`TRBA.__init__`"
 msgstr ""
 
-#: ../../../../src/manuscript/recognizers/_trba/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:91
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.export:91
 #: 118269f136504e25ab8a675c1f57ff9b
 msgid "Initialize TRBA recognizer with ONNX model."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:5
+#: 746895dbe7e44f1cb4f2d8c137b7fff8
+msgid "Single image or list of images to recognize. Each image can be:  - Path to image file (str or Path) - RGB numpy array with shape ``(H, W, 3)`` in ``uint8`` - PIL Image object"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:5
+#: ff1647a92af342eba4a699c233ba8244
+msgid "Single image or list of images to recognize. Each image can be:"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:7
+#: d5bc3d4892bc4fa7b7d67765ccc9bdc7
+msgid "Path to image file (str or Path)"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:8
+#: 5eefec848c164313bcdc71efd19e4c12
+msgid "RGB numpy array with shape ``(H, W, 3)`` in ``uint8``"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:9
+#: 4c63f09787904284a42e704753095fce
+msgid "PIL Image object"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:12
+#: 8598eed10a8d4ad5b951c3ac828fb405
+msgid "Number of images to process simultaneously. Larger batches are faster but require more memory. Default is 32."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:16
+#: 3111f762caeb4408907469617972fb58
+msgid "Recognition results as list of dictionaries, each containing:  - ``\"text\"`` : str — recognized text - ``\"confidence\"`` : float — recognition confidence in [0, 1]  If input is a single image, returns a list with one element."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:16
+#: 27664f8ab5db4243aaa7d3a99c86d0cd
+msgid "Recognition results as list of dictionaries, each containing:"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:18
+#: 82f90593391d45878eaefd3606610917
+msgid "``\"text\"`` : str — recognized text"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:19
+#: 2f1b6bb26ed5475fa605e62b2e99d140
+msgid "``\"confidence\"`` : float — recognition confidence in [0, 1]"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:21
+#: 60598501ca8143058a1cbb12087ac1ce
+msgid "If input is a single image, returns a list with one element."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:26
+#: e8f397496fa44fe095edf4eac36d3e6f
+msgid "Recognize single image:"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.predict:33
+#: 64d7b3a3da0d4d00a74906301e2c122c
+msgid "Process numpy arrays:"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:5
+#: 37b389db51794b82a7fc3ac026dd0d04
+msgid "Path(s) to training CSV files. Each CSV should have columns: ``image_path`` (relative to ``train_roots``) and ``text`` (ground truth transcription)."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:10
+#: 2310fd8b9b9a4069a5b8e1478a971e32
+msgid "Root directory/directories containing training images. Must have same length as ``train_csvs``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:14
+#: 419d3b0ec3f0413c840e34e298e208a8
+msgid "Path(s) to validation CSV files with same format as ``train_csvs``. If ``None``, no validation is performed. Default is ``None``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:18
+#: bf66fd563dc343d895aae6570677b655
+msgid "Root directory/directories for validation images. Must match length of ``val_csvs`` if provided. Default is ``None``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:22
+#: 916bf34c469348a38a08f1f119abd365
+msgid "Experiment directory where checkpoints and logs will be saved. If ``None``, auto-generated based on timestamp. Default is ``None``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:26
+#: ad365bfb5fb049368432e0b40595f56a
+msgid "Path to character set file. If ``None``, uses default charset from package. Default is ``None``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:30
+#: e38f8165e1b24ebca4149b232be42b79
+msgid "Text encoding for reading CSV files. Default is ``\"utf-8\"``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:33
+#: 2ce65bbb0bd643459301ad7dd5afd54c
+msgid "Target height for input images (pixels). Default is 64."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:36
+#: 570ebbfcc52b4c5f9f57479ba6601b6e
+msgid "Target width for input images (pixels). Default is 256."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:39
+#: e8bb7e052c974392a15a62606a2bff0a
+msgid "Maximum sequence length for text recognition. Default is 25."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:42
+#: e3ff68bd7f0645a79df751a08867ea02
+msgid "Hidden dimension size for RNN encoder/decoder. Default is 256."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:45
+#: 7521193d4cfa426fb546ffdc5cf9b092
+msgid "Number of Bidirectional LSTM layers in the encoder. Default is 2."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:48
+#: 88dee22476384b5c850e7546294d445d
+msgid "Number of input channels for CNN backbone (3 for RGB, 1 for grayscale). Default is 3."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:51
+#: 0171d4b19fd24a889dddd45c6788e4f5
+msgid "Number of output channels from CNN backbone. Default is 512."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:54
+#: 8bfb5fc85b604e68a90ef183b7033534
+msgid "CNN backbone variant. ``\"seresnet31\"`` keeps the standard SE-ResNet-31, while ``\"seresnet31-lite\"`` enables a depthwise-lite version. Default is ``\"seresnet31\"``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:58
+#: 76893019451e41d3a79d8b807b70f1d0
+msgid "Initial weight for CTC loss during training (CTC always used for stability): ``loss = attn_loss * (1 - ctc_weight) + ctc_loss * ctc_weight``. CTC weight decays over epochs. Default is 0.3."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:63
+#: 38d929a6c78c4a52b1e34db93fbd4b4e
+msgid "Number of epochs for CTC weight to decay to minimum. Default is 50."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:66
+#: f898d26e57454c4ba821ef546d8d66c3
+msgid "Minimum value for CTC weight after decay. Default is 0.0."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:69
+#: dde8484f8a7946768cd785289e0bc844
+msgid "Maximum gradient norm for clipping (prevents gradient explosion/NaN). Default is 5.0."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:73
+#: 481135019bb641a0b5a9dd06e1925f98
+msgid "Training batch size. Default is 32."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:76
+#: de8dcebbd82748a19fa2a4c2b2ccebba
+msgid "Number of training epochs. Default is 20."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:79
+#: 6e7b27d52992458a87c863e51f88ba95
+msgid "Learning rate. Default is 1e-3."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:82
+#: f568922bfec94778b38359cb414b362b
+msgid "Optimizer type. Default is ``\"AdamW\"``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:85
+#: 5dd87cee4401430fad4c691cd7a40844
+msgid "Learning rate scheduler type:  - ``\"OneCycleLR\"`` — one-cycle policy with cosine annealing (default, recommended) - ``\"ReduceLROnPlateau\"`` — reduce LR on validation loss plateau - ``\"CosineAnnealingLR\"`` — cosine annealing over epochs - ``\"None\"`` or ``None`` — constant learning rate  Default is ``\"OneCycleLR\"``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:85
+#: f95f68999cc24f3ca7f3529c96bc7132
+msgid "Learning rate scheduler type:"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:87
+#: 761459ec3d074da8a35d886f166c87b2
+msgid "``\"OneCycleLR\"`` — one-cycle policy with cosine annealing (default, recommended)"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:88
+#: 5a890e951e9b4c5980f755eb0699267d
+msgid "``\"ReduceLROnPlateau\"`` — reduce LR on validation loss plateau"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:89
+#: fd3ab7362c3e4448b0f45da7bf997b22
+msgid "``\"CosineAnnealingLR\"`` — cosine annealing over epochs"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:90
+#: 81380a804d3d4148a0916b104589eca5
+msgid "``\"None\"`` or ``None`` — constant learning rate"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:92
+#: 63dcbdd48a4c4d1d894c904c87fb1d68
+msgid "Default is ``\"OneCycleLR\"``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:95
+#: f26b02fdeb1840c7aa30c1264507d4c7
+msgid "L2 weight decay coefficient. Default is 0.0."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:98
+#: f3f4f848d7a94aa1ada883939e96137a
+msgid "Momentum for SGD optimizer. Default is 0.9."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:101
+#: 9acbf8178fc74e03a4483efb984d8b4b
+msgid "Perform validation every N epochs. Default is 1."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:104
+#: 89e28fea00c040f483758b50c2e10ac5
+msgid "Maximum number of validation samples to use. Default is 3000."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:107
+#: 50893a1ace8647b8a5f0e0d450f6782b
+msgid "Sampling proportions for multiple training datasets. Must sum to 1.0 and match length of ``train_csvs``. If ``None``, datasets are concatenated equally. Default is ``None``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:112
+#: c52af6d006bd421a8440ca6a7065d83e
+msgid "Number of data loading workers. Default is 0."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:115
+#: 9876a05ac99a4cb2b9ac49dd2ce372fe
+msgid "Random seed for reproducibility. Default is 42."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:118
+#: 9d8e247f6c3446e695b822995c5008ca
+msgid "Path to checkpoint file to resume training from. Default is ``None``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:121
+#: 081ab97c6e29431795e52f217a93e062
+msgid "Save checkpoint every N epochs. If ``None``, only saves best model. Default is ``None``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:125
+#: e2b7f6e281594d4085cfc369f9992bb4
+msgid "Training device. Default is ``\"cuda\"``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:128
+#: e06d63a25d8044dfb3a1ab36984847ed
+msgid "CNN freezing policy. Default is ``\"none\"``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:131
+#: 2c799a79bcbf4d22b51c9ddc558f8f6c
+msgid "Encoder RNN freezing policy. Default is ``\"none\"``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:134
+#: 25362a5888004f92904ed0dc806019f3
+msgid "Attention module freezing policy. Default is ``\"none\"``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:137
+#: ad4a403a8cd943fdb4616efe5bdb14c7
+msgid "Pretrained weights to initialize from:  - ``\"default\"`` or ``True`` — use release weights - ``None`` or ``False`` — train from scratch - str/Path — path or URL to custom weights file  Default is ``\"default\"``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:137
+#: 16c69854680d4b9eada7c06d60de9aef
+msgid "Pretrained weights to initialize from:"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:139
+#: fa8511c3e3224e5290ef0ea3cb273c6a
+msgid "``\"default\"`` or ``True`` — use release weights"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:140
+#: 4ab74046b3104cf88d9e59f78c6e7d94
+msgid "``None`` or ``False`` — train from scratch"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:141
+#: 04026795c9e149ecbf1dbeece3c6c1b6
+msgid "str/Path — path or URL to custom weights file"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:143
+#: d161c2d77b0840338e763730c0758819
+msgid "Default is ``\"default\"``."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:146
+#: 2f481eb6470349b79c58a62d5b4150f0
+msgid "Additional configuration parameters passed to training config."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:149
+#: 485b50c6e69d482f9c908ff798910707
+msgid "Path to the best model checkpoint saved during training."
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:154
+#: d782e9cd114542d08e3739cff5a4ff59
+msgid "Train on single dataset with validation:"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:171
+#: 9f86e9e9ab0a4185bf84f16098fdfbc5
+msgid "Train on multiple datasets with custom proportions:"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:189
+#: 273ebf0627ad42e6b23ed0ee4a9bd31b
+msgid "Resume training from checkpoint:"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:198
+#: 2b6f0e1d3a52463e98d3196ed11f6468
+msgid "Fine-tune from pretrained weights with frozen CNN:"
+msgstr ""
+
+#: ../../../../src/manuscript/recognizers/__init__.py:docstring of manuscript.recognizers._trba.TRBA.train:209
+#: 0b79901e84ad4a81b4659dd00f53599b
+msgid "Train with CTC for stability (always enabled):"
 msgstr ""

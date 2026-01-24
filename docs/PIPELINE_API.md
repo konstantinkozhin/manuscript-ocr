@@ -280,6 +280,40 @@ result, vis_img = pipeline.predict("document.jpg", vis=True)
 vis_img.save("output_visualization.jpg")
 ```
 
+### Промежуточные результаты
+
+```python
+pipeline = Pipeline(corrector=CharLM())
+result = pipeline.predict("document.jpg")
+
+# Результат после детекции (до распознавания)
+detection_page = pipeline.last_detection_page
+
+# Результат после распознавания (до коррекции)
+recognition_page = pipeline.last_recognition_page
+
+# Результат после коррекции (None если корректор не используется)
+correction_page = pipeline.last_correction_page
+```
+
+### Экспорт/импорт Page в JSON
+
+```python
+page = result["page"]
+
+# Сохранить в файл
+page.to_json("result.json")
+
+# Получить как строку
+json_str = page.to_json()
+
+# Загрузить из файла
+page = Page.from_json("result.json")
+
+# Загрузить из строки
+page = Page.from_json('{"blocks": [...]}')
+```
+
 ### С профилированием
 
 ```python

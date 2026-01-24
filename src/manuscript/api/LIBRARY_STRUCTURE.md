@@ -8,12 +8,16 @@ graph LR
     manuscript --> data["data<br/><i>Структуры данных</i>"]
     manuscript --> detectors["detectors<br/><i>Детекторы текста</i>"]
     manuscript --> recognizers["recognizers<br/><i>Распознаватели текста</i>"]
+    manuscript --> correctors["correctors<br/><i>Корректоры текста</i>"]
     manuscript --> utils["utils<br/><i>Утилиты</i>"]
     manuscript --> api["api<br/><i>API базовые классы</i>"]
 
-    %% Pipeline methods
+    %% Pipeline methods & properties
     Pipeline --> p_predict["predict()<br/><i>→ Dict | Tuple[Dict, Image]</i>"]
     Pipeline --> p_get_text["get_text()<br/><i>→ str</i>"]
+    Pipeline --> p_last_det["last_detection_page<br/><i>→ Page | None</i>"]
+    Pipeline --> p_last_rec["last_recognition_page<br/><i>→ Page | None</i>"]
+    Pipeline --> p_last_corr["last_correction_page<br/><i>→ Page | None</i>"]
 
     %% Data structures
     data --> Page["Page"]
@@ -22,6 +26,8 @@ graph LR
     data --> Word["Word"]
     
     Page --> page_blocks["blocks: List[Block]"]
+    Page --> page_to_json["to_json()<br/><i>→ str</i>"]
+    Page --> page_from_json["from_json()<br/><i>→ Page</i>"]
     Block --> block_lines["lines: List[Line]"]
     Block --> block_order["order: Optional[int]"]
     Line --> line_words["words: List[Word]"]
@@ -43,6 +49,12 @@ graph LR
     TRBA --> trba_predict["predict()<br/><i>→ List[Dict[str, Any]]</i>"]
     TRBA --> trba_train["train()<br/><i>→ None</i>"]
     TRBA --> trba_export["export()<br/><i>→ str</i>"]
+
+    %% Correctors
+    correctors --> CharLM["CharLM<br/><i>Character-level Language Model</i>"]
+    CharLM --> charlm_predict["predict()<br/><i>→ Page</i>"]
+    CharLM --> charlm_train["train()<br/><i>→ None</i>"]
+    CharLM --> charlm_export["export()<br/><i>→ str</i>"]
 
     %% Utils submodules
     utils --> io["io<br/><i>Чтение/запись</i>"]
@@ -73,6 +85,7 @@ graph LR
     style data fill:#bbf7d0,color:#064e3b,stroke:#047857
     style detectors fill:#bfdbfe,color:#1e3a8a,stroke:#2563eb
     style recognizers fill:#ddd6fe,color:#4c1d95,stroke:#7c3aed
+    style correctors fill:#fce7f3,color:#831843,stroke:#db2777
     style utils fill:#fed7aa,color:#7c2d12,stroke:#ea580c
     style api fill:#fecaca,color:#7f1d1d,stroke:#dc2626
 ```
