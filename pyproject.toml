@@ -4,11 +4,17 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "manuscript-ocr"
-version = "0.1.9"
-description = ""
+version = "0.1.10"
+description = "Detects and recognizes text in historical, archival and handwritten documents. Optimized for fast inference with ONNX Runtime (CPU/GPU/CoreML) and optional training with PyTorch. Supports plugging custom models via a simple API."
 readme = "README.md"
 requires-python = ">=3.8"
-authors = [{ email = "sherstpasha99@gmail.com" }]
+authors = [
+    { name = "Pavel Sherstnev", email = "sherstpasha99@gmail.com" },
+    { name = "Vlada Zhukovskaya", email = "zhukovskaya.vlada00@gmail.com" },
+    { name = "Konstantin Kozhin", email = "i@konstantin-kozhin.ru" },
+    { name = "Anna Pyataeva", email = "anna4u.online@gmail.com" },
+    { name = "Alina Nurimanova", email = "alenkozavr@gmail.com" }
+]
 urls = { Homepage = "https://github.com/konstantinkozhin/manuscript-ocr" }
 
 classifiers = [

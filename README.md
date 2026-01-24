@@ -7,6 +7,44 @@
 
 ---
 
+## Быстрый пример
+
+```python
+from manuscript import Pipeline
+from manuscript.utils import visualize_page
+
+# Инициализация пайплайна
+pipeline = Pipeline()
+
+image_path = "example/image.jpg"
+
+# Запуск пайплайна
+result = pipeline.predict(image_path)
+
+# Весь объект результата
+print(result)
+
+# Текст
+text = pipeline.get_text(result["page"])
+print(text)
+
+# Визуализация
+visualize_page(image_path, result["page"], show_lines=False, show_numbers=True)
+```
+
+<img src="example/image.jpg" alt="Результат визуализации" />
+
+---
+
+## Документация
+
+**[Полная документация](https://konstantinkozhin.github.io/manuscript-ocr)** (English & Русский)
+
+Подробные примеры и руководства:
+- [Pipeline API](./docs/PIPELINE_API.md) - интеграция и создание кастомных компонентов
+
+---
+
 ## Установка
 
 ### Режим 1: Пользовательская установка (только inference)
@@ -85,12 +123,3 @@ detector = EAST(device="coreml")
 recognizer = TRBA(device="coreml")
 pipeline = Pipeline(detector=detector, recognizer=recognizer)
 ```
-
----
-
-## Документация
-
-**[Полная документация](https://konstantinkozhin.github.io/manuscript-ocr)** (English & Русский)
-
-Подробные примеры и руководства:
-- [Pipeline API](./docs/PIPELINE_API.md) - интеграция и создание кастомных компонентов
