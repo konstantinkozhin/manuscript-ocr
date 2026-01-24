@@ -1,5 +1,5 @@
 from pydantic import BaseModel, Field
-from typing import List, Tuple, Optional
+from typing import List, Tuple, Optional, Union
 from pathlib import Path
 import json
 
@@ -160,7 +160,7 @@ class Page(BaseModel):
 
     blocks: List[Block]
 
-    def to_json(self, path: Optional[str | Path] = None, indent: int = 2) -> str:
+    def to_json(self, path: Optional[Union[str, Path]] = None, indent: int = 2) -> str:
         """
         Export Page to JSON.
 
@@ -188,7 +188,7 @@ class Page(BaseModel):
         return json_str
 
     @classmethod
-    def from_json(cls, source: str | Path) -> "Page":
+    def from_json(cls, source: Union[str, Path]) -> "Page":
         """
         Load Page from JSON file or string.
 
