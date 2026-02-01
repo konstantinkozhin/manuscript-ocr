@@ -1,5 +1,6 @@
 import os
 import json
+import traceback
 from pathlib import Path
 from typing import List, Union, Optional, Sequence, Dict, Any
 
@@ -18,10 +19,14 @@ try:
     from .training.train import Config, run_training
 
     _TRAINING_AVAILABLE = True
-except ImportError:
+    _TRAINING_IMPORT_ERROR = None
+    _TRAINING_IMPORT_TRACEBACK = None
+except ImportError as exc:
     Config = None
     run_training = None
     _TRAINING_AVAILABLE = False
+    _TRAINING_IMPORT_ERROR = exc
+    _TRAINING_IMPORT_TRACEBACK = traceback.format_exc()
 
 
 class TRBA(BaseModel):
@@ -709,10 +714,19 @@ class TRBA(BaseModel):
         ... )
         """
         if not _TRAINING_AVAILABLE:
+            details = ""
+            if _TRAINING_IMPORT_TRACEBACK:
+                details = (
+                    "\nOriginal import error traceback:\n"
+                    f"{_TRAINING_IMPORT_TRACEBACK.rstrip()}"
+                )
+            elif _TRAINING_IMPORT_ERROR is not None:
+                details = f"\nOriginal import error: {_TRAINING_IMPORT_ERROR!r}"
             raise ImportError(
                 "Training dependencies not available. "
                 "Install with: pip install manuscript-ocr[dev]"
-            )
+                f"{details}"
+            ) from _TRAINING_IMPORT_ERROR
 
         def _ensure_path_list(
             value: Optional[Union[str, Sequence[Optional[str]]]],
