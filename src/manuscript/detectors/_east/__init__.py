@@ -353,9 +353,9 @@ class EAST(BaseModel):
                     # Merge: extend x-coordinates, keep y from original
                     merged_box = (
                         min(box1[0], box2[0]),  # x0: take minimum
-                        box1[1],                 # y0: keep from original
+                        box1[1],  # y0: keep from original
                         max(box1[2], box2[2]),  # x1: take maximum
-                        box1[3],                 # y1: keep from original
+                        box1[3],  # y1: keep from original
                     )
                     avg_score = (score1 + score2) / 2
                     merged.append((merged_box, avg_score))
@@ -515,8 +515,12 @@ class EAST(BaseModel):
             final_quads_flipped, _, _ = self._run_inference_on_image(img_flipped)
 
             # Scale both to original size first
-            scaled_orig = self._scale_boxes_to_original(final_quads_nms, (orig_h, orig_w))
-            scaled_flipped = self._scale_boxes_to_original(final_quads_flipped, (orig_h, orig_w))
+            scaled_orig = self._scale_boxes_to_original(
+                final_quads_nms, (orig_h, orig_w)
+            )
+            scaled_flipped = self._scale_boxes_to_original(
+                final_quads_flipped, (orig_h, orig_w)
+            )
 
             # Convert to axis-aligned boxes for IoU matching
             # Keep track of original quads for non-axis-aligned output
@@ -539,7 +543,9 @@ class EAST(BaseModel):
                 x0_mirrored = orig_w - x1
                 x1_mirrored = orig_w - x0
                 score = float(np.clip(quad[8], 0.0, 1.0))
-                boxes_flipped.append(((int(x0_mirrored), int(y0), int(x1_mirrored), int(y1)), score))
+                boxes_flipped.append(
+                    ((int(x0_mirrored), int(y0), int(x1_mirrored), int(y1)), score)
+                )
 
             # Find which original boxes have matches in flipped view
             matched_orig_indices = []
@@ -594,9 +600,7 @@ class EAST(BaseModel):
                 blocks=[Block(lines=[Line(words=words, order=0)], order=0)]
             )
             page = organize_page(
-                initial_page,
-                max_splits=max_columns,
-                use_columns=split_into_columns
+                initial_page, max_splits=max_columns, use_columns=split_into_columns
             )
         else:
             for idx, w in enumerate(words):
@@ -620,21 +624,25 @@ class EAST(BaseModel):
         model_name: str = "resnet_quad",
         backbone_name: str = "resnet50",
         pretrained_backbone: bool = True,
-        freeze_first: bool = True,
+        freeze_first: bool = False,
         target_size: int = 1024,
         score_geo_scale: Optional[float] = None,
+        score_map_shrink_ratio: float = 0.3,
         epochs: int = 500,
         batch_size: int = 3,
         accumulation_steps: int = 1,
-        lr: float = 1e-3,
+        lr: float = 1e-4,
+        lr_scheduler: str = "cosine_restart",
+        lr_scheduler_params: Optional[Dict[str, Any]] = None,
+        augmentation_config: Optional[Dict[str, Any]] = None,
         grad_clip: float = 5.0,
         early_stop: int = 100,
-        use_sam: bool = True,
+        use_sam: bool = False,
         sam_type: str = "asam",
-        use_lookahead: bool = True,
+        use_lookahead: bool = False,
         use_ema: bool = False,
         use_multiscale: bool = True,
-        use_ohem: bool = True,
+        use_ohem: bool = False,
         ohem_ratio: float = 0.5,
         use_focal_geo: bool = True,
         focal_gamma: float = 2.0,
@@ -680,6 +688,8 @@ class EAST(BaseModel):
         score_geo_scale : float, optional
             Multiplier to recover original coordinates from score/geo maps.
             If None, automatically taken from the model. Default ``None``.
+        score_map_shrink_ratio : float, optional
+            Shrink ratio for score map. Default ``0.3``.
         epochs : int, optional
             Number of training epochs. Default ``500``.
         batch_size : int, optional
@@ -695,6 +705,32 @@ class EAST(BaseModel):
             Default is ``1`` (no accumulation).
         lr : float, optional
             Learning rate. Default ``1e-3``.
+        lr_scheduler : {"cosine_restart", "cosine", "linear", "step", "exponential", "plateau", "none"}, optional
+            Learning rate scheduler type. Default ``"cosine_restart"``.
+        lr_scheduler_params : dict, optional
+            Extra scheduler parameters (depends on scheduler type). Common keys:
+
+            - ``cosine_restart``: ``t0``, ``t_mult``, ``eta_min``
+            - ``cosine``: ``t_max``, ``eta_min``
+            - ``linear``: ``final_factor``
+            - ``step``: ``step_size``, ``gamma``
+            - ``exponential``: ``gamma``
+            - ``plateau``: ``factor``, ``patience``, ``min_lr``
+        augmentation_config : dict, optional
+            Full augmentation configuration passed to ``EASTDataset``. This is the
+            preferred place for all augmentation settings. Any keys here override the
+            corresponding defaults. Supported keys include:
+
+            - ``flip_prob``, ``color_jitter``
+            - ``small_rotate_prob``, ``small_rotate_deg``
+            - ``perspective_prob``, ``perspective_scale``
+            - ``blur_prob``, ``blur_ksize_range``
+            - ``noise_prob``, ``noise_std``, ``salt_pepper_prob``
+            - ``jpeg_prob``, ``jpeg_quality_range``
+            - ``shading_prob``, ``shading_strength``
+            - ``gamma_prob``, ``gamma_range``
+            - ``downscale_prob``, ``downscale_range``
+            - ``negative_prob``
         grad_clip : float, optional
             Gradient clipping value (L2 norm). Default ``5.0``.
         early_stop : int, optional
@@ -774,6 +810,38 @@ class EAST(BaseModel):
         ...     val_interval=3,
         ... )
         >>> print("Best checkpoint loaded:", best_model)
+
+        Configure augmentations via ``augmentation_config``:
+
+        >>> aug_cfg = {
+        ...     "flip_prob": 0.02,
+        ...     "color_jitter": (0.1, 0.1, 0.1, 0.05),
+        ...     "small_rotate_prob": 0.15,
+        ...     "small_rotate_deg": 1.5,
+        ...     "perspective_prob": 0.08,
+        ...     "perspective_scale": 0.015,
+        ...     "blur_prob": 0.1,
+        ...     "blur_ksize_range": (3, 5),
+        ...     "noise_prob": 0.1,
+        ...     "noise_std": 0.008,
+        ...     "salt_pepper_prob": 0.0005,
+        ...     "jpeg_prob": 0.1,
+        ...     "jpeg_quality_range": (75, 95),
+        ...     "shading_prob": 0.1,
+        ...     "shading_strength": 0.1,
+        ...     "gamma_prob": 0.2,
+        ...     "gamma_range": (0.95, 1.05),
+        ...     "downscale_prob": 0.1,
+        ...     "downscale_range": (0.7, 0.95),
+        ...     "negative_prob": 0.05,
+        ... }
+        >>> best_model = EAST.train(
+        ...     train_images=train_images,
+        ...     train_anns=train_anns,
+        ...     val_images=val_images,
+        ...     val_anns=val_anns,
+        ...     augmentation_config=aug_cfg,
+        ... )
         """
         if not _TORCH_AVAILABLE:
             raise ImportError(
@@ -793,12 +861,40 @@ class EAST(BaseModel):
         if score_geo_scale is None:
             score_geo_scale = model.score_scale
 
+        base_augmentation_config = {
+            "flip_prob": 0.01,
+            "color_jitter": (0.1, 0.1, 0.1, 0.05),
+            "small_rotate_prob": 0.2,
+            "small_rotate_deg": 2.0,
+            "perspective_prob": 0.1,
+            "perspective_scale": 0.015,
+            "blur_prob": 0.1,
+            "blur_ksize_range": (3, 5),
+            "noise_prob": 0.1,
+            "noise_std": 0.008,
+            "salt_pepper_prob": 0.0005,
+            "jpeg_prob": 0.1,
+            "jpeg_quality_range": (75, 95),
+            "shading_prob": 0.1,
+            "shading_strength": 0.1,
+            "gamma_prob": 0.2,
+            "gamma_range": (0.95, 1.05),
+            "downscale_prob": 0.1,
+            "downscale_range": (0.7, 0.95),
+            "negative_prob": 0.05,
+        }
+        aug_cfg = dict(base_augmentation_config)
+        if augmentation_config:
+            aug_cfg.update(augmentation_config)
+
         def make_dataset(imgs, anns, name: Optional[str] = None):
             return EASTDataset(
                 images_folder=imgs,
                 coco_annotation_file=anns,
                 target_size=target_size,
                 score_geo_scale=score_geo_scale,
+                shrink_ratio=score_map_shrink_ratio,
+                **aug_cfg,
                 dataset_name=name,
             )
 
@@ -887,7 +983,10 @@ class EAST(BaseModel):
 
         def _is_experiment_checkpoint(file_path: Path) -> bool:
             parent = file_path.parent
-            return parent.name == "checkpoints" or (parent / "training_config.json").exists()
+            return (
+                parent.name == "checkpoints"
+                or (parent / "training_config.json").exists()
+            )
 
         def _resolve_resume_target(
             target: Union[str, Path],
@@ -919,7 +1018,9 @@ class EAST(BaseModel):
             resume_state = default_state if default_state.exists() else None
             return os.path.abspath(os.fspath(experiment_dir)), resume_state
 
-        default_experiment_dir = os.path.abspath(os.path.join(experiment_root, model_name))
+        default_experiment_dir = os.path.abspath(
+            os.path.join(experiment_root, model_name)
+        )
         resume_state_path: Optional[Path] = None
         if resume_from is None:
             experiment_dir = default_experiment_dir
@@ -940,6 +1041,8 @@ class EAST(BaseModel):
             batch_size=batch_size,
             accumulation_steps=accumulation_steps,
             lr=lr,
+            lr_scheduler=lr_scheduler,
+            lr_scheduler_params=lr_scheduler_params,
             grad_clip=grad_clip,
             early_stop=early_stop,
             use_sam=use_sam,
@@ -962,6 +1065,8 @@ class EAST(BaseModel):
             resume_state_path=(
                 os.fspath(resume_state_path) if resume_state_path else None
             ),
+            score_map_shrink_ratio=score_map_shrink_ratio,
+            augmentation_config=aug_cfg,
         )
         return best_model
 
@@ -1037,7 +1142,7 @@ class EAST(BaseModel):
         Export with automatic backbone detection:
 
         >>> from manuscript.detectors import EAST
-        >>> EAST.export_to_onnx(
+        >>> EAST.export(
         ...     weights_path="east_resnet50.pth",
         ...     output_path="east_model.onnx"
         ... )
@@ -1047,7 +1152,7 @@ class EAST(BaseModel):
 
         Export with explicit backbone:
 
-        >>> EAST.export_to_onnx(
+        >>> EAST.export(
         ...     weights_path="custom_weights.pth",
         ...     output_path="custom_model.onnx",
         ...     backbone_name="resnet101",

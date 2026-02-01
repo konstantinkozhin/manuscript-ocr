@@ -82,6 +82,116 @@ def dice_coefficient(pred: torch.Tensor, target: torch.Tensor, eps: float = 1e-6
     return (numerator + eps) / (denominator + eps)
 
 
+def _find_preview_dataset(dataset):
+    if dataset is None:
+        return None
+    if hasattr(dataset, "preview_augmentation") and len(dataset) > 0:
+        return dataset
+    if hasattr(dataset, "datasets"):
+        candidates = [
+            ds
+            for ds in dataset.datasets
+            if hasattr(ds, "preview_augmentation") and len(ds) > 0
+        ]
+        if candidates:
+            return random.choice(candidates)
+    if hasattr(dataset, "dataset"):
+        return _find_preview_dataset(dataset.dataset)
+    return None
+
+
+def _log_augmentation_previews(writer: SummaryWriter, dataset):
+    ds = _find_preview_dataset(dataset)
+    if ds is None:
+        return
+    if len(ds) == 0:
+        return
+    idx = random.randint(0, len(ds) - 1)
+    if not hasattr(ds, "list_augmentations"):
+        return
+    names = ds.list_augmentations()
+    for name in names:
+        preview = ds.preview_augmentation(idx, name)
+        if preview is None:
+            continue
+        writer.add_image(f"Augmentations/{name}", preview, 0, dataformats="HWC")
+
+
+def _build_scheduler(
+    optimizer: torch.optim.Optimizer,
+    scheduler_type: str,
+    lr: float,
+    num_epochs: int,
+    params: Optional[Dict[str, Any]] = None,
+):
+    params = params or {}
+    sched_name = str(scheduler_type).strip().lower()
+    if sched_name in ("none", "constant", "off"):
+        return None, "none"
+
+    if sched_name in ("cosine_restart", "cosineannealingwarmrestarts"):
+        t0 = int(params.get("t0", 10))
+        t_mult = int(params.get("t_mult", 1))
+        eta_min = float(params.get("eta_min", lr / 100))
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
+            optimizer,
+            T_0=max(t0, 1),
+            T_mult=max(t_mult, 1),
+            eta_min=eta_min,
+        )
+        return scheduler, "batch"
+
+    if sched_name in ("cosine", "cosineannealing"):
+        t_max = int(params.get("t_max", max(num_epochs, 1)))
+        eta_min = float(params.get("eta_min", lr / 100))
+        scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
+            optimizer,
+            T_max=max(t_max, 1),
+            eta_min=eta_min,
+        )
+        return scheduler, "epoch"
+
+    if sched_name in ("linear", "lineardecay"):
+        final_factor = float(params.get("final_factor", 0.0))
+
+        def lr_lambda(epoch_idx: int):
+            if num_epochs <= 0:
+                return 1.0
+            progress = min(max(epoch_idx / float(num_epochs), 0.0), 1.0)
+            return max(final_factor, 1.0 - progress * (1.0 - final_factor))
+
+        scheduler = torch.optim.lr_scheduler.LambdaLR(optimizer, lr_lambda=lr_lambda)
+        return scheduler, "epoch"
+
+    if sched_name in ("step", "steplr"):
+        step_size = int(params.get("step_size", max(1, num_epochs // 3)))
+        gamma = float(params.get("gamma", 0.1))
+        scheduler = torch.optim.lr_scheduler.StepLR(
+            optimizer, step_size=max(step_size, 1), gamma=gamma
+        )
+        return scheduler, "epoch"
+
+    if sched_name in ("exponential", "exp", "explr"):
+        gamma = float(params.get("gamma", 0.95))
+        scheduler = torch.optim.lr_scheduler.ExponentialLR(optimizer, gamma=gamma)
+        return scheduler, "epoch"
+
+    if sched_name in ("plateau", "reducelronplateau"):
+        factor = float(params.get("factor", 0.5))
+        patience = int(params.get("patience", 10))
+        min_lr = float(params.get("min_lr", lr / 100))
+        scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(
+            optimizer,
+            mode="min",
+            factor=factor,
+            patience=patience,
+            min_lr=min_lr,
+        )
+        return scheduler, "val"
+
+    raise ValueError(f"Unknown lr_scheduler: {scheduler_type}")
+
+
 def _run_training(
     experiment_dir: str,
     model: torch.nn.Module,
@@ -92,6 +202,8 @@ def _run_training(
     batch_size: int,
     accumulation_steps: int,
     lr: float,
+    lr_scheduler: str,
+    lr_scheduler_params: Optional[Dict[str, Any]],
     grad_clip: float,
     early_stop: int,
     use_sam: bool,
@@ -113,6 +225,8 @@ def _run_training(
     val_dataset_names: Optional[Sequence[str]] = None,
     resume: bool = False,
     resume_state_path: Optional[str] = None,
+    score_map_shrink_ratio: Optional[float] = None,
+    augmentation_config: Optional[Dict[str, Any]] = None,
 ):
     experiment_dir = os.path.abspath(os.fspath(experiment_dir))
     log_dir = os.path.join(experiment_dir, "logs")
@@ -129,6 +243,8 @@ def _run_training(
         "accumulation_steps": accumulation_steps,
         "effective_batch_size": batch_size * accumulation_steps,
         "lr": lr,
+        "lr_scheduler": lr_scheduler,
+        "lr_scheduler_params": lr_scheduler_params,
         "grad_clip": grad_clip,
         "early_stop": early_stop,
         "use_sam": use_sam,
@@ -141,10 +257,12 @@ def _run_training(
         "use_focal_geo": use_focal_geo,
         "focal_gamma": focal_gamma if use_focal_geo else None,
         "val_interval": val_interval,
-        "scheduler": "CosineAnnealingWarmRestarts",
+        "scheduler": lr_scheduler,
         "optimizer": "SAM" if use_sam else ("Lookahead(RAdam)" if use_lookahead else "RAdam"),
         "train_dataset_size": len(train_dataset),
         "val_dataset_size": len(val_dataset),
+        "score_map_shrink_ratio": score_map_shrink_ratio,
+        "augmentation_config": augmentation_config,
     }
     
     config_path = os.path.join(experiment_dir, "training_config.json")
@@ -233,11 +351,12 @@ def _run_training(
         if not hasattr(optimizer, attr):
             setattr(optimizer, attr, OrderedDict())
 
-    scheduler = torch.optim.lr_scheduler.CosineAnnealingWarmRestarts(
-        optimizer,
-        T_0=10,
-        T_mult=1,
-        eta_min=lr / 100,
+    scheduler, scheduler_step = _build_scheduler(
+        optimizer=optimizer,
+        scheduler_type=lr_scheduler,
+        lr=lr,
+        num_epochs=num_epochs,
+        params=lr_scheduler_params,
     )
     try:
         scaler = torch.amp.GradScaler(device_type="cuda")
@@ -282,7 +401,8 @@ def _run_training(
             if use_ema and checkpoint.get("ema_state") is not None:
                 ema_model.load_state_dict(checkpoint["ema_state"])
             optimizer.load_state_dict(checkpoint["optimizer_state"])
-            scheduler.load_state_dict(checkpoint["scheduler_state"])
+            if scheduler is not None and checkpoint.get("scheduler_state") is not None:
+                scheduler.load_state_dict(checkpoint["scheduler_state"])
             scaler_state = checkpoint.get("scaler_state")
             if scaler_state is not None:
                 scaler.load_state_dict(scaler_state)
@@ -302,6 +422,8 @@ def _run_training(
 
     def _sanitize_tag(name: str) -> str:
         return name.replace("\\", "_").replace("/", "_").replace(" ", "_")
+
+    _log_augmentation_previews(writer, train_dataset)
 
     collage_cell_size = 480
     collage_samples = 4
@@ -414,14 +536,19 @@ def _run_training(
 
                 loss = loss * accumulation_steps
 
-            scheduler.step(epoch + imgs.size(0) / len(train_loader))
+            if scheduler is not None and scheduler_step == "batch":
+                scheduler.step(epoch + imgs.size(0) / len(train_loader))
             train_loss += loss.item()
             
             current_step = global_step + batch_idx
             writer.add_scalar("Loss/Train_Step", loss.item(), current_step)
             
             # Log learning rate at each step
-            current_lr = scheduler.get_last_lr()[0]
+            current_lr = (
+                scheduler.get_last_lr()[0]
+                if scheduler is not None
+                else optimizer.param_groups[0]["lr"]
+            )
             writer.add_scalar("LearningRate/Step", current_lr, current_step)
 
             if use_ema:
@@ -433,7 +560,13 @@ def _run_training(
         writer.add_scalar("Loss/Train", avg_train, epoch)
         
         # Log learning rate at each epoch
-        current_lr = scheduler.get_last_lr()[0]
+        if scheduler is not None and scheduler_step == "epoch":
+            scheduler.step()
+        current_lr = (
+            scheduler.get_last_lr()[0]
+            if scheduler is not None
+            else optimizer.param_groups[0]["lr"]
+        )
         writer.add_scalar("LearningRate/Epoch", current_lr, epoch)
         
         if device.type == "cuda":
@@ -447,7 +580,6 @@ def _run_training(
             if use_ema:
                 ema_model.eval()
             eval_model = ema_model if use_ema else model
-
             total_val_loss = 0.0
             total_val_batches = 0
             overall_dice_sum = 0.0
@@ -511,6 +643,9 @@ def _run_training(
             writer.add_scalar("Loss/Val", avg_val, epoch)
             writer.add_scalar("Dice/Val", overall_dice, epoch)
 
+            if scheduler is not None and scheduler_step == "val":
+                scheduler.step(avg_val)
+
             for ds_name, metrics in per_dataset_metrics.items():
                 tag = _sanitize_tag(ds_name)
                 writer.add_scalar(f"Loss/Val/{tag}", metrics["loss"], epoch)
@@ -530,7 +665,7 @@ def _run_training(
                     should_stop = True
 
             make_collage("Predictions", epoch)
-            
+
             if device.type == "cuda":
                 torch.cuda.empty_cache()
 
@@ -544,7 +679,7 @@ def _run_training(
             "model_state": model.state_dict(),
             "ema_state": ema_model.state_dict() if use_ema else None,
             "optimizer_state": optimizer.state_dict(),
-            "scheduler_state": scheduler.state_dict(),
+            "scheduler_state": scheduler.state_dict() if scheduler is not None else None,
             "scaler_state": scaler.state_dict(),
             "best_val_loss": best_val_loss,
             "patience": patience,
@@ -564,7 +699,7 @@ def _run_training(
         
         export_size = target_size if target_size is not None else 1280
         
-        EAST.export_to_onnx(
+        EAST.export(
             weights_path=best_weights_path,
             output_path=onnx_path,
             input_size=export_size,
@@ -598,7 +733,13 @@ def _collage_batch(
 ):
     """Create collage with model predictions for visualization."""
     coll_imgs = []
-    for i in range(min(num, len(dataset))):
+    total = len(dataset)
+    if total == 0:
+        return None
+
+    sample_count = min(num, total)
+    indices = np.random.choice(total, size=sample_count, replace=False)
+    for i in indices:
         img_t, tgt = dataset[i]
         gt_s = tgt["score_map"].squeeze(0).cpu().numpy()
         gt_g = tgt["geo_map"].cpu().numpy().transpose(1, 2, 0)
@@ -635,3 +776,4 @@ def _collage_batch(
     top = np.hstack(coll_imgs[:2])
     bot = np.hstack(coll_imgs[2:4]) if len(coll_imgs) > 2 else np.zeros_like(top)
     return np.vstack([top, bot])
+
