@@ -755,10 +755,13 @@ class EAST(BaseModel):
         focal_gamma : float, optional
             Gamma for focal geometry loss. Default ``2.0``.
         resume_from : str or Path, optional
-            Resume training from a previous experiment:
+            Resume training from a previous experiment or initialize from local weights:
             a) experiment directory,
             b) `.../checkpoints/`,
-            c) direct path to `last_state.pt`.
+            c) direct path to full-state checkpoint (`last_state.pt`).
+            If a weights-only file is provided (e.g. `best.pth`), model weights
+            are loaded, but training starts in the current
+            ``experiment_root/model_name`` directory.
             Default ``None``.
         val_interval : int, optional
             Run validation every N epochs. Default ``1``.
@@ -982,11 +985,16 @@ class EAST(BaseModel):
             return (Path.cwd() / p).resolve()
 
         def _is_experiment_checkpoint(file_path: Path) -> bool:
+            # Only full-state checkpoint files should force reusing source experiment dir.
+            # Weights-only files (e.g. best.pth) should initialize model in a new experiment.
+            state_checkpoint_names = {"last_state.pt", "checkpoint_last.pth", "checkpoint_last.pt"}
+            if file_path.name not in state_checkpoint_names:
+                return False
+
             parent = file_path.parent
-            return (
-                parent.name == "checkpoints"
-                or (parent / "training_config.json").exists()
-            )
+            if parent.name == "checkpoints":
+                return (parent.parent / "training_config.json").exists()
+            return (parent / "training_config.json").exists()
 
         def _resolve_resume_target(
             target: Union[str, Path],

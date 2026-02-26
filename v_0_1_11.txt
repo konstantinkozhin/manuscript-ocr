@@ -27,5 +27,13 @@ File:
 File:
 - src/manuscript/recognizers/_trba/training/train.py
 
+4) EAST experiment naming fix when loading local weights/checkpoints (local)
+- Fixed behavior where passing a weights path from another experiment could force reusing old experiment folder name.
+- Now only full-state resume checkpoints (last_state.pt / checkpoint_last.pth / checkpoint_last.pt) reuse source experiment dir.
+- Weights-only files (for example best.pth) now initialize model but keep current experiment_root/model_name for a new run.
+
+File:
+- src/manuscript/detectors/_east/__init__.py
+
 Summary:
-- v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fix).
+- v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fixes).
