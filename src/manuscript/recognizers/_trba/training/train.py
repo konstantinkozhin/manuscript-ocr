@@ -878,7 +878,7 @@ def run_training(cfg: Config, device: str = "cuda"):
                     max_len=max_len,
                     strict_max_len=True,
                 )
-                n_val = min(val_size if val_size else 3000, len(full_ds))
+                n_val = min(3000 if val_size is None else val_size, len(full_ds))
                 n_train = len(full_ds) - n_val
                 if n_train <= 0:
                     raise ValueError(

@@ -1,0 +1,31 @@
+Changes in branch v_0_1_11
+==================================
+
+1) EAST training pipeline update (commit 32acec9)
+- Added config options in EAST.train: score_map_shrink_ratio, lr_scheduler, lr_scheduler_params, augmentation_config.
+- Expanded EASTDataset augmentations (geometric + photometric) with parameter validation.
+- Added augmentation preview/list and TensorBoard preview logging.
+- Added multiple LR schedulers: cosine_restart/cosine/linear/step/exponential/plateau/none.
+- Updated default training settings: lr=1e-4, freeze_first=False, use_sam=False, use_lookahead=False, use_ohem=False.
+
+Files:
+- src/manuscript/detectors/_east/__init__.py
+- src/manuscript/detectors/_east/dataset.py
+- src/manuscript/detectors/_east/train_utils.py
+
+2) Better TRBA import diagnostics (commit c7e4aa9)
+- On training-import failure, saves original ImportError and traceback.
+- Re-raises error with root-cause details (raise ... from ...).
+
+File:
+- src/manuscript/recognizers/_trba/__init__.py
+
+3) TRBA validation size handling fix (local)
+- Fixed case where val_size=0 was incorrectly treated as falsy and replaced with default 3000.
+- Now fallback to 3000 happens only when val_size is None.
+
+File:
+- src/manuscript/recognizers/_trba/training/train.py
+
+Summary:
+- v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fix).
