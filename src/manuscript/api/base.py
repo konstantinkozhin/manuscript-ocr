@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 from pathlib import Path
 from typing import Optional, Dict
 import shutil
+import time
+import urllib.error
 import urllib.request
 import tempfile
 import onnxruntime as ort
@@ -212,45 +214,82 @@ class BaseModel(ABC):
             return str(file)
 
         print(f"Downloading {Path(url).name} from {url}")
+        max_attempts = 5
+        retry_statuses = {429, 500, 502, 503, 504}
+        base_backoff_seconds = 1.0
+        last_error = None
 
-        # Create temporary file
-        tmp = tempfile.NamedTemporaryFile(delete=False).name
+        for attempt in range(1, max_attempts + 1):
+            tmp = tempfile.NamedTemporaryFile(delete=False).name
 
-        if tqdm is not None:
             try:
-                # Get file size
-                with urllib.request.urlopen(url) as response:
-                    total_size = int(response.headers.get("content-length", 0))
+                if tqdm is not None:
+                    try:
+                        # Get file size
+                        with urllib.request.urlopen(url) as response:
+                            total_size = int(response.headers.get("content-length", 0))
 
-                with tqdm(
-                    total=total_size,
-                    unit="B",
-                    unit_scale=True,
-                    unit_divisor=1024,
-                    desc=Path(url).name,
-                    ncols=80,
-                ) as pbar:
+                        with tqdm(
+                            total=total_size,
+                            unit="B",
+                            unit_scale=True,
+                            unit_divisor=1024,
+                            desc=Path(url).name,
+                            ncols=80,
+                        ) as pbar:
 
-                    def reporthook(block_num, block_size, total_size):
-                        downloaded = block_num * block_size
-                        if downloaded < total_size:
-                            pbar.update(block_size)
-                        else:
-                            pbar.update(total_size - pbar.n)
+                            def reporthook(block_num, block_size, total_size):
+                                downloaded = block_num * block_size
+                                if downloaded < total_size:
+                                    pbar.update(block_size)
+                                else:
+                                    pbar.update(total_size - pbar.n)
 
-                    urllib.request.urlretrieve(url, tmp, reporthook=reporthook)
-            except Exception as e:
-                # Fallback to simple download if progress bar fails
-                print(f"Progress bar error ({e}), downloading without progress...")
-                urllib.request.urlretrieve(url, tmp)
-        else:
-            # No tqdm available, simple download
-            urllib.request.urlretrieve(url, tmp)
+                            urllib.request.urlretrieve(url, tmp, reporthook=reporthook)
+                    except Exception as e:
+                        # Fallback to simple download if progress bar fails
+                        print(f"Progress bar error ({e}), downloading without progress...")
+                        urllib.request.urlretrieve(url, tmp)
+                else:
+                    # No tqdm available, simple download
+                    urllib.request.urlretrieve(url, tmp)
 
-        # Move to cache
-        shutil.move(tmp, file)
-        print(f" Downloaded to {file}")
-        return str(file)
+                # Move to cache
+                shutil.move(tmp, file)
+                print(f" Downloaded to {file}")
+                return str(file)
+
+            except urllib.error.HTTPError as e:
+                last_error = e
+                if e.code not in retry_statuses or attempt == max_attempts:
+                    raise
+                delay = base_backoff_seconds * (2 ** (attempt - 1))
+                print(
+                    f"Download failed with HTTP {e.code}. "
+                    f"Retrying in {delay:.1f}s ({attempt}/{max_attempts - 1})..."
+                )
+                time.sleep(delay)
+            except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
+                last_error = e
+                if attempt == max_attempts:
+                    raise
+                delay = base_backoff_seconds * (2 ** (attempt - 1))
+                print(
+                    f"Download failed ({e}). "
+                    f"Retrying in {delay:.1f}s ({attempt}/{max_attempts - 1})..."
+                )
+                time.sleep(delay)
+            finally:
+                tmp_path = Path(tmp)
+                if tmp_path.exists():
+                    try:
+                        tmp_path.unlink()
+                    except OSError:
+                        pass
+
+        if last_error is not None:
+            raise last_error
+        raise RuntimeError(f"Failed to download: {url}")
 
     def _download_github(self, spec: str) -> str:
         payload = spec.replace("github://", "").strip()

@@ -35,5 +35,13 @@ File:
 File:
 - src/manuscript/detectors/_east/__init__.py
 
+5) HTTP download retry/backoff for model weights (local)
+- Added retry logic in BaseModel._download_http for transient network/server errors.
+- Retries on HTTP 429/500/502/503/504 and URLError/timeout-style failures.
+- Uses exponential backoff (up to 5 attempts) and cleans temporary files between attempts.
+
+File:
+- src/manuscript/api/base.py
+
 Summary:
 - v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fixes).
