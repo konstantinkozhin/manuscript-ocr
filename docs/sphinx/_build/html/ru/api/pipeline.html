@@ -19,6 +19,7 @@
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/translations.js?v=cd1d70c9"></script>
       <script src="../_static/language_switcher.js?v=db730534"></script>
+      <script src="../_static/version_sidebar.js?v=edadfa97"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Алфавитный указатель" href="../genindex.html" />
     <link rel="search" title="Поиск" href="../search.html" />
@@ -205,7 +206,9 @@
 <span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">manuscript._pipeline.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recognizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_text_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/_pipeline.html#Pipeline"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript._pipeline.Pipeline" title="Ссылка на это определение"></a></dt>
 <dd><p>Базовые классы: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>Высокоуровневый OCR-конвейер, объединяющий детекцию, распознавание и коррекцию текста.</p>
-<p>Класс Pipeline координирует детектор EAST, распознаватель TRBA и опциональный корректор текста для выполнения полного OCR-процесса: детекция → извлечение кропов → распознавание → коррекция → объединение результатов.</p>
+<p>The Pipeline class orchestrates EAST detector, TRBA recognizer, and optional
+text corrector to perform complete OCR workflow:
+detection -&gt; recognition -&gt; correction -&gt; result merging.</p>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="manuscript._pipeline.Pipeline.detector">
 <span class="sig-name descname"><span class="pre">detector</span></span><a class="headerlink" href="#manuscript._pipeline.Pipeline.detector" title="Ссылка на это определение"></a></dt>

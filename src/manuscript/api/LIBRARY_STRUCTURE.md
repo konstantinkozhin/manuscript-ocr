@@ -46,13 +46,13 @@ graph LR
 
     %% Recognizers
     recognizers --> TRBA["TRBA<br/><i>Text Recognition with BiLSTM + Attention</i>"]
-    TRBA --> trba_predict["predict()<br/><i>→ List[Dict[str, Any]]</i>"]
+    TRBA --> trba_predict["predict(page, image=None)<br/><i>→ Page</i>"]
     TRBA --> trba_train["train()<br/><i>→ None</i>"]
     TRBA --> trba_export["export()<br/><i>→ str</i>"]
 
     %% Correctors
     correctors --> CharLM["CharLM<br/><i>Character-level Language Model</i>"]
-    CharLM --> charlm_predict["predict()<br/><i>→ Page</i>"]
+    CharLM --> charlm_predict["predict(page, image=None)<br/><i>→ Page</i>"]
     CharLM --> charlm_train["train()<br/><i>→ None</i>"]
     CharLM --> charlm_export["export()<br/><i>→ str</i>"]
 
@@ -89,3 +89,4 @@ graph LR
     style utils fill:#fed7aa,color:#7c2d12,stroke:#ea580c
     style api fill:#fecaca,color:#7f1d1d,stroke:#dc2626
 ```
+

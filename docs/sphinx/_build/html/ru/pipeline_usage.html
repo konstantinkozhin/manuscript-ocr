@@ -19,6 +19,7 @@
       <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="_static/translations.js?v=cd1d70c9"></script>
       <script src="_static/language_switcher.js?v=db730534"></script>
+      <script src="_static/version_sidebar.js?v=edadfa97"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Алфавитный указатель" href="genindex.html" />
     <link rel="search" title="Поиск" href="search.html" />
@@ -242,42 +243,46 @@
 </section>
 <section id="recognizer-requirements">
 <h2>Требования к распознавателю<a class="headerlink" href="#recognizer-requirements" title="Ссылка на этот заголовок"></a></h2>
-<p>Класс распознавателя должен реализовать метод <code class="docutils literal notranslate"><span class="pre">predict</span></code>, который принимает список изображений и возвращает список результатов:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">images</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<p>A recognizer class must implement a <code class="docutils literal notranslate"><span class="pre">predict</span></code> method that takes a <code class="docutils literal notranslate"><span class="pre">Page</span></code> object and optionally the source image, then returns updated <code class="docutils literal notranslate"><span class="pre">Page</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parameters:</span>
-<span class="sd">    - images: list of numpy arrays (RGB word images)</span>
+<span class="sd">    - page: Page object with detected words</span>
+<span class="sd">    - image: optional source image (for crop extraction / context)</span>
 
-<span class="sd">    Returns list of dictionaries:</span>
-<span class="sd">    [</span>
-<span class="sd">        {&quot;text&quot;: &quot;word1&quot;, &quot;confidence&quot;: 0.95},</span>
-<span class="sd">        {&quot;text&quot;: &quot;word2&quot;, &quot;confidence&quot;: 0.92},</span>
-<span class="sd">        ...</span>
-<span class="sd">    ]</span>
+<span class="sd">    Returns:</span>
+<span class="sd">    - Page: Page object where recognizer fills word.text and</span>
+<span class="sd">      word.recognition_confidence</span>
 <span class="sd">    &quot;&quot;&quot;</span>
     <span class="k">pass</span>
 </pre></div>
 </div>
 <p><strong>Пример:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">class</span><span class="w"> </span><span class="nc">MyRecognizer</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">images</span><span class="p">):</span>
-        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">img</span> <span class="ow">in</span> <span class="n">images</span><span class="p">:</span>
-            <span class="c1"># Your recognition logic</span>
-            <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;recognized_text&quot;</span>
-            <span class="n">confidence</span> <span class="o">=</span> <span class="mf">0.92</span>
-            <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span> <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="n">confidence</span><span class="p">})</span>
-        <span class="k">return</span> <span class="n">results</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span>
+
+<span class="k">class</span><span class="w"> </span><span class="nc">MyRecognizer</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
+                    <span class="c1"># Your recognition logic</span>
+                    <span class="n">word</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;recognized_text&quot;</span>
+                    <span class="n">word</span><span class="o">.</span><span class="n">recognition_confidence</span> <span class="o">=</span> <span class="mf">0.92</span>
+        <span class="k">return</span> <span class="n">result</span>
 </pre></div>
 </div>
 </section>
 <section id="corrector-requirements">
 <h2>Требования к корректору<a class="headerlink" href="#corrector-requirements" title="Ссылка на этот заголовок"></a></h2>
-<p>Класс корректора должен реализовать метод <code class="docutils literal notranslate"><span class="pre">predict</span></code>, который принимает объект Page и возвращает исправленный Page:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
+<p>A corrector class must implement a <code class="docutils literal notranslate"><span class="pre">predict</span></code> method that takes a <code class="docutils literal notranslate"><span class="pre">Page</span></code> object and optionally the source image, then returns a corrected <code class="docutils literal notranslate"><span class="pre">Page</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Parameters:</span>
 <span class="sd">    - page: Page object with recognized text</span>
+<span class="sd">    - image: optional source image (for context-aware correction)</span>
 
 <span class="sd">    Returns:</span>
 <span class="sd">    - Page: Page object with corrected text</span>
@@ -286,10 +291,12 @@
 </pre></div>
 </div>
 <p><strong>Пример:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span>
 
 <span class="k">class</span><span class="w"> </span><span class="nc">MyCorrector</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
         <span class="n">result</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>

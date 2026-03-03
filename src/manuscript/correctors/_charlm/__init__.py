@@ -222,7 +222,7 @@ class CharLM(BaseModel):
         self.onnx_session = ort.InferenceSession(str(self.weights), providers=providers)
         self._log_device_info(self.onnx_session)
 
-    def predict(self, page: Page) -> Page:
+    def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
         """
         Apply character-level correction to a Page.
 
@@ -230,12 +230,18 @@ class CharLM(BaseModel):
         ----------
         page : Page
             Input Page object with recognized text.
+        image : np.ndarray, optional
+            Optional source image associated with ``page``.
+            Reserved for integrations that may pass the original image
+            to correctors. ``CharLM`` does not use this argument.
 
         Returns
         -------
         Page
             Corrected Page object with updated word texts.
         """
+        _ = image  # Intentionally unused in CharLM.
+
         if self.weights is None or not self.c2i:
             return page.model_copy(deep=True)
 

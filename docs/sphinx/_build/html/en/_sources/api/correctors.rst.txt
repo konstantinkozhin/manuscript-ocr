@@ -59,6 +59,10 @@ Use ``create_page_from_text`` to quickly test correction on text:
     corrector = CharLM()
     corrected = corrector.predict(page)
 
+    # Optional: pass source image for context-aware custom correctors
+    # (CharLM currently ignores this argument)
+    # corrected = corrector.predict(page, image=image_array)
+
     # Extract corrected text
     for line in corrected.blocks[0].lines:
         text = " ".join(w.text for w in line.words)

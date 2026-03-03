@@ -10,6 +10,7 @@ import onnxruntime as ort
 from PIL import Image
 
 from manuscript.api.base import BaseModel
+from manuscript.data import Page
 from manuscript.utils import read_image
 
 from .data.transforms import load_charset
@@ -79,10 +80,10 @@ class TRBA(BaseModel):
     -----
     The class provides three main public methods:
 
-    - ``predict`` — run text recognition inference on cropped word images.
-    - ``train`` — high-level training entrypoint to train a TRBA model
+    - ``predict`` - run recognition over words in a ``Page`` object.
+    - ``train`` - high-level training entrypoint to train a TRBA model
       on custom datasets.
-    - ``export`` — static method to export PyTorch model to ONNX format.
+    - ``export`` - static method to export PyTorch model to ONNX format.
 
     Model uses ONNX Runtime for fast inference on CPU and GPU.
     For GPU acceleration, install: ``pip install onnxruntime-gpu``
@@ -215,7 +216,7 @@ class TRBA(BaseModel):
                 description="config",
             )
 
-        # 2. Try same filename with .json extension (e.g., model.onnx → model.json)
+        # 2. Try same filename with .json extension (e.g., model.onnx -> model.json)
         config_candidate = weights_path.with_suffix(".json")
         if config_candidate.exists():
             return str(config_candidate.absolute())
@@ -272,7 +273,7 @@ class TRBA(BaseModel):
                 description="charset",
             )
 
-        # 2. Try same filename with .txt extension (e.g., model.onnx → model.txt)
+        # 2. Try same filename with .txt extension (e.g., model.onnx -> model.txt)
         charset_candidate = weights_path.with_suffix(".txt")
         if charset_candidate.exists():
             return str(charset_candidate.absolute())
@@ -383,71 +384,50 @@ class TRBA(BaseModel):
         if height > width * self.rotate_threshold:
             crop = np.rot90(crop, k=-1)
         return crop
+    def _extract_word_image(
+        self, image: np.ndarray, polygon: np.ndarray
+    ) -> Optional[np.ndarray]:
+        """
+        Extract word crop using polygon bounding box.
+        """
+        try:
+            x_min, y_min = np.min(polygon, axis=0)
+            x_max, y_max = np.max(polygon, axis=0)
 
-    def predict(
+            h, w = image.shape[:2]
+            x1 = max(0, int(x_min))
+            y1 = max(0, int(y_min))
+            x2 = min(w, int(x_max))
+            y2 = min(h, int(y_max))
+
+            region_image = image[y1:y2, x1:x2]
+            if region_image.size == 0:
+                return None
+
+            return region_image
+        except Exception:
+            return None
+
+    def _predict_word_images(
         self,
-        images: Union[
-            np.ndarray, str, Image.Image, List[Union[np.ndarray, str, Image.Image]]
-        ],
+        images: List[Union[np.ndarray, str, Path, Image.Image]],
         batch_size: int = 32,
     ) -> List[Dict[str, Any]]:
         """
-        Run text recognition on one or more word images.
-
-        Parameters
-        ----------
-        images : str, Path, numpy.ndarray, PIL.Image, or list thereof
-            Single image or list of images to recognize. Each image can be:
-
-            - Path to image file (str or Path)
-            - RGB numpy array with shape ``(H, W, 3)`` in ``uint8``
-            - PIL Image object
-
-        batch_size : int, optional
-            Number of images to process simultaneously. Larger batches are
-            faster but require more memory. Default is 32.
-
-        Returns
-        -------
-        list of dict
-            Recognition results as list of dictionaries, each containing:
-
-            - ``"text"`` : str — recognized text
-            - ``"confidence"`` : float — recognition confidence in [0, 1]
-
-            If input is a single image, returns a list with one element.
-
-        Examples
-        --------
-        Recognize single image:
-
-        >>> from manuscript.recognizers import TRBA
-        >>> recognizer = TRBA()
-        >>> results = recognizer.predict("word_image.jpg")
-        >>> print(f"Text: '{results[0]['text']}' (confidence: {results[0]['confidence']:.3f})")
-
-        Process numpy arrays:
-
-        >>> import cv2
-        >>> img = cv2.imread("word.jpg")
-        >>> img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)
-        >>> results = recognizer.predict(img_rgb)
-        >>> print(results[0]["text"])
+        Run ONNX inference on prepared word image list.
         """
         # Initialize session on first call
         if self.onnx_session is None:
             self._initialize_session()
 
-        if not isinstance(images, list):
-            images_list = [images]
-        else:
-            images_list = images
+        if not images:
+            return []
 
         results: List[Dict[str, Any]] = []
 
         # Process images in batches
-        for i in range(0, len(images_list), batch_size):
-            batch_images = images_list[i : i + batch_size]
+        for i in range(0, len(images), batch_size):
+            batch_images = images[i : i + batch_size]
 
             # Preprocess batch
             batch_tensors = []
@@ -469,7 +449,7 @@ class TRBA(BaseModel):
             # Decode predictions
             preds = np.argmax(logits, axis=-1)  # [B, max_length]
 
-            # Calculate confidence (softmax + mean log prob)
+            # Calculate confidence (softmax + mean prob)
             probs = self._softmax(logits, axis=-1)  # [B, T, num_classes]
 
             for j in range(len(batch_images)):
@@ -499,6 +479,93 @@ class TRBA(BaseModel):
                 results.append({"text": text, "confidence": confidence})
 
         return results
+
+    def predict(
+        self,
+        page: Page,
+        image: Optional[Union[np.ndarray, str, Path, Image.Image]] = None,
+        batch_size: int = 32,
+        min_text_size: int = 5,
+    ) -> Page:
+        """
+        Recognize text for words in a ``Page`` and return updated ``Page``.
+
+        Parameters
+        ----------
+        page : Page
+            Page object with detected word polygons.
+        image : str, Path, numpy.ndarray, or PIL.Image, optional
+            Source page image used to extract word crops. If ``None``,
+            recognition is skipped and a deep copy of ``page`` is returned.
+        batch_size : int, optional
+            Number of word crops to process simultaneously. Larger batches are
+            faster but require more memory. Default is 32.
+        min_text_size : int, optional
+            Minimum crop width/height in pixels to run recognition for a word.
+            Words below this threshold are left unchanged. Default is 5.
+
+        Returns
+        -------
+        Page
+            New Page object with recognized ``text`` and
+            ``recognition_confidence`` filled for processed words.
+
+        Examples
+        --------
+        Recognize words inside detected page:
+
+        >>> from manuscript.detectors import EAST
+        >>> from manuscript.recognizers import TRBA
+        >>> detector = EAST()
+        >>> recognizer = TRBA()
+        >>> det = detector.predict("page.jpg")
+        >>> recognized_page = recognizer.predict(det["page"], image="page.jpg")
+        """
+        result_page = page.model_copy(deep=True)
+
+        if image is None:
+            return result_page
+
+        image_array = read_image(image)
+        word_images: List[np.ndarray] = []
+        word_objects = []
+
+        for block in result_page.blocks:
+            for line in block.lines:
+                for word in line.words:
+                    poly = np.array(word.polygon, dtype=np.float32)
+                    if poly.size == 0:
+                        continue
+
+                    x_min, y_min = np.min(poly, axis=0)
+                    x_max, y_max = np.max(poly, axis=0)
+                    width = x_max - x_min
+                    height = y_max - y_min
+
+                    if width < min_text_size or height < min_text_size:
+                        continue
+
+                    region_image = self._extract_word_image(
+                        image_array, poly.astype(np.int32)
+                    )
+                    if region_image is None or region_image.size == 0:
+                        continue
+
+                    word_images.append(region_image)
+                    word_objects.append(word)
+
+        if not word_images:
+            return result_page
+
+        recognition_results = self._predict_word_images(
+            word_images, batch_size=batch_size
+        )
+
+        for word_obj, rec in zip(word_objects, recognition_results):
+            word_obj.text = rec["text"]
+            word_obj.recognition_confidence = rec["confidence"]
+
+        return result_page
 
     @staticmethod
     def _softmax(x: np.ndarray, axis: int = -1) -> np.ndarray:
@@ -614,10 +681,10 @@ class TRBA(BaseModel):
         scheduler : {"ReduceLROnPlateau", "CosineAnnealingLR", "OneCycleLR", "None"}, optional
             Learning rate scheduler type:
 
-            - ``"OneCycleLR"`` — one-cycle policy with cosine annealing (default, recommended)
-            - ``"ReduceLROnPlateau"`` — reduce LR on validation loss plateau
-            - ``"CosineAnnealingLR"`` — cosine annealing over epochs
-            - ``"None"`` or ``None`` — constant learning rate
+            - ``"OneCycleLR"`` - one-cycle policy with cosine annealing (default, recommended)
+            - ``"ReduceLROnPlateau"`` - reduce LR on validation loss plateau
+            - ``"CosineAnnealingLR"`` - cosine annealing over epochs
+            - ``"None"`` or ``None`` - constant learning rate
 
             Default is ``"OneCycleLR"``.
         weight_decay : float, optional
@@ -652,9 +719,9 @@ class TRBA(BaseModel):
         pretrain_weights : str, Path, bool, or None, optional
             Pretrained weights to initialize from:
 
-            - ``"default"`` or ``True`` — use release weights
-            - ``None`` or ``False`` — train from scratch
-            - str/Path — path or URL to custom weights file
+            - ``"default"`` or ``True`` - use release weights
+            - ``None`` or ``False`` - train from scratch
+            - str/Path - path or URL to custom weights file
 
             Default is ``"default"``.
         **extra_config : dict, optional
@@ -966,8 +1033,11 @@ class TRBA(BaseModel):
 
         Use the exported model for inference:
 
+        >>> from manuscript.detectors import EAST
         >>> recognizer = TRBA(weights="trba_model.onnx")
-        >>> result = recognizer.predict("word_image.jpg")
+        >>> detector = EAST()
+        >>> det = detector.predict("page.jpg")
+        >>> result = recognizer.predict(det["page"], image="page.jpg")
 
         See Also
         --------
@@ -1160,3 +1230,4 @@ class TRBA(BaseModel):
         print(f"\nInput shape: [batch_size, 3, {img_h}, {img_w}]")
         print(f"Output shape: [batch_size, {max_length}, {num_classes}]")
         print(f"Decoding: Greedy (argmax over last dimension)")
+

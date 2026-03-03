@@ -82,20 +82,17 @@ page = Page(blocks=[block])
 
 ## Требования к Распознавателю
 
-Класс распознавателя должен реализовать метод `predict`, который принимает список изображений и возвращает список результатов:
+Класс распознавателя должен реализовать метод `predict`, который принимает `Page` и опционально исходное изображение, а возвращает обновленный `Page`:
 
 ```python
-def predict(self, images: List[np.ndarray]) -> List[Dict[str, Any]]:
+def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
     """
     Параметры:
-    - images: список numpy массивов (RGB изображения слов)
+    - page: объект Page с детектированными словами
+    - image: необязательное исходное изображение (контекст / извлечение crop)
     
-    Возвращает список словарей:
-    [
-        {"text": "слово1", "confidence": 0.95},
-        {"text": "слово2", "confidence": 0.92},
-        ...
-    ]
+    Возвращает:
+    - Page: объект Page, где заполнены `word.text` и `word.recognition_confidence`
     """
     pass
 ```
@@ -103,15 +100,20 @@ def predict(self, images: List[np.ndarray]) -> List[Dict[str, Any]]:
 **Пример:**
 
 ```python
+from typing import Optional
+import numpy as np
+from manuscript.data import Page
+
 class MyRecognizer:
-    def predict(self, images):
-        results = []
-        for img in images:
-            # Ваша логика распознавания
-            text = "распознанный_текст"
-            confidence = 0.92
-            results.append({"text": text, "confidence": confidence})
-        return results
+    def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
+        result = page.model_copy(deep=True)
+        for block in result.blocks:
+            for line in block.lines:
+                for word in line.words:
+                    # Ваша логика распознавания
+                    word.text = "распознанный_текст"
+                    word.recognition_confidence = 0.92
+        return result
 ```
 
 ---
@@ -121,10 +123,11 @@ class MyRecognizer:
 Класс корректора должен реализовать метод `predict`, который принимает объект Page и возвращает исправленный Page:
 
 ```python
-def predict(self, page: Page) -> Page:
+def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
     """
     Параметры:
     - page: объект Page с распознанным текстом
+    - image: необязательное исходное изображение (контекст для коррекции)
     
     Возвращает:
     - Page: объект Page с исправленным текстом
@@ -135,10 +138,12 @@ def predict(self, page: Page) -> Page:
 **Пример:**
 
 ```python
+from typing import Optional
+import numpy as np
 from manuscript.data import Page
 
 class MyCorrector:
-    def predict(self, page: Page) -> Page:
+    def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
         result = page.model_copy(deep=True)
         for block in result.blocks:
             for line in block.lines:
@@ -211,14 +216,15 @@ class MyDetector:
 
 ```python
 class MyRecognizer:
-    def predict(self, images):
-        results = []
-        for img in images:
-            # Ваша логика распознавания
-            text = "распознанный_текст"
-            confidence = 0.92
-            results.append({"text": text, "confidence": confidence})
-        return results
+    def predict(self, page, image=None):
+        result = page.model_copy(deep=True)
+        for block in result.blocks:
+            for line in block.lines:
+                for word in line.words:
+                    # Ваша логика распознавания
+                    word.text = "распознанный_текст"
+                    word.recognition_confidence = 0.92
+        return result
 ```
 
 ### Использование с Pipeline
@@ -236,7 +242,6 @@ detector = MyDetector()
 recognizer = MyRecognizer()
 pipeline = Pipeline(detector, recognizer)
 result = pipeline.predict("image.jpg")
-```
 ```
 
 ---

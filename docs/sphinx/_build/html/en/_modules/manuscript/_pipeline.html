@@ -452,6 +452,7 @@ mermaid.initialize(
 
 window.addEventListener("load", load);</script>
       <script src="../../_static/language_switcher.js?v=db730534"></script>
+      <script src="../../_static/version_sidebar.js?v=edadfa97"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -629,6 +630,7 @@ window.addEventListener("load", load);</script>
              
   <h1>Source code for manuscript._pipeline</h1><div class="highlight"><pre>
 <span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
 
@@ -652,7 +654,7 @@ window.addEventListener("load", load);</script>
 
 <span class="sd">    The Pipeline class orchestrates EAST detector, TRBA recognizer, and optional</span>
 <span class="sd">    text corrector to perform complete OCR workflow:</span>
-<span class="sd">    detection → crop extraction → recognition → correction → result merging.</span>
+<span class="sd">    detection -&gt; recognition -&gt; correction -&gt; result merging.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
@@ -820,48 +822,27 @@ window.addEventListener("load", load);</script>
 
             <span class="k">return</span> <span class="n">result</span>
 
-        <span class="c1"># ---- LOAD IMAGE FOR CROPPING ----</span>
+        <span class="c1"># ---- LOAD IMAGE FOR RECOGNITION ----</span>
         <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
         <span class="n">image_array</span> <span class="o">=</span> <span class="n">read_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Load image for crops: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
-
-        <span class="c1"># ---- EXTRACT WORD CROPS ----</span>
-        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">word_images</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="n">word_objects</span> <span class="o">=</span> <span class="p">[]</span>  <span class="c1"># Keep references to Word objects for updating</span>
-
-        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">page</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
-                    <span class="n">poly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">polygon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-                    <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">poly</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-                    <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">poly</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-                    <span class="n">width</span> <span class="o">=</span> <span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span>
-                    <span class="n">height</span> <span class="o">=</span> <span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span>
-
-                    <span class="c1"># Filter by minimum size</span>
-                    <span class="k">if</span> <span class="n">width</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_text_size</span> <span class="ow">and</span> <span class="n">height</span> <span class="o">&gt;=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_text_size</span><span class="p">:</span>
-                        <span class="n">region_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_word_image</span><span class="p">(</span><span class="n">image_array</span><span class="p">,</span> <span class="n">poly</span><span class="p">)</span>
-                        <span class="k">if</span> <span class="n">region_image</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="ow">and</span> <span class="n">region_image</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
-                            <span class="n">word_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">region_image</span><span class="p">)</span>
-                            <span class="n">word_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
-
-        <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extract </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">word_images</span><span class="p">)</span><span class="si">}</span><span class="s2"> crops: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Load image for recognition: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
 
         <span class="c1"># ---- RECOGNITION ----</span>
-        <span class="k">if</span> <span class="n">word_images</span><span class="p">:</span>
-            <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-            <span class="n">recognition_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">word_images</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="mi">32</span><span class="p">)</span>
-            <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
-                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Recognition: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+        <span class="n">recognizer_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="n">image_array</span><span class="p">}</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">predict_params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="o">.</span><span class="n">predict</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+            <span class="k">if</span> <span class="s2">&quot;batch_size&quot;</span> <span class="ow">in</span> <span class="n">predict_params</span><span class="p">:</span>
+                <span class="n">recognizer_kwargs</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span>
+            <span class="k">if</span> <span class="s2">&quot;min_text_size&quot;</span> <span class="ow">in</span> <span class="n">predict_params</span><span class="p">:</span>
+                <span class="n">recognizer_kwargs</span><span class="p">[</span><span class="s2">&quot;min_text_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_text_size</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="k">pass</span>
 
-            <span class="c1"># Update Word objects with recognition results</span>
-            <span class="k">for</span> <span class="n">word_obj</span><span class="p">,</span> <span class="n">result</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">word_objects</span><span class="p">,</span> <span class="n">recognition_results</span><span class="p">):</span>
-                <span class="n">word_obj</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
-                <span class="n">word_obj</span><span class="o">.</span><span class="n">recognition_confidence</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;confidence&quot;</span><span class="p">]</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="o">**</span><span class="n">recognizer_kwargs</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
+            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Recognition: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_recognition_page</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 
@@ -935,44 +916,7 @@ window.addEventListener("load", load);</script>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">last_correction_page</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Page</span><span class="p">]:</span>
-        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_correction_page</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_word_image</span><span class="p">(</span>
-        <span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">polygon</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Extract word region from image using polygon coordinates.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        image : np.ndarray</span>
-<span class="sd">            Input image (H, W, 3)</span>
-<span class="sd">        polygon : np.ndarray</span>
-<span class="sd">            Polygon coordinates [[x1,y1], [x2,y2], ...]</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        np.ndarray or None</span>
-<span class="sd">            Cropped word image or None if extraction failed</span>
-<span class="sd">        &quot;&quot;&quot;</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-            <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-
-            <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
-            <span class="n">x1</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">x_min</span><span class="p">))</span>
-            <span class="n">y1</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">y_min</span><span class="p">))</span>
-            <span class="n">x2</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">x_max</span><span class="p">))</span>
-            <span class="n">y2</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">y_max</span><span class="p">))</span>
-
-            <span class="n">region_image</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">y1</span><span class="p">:</span><span class="n">y2</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span><span class="n">x2</span><span class="p">]</span>
-
-            <span class="k">if</span> <span class="n">region_image</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
-                <span class="k">return</span> <span class="kc">None</span>
-
-            <span class="k">return</span> <span class="n">region_image</span> <span class="k">if</span> <span class="n">region_image</span><span class="o">.</span><span class="n">size</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
-        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
-            <span class="k">return</span> <span class="kc">None</span></div>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_correction_page</span></div>
 
 
 </pre></div>

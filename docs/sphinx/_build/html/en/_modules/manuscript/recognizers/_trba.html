@@ -452,6 +452,7 @@ mermaid.initialize(
 
 window.addEventListener("load", load);</script>
       <script src="../../../_static/language_switcher.js?v=db730534"></script>
+      <script src="../../../_static/version_sidebar.js?v=edadfa97"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -640,6 +641,7 @@ window.addEventListener("load", load);</script>
 <span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.api.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_image</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.data.transforms</span><span class="w"> </span><span class="kn">import</span> <span class="n">load_charset</span>
@@ -711,10 +713,10 @@ window.addEventListener("load", load);</script>
 <span class="sd">    -----</span>
 <span class="sd">    The class provides three main public methods:</span>
 
-<span class="sd">    - ``predict`` — run text recognition inference on cropped word images.</span>
-<span class="sd">    - ``train`` — high-level training entrypoint to train a TRBA model</span>
+<span class="sd">    - ``predict`` - run recognition over words in a ``Page`` object.</span>
+<span class="sd">    - ``train`` - high-level training entrypoint to train a TRBA model</span>
 <span class="sd">      on custom datasets.</span>
-<span class="sd">    - ``export`` — static method to export PyTorch model to ONNX format.</span>
+<span class="sd">    - ``export`` - static method to export PyTorch model to ONNX format.</span>
 
 <span class="sd">    Model uses ONNX Runtime for fast inference on CPU and GPU.</span>
 <span class="sd">    For GPU acceleration, install: ``pip install onnxruntime-gpu``</span>
@@ -850,7 +852,7 @@ window.addEventListener("load", load);</script>
                 <span class="n">description</span><span class="o">=</span><span class="s2">&quot;config&quot;</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="c1"># 2. Try same filename with .json extension (e.g., model.onnx → model.json)</span>
+        <span class="c1"># 2. Try same filename with .json extension (e.g., model.onnx -&gt; model.json)</span>
         <span class="n">config_candidate</span> <span class="o">=</span> <span class="n">weights_path</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.json&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">config_candidate</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">config_candidate</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span>
@@ -907,7 +909,7 @@ window.addEventListener("load", load);</script>
                 <span class="n">description</span><span class="o">=</span><span class="s2">&quot;charset&quot;</span><span class="p">,</span>
             <span class="p">)</span>
 
-        <span class="c1"># 2. Try same filename with .txt extension (e.g., model.onnx → model.txt)</span>
+        <span class="c1"># 2. Try same filename with .txt extension (e.g., model.onnx -&gt; model.txt)</span>
         <span class="n">charset_candidate</span> <span class="o">=</span> <span class="n">weights_path</span><span class="o">.</span><span class="n">with_suffix</span><span class="p">(</span><span class="s2">&quot;.txt&quot;</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">charset_candidate</span><span class="o">.</span><span class="n">exists</span><span class="p">():</span>
             <span class="k">return</span> <span class="nb">str</span><span class="p">(</span><span class="n">charset_candidate</span><span class="o">.</span><span class="n">absolute</span><span class="p">())</span>
@@ -1018,73 +1020,50 @@ window.addEventListener("load", load);</script>
         <span class="k">if</span> <span class="n">height</span> <span class="o">&gt;</span> <span class="n">width</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">rotate_threshold</span><span class="p">:</span>
             <span class="n">crop</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">rot90</span><span class="p">(</span><span class="n">crop</span><span class="p">,</span> <span class="n">k</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>
         <span class="k">return</span> <span class="n">crop</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_extract_word_image</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">polygon</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Extract word crop using polygon bounding box.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+            <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">polygon</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
 
-<div class="viewcode-block" id="TRBA.predict">
-<a class="viewcode-back" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.predict">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span>
+            <span class="n">h</span><span class="p">,</span> <span class="n">w</span> <span class="o">=</span> <span class="n">image</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
+            <span class="n">x1</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">x_min</span><span class="p">))</span>
+            <span class="n">y1</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">y_min</span><span class="p">))</span>
+            <span class="n">x2</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">w</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">x_max</span><span class="p">))</span>
+            <span class="n">y2</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">h</span><span class="p">,</span> <span class="nb">int</span><span class="p">(</span><span class="n">y_max</span><span class="p">))</span>
+
+            <span class="n">region_image</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="n">y1</span><span class="p">:</span><span class="n">y2</span><span class="p">,</span> <span class="n">x1</span><span class="p">:</span><span class="n">x2</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">region_image</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">None</span>
+
+            <span class="k">return</span> <span class="n">region_image</span>
+        <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_predict_word_images</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">images</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span>
-            <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">,</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">]]</span>
-        <span class="p">],</span>
+        <span class="n">images</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">]],</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Run text recognition on one or more word images.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        images : str, Path, numpy.ndarray, PIL.Image, or list thereof</span>
-<span class="sd">            Single image or list of images to recognize. Each image can be:</span>
-
-<span class="sd">            - Path to image file (str or Path)</span>
-<span class="sd">            - RGB numpy array with shape ``(H, W, 3)`` in ``uint8``</span>
-<span class="sd">            - PIL Image object</span>
-
-<span class="sd">        batch_size : int, optional</span>
-<span class="sd">            Number of images to process simultaneously. Larger batches are</span>
-<span class="sd">            faster but require more memory. Default is 32.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        list of dict</span>
-<span class="sd">            Recognition results as list of dictionaries, each containing:</span>
-
-<span class="sd">            - ``&quot;text&quot;`` : str — recognized text</span>
-<span class="sd">            - ``&quot;confidence&quot;`` : float — recognition confidence in [0, 1]</span>
-
-<span class="sd">            If input is a single image, returns a list with one element.</span>
-
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
-<span class="sd">        Recognize single image:</span>
-
-<span class="sd">        &gt;&gt;&gt; from manuscript.recognizers import TRBA</span>
-<span class="sd">        &gt;&gt;&gt; recognizer = TRBA()</span>
-<span class="sd">        &gt;&gt;&gt; results = recognizer.predict(&quot;word_image.jpg&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; print(f&quot;Text: &#39;{results[0][&#39;text&#39;]}&#39; (confidence: {results[0][&#39;confidence&#39;]:.3f})&quot;)</span>
-
-<span class="sd">        Process numpy arrays:</span>
-
-<span class="sd">        &gt;&gt;&gt; import cv2</span>
-<span class="sd">        &gt;&gt;&gt; img = cv2.imread(&quot;word.jpg&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; img_rgb = cv2.cvtColor(img, cv2.COLOR_BGR2RGB)</span>
-<span class="sd">        &gt;&gt;&gt; results = recognizer.predict(img_rgb)</span>
-<span class="sd">        &gt;&gt;&gt; print(results[0][&quot;text&quot;])</span>
+<span class="sd">        Run ONNX inference on prepared word image list.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="c1"># Initialize session on first call</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_session</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_initialize_session</span><span class="p">()</span>
 
-        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">images</span><span class="p">,</span> <span class="nb">list</span><span class="p">):</span>
-            <span class="n">images_list</span> <span class="o">=</span> <span class="p">[</span><span class="n">images</span><span class="p">]</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">images_list</span> <span class="o">=</span> <span class="n">images</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">images</span><span class="p">:</span>
+            <span class="k">return</span> <span class="p">[]</span>
 
         <span class="n">results</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
 
         <span class="c1"># Process images in batches</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">images_list</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">):</span>
-            <span class="n">batch_images</span> <span class="o">=</span> <span class="n">images_list</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">]</span>
+        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">images</span><span class="p">),</span> <span class="n">batch_size</span><span class="p">):</span>
+            <span class="n">batch_images</span> <span class="o">=</span> <span class="n">images</span><span class="p">[</span><span class="n">i</span> <span class="p">:</span> <span class="n">i</span> <span class="o">+</span> <span class="n">batch_size</span><span class="p">]</span>
 
             <span class="c1"># Preprocess batch</span>
             <span class="n">batch_tensors</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1106,7 +1085,7 @@ window.addEventListener("load", load);</script>
             <span class="c1"># Decode predictions</span>
             <span class="n">preds</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">argmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># [B, max_length]</span>
 
-            <span class="c1"># Calculate confidence (softmax + mean log prob)</span>
+            <span class="c1"># Calculate confidence (softmax + mean prob)</span>
             <span class="n">probs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_softmax</span><span class="p">(</span><span class="n">logits</span><span class="p">,</span> <span class="n">axis</span><span class="o">=-</span><span class="mi">1</span><span class="p">)</span>  <span class="c1"># [B, T, num_classes]</span>
 
             <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">batch_images</span><span class="p">)):</span>
@@ -1135,7 +1114,96 @@ window.addEventListener("load", load);</script>
 
                 <span class="n">results</span><span class="o">.</span><span class="n">append</span><span class="p">({</span><span class="s2">&quot;text&quot;</span><span class="p">:</span> <span class="n">text</span><span class="p">,</span> <span class="s2">&quot;confidence&quot;</span><span class="p">:</span> <span class="n">confidence</span><span class="p">})</span>
 
-        <span class="k">return</span> <span class="n">results</span></div>
+        <span class="k">return</span> <span class="n">results</span>
+
+<div class="viewcode-block" id="TRBA.predict">
+<a class="viewcode-back" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.predict">[docs]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span>
+        <span class="bp">self</span><span class="p">,</span>
+        <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span>
+        <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">32</span><span class="p">,</span>
+        <span class="n">min_text_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Recognize text for words in a ``Page`` and return updated ``Page``.</span>
+
+<span class="sd">        Parameters</span>
+<span class="sd">        ----------</span>
+<span class="sd">        page : Page</span>
+<span class="sd">            Page object with detected word polygons.</span>
+<span class="sd">        image : str, Path, numpy.ndarray, or PIL.Image, optional</span>
+<span class="sd">            Source page image used to extract word crops. If ``None``,</span>
+<span class="sd">            recognition is skipped and a deep copy of ``page`` is returned.</span>
+<span class="sd">        batch_size : int, optional</span>
+<span class="sd">            Number of word crops to process simultaneously. Larger batches are</span>
+<span class="sd">            faster but require more memory. Default is 32.</span>
+<span class="sd">        min_text_size : int, optional</span>
+<span class="sd">            Minimum crop width/height in pixels to run recognition for a word.</span>
+<span class="sd">            Words below this threshold are left unchanged. Default is 5.</span>
+
+<span class="sd">        Returns</span>
+<span class="sd">        -------</span>
+<span class="sd">        Page</span>
+<span class="sd">            New Page object with recognized ``text`` and</span>
+<span class="sd">            ``recognition_confidence`` filled for processed words.</span>
+
+<span class="sd">        Examples</span>
+<span class="sd">        --------</span>
+<span class="sd">        Recognize words inside detected page:</span>
+
+<span class="sd">        &gt;&gt;&gt; from manuscript.detectors import EAST</span>
+<span class="sd">        &gt;&gt;&gt; from manuscript.recognizers import TRBA</span>
+<span class="sd">        &gt;&gt;&gt; detector = EAST()</span>
+<span class="sd">        &gt;&gt;&gt; recognizer = TRBA()</span>
+<span class="sd">        &gt;&gt;&gt; det = detector.predict(&quot;page.jpg&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; recognized_page = recognizer.predict(det[&quot;page&quot;], image=&quot;page.jpg&quot;)</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">result_page</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">image</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result_page</span>
+
+        <span class="n">image_array</span> <span class="o">=</span> <span class="n">read_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+        <span class="n">word_images</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">word_objects</span> <span class="o">=</span> <span class="p">[]</span>
+
+        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">result_page</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
+                <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
+                    <span class="n">poly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">polygon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">poly</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">continue</span>
+
+                    <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">poly</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">poly</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="n">width</span> <span class="o">=</span> <span class="n">x_max</span> <span class="o">-</span> <span class="n">x_min</span>
+                    <span class="n">height</span> <span class="o">=</span> <span class="n">y_max</span> <span class="o">-</span> <span class="n">y_min</span>
+
+                    <span class="k">if</span> <span class="n">width</span> <span class="o">&lt;</span> <span class="n">min_text_size</span> <span class="ow">or</span> <span class="n">height</span> <span class="o">&lt;</span> <span class="n">min_text_size</span><span class="p">:</span>
+                        <span class="k">continue</span>
+
+                    <span class="n">region_image</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_extract_word_image</span><span class="p">(</span>
+                        <span class="n">image_array</span><span class="p">,</span> <span class="n">poly</span><span class="o">.</span><span class="n">astype</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
+                    <span class="p">)</span>
+                    <span class="k">if</span> <span class="n">region_image</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">region_image</span><span class="o">.</span><span class="n">size</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="k">continue</span>
+
+                    <span class="n">word_images</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">region_image</span><span class="p">)</span>
+                    <span class="n">word_objects</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">word_images</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result_page</span>
+
+        <span class="n">recognition_results</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_predict_word_images</span><span class="p">(</span>
+            <span class="n">word_images</span><span class="p">,</span> <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span>
+        <span class="p">)</span>
+
+        <span class="k">for</span> <span class="n">word_obj</span><span class="p">,</span> <span class="n">rec</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">word_objects</span><span class="p">,</span> <span class="n">recognition_results</span><span class="p">):</span>
+            <span class="n">word_obj</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s2">&quot;text&quot;</span><span class="p">]</span>
+            <span class="n">word_obj</span><span class="o">.</span><span class="n">recognition_confidence</span> <span class="o">=</span> <span class="n">rec</span><span class="p">[</span><span class="s2">&quot;confidence&quot;</span><span class="p">]</span>
+
+        <span class="k">return</span> <span class="n">result_page</span></div>
 
 
     <span class="nd">@staticmethod</span>
@@ -1254,10 +1322,10 @@ window.addEventListener("load", load);</script>
 <span class="sd">        scheduler : {&quot;ReduceLROnPlateau&quot;, &quot;CosineAnnealingLR&quot;, &quot;OneCycleLR&quot;, &quot;None&quot;}, optional</span>
 <span class="sd">            Learning rate scheduler type:</span>
 
-<span class="sd">            - ``&quot;OneCycleLR&quot;`` — one-cycle policy with cosine annealing (default, recommended)</span>
-<span class="sd">            - ``&quot;ReduceLROnPlateau&quot;`` — reduce LR on validation loss plateau</span>
-<span class="sd">            - ``&quot;CosineAnnealingLR&quot;`` — cosine annealing over epochs</span>
-<span class="sd">            - ``&quot;None&quot;`` or ``None`` — constant learning rate</span>
+<span class="sd">            - ``&quot;OneCycleLR&quot;`` - one-cycle policy with cosine annealing (default, recommended)</span>
+<span class="sd">            - ``&quot;ReduceLROnPlateau&quot;`` - reduce LR on validation loss plateau</span>
+<span class="sd">            - ``&quot;CosineAnnealingLR&quot;`` - cosine annealing over epochs</span>
+<span class="sd">            - ``&quot;None&quot;`` or ``None`` - constant learning rate</span>
 
 <span class="sd">            Default is ``&quot;OneCycleLR&quot;``.</span>
 <span class="sd">        weight_decay : float, optional</span>
@@ -1292,9 +1360,9 @@ window.addEventListener("load", load);</script>
 <span class="sd">        pretrain_weights : str, Path, bool, or None, optional</span>
 <span class="sd">            Pretrained weights to initialize from:</span>
 
-<span class="sd">            - ``&quot;default&quot;`` or ``True`` — use release weights</span>
-<span class="sd">            - ``None`` or ``False`` — train from scratch</span>
-<span class="sd">            - str/Path — path or URL to custom weights file</span>
+<span class="sd">            - ``&quot;default&quot;`` or ``True`` - use release weights</span>
+<span class="sd">            - ``None`` or ``False`` - train from scratch</span>
+<span class="sd">            - str/Path - path or URL to custom weights file</span>
 
 <span class="sd">            Default is ``&quot;default&quot;``.</span>
 <span class="sd">        **extra_config : dict, optional</span>
@@ -1609,8 +1677,11 @@ window.addEventListener("load", load);</script>
 
 <span class="sd">        Use the exported model for inference:</span>
 
+<span class="sd">        &gt;&gt;&gt; from manuscript.detectors import EAST</span>
 <span class="sd">        &gt;&gt;&gt; recognizer = TRBA(weights=&quot;trba_model.onnx&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; result = recognizer.predict(&quot;word_image.jpg&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; detector = EAST()</span>
+<span class="sd">        &gt;&gt;&gt; det = detector.predict(&quot;page.jpg&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; result = recognizer.predict(det[&quot;page&quot;], image=&quot;page.jpg&quot;)</span>
 
 <span class="sd">        See Also</span>
 <span class="sd">        --------</span>
@@ -1804,6 +1875,7 @@ window.addEventListener("load", load);</script>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Output shape: [batch_size, </span><span class="si">{</span><span class="n">max_length</span><span class="si">}</span><span class="s2">, </span><span class="si">{</span><span class="n">num_classes</span><span class="si">}</span><span class="s2">]&quot;</span><span class="p">)</span>
         <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Decoding: Greedy (argmax over last dimension)&quot;</span><span class="p">)</span></div>
 </div>
+
 
 </pre></div>
 

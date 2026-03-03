@@ -1,4 +1,5 @@
 import pytest
+import numpy as np
 from copy import deepcopy
 
 from manuscript.data import Word, Line, Block, Page
@@ -63,13 +64,13 @@ class TestBaseCorrector:
             def _initialize_session(self):
                 pass
 
-            def predict(self, page: Page) -> Page:
+            def predict(self, page: Page, image=None) -> Page:
                 return page.model_copy(deep=True)
 
         corrector = MinimalCorrector()
         page = create_sample_page()
 
-        result = corrector.predict(page)
+        result = corrector.predict(page, image=np.zeros((16, 16, 3), dtype=np.uint8))
         assert isinstance(result, Page)
 
     def test_base_model_call_invokes_predict(self):
@@ -88,14 +89,14 @@ class TestBaseCorrector:
             def _initialize_session(self):
                 pass
 
-            def predict(self, page: Page) -> Page:
+            def predict(self, page: Page, image=None) -> Page:
                 self.call_count += 1
                 return page.model_copy(deep=True)
 
         corrector = CallableCorrector()
         page = create_sample_page()
 
-        result = corrector(page)
+        result = corrector(page, image=np.zeros((16, 16, 3), dtype=np.uint8))
 
         assert corrector.call_count == 1
         assert isinstance(result, Page)
@@ -127,6 +128,16 @@ class TestCharLM:
         page = create_sample_page()
 
         result = corrector.predict(page)
+
+        assert isinstance(result, Page)
+
+    def test_charlm_accepts_optional_image_argument(self):
+        """CharLM.predict accepts optional image argument and returns Page."""
+        corrector = CharLM(weights=None)
+        page = create_sample_page()
+        image = np.zeros((64, 64, 3), dtype=np.uint8)
+
+        result = corrector.predict(page, image=image)
 
         assert isinstance(result, Page)
 
@@ -302,7 +313,7 @@ class TestCustomCorrector:
             def _initialize_session(self):
                 pass
             
-            def predict(self, page: Page) -> Page:
+            def predict(self, page: Page, image=None) -> Page:
                 result = page.model_copy(deep=True)
                 for block in result.blocks:
                     for line in block.lines:
@@ -335,7 +346,7 @@ class TestCustomCorrector:
             def _initialize_session(self):
                 pass
             
-            def predict(self, page: Page) -> Page:
+            def predict(self, page: Page, image=None) -> Page:
                 result = page.model_copy(deep=True)
                 for block in result.blocks:
                     for line in block.lines:
@@ -367,7 +378,7 @@ class TestCustomCorrector:
             def _initialize_session(self):
                 pass
             
-            def predict(self, page: Page) -> Page:
+            def predict(self, page: Page, image=None) -> Page:
                 result = page.model_copy(deep=True)
                 for block in result.blocks:
                     for line in block.lines:

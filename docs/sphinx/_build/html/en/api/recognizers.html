@@ -18,6 +18,7 @@
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/language_switcher.js?v=db730534"></script>
+      <script src="../_static/version_sidebar.js?v=edadfa97"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -247,10 +248,10 @@ Default is <code class="docutils literal notranslate"><span class="pre">1.5</spa
 <p class="rubric">Notes</p>
 <p>The class provides three main public methods:</p>
 <ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">predict</span></code> — run text recognition inference on cropped word images.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">train</span></code> — high-level training entrypoint to train a TRBA model
+<li><p><code class="docutils literal notranslate"><span class="pre">predict</span></code> - run recognition over words in a <code class="docutils literal notranslate"><span class="pre">Page</span></code> object.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">train</span></code> - high-level training entrypoint to train a TRBA model
 on custom datasets.</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">export</span></code> — static method to export PyTorch model to ONNX format.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">export</span></code> - static method to export PyTorch model to ONNX format.</p></li>
 </ul>
 <p>Model uses ONNX Runtime for fast inference on CPU and GPU.
 For GPU acceleration, install: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">onnxruntime-gpu</span></code></p>
@@ -284,8 +285,8 @@ For GPU acceleration, install: <code class="docutils literal notranslate"><span 
 <tr class="row-even"><td><p><a class="reference internal" href="#manuscript.recognizers.TRBA.export" title="manuscript.recognizers.TRBA.export"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export</span></code></a>(weights_path, config_path, ...[, ...])</p></td>
 <td><p>Export TRBA PyTorch model to ONNX format.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#manuscript.recognizers.TRBA.predict" title="manuscript.recognizers.TRBA.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(images[, batch_size])</p></td>
-<td><p>Run text recognition on one or more word images.</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#manuscript.recognizers.TRBA.predict" title="manuscript.recognizers.TRBA.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(page[, image, batch_size, min_text_size])</p></td>
+<td><p>Recognize text for words in a <code class="docutils literal notranslate"><span class="pre">Page</span></code> and return updated <code class="docutils literal notranslate"><span class="pre">Page</span></code>.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">runtime_providers</span></code>()</p></td>
 <td><p>Get ONNX Runtime execution providers based on device.</p></td>
@@ -333,49 +334,36 @@ For GPU acceleration, install: <code class="docutils literal notranslate"><span 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="manuscript.recognizers.TRBA.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/recognizers/_trba.html#TRBA.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.recognizers.TRBA.predict" title="Link to this definition"></a></dt>
-<dd><p>Run text recognition on one or more word images.</p>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_text_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/recognizers/_trba.html#TRBA.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.recognizers.TRBA.predict" title="Link to this definition"></a></dt>
+<dd><p>Recognize text for words in a <code class="docutils literal notranslate"><span class="pre">Page</span></code> and return updated <code class="docutils literal notranslate"><span class="pre">Page</span></code>.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>images</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, </em><em>PIL.Image</em><em>, or </em><em>list thereof</em>) – <p>Single image or list of images to recognize. Each image can be:</p>
-<ul>
-<li><p>Path to image file (str or Path)</p></li>
-<li><p>RGB numpy array with shape <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W,</span> <span class="pre">3)</span></code> in <code class="docutils literal notranslate"><span class="pre">uint8</span></code></p></li>
-<li><p>PIL Image object</p></li>
-</ul>
-</p></li>
-<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Number of images to process simultaneously. Larger batches are
+<li><p><strong>page</strong> (<a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page"><em>Page</em></a>) – Page object with detected word polygons.</p></li>
+<li><p><strong>image</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em>, </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a><em>, or </em><em>PIL.Image</em><em>, </em><em>optional</em>) – Source page image used to extract word crops. If <code class="docutils literal notranslate"><span class="pre">None</span></code>,
+recognition is skipped and a deep copy of <code class="docutils literal notranslate"><span class="pre">page</span></code> is returned.</p></li>
+<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Number of word crops to process simultaneously. Larger batches are
 faster but require more memory. Default is 32.</p></li>
+<li><p><strong>min_text_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Minimum crop width/height in pixels to run recognition for a word.
+Words below this threshold are left unchanged. Default is 5.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p><p>Recognition results as list of dictionaries, each containing:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;text&quot;</span></code> : str — recognized text</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;confidence&quot;</span></code> : float — recognition confidence in [0, 1]</p></li>
-</ul>
-<p>If input is a single image, returns a list with one element.</p>
-</p>
+<dd class="field-even"><p>New Page object with recognized <code class="docutils literal notranslate"><span class="pre">text</span></code> and
+<code class="docutils literal notranslate"><span class="pre">recognition_confidence</span></code> filled for processed words.</p>
 </dd>
 <dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(in Python v3.14)">list</a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
+<dd class="field-odd"><p><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page">Page</a></p>
 </dd>
 </dl>
 <p class="rubric">Examples</p>
-<p>Recognize single image:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.recognizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRBA</span>
+<p>Recognize words inside detected page:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.recognizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRBA</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">detector</span> <span class="o">=</span> <span class="n">EAST</span><span class="p">()</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">recognizer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;word_image.jpg&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Text: &#39;</span><span class="si">{</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;text&#39;</span><span class="p">]</span><span class="si">}</span><span class="s2">&#39; (confidence: </span><span class="si">{</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s1">&#39;confidence&#39;</span><span class="p">]</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">)&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-<p>Process numpy arrays:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">import</span><span class="w"> </span><span class="nn">cv2</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">imread</span><span class="p">(</span><span class="s2">&quot;word.jpg&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">img_rgb</span> <span class="o">=</span> <span class="n">cv2</span><span class="o">.</span><span class="n">cvtColor</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">cv2</span><span class="o">.</span><span class="n">COLOR_BGR2RGB</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">results</span> <span class="o">=</span> <span class="n">recognizer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">img_rgb</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">results</span><span class="p">[</span><span class="mi">0</span><span class="p">][</span><span class="s2">&quot;text&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">det</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;page.jpg&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">recognized_page</span> <span class="o">=</span> <span class="n">recognizer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">det</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">],</span> <span class="n">image</span><span class="o">=</span><span class="s2">&quot;page.jpg&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 </dd></dl>
@@ -423,10 +411,10 @@ Default is 5.0.</p></li>
 <li><p><strong>optimizer</strong> (<em>{&quot;Adam&quot;</em><em>, </em><em>&quot;SGD&quot;</em><em>, </em><em>&quot;AdamW&quot;}</em><em>, </em><em>optional</em>) – Optimizer type. Default is <code class="docutils literal notranslate"><span class="pre">&quot;AdamW&quot;</span></code>.</p></li>
 <li><p><strong>scheduler</strong> (<em>{&quot;ReduceLROnPlateau&quot;</em><em>, </em><em>&quot;CosineAnnealingLR&quot;</em><em>, </em><em>&quot;OneCycleLR&quot;</em><em>, </em><em>&quot;None&quot;}</em><em>, </em><em>optional</em>) – <p>Learning rate scheduler type:</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;OneCycleLR&quot;</span></code> — one-cycle policy with cosine annealing (default, recommended)</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;ReduceLROnPlateau&quot;</span></code> — reduce LR on validation loss plateau</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;CosineAnnealingLR&quot;</span></code> — cosine annealing over epochs</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;None&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code> — constant learning rate</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;OneCycleLR&quot;</span></code> - one-cycle policy with cosine annealing (default, recommended)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;ReduceLROnPlateau&quot;</span></code> - reduce LR on validation loss plateau</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;CosineAnnealingLR&quot;</span></code> - cosine annealing over epochs</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;None&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code> - constant learning rate</p></li>
 </ul>
 <p>Default is <code class="docutils literal notranslate"><span class="pre">&quot;OneCycleLR&quot;</span></code>.</p>
 </p></li>
@@ -448,9 +436,9 @@ Default is <code class="docutils literal notranslate"><span class="pre">None</sp
 <li><p><strong>freeze_attention</strong> (<em>{&quot;none&quot;</em><em>, </em><em>&quot;all&quot;}</em><em>, </em><em>optional</em>) – Attention module freezing policy. Default is <code class="docutils literal notranslate"><span class="pre">&quot;none&quot;</span></code>.</p></li>
 <li><p><strong>pretrain_weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, or </em><em>None</em><em>, </em><em>optional</em>) – <p>Pretrained weights to initialize from:</p>
 <ul>
-<li><p><code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">True</span></code> — use release weights</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code> — train from scratch</p></li>
-<li><p>str/Path — path or URL to custom weights file</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">True</span></code> - use release weights</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code> or <code class="docutils literal notranslate"><span class="pre">False</span></code> - train from scratch</p></li>
+<li><p>str/Path - path or URL to custom weights file</p></li>
 </ul>
 <p>Default is <code class="docutils literal notranslate"><span class="pre">&quot;default&quot;</span></code>.</p>
 </p></li>
@@ -613,8 +601,11 @@ during training and is not included in the ONNX model.</p>
 </pre></div>
 </div>
 <p>Use the exported model for inference:</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;trba_model.onnx&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">recognizer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;word_image.jpg&quot;</span><span class="p">)</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;trba_model.onnx&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">detector</span> <span class="o">=</span> <span class="n">EAST</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">det</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;page.jpg&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">recognizer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">det</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">],</span> <span class="n">image</span><span class="o">=</span><span class="s2">&quot;page.jpg&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
 <div class="admonition seealso">

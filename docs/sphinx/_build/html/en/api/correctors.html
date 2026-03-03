@@ -18,6 +18,7 @@
       <script src="../_static/doctools.js?v=fd6eb6e6"></script>
       <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="../_static/language_switcher.js?v=db730534"></script>
+      <script src="../_static/version_sidebar.js?v=edadfa97"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -258,7 +259,7 @@ Default is 0.05.</p></li>
 <tr class="row-even"><td><p><a class="reference internal" href="#manuscript.correctors.CharLM.export" title="manuscript.correctors.CharLM.export"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export</span></code></a>(weights_path, vocab_path, output_path)</p></td>
 <td><p>Export CharLM PyTorch model to ONNX format.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#manuscript.correctors.CharLM.predict" title="manuscript.correctors.CharLM.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(page)</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#manuscript.correctors.CharLM.predict" title="manuscript.correctors.CharLM.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(page[, image])</p></td>
 <td><p>Apply character-level correction to a Page.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">runtime_providers</span></code>()</p></td>
@@ -316,11 +317,16 @@ Default is 0.05.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="manuscript.correctors.CharLM.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/correctors/_charlm.html#CharLM.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.correctors.CharLM.predict" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/correctors/_charlm.html#CharLM.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.correctors.CharLM.predict" title="Link to this definition"></a></dt>
 <dd><p>Apply character-level correction to a Page.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>page</strong> (<a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page"><em>Page</em></a>) – Input Page object with recognized text.</p>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>page</strong> (<a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page"><em>Page</em></a>) – Input Page object with recognized text.</p></li>
+<li><p><strong>image</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Optional source image associated with <code class="docutils literal notranslate"><span class="pre">page</span></code>.
+Reserved for integrations that may pass the original image
+to correctors. <code class="docutils literal notranslate"><span class="pre">CharLM</span></code> does not use this argument.</p></li>
+</ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p>Corrected Page object with updated word texts.</p>
@@ -457,6 +463,10 @@ corrections based on learned patterns.</p>
 <span class="c1"># Apply correction (using default prereform model)</span>
 <span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">()</span>
 <span class="n">corrected</span> <span class="o">=</span> <span class="n">corrector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+
+<span class="c1"># Optional: pass source image for context-aware custom correctors</span>
+<span class="c1"># (CharLM currently ignores this argument)</span>
+<span class="c1"># corrected = corrector.predict(page, image=image_array)</span>
 
 <span class="c1"># Extract corrected text</span>
 <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">corrected</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>

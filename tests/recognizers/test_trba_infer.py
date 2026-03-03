@@ -4,6 +4,7 @@ import numpy as np
 from PIL import Image
 
 from manuscript.recognizers import TRBA
+from manuscript.data import Word, Line, Block, Page
 
 
 class TestTRBAInitialization:
@@ -328,3 +329,106 @@ class TestTRBAAPI:
         assert callable(TRBA.train)
         assert hasattr(TRBA, 'export')
         assert callable(TRBA.export)
+
+
+class TestTRBAPredictPageInterface:
+    """Tests for Page-based recognizer API."""
+
+    def _create_recognizer(self, tmp_path):
+        weights_file = tmp_path / "model.onnx"
+        config_file = tmp_path / "model.json"
+        charset_file = tmp_path / "model.txt"
+
+        weights_file.write_text("mock_onnx")
+        config_file.write_text('{"max_len": 25, "hidden_size": 256, "img_h": 64, "img_w": 256}')
+        charset_file.write_text("<PAD>\n<SOS>\n<EOS>\na\nb\nc")
+
+        return TRBA(
+            weights=str(weights_file),
+            config=str(config_file),
+            charset=str(charset_file),
+            device="cpu",
+        )
+
+    @staticmethod
+    def _create_page() -> Page:
+        words = [
+            Word(
+                polygon=[(10.0, 10.0), (80.0, 10.0), (80.0, 40.0), (10.0, 40.0)],
+                detection_confidence=0.95,
+            ),
+            Word(
+                polygon=[(90.0, 10.0), (160.0, 10.0), (160.0, 40.0), (90.0, 40.0)],
+                detection_confidence=0.92,
+            ),
+        ]
+        return Page(blocks=[Block(lines=[Line(words=words)])])
+
+    def test_predict_accepts_page_and_returns_page(self, tmp_path):
+        recognizer = self._create_recognizer(tmp_path)
+        page = self._create_page()
+        image = np.zeros((64, 180, 3), dtype=np.uint8)
+
+        with patch.object(
+            recognizer,
+            "_predict_word_images",
+            return_value=[
+                {"text": "word1", "confidence": 0.9},
+                {"text": "word2", "confidence": 0.85},
+            ],
+        ) as mocked:
+            result = recognizer.predict(page, image=image, min_text_size=1)
+
+        assert isinstance(result, Page)
+        assert result is not page
+        assert result.blocks[0].lines[0].words[0].text == "word1"
+        assert result.blocks[0].lines[0].words[1].text == "word2"
+        assert result.blocks[0].lines[0].words[0].recognition_confidence == 0.9
+        assert result.blocks[0].lines[0].words[1].recognition_confidence == 0.85
+        mocked.assert_called_once()
+
+    def test_predict_without_image_returns_copy(self, tmp_path):
+        recognizer = self._create_recognizer(tmp_path)
+        page = self._create_page()
+
+        result = recognizer.predict(page, image=None)
+
+        assert isinstance(result, Page)
+        assert result is not page
+        assert result.blocks[0].lines[0].words[0].text is None
+        assert result.blocks[0].lines[0].words[1].text is None
+
+    def test_predict_respects_min_text_size(self, tmp_path):
+        recognizer = self._create_recognizer(tmp_path)
+        page = Page(
+            blocks=[
+                Block(
+                    lines=[
+                        Line(
+                            words=[
+                                Word(
+                                    polygon=[(10.0, 10.0), (12.0, 10.0), (12.0, 12.0), (10.0, 12.0)],
+                                    detection_confidence=0.9,
+                                ),
+                                Word(
+                                    polygon=[(20.0, 10.0), (100.0, 10.0), (100.0, 40.0), (20.0, 40.0)],
+                                    detection_confidence=0.9,
+                                ),
+                            ]
+                        )
+                    ]
+                )
+            ]
+        )
+        image = np.zeros((64, 180, 3), dtype=np.uint8)
+
+        with patch.object(
+            recognizer,
+            "_predict_word_images",
+            return_value=[{"text": "big", "confidence": 0.88}],
+        ) as mocked:
+            result = recognizer.predict(page, image=image, min_text_size=5)
+
+        assert result.blocks[0].lines[0].words[0].text is None
+        assert result.blocks[0].lines[0].words[1].text == "big"
+        mocked.assert_called_once()

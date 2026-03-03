@@ -46,7 +46,7 @@ Overview of the manuscript-ocr library architecture.
 
         %% Recognizers
         recognizers --> TRBA["TRBA<br/><i>Text Recognition with BiLSTM + Attention</i>"]
-        TRBA --> trba_predict["predict()<br/><i>→ List[Dict[str, Any]]</i>"]
+        TRBA --> trba_predict["predict(page, image=None)<br/><i>→ Page</i>"]
         TRBA --> trba_train["train()<br/><i>→ None</i>"]
         TRBA --> trba_export["export()<br/><i>→ str</i>"]
 

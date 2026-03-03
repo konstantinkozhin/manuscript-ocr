@@ -5,7 +5,7 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>manuscript.correctors._charlm &mdash; manuscript-ocr 0.1.11 documentation</title>
+  <title>manuscript.correctors._charlm &mdash; manuscript-ocr 0.1.10 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
       <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/language_switcher.css?v=d768f156" />
@@ -13,9 +13,9 @@
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=1e825a29"></script>
-      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/documentation_options.js?v=bafade30"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
       <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
 
@@ -452,6 +452,7 @@ mermaid.initialize(
 
 window.addEventListener("load", load);</script>
       <script src="../../../_static/language_switcher.js?v=db730534"></script>
+      <script src="../../../_static/version_sidebar.js?v=edadfa97"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -859,7 +860,7 @@ window.addEventListener("load", load);</script>
 
 <div class="viewcode-block" id="CharLM.predict">
 <a class="viewcode-back" href="../../../api/correctors.html#manuscript.correctors.CharLM.predict">[docs]</a>
-    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Apply character-level correction to a Page.</span>
 
@@ -867,12 +868,18 @@ window.addEventListener("load", load);</script>
 <span class="sd">        ----------</span>
 <span class="sd">        page : Page</span>
 <span class="sd">            Input Page object with recognized text.</span>
+<span class="sd">        image : np.ndarray, optional</span>
+<span class="sd">            Optional source image associated with ``page``.</span>
+<span class="sd">            Reserved for integrations that may pass the original image</span>
+<span class="sd">            to correctors. ``CharLM`` does not use this argument.</span>
 
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
 <span class="sd">        Page</span>
 <span class="sd">            Corrected Page object with updated word texts.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">_</span> <span class="o">=</span> <span class="n">image</span>  <span class="c1"># Intentionally unused in CharLM.</span>
+
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">weights</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">c2i</span><span class="p">:</span>
             <span class="k">return</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 

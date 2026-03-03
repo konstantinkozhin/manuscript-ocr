@@ -50,20 +50,58 @@ class DummyDetector:
 class DummyRecognizer:
     def __init__(self):
         self.call_count = 0
+        self.last_image = None
+        self.last_min_text_size = None
 
     def predict(
-        self, images: List[np.ndarray], batch_size: int = 32
-    ) -> List[Dict[str, Any]]:
+        self,
+        page: Page,
+        image: np.ndarray = None,
+        batch_size: int = 32,
+        min_text_size: int = 5,
+    ) -> Page:
         self.call_count += 1
+        self.last_image = image
+        self.last_min_text_size = min_text_size
 
-        results = []
-        for i, img in enumerate(images):
-            results.append({
-                "text": f"word{i + 1}",
-                "confidence": 0.9 - i * 0.05
-            })
+        result = page.model_copy(deep=True)
+        recognized_idx = 0
 
-        return results
+        for block in result.blocks:
+            for line in block.lines:
+                for word in line.words:
+                    poly = np.array(word.polygon, dtype=np.float32)
+                    x_min, y_min = np.min(poly, axis=0)
+                    x_max, y_max = np.max(poly, axis=0)
+                    width = x_max - x_min
+                    height = y_max - y_min
+
+                    if width < min_text_size or height < min_text_size:
+                        continue
+
+                    recognized_idx += 1
+                    word.text = f"word{recognized_idx}"
+                    word.recognition_confidence = 0.9 - (recognized_idx - 1) * 0.05
+
+        return result
+
+
+class DummyCorrector:
+    def __init__(self):
+        self.call_count = 0
+        self.last_image = None
+
+    def predict(self, page: Page, image: np.ndarray = None) -> Page:
+        self.call_count += 1
+        self.last_image = image
+
+        result = page.model_copy(deep=True)
+        for block in result.blocks:
+            for line in block.lines:
+                for word in line.words:
+                    if word.text:
+                        word.text = word.text + "_corr"
+        return result
 
 
 class TestPipelineAPICompatibility:
@@ -245,8 +283,10 @@ class TestPipelineAPICompatibility:
         img = np.zeros((100, 400, 3), dtype=np.uint8)
         result = pipeline.predict(img, recognize_text=True, vis=False)
 
-        # Recognizer should not be called because all boxes are filtered out
-        assert recognizer.call_count == 0
+        # Recognizer is called, but no words satisfy min_text_size
+        assert recognizer.call_count == 1
+        page = result["page"]
+        assert page.blocks[0].lines[0].words[0].text is None
 
     def test_pipeline_confidence_preservation(self):
         """Test that confidence scores are properly preserved"""
@@ -270,6 +310,24 @@ class TestPipelineAPICompatibility:
         assert words[0].recognition_confidence == 0.9
         assert words[1].recognition_confidence == 0.85
         assert words[2].recognition_confidence == 0.8
+
+    def test_pipeline_with_corrector_optional_image_signature(self):
+        """Pipeline supports correctors that accept optional image argument."""
+        detector = DummyDetector()
+        recognizer = DummyRecognizer()
+        corrector = DummyCorrector()
+
+        pipeline = Pipeline(detector=detector, recognizer=recognizer, corrector=corrector)
+
+        img = np.zeros((100, 400, 3), dtype=np.uint8)
+        result = pipeline.predict(img)
+
+        page = result["page"]
+        assert page.blocks[0].lines[0].words[0].text == "word1_corr"
+        assert page.blocks[0].lines[0].words[1].text == "word2_corr"
+        assert page.blocks[0].lines[0].words[2].text == "word3_corr"
+        assert corrector.call_count == 1
+        assert corrector.last_image is None
 
 
 class TestDummyImplementations:
@@ -310,29 +368,34 @@ class TestDummyImplementations:
         assert isinstance(result["geo_map"], np.ndarray)
 
     def test_dummy_recognizer_returns_correct_format(self):
-        """Test DummyRecognizer returns list of dicts"""
+        """Test DummyRecognizer returns Page and fills recognition fields."""
         recognizer = DummyRecognizer()
-        images = [np.zeros((64, 256, 3), dtype=np.uint8) for _ in range(3)]
+        page = DummyDetector().predict(np.zeros((100, 100, 3), dtype=np.uint8))["page"]
+        image = np.zeros((100, 400, 3), dtype=np.uint8)
 
-        results = recognizer.predict(images)
+        result_page = recognizer.predict(page, image=image)
 
-        assert len(results) == 3
-        assert all(isinstance(r, dict) for r in results)
-        assert all("text" in r and "confidence" in r for r in results)
+        assert isinstance(result_page, Page)
+        words = result_page.blocks[0].lines[0].words
+        assert words[0].text == "word1"
+        assert words[1].text == "word2"
+        assert words[2].text == "word3"
 
     def test_dummy_recognizer_correct_content(self):
-        """Test DummyRecognizer returns correct text and confidence"""
+        """Test DummyRecognizer sets correct text and confidence."""
         recognizer = DummyRecognizer()
-        images = [np.zeros((64, 256, 3), dtype=np.uint8) for _ in range(3)]
+        page = DummyDetector().predict(np.zeros((100, 100, 3), dtype=np.uint8))["page"]
+        image = np.zeros((100, 400, 3), dtype=np.uint8)
 
-        results = recognizer.predict(images)
+        result_page = recognizer.predict(page, image=image)
+        words = result_page.blocks[0].lines[0].words
 
-        assert results[0]["text"] == "word1"
-        assert results[0]["confidence"] == 0.9
-        assert results[1]["text"] == "word2"
-        assert results[1]["confidence"] == 0.85
-        assert results[2]["text"] == "word3"
-        assert results[2]["confidence"] == 0.8
+        assert words[0].text == "word1"
+        assert words[0].recognition_confidence == 0.9
+        assert words[1].text == "word2"
+        assert words[1].recognition_confidence == 0.85
+        assert words[2].text == "word3"
+        assert words[2].recognition_confidence == 0.8
 
 
 def test_pipeline_integration_example():
@@ -443,10 +506,32 @@ class TestPipelineCropIntegration:
             def __init__(self):
                 self.received_shapes = []
             
-            def predict(self, images, batch_size=32):
-                for img in images:
-                    self.received_shapes.append(img.shape)
-                return [{"text": "test", "confidence": 0.9} for _ in images]
+            def predict(self, page, image=None, batch_size=32, min_text_size=5):
+                result = page.model_copy(deep=True)
+                if image is None:
+                    return result
+
+                for block in result.blocks:
+                    for line in block.lines:
+                        for word in line.words:
+                            poly = np.array(word.polygon, dtype=np.int32)
+                            x_min, y_min = np.min(poly, axis=0)
+                            x_max, y_max = np.max(poly, axis=0)
+
+                            w = x_max - x_min
+                            h = y_max - y_min
+                            if w < min_text_size or h < min_text_size:
+                                continue
+
+                            crop = image[y_min:y_max, x_min:x_max]
+                            if crop.size == 0:
+                                continue
+
+                            self.received_shapes.append(crop.shape)
+                            word.text = "test"
+                            word.recognition_confidence = 0.9
+
+                return result
         
         detector = VerticalWordDetector()
         recognizer = ShapeTrackingRecognizer()

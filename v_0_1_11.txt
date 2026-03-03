@@ -61,7 +61,7 @@ Files:
 - docs/sphinx/conf.py
 
 8) Text-crop rotation moved from Pipeline to TRBA recognizer (local)
-- Removed crop-rotation step from `Pipeline`; it now only extracts raw word crops.
+- Removed crop extraction/rotation logic from `Pipeline`; recognition now passes `Page` + source image to recognizer.
 - Rotation/orientation logic is now applied inside `TRBA` per crop during preprocessing.
 - Rotation control is configured via `TRBA(rotate_threshold=...)` instead of `Pipeline(...)`.
 - Updated pipeline docs/examples and tests to reflect the new behavior.
@@ -92,6 +92,39 @@ Files:
 Files:
 - docs/sphinx/_archive/0.1.10/*
 - .github/workflows/docs.yml
+
+11) Corrector API extended with optional image context (local)
+- Updated corrector contract to `predict(page, image=None) -> Page`.
+- `CharLM.predict` now accepts optional `image` argument (currently ignored by CharLM logic).
+- Updated custom-corrector tests and added coverage for optional image argument.
+- Updated API and Sphinx docs for corrector requirements and examples.
+
+Files:
+- src/manuscript/correctors/_charlm/__init__.py
+- src/manuscript/_pipeline.py
+- tests/correctors/test_correctors.py
+- tests/test_pipeline_api_compatibility.py
+- docs/sphinx/pipeline_usage.rst
+- docs/PIPELINE_API.md
+- docs/sphinx/api/correctors.rst
+- src/manuscript/api/LIBRARY_STRUCTURE.md
+
+12) Recognizer API switched to Page-through contract (local)
+- `TRBA.predict` now accepts `page` (required) and `image` (optional), and returns updated `Page`.
+- TRBA writes recognition output directly into `word.text` and `word.recognition_confidence`.
+- `Pipeline` now forwards detection `Page` into recognizer (instead of image list flow).
+- Added/updated tests for the new recognizer interface and min-text-size behavior.
+- Updated docs/examples to reflect `predict(page, image=None) -> Page`.
+
+Files:
+- src/manuscript/recognizers/_trba/__init__.py
+- src/manuscript/_pipeline.py
+- tests/test_pipeline_api_compatibility.py
+- tests/recognizers/test_trba_infer.py
+- docs/sphinx/pipeline_usage.rst
+- docs/PIPELINE_API.md
+- docs/sphinx/structure.rst
+- src/manuscript/api/LIBRARY_STRUCTURE.md
 
 Summary:
 - v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fixes).

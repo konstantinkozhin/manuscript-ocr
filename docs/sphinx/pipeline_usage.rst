@@ -54,21 +54,19 @@ See ``src/manuscript/data/structures.py`` for detailed structure documentation.
 Recognizer Requirements
 -----------------------
 
-A recognizer class must implement a ``predict`` method that takes a list of images and returns a list of results:
+A recognizer class must implement a ``predict`` method that takes a ``Page`` object and optionally the source image, then returns updated ``Page``:
 
 .. code-block:: python
 
-    def predict(self, images: List[np.ndarray]) -> List[Dict[str, Any]]:
+    def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
         """
         Parameters:
-        - images: list of numpy arrays (RGB word images)
+        - page: Page object with detected words
+        - image: optional source image (for crop extraction / context)
         
-        Returns list of dictionaries:
-        [
-            {"text": "word1", "confidence": 0.95},
-            {"text": "word2", "confidence": 0.92},
-            ...
-        ]
+        Returns:
+        - Page: Page object where recognizer fills word.text and
+          word.recognition_confidence
         """
         pass
 
@@ -76,27 +74,33 @@ A recognizer class must implement a ``predict`` method that takes a list of imag
 
 .. code-block:: python
 
+    from typing import Optional
+    import numpy as np
+    from manuscript.data import Page
+
     class MyRecognizer:
-        def predict(self, images):
-            results = []
-            for img in images:
-                # Your recognition logic
-                text = "recognized_text"
-                confidence = 0.92
-                results.append({"text": text, "confidence": confidence})
-            return results
+        def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
+            result = page.model_copy(deep=True)
+            for block in result.blocks:
+                for line in block.lines:
+                    for word in line.words:
+                        # Your recognition logic
+                        word.text = "recognized_text"
+                        word.recognition_confidence = 0.92
+            return result
 
 Corrector Requirements
 ----------------------
 
-A corrector class must implement a ``predict`` method that takes a Page object and returns a corrected Page:
+A corrector class must implement a ``predict`` method that takes a ``Page`` object and optionally the source image, then returns a corrected ``Page``:
 
 .. code-block:: python
 
-    def predict(self, page: Page) -> Page:
+    def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
         """
         Parameters:
         - page: Page object with recognized text
+        - image: optional source image (for context-aware correction)
         
         Returns:
         - Page: Page object with corrected text
@@ -107,10 +111,12 @@ A corrector class must implement a ``predict`` method that takes a Page object a
 
 .. code-block:: python
 
+    from typing import Optional
+    import numpy as np
     from manuscript.data import Page
 
     class MyCorrector:
-        def predict(self, page: Page) -> Page:
+        def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
             result = page.model_copy(deep=True)
             for block in result.blocks:
                 for line in block.lines:

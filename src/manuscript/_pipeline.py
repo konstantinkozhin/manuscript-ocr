@@ -1,4 +1,5 @@
 import time
+import inspect
 from pathlib import Path
 from typing import Dict, List, Optional, Union, TYPE_CHECKING
 
@@ -20,7 +21,7 @@ class Pipeline:
 
     The Pipeline class orchestrates EAST detector, TRBA recognizer, and optional
     text corrector to perform complete OCR workflow:
-    detection → crop extraction → recognition → correction → result merging.
+    detection -> recognition -> correction -> result merging.
 
     Attributes
     ----------
@@ -183,48 +184,27 @@ class Pipeline:
 
             return result
 
-        # ---- LOAD IMAGE FOR CROPPING ----
+        # ---- LOAD IMAGE FOR RECOGNITION ----
         t0 = time.time()
         image_array = read_image(image)
         if profile:
-            print(f"Load image for crops: {time.time() - t0:.3f}s")
-
-        # ---- EXTRACT WORD CROPS ----
-        t0 = time.time()
-        word_images = []
-        word_objects = []  # Keep references to Word objects for updating
-
-        for block in page.blocks:
-            for line in block.lines:
-                for word in line.words:
-                    poly = np.array(word.polygon, dtype=np.int32)
-                    x_min, y_min = np.min(poly, axis=0)
-                    x_max, y_max = np.max(poly, axis=0)
-
-                    width = x_max - x_min
-                    height = y_max - y_min
-
-                    # Filter by minimum size
-                    if width >= self.min_text_size and height >= self.min_text_size:
-                        region_image = self._extract_word_image(image_array, poly)
-                        if region_image is not None and region_image.size > 0:
-                            word_images.append(region_image)
-                            word_objects.append(word)
-
-        if profile:
-            print(f"Extract {len(word_images)} crops: {time.time() - t0:.3f}s")
+            print(f"Load image for recognition: {time.time() - t0:.3f}s")
 
         # ---- RECOGNITION ----
-        if word_images:
-            t0 = time.time()
-            recognition_results = self.recognizer.predict(word_images, batch_size=32)
-            if profile:
-                print(f"Recognition: {time.time() - t0:.3f}s")
+        t0 = time.time()
+        recognizer_kwargs = {"image": image_array}
+        try:
+            predict_params = inspect.signature(self.recognizer.predict).parameters
+            if "batch_size" in predict_params:
+                recognizer_kwargs["batch_size"] = 32
+            if "min_text_size" in predict_params:
+                recognizer_kwargs["min_text_size"] = self.min_text_size
+        except (TypeError, ValueError):
+            pass
 
-            # Update Word objects with recognition results
-            for word_obj, result in zip(word_objects, recognition_results):
-                word_obj.text = result["text"]
-                word_obj.recognition_confidence = result["confidence"]
+        page = self.recognizer.predict(page, **recognizer_kwargs)
+        if profile:
+            print(f"Recognition: {time.time() - t0:.3f}s")
 
         self._last_recognition_page = page.model_copy(deep=True)
 
@@ -295,41 +275,4 @@ class Pipeline:
     @property
     def last_correction_page(self) -> Optional[Page]:
         return self._last_correction_page
-
-    def _extract_word_image(
-        self, image: np.ndarray, polygon: np.ndarray
-    ) -> Optional[np.ndarray]:
-        """
-        Extract word region from image using polygon coordinates.
-
-        Parameters
-        ----------
-        image : np.ndarray
-            Input image (H, W, 3)
-        polygon : np.ndarray
-            Polygon coordinates [[x1,y1], [x2,y2], ...]
-
-        Returns
-        -------
-        np.ndarray or None
-            Cropped word image or None if extraction failed
-        """
-        try:
-            x_min, y_min = np.min(polygon, axis=0)
-            x_max, y_max = np.max(polygon, axis=0)
-
-            h, w = image.shape[:2]
-            x1 = max(0, int(x_min))
-            y1 = max(0, int(y_min))
-            x2 = min(w, int(x_max))
-            y2 = min(h, int(y_max))
-
-            region_image = image[y1:y2, x1:x2]
-
-            if region_image.size == 0:
-                return None
-
-            return region_image if region_image.size > 0 else None
-        except Exception:
-            return None
 
