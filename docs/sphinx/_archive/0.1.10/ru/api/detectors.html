@@ -1,0 +1,559 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ru" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Детекторы &mdash; документация manuscript-ocr 0.1.10</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/language_switcher.css?v=d768f156" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=d4fcfcff"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/translations.js?v=5b699b7f"></script>
+      <script src="../_static/language_switcher.js?v=db730534"></script>
+      <script src="../_static/version_sidebar.js?v=edadfa97"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Алфавитный указатель" href="../genindex.html" />
+    <link rel="search" title="Поиск" href="../search.html" />
+    <link rel="next" title="Распознаватели" href="recognizers.html" />
+    <link rel="prev" title="Структуры данных" href="data.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            manuscript-ocr
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Поиск в документации" aria-label="Поиск в документации" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Меню навигации">
+              <p class="caption" role="heading"><span class="caption-text">Содержание:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Начало работы</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#installation">Установка</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#quick-start">Быстрый старт</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#main-components">Основные компоненты</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pipeline_usage.html">Руководство по использованию Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#detector-requirements">Требования к детектору</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#result-structure">Структура результата</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#recognizer-requirements">Требования к распознавателю</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#corrector-requirements">Требования к корректору</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#built-in-charlm-corrector">Встроенный корректор CharLM</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#compatible-implementation-examples">Примеры совместимых реализаций</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#complete-detector-example">Полный пример детектора</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#using-custom-components">Использование кастомных компонентов</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#pipeline-usage-examples">Примеры использования Pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#basic-usage">Базовое использование</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#detection-only-without-recognition">Только детекция (без распознавания)</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#with-visualization">С визуализацией</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#intermediate-results">Промежуточные результаты</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#export-import-page-to-json">Экспорт/импорт Page в JSON</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#with-profiling">С профилированием</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#batch-processing">Пакетная обработка</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#component-configuration">Настройка компонентов</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#replacing-detector-or-recognizer">Замена детектора или распознавателя</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#built-in-model-configuration">Настройка встроенных моделей</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#size-filtering">Фильтрация по размеру</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#automatic-rotation-control">Управление автоматическим поворотом</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">Структура библиотеки</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../structure.html#module-descriptions">Описание модулей</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Справочник API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html">Конвейер</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.rotate_threshold"><code class="docutils literal notranslate"><span class="pre">Pipeline.rotate_threshold</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">Структуры данных</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data.html#data-model">Модель данных</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#module-manuscript.data">Справочник API</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Word"><code class="docutils literal notranslate"><span class="pre">Word</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Page"><code class="docutils literal notranslate"><span class="pre">Page</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Детекторы</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="recognizers.html">Распознаватели</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="correctors.html">Корректоры</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="correctors.html#charlm"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#manuscript.correctors.CharLM"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#overview">Обзор</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#available-presets">Доступные пресеты</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#quick-example">Быстрый пример</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#basic-usage">Базовое использование</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#advanced-configuration">Расширенная конфигурация</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#using-custom-lexicon">Использование пользовательского лексикона</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#training-custom-model">Обучение пользовательской модели</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#export-to-onnx">Экспорт в ONNX</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Утилиты</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.read_image"><code class="docutils literal notranslate"><span class="pre">read_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Меню навигации для мобильных устройств" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">manuscript-ocr</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Навигация по страницам">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Справочник API</a></li>
+      <li class="breadcrumb-item active">Детекторы</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/detectors.rst.txt" rel="nofollow"> Просмотреть исходный код страницы</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="detectors">
+<h1>Детекторы<a class="headerlink" href="#detectors" title="Ссылка на этот заголовок"></a></h1>
+<p>Модели детекции текста.</p>
+<span class="target" id="module-manuscript.detectors"></span><dl class="py class">
+<dt class="sig sig-object py" id="manuscript.detectors.EAST">
+<em class="property"><span class="pre">class</span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manuscript.detectors.</span></span><span class="sig-name descname"><span class="pre">EAST</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1280</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_ratio_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_ratio_h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iou_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iou_threshold_standard</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_geo_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_aligned_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_area_anomalies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anomaly_sigma_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anomaly_min_box_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tta_iou_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_east.html#EAST"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.detectors.EAST" title="Ссылка на это определение"></a></dt>
+<dd><p>Базовые классы: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Инициализация текстового детектора EAST с использованием ONNX Runtime.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Путь или идентификатор для весов модели ONNX. Поддерживает: локальный путь, HTTP/HTTPS URL, GitHub release, Google Drive, имя пресета (<code class="docutils literal notranslate"><span class="pre">&quot;east_50_g1&quot;</span></code>), <code class="docutils literal notranslate"><span class="pre">None</span></code> — автозагрузка пресета по умолчанию (east_50_g1)</p></li>
+<li><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Устройство вычислений: <code class="docutils literal notranslate"><span class="pre">&quot;cuda&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;coreml&quot;</span></code> или <code class="docutils literal notranslate"><span class="pre">&quot;cpu&quot;</span></code>. Если None, автоматически выбирается CPU. Для ускорения GPU/CoreML:  - CUDA (NVIDIA): <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">onnxruntime-gpu</span></code>  - CoreML (Apple Silicon M1/M2/M3): <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">onnxruntime-silicon</span></code>  По умолчанию <code class="docutils literal notranslate"><span class="pre">None</span></code> (CPU).</p></li>
+<li><p><strong>target_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Размер входного изображения для инференса. Изображения приводятся к <code class="docutils literal notranslate"><span class="pre">(target_size,</span> <span class="pre">target_size)</span></code>. Значение по умолчанию — 1280.</p></li>
+<li><p><strong>expand_ratio_w</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Коэффициент горизонтального расширения, применяемый к боксам после NMS. По умолчанию 0.7.</p></li>
+<li><p><strong>expand_ratio_h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Коэффициент вертикального расширения, применяемый к боксам после NMS. По умолчанию 0.7.</p></li>
+<li><p><strong>expand_power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Степень нелинейного расширения боксов. Определяет, как масштабируется расширение в зависимости от размера бокса.  - 1.0 = линейно (малые и большие боксы расширяются одинаково)  - &lt;1.0 = малые боксы расширяются сильнее (например, 0.5, рекомендуется для детекции символов)  - &gt;1.0 = большие боксы расширяются сильнее  Значение по умолчанию — 0.5.</p></li>
+<li><p><strong>score_thresh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Порог уверенности для отбора кандидатов перед NMS. Значение по умолчанию — 0.7.</p></li>
+<li><p><strong>iou_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Порог IoU для фазы объединения locality-aware NMS. По умолчанию 0.2.</p></li>
+<li><p><strong>iou_threshold_standard</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Порог IoU для стандартного NMS после locality-aware объединения. Если None, используется значение iou_threshold. По умолчанию None.</p></li>
+<li><p><strong>score_geo_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Коэффициент масштабирования при декодировании карт геометрии/оценок. По умолчанию 0.25.</p></li>
+<li><p><strong>quantization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Разрешение квантования координат точек при декодировании. По умолчанию 2.</p></li>
+<li><p><strong>axis_aligned_output</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True, возвращаются осево-ориентированные прямоугольники вместо исходных четырёхугольников. По умолчанию True.</p></li>
+<li><p><strong>remove_area_anomalies</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True, удаляет четырёхугольники с аномально большой площадью относительно распределения. По умолчанию False.</p></li>
+<li><p><strong>anomaly_sigma_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Порог сигмы для фильтрации аномальных площадей. По умолчанию 5.0.</p></li>
+<li><p><strong>anomaly_min_box_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Минимальное количество боксов перед применением фильтрации аномалий. По умолчанию 30.</p></li>
+<li><p><strong>use_tta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Enable Test-Time Augmentation (TTA). When enabled, inference is run
+on both the original and horizontally flipped image, and results are
+merged. This can improve detection of partially visible or edge text.
+Default is False.</p></li>
+<li><p><strong>tta_iou_thresh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – IoU threshold for merging boxes from original and flipped images
+during TTA. Boxes with IoU &gt; threshold are considered matches and
+merged. Default is 0.1.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Заметки</p>
+<p>Класс предоставляет два основных публичных метода:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">predict</span></code> — выполняет инференс на одном изображении и возвращает детекции.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">train</span></code> — высокоуровневая точка входа для обучения модели EAST на пользовательских датасетах.</p></li>
+</ul>
+<p>Детектор использует ONNX Runtime для быстрого инференса на CPU и GPU. Для ускорения на GPU установите: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">onnxruntime-gpu</span></code></p>
+<p class="rubric">Методы</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code>(*args, **kwargs)</p></td>
+<td><p>Вызов объекта как функции.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#manuscript.detectors.EAST.export" title="manuscript.detectors.EAST.export"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export</span></code></a>(weights_path, output_path[, ...])</p></td>
+<td><p>Экспорт модели EAST из PyTorch в формат ONNX.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#manuscript.detectors.EAST.predict" title="manuscript.detectors.EAST.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(img_or_path[, return_maps, ...])</p></td>
+<td><p>Запуск инференса EAST и возврат результатов детекции.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">runtime_providers</span></code>()</p></td>
+<td><p>Получение провайдеров выполнения ONNX Runtime в зависимости от устройства.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#manuscript.detectors.EAST.train" title="manuscript.detectors.EAST.train"><code class="xref py py-obj docutils literal notranslate"><span class="pre">train</span></code></a>(train_images, train_anns, val_images, ...)</p></td>
+<td><p>Обучение модели EAST на пользовательских датасетах.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manuscript.detectors.EAST.default_weights_name">
+<span class="sig-name descname"><span class="pre">default_weights_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(в Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'east_50_g1'</span></em><a class="headerlink" href="#manuscript.detectors.EAST.default_weights_name" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manuscript.detectors.EAST.pretrained_registry">
+<span class="sig-name descname"><span class="pre">pretrained_registry</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(в Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'east_50_g1':</span> <span class="pre">'github://konstantinkozhin/manuscript-ocr/v0.1.0/east_50_g1.onnx'}</span></em><a class="headerlink" href="#manuscript.detectors.EAST.pretrained_registry" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.detectors.EAST.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1280</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_ratio_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_ratio_h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iou_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iou_threshold_standard</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_geo_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_aligned_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_area_anomalies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anomaly_sigma_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anomaly_min_box_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tta_iou_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_east.html#EAST.__init__"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.detectors.EAST.__init__" title="Ссылка на это определение"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(в Python v3.14)"><em>Path</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>target_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>expand_ratio_w</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>expand_ratio_h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>expand_power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>score_thresh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>iou_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>iou_threshold_standard</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>score_geo_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>quantization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>axis_aligned_output</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>remove_area_anomalies</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>anomaly_sigma_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>anomaly_min_box_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>use_tta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>tta_iou_thresh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.detectors.EAST.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_or_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_maps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_reading_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_into_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_east.html#EAST.predict"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.detectors.EAST.predict" title="Ссылка на это определение"></a></dt>
+<dd><p>Запуск инференса EAST и возврат результатов детекции.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>img_or_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(в Python v3.14)"><em>pathlib.Path</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(в NumPy v2.4)"><em>numpy.ndarray</em></a>) – Путь к файлу изображения или RGB-изображение в виде массива NumPy формата <code class="docutils literal notranslate"><span class="pre">uint8</span></code> с формой <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W,</span> <span class="pre">3)</span></code>.</p></li>
+<li><p><strong>return_maps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True, возвращает необработанные карты оценок и геометрии под ключами <code class="docutils literal notranslate"><span class="pre">&quot;score_map&quot;</span></code> и <code class="docutils literal notranslate"><span class="pre">&quot;geo_map&quot;</span></code>. По умолчанию False.</p></li>
+<li><p><strong>sort_reading_order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True, сортирует обнаруженные слова в естественном порядке чтения (слева направо, сверху вниз) и группирует их в строки. По умолчанию True.</p></li>
+<li><p><strong>split_into_columns</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True и <code class="docutils literal notranslate"><span class="pre">sort_reading_order=True</span></code>, сегментирует страницу на колонки (отдельные Blocks). Если False, вся страница рассматривается как одна колонка. Используется только при <code class="docutils literal notranslate"><span class="pre">sort_reading_order=True</span></code>. По умолчанию True.</p></li>
+<li><p><strong>max_columns</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Максимальное количество колонок для обнаружения при <code class="docutils literal notranslate"><span class="pre">split_into_columns=True</span></code>. Большие значения позволяют обнаруживать больше колонок. Используется только при <code class="docutils literal notranslate"><span class="pre">sort_reading_order=True</span></code> и <code class="docutils literal notranslate"><span class="pre">split_into_columns=True</span></code>. По умолчанию 10.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Словарь со следующими ключами:  - <code class="docutils literal notranslate"><span class="pre">&quot;page&quot;</span></code> : Page     Разобранный результат детекции в виде объекта Page, содержащего Block(и) со Line(ами) объектов Word. Каждый Word содержит координаты полигона и оценки уверенности. Слова и строки имеют индексы порядка чтения.  - <code class="docutils literal notranslate"><span class="pre">&quot;score_map&quot;</span></code> : numpy.ndarray или None     Необработанная карта оценок, если <code class="docutils literal notranslate"><span class="pre">return_maps=True</span></code>.  - <code class="docutils literal notranslate"><span class="pre">&quot;geo_map&quot;</span></code> : numpy.ndarray или None     Необработанная карта геометрии, если <code class="docutils literal notranslate"><span class="pre">return_maps=True</span></code>.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(в Python v3.14)">dict</a></p>
+</dd>
+</dl>
+<p class="rubric">Заметки</p>
+<p>Метод выполняет: (1) загрузку изображения, (2) изменение размера и нормализацию, (3) инференс модели, (4) декодирование четырёхугольников, (5) NMS, (6) расширение боксов, (7) масштабирование координат обратно к исходному размеру, (8) опциональную сортировку по порядку чтения с группировкой в строки.</p>
+<p><strong>Test-Time Augmentation (TTA):</strong></p>
+<p>When <code class="docutils literal notranslate"><span class="pre">use_tta=True</span></code> is set during initialization, the method runs
+inference on both the original and horizontally flipped image, then
+merges results. Boxes from both views are matched by IoU and merged
+by taking the union of coordinates with averaged scores. This can
+improve detection of text near image edges or partially visible text.</p>
+<p>Для визуализации используйте внешнюю утилиту <code class="docutils literal notranslate"><span class="pre">visualize_page</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualize_page</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vis_img</span> <span class="o">=</span> <span class="n">visualize_page</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">])</span>
+</pre></div>
+</div>
+<p class="rubric">Примеры</p>
+<p>Выполнить инференс и получить структурированный результат:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">EAST</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;example/ocr_example_image.jpg&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">page</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Access first line&#39;s first word</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">first_word</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Confidence: </span><span class="si">{</span><span class="n">first_word</span><span class="o">.</span><span class="n">detection_confidence</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Визуализировать результаты отдельно:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualize_page</span><span class="p">,</span> <span class="n">read_image</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">read_image</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vis_img</span> <span class="o">=</span> <span class="n">visualize_page</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vis_img</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.detectors.EAST.train">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_anns</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">*</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">experiment_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./experiments'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'resnet_quad'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backbone_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'resnet50'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained_backbone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freeze_first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_geo_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulation_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_sam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sam_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'asam'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_lookahead</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_multiscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ohem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ohem_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_focal_geo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">focal_gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resume_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_east.html#EAST.train"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.detectors.EAST.train" title="Ссылка на это определение"></a></dt>
+<dd><p>Обучение модели EAST на пользовательских датасетах.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_images</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em> or </em><em>sequence</em><em> of </em><em>paths</em>) – Путь(и) к каталогам с обучающими изображениями.</p></li>
+<li><p><strong>train_anns</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em> or </em><em>sequence</em><em> of </em><em>paths</em>) – Путь(и) к JSON-файлам аннотаций в формате COCO, соответствующим <code class="docutils literal notranslate"><span class="pre">train_images</span></code>.</p></li>
+<li><p><strong>val_images</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em> or </em><em>sequence</em><em> of </em><em>paths</em>) – Путь(и) к каталогам с валидационными изображениями.</p></li>
+<li><p><strong>val_anns</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em> or </em><em>sequence</em><em> of </em><em>paths</em>) – Путь(и) к JSON-файлам аннотаций в формате COCO, соответствующим <code class="docutils literal notranslate"><span class="pre">val_images</span></code>.</p></li>
+<li><p><strong>experiment_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Базовый каталог, в котором будут создаваться папки экспериментов. По умолчанию <code class="docutils literal notranslate"><span class="pre">&quot;./experiments&quot;</span></code>.</p></li>
+<li><p><strong>model_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Имя папки внутри <code class="docutils literal notranslate"><span class="pre">experiment_root</span></code> для логов и чекпоинтов. По умолчанию <code class="docutils literal notranslate"><span class="pre">&quot;resnet_quad&quot;</span></code>.</p></li>
+<li><p><strong>backbone_name</strong> (<em>{&quot;resnet50&quot;</em><em>, </em><em>&quot;resnet101&quot;}</em><em>, </em><em>optional</em>) – Используемая архитектура backbone. Варианты:  - <code class="docutils literal notranslate"><span class="pre">&quot;resnet50&quot;</span></code> — ResNet-50 (быстрее, меньше параметров)  - <code class="docutils literal notranslate"><span class="pre">&quot;resnet101&quot;</span></code> — ResNet-101 (медленнее, больше ёмкость)  По умолчанию <code class="docutils literal notranslate"><span class="pre">&quot;resnet50&quot;</span></code>.</p></li>
+<li><p><strong>pretrained_backbone</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Использовать веса backbone, предобученные на ImageNet. По умолчанию <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>freeze_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Заморозить нижние слои backbone. По умолчанию <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>target_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Изменять размер короткой стороны изображений до этого значения. По умолчанию <code class="docutils literal notranslate"><span class="pre">1024</span></code>.</p></li>
+<li><p><strong>score_geo_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Множитель для восстановления исходных координат из карт оценок/геометрии. Если None, автоматически берётся из модели. По умолчанию <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>epochs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Количество эпох обучения. По умолчанию <code class="docutils literal notranslate"><span class="pre">500</span></code>.</p></li>
+<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Размер батча на GPU. По умолчанию <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p></li>
+<li><p><strong>accumulation_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Количество шагов накопления градиента. Эффективный размер батча будет <code class="docutils literal notranslate"><span class="pre">batch_size</span> <span class="pre">*</span> <span class="pre">accumulation_steps</span></code>. Используйте это для обучения с большими эффективными батчами при ограниченной памяти GPU. Например:  - <code class="docutils literal notranslate"><span class="pre">batch_size=2,</span> <span class="pre">accumulation_steps=4</span></code> → эффективный размер батча = 8  - <code class="docutils literal notranslate"><span class="pre">batch_size=1,</span> <span class="pre">accumulation_steps=8</span></code> → эффективный размер батча = 8  По умолчанию <code class="docutils literal notranslate"><span class="pre">1</span></code> (без накопления).</p></li>
+<li><p><strong>lr</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Скорость обучения. По умолчанию <code class="docutils literal notranslate"><span class="pre">1e-3</span></code>.</p></li>
+<li><p><strong>grad_clip</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Значение отсечения градиента (L2-норма). По умолчанию <code class="docutils literal notranslate"><span class="pre">5.0</span></code>.</p></li>
+<li><p><strong>early_stop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Терпение (число эпох без улучшений) для ранней остановки. По умолчанию <code class="docutils literal notranslate"><span class="pre">100</span></code>.</p></li>
+<li><p><strong>use_sam</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Включить оптимизатор SAM. По умолчанию <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>sam_type</strong> (<em>{&quot;sam&quot;</em><em>, </em><em>&quot;asam&quot;}</em><em>, </em><em>optional</em>) – Используемый вариант SAM. По умолчанию <code class="docutils literal notranslate"><span class="pre">&quot;asam&quot;</span></code>.</p></li>
+<li><p><strong>use_lookahead</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Обернуть оптимизатор в Lookahead. По умолчанию <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>use_ema</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Поддерживать EMA-версию весов модели. По умолчанию <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>use_multiscale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Случайное мульти-масштабное обучение. По умолчанию <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>use_ohem</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Онлайн-отбор сложных примеров (OHEM). По умолчанию <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>ohem_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Доля сложных негативных примеров для OHEM. По умолчанию <code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p></li>
+<li><p><strong>use_focal_geo</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Применять focal loss к геометрическим каналам. По умолчанию <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>focal_gamma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Параметр gamma для focal loss геометрии. По умолчанию <code class="docutils literal notranslate"><span class="pre">2.0</span></code>.</p></li>
+<li><p><strong>resume_from</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Возобновить обучение из предыдущего эксперимента: a) каталог эксперимента, b) <cite>…/checkpoints/</cite>, c) прямой путь к <cite>last_state.pt</cite>. По умолчанию <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>val_interval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Запускать валидацию каждые N эпох. По умолчанию <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>num_workers</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Количество рабочих процессов для загрузки данных. Установите 0 для однопроцессной загрузки (безопаснее на Windows). По умолчанию <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p><strong>device</strong> (<em>torch.device</em><em>, </em><em>optional</em>) – Устройство CUDA или CPU. Автоматически выбирается, если None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Лучшие веса модели (EMA, если включено, иначе базовая модель).</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+<p class="rubric">Примеры</p>
+<p>Обучение на двух датасетах с валидацией:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">train_images</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/archive/train_images&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/ddi/train_images&quot;</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">train_anns</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/archive/train.json&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/ddi/train.json&quot;</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">val_images</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/archive/test_images&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/ddi/test_images&quot;</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">val_anns</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/archive/test.json&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/ddi/test.json&quot;</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">best_model</span> <span class="o">=</span> <span class="n">EAST</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">train_images</span><span class="o">=</span><span class="n">train_images</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">train_anns</span><span class="o">=</span><span class="n">train_anns</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">val_images</span><span class="o">=</span><span class="n">val_images</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">val_anns</span><span class="o">=</span><span class="n">val_anns</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">backbone_name</span><span class="o">=</span><span class="s2">&quot;resnet50&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">target_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">use_sam</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">freeze_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">val_interval</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best checkpoint loaded:&quot;</span><span class="p">,</span> <span class="n">best_model</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.detectors.EAST.export">
+<em class="property"><span class="pre">static</span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backbone_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1280</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opset_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_east.html#EAST.export"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.detectors.EAST.export" title="Ссылка на это определение"></a></dt>
+<dd><p>Экспорт модели EAST из PyTorch в формат ONNX.</p>
+<p>Этот метод конвертирует обученную модель EAST из PyTorch в формат ONNX, который может использоваться для более быстрого инференса с ONNX Runtime. Экспортированную модель можно загрузить с помощью <code class="docutils literal notranslate"><span class="pre">EAST(weights_path=&quot;model.onnx&quot;,</span> <span class="pre">use_onnx=True)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> or </em><em>Path</em>) – Путь к файлу весов модели PyTorch (.pth).</p></li>
+<li><p><strong>output_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> or </em><em>Path</em>) – Путь, по которому будет сохранена модель ONNX (.onnx).</p></li>
+<li><p><strong>backbone_name</strong> (<em>{&quot;resnet50&quot;</em><em>, </em><em>&quot;resnet101&quot;}</em><em>, </em><em>optional</em>) – Архитектура backbone модели. Если None, будет автоматически определена из чекпоинта. Должна совпадать с архитектурой, использованной при обучении. По умолчанию None (автоопределение).</p></li>
+<li><p><strong>input_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Размер входного изображения (высота и ширина). Модель принимает изображения формы <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">3,</span> <span class="pre">input_size,</span> <span class="pre">input_size)</span></code>. По умолчанию 1280.</p></li>
+<li><p><strong>opset_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Версия opset ONNX для экспорта. По умолчанию 14.</p></li>
+<li><p><strong>simplify</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True, применяется упрощение графа ONNX с помощью onnx-simplifier для оптимизации модели. Требуется пакет <code class="docutils literal notranslate"><span class="pre">onnx-simplifier</span></code>. По умолчанию True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Модель ONNX сохраняется в <code class="docutils literal notranslate"><span class="pre">output_path</span></code>.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Исключение<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(в Python v3.14)"><strong>ImportError</strong></a> – Если необходимые пакеты (torch, onnx) не установлены.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError" title="(в Python v3.14)"><strong>FileNotFoundError</strong></a> – Если <code class="docutils literal notranslate"><span class="pre">weights_path</span></code> не существует.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(в Python v3.14)"><strong>ValueError</strong></a> – Если backbone_name не соответствует архитектуре чекпоинта.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Заметки</p>
+<p>Экспортированная модель ONNX имеет два выхода:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">score_map</span></code>: карта уверенности текста формы <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">1,</span> <span class="pre">H,</span> <span class="pre">W)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">geo_map</span></code>: карта геометрии формы <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">8,</span> <span class="pre">H,</span> <span class="pre">W)</span></code></p></li>
+</ul>
+<p>Модель поддерживает динамический размер батча и размеры изображения через настройку динамических осей.</p>
+<p><strong>Автоматическое определение backbone:</strong></p>
+<p>Метод автоматически определяет архитектуру backbone из чекпоинта, анализируя количество параметров в layer4. Это предотвращает несоответствия между чекпоинтом и архитектурой, которые могли бы привести к некорректному экспорту.</p>
+<p class="rubric">Примеры</p>
+<p>Экспорт с автоматическим определением backbone:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">EAST</span><span class="o">.</span><span class="n">export_to_onnx</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">weights_path</span><span class="o">=</span><span class="s2">&quot;east_resnet50.pth&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;east_model.onnx&quot;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">Auto-detected backbone: resnet50</span>
+<span class="go">Exporting to ONNX (opset 14)...</span>
+<span class="go">[OK] ONNX model saved to: east_model.onnx</span>
+</pre></div>
+</div>
+<p>Экспорт с явным указанием backbone:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">EAST</span><span class="o">.</span><span class="n">export_to_onnx</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">weights_path</span><span class="o">=</span><span class="s2">&quot;custom_weights.pth&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;custom_model.onnx&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">backbone_name</span><span class="o">=</span><span class="s2">&quot;resnet101&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">input_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">simplify</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Использование экспортированной модели для инференса:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">detector</span> <span class="o">=</span> <span class="n">EAST</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">weights_path</span><span class="o">=</span><span class="s2">&quot;east_model.onnx&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">use_onnx</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;image.jpg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">См. также</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#manuscript.detectors.EAST.__init__" title="manuscript.detectors.EAST.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EAST.__init__</span></code></a></dt><dd><p>Инициализация детектора EAST с поддержкой ONNX с использованием <code class="docutils literal notranslate"><span class="pre">use_onnx=True</span></code>.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Нижняя область">
+        <a href="data.html" class="btn btn-neutral float-left" title="Структуры данных" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Предыдущая</a>
+        <a href="recognizers.html" class="btn btn-neutral float-right" title="Распознаватели" accesskey="n" rel="next">Следующая <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Авторские права 2026, Konstantin Kozhin. </p>
+  </div>
+
+  Собрано при помощи <a href="https://www.sphinx-doc.org/">Sphinx</a> с использованием
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">темы,</a>
+    предоставленной <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

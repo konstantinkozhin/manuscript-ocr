@@ -98,3 +98,7 @@ Desktop.ini
 
 logs/
 debug/
+
+# Sphinx build artifacts
+docs/sphinx/_build/
+docs/sphinx/_site/

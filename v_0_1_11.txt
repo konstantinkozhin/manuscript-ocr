@@ -60,5 +60,37 @@ Files:
 - .github/workflows/docs.yml
 - docs/sphinx/conf.py
 
+8) Text-crop rotation moved from Pipeline to TRBA recognizer (local)
+- Removed crop-rotation step from `Pipeline`; it now only extracts raw word crops.
+- Rotation/orientation logic is now applied inside `TRBA` per crop during preprocessing.
+- Rotation control is configured via `TRBA(rotate_threshold=...)` instead of `Pipeline(...)`.
+- Updated pipeline docs/examples and tests to reflect the new behavior.
+
+Files:
+- src/manuscript/_pipeline.py
+- src/manuscript/recognizers/_trba/__init__.py
+- tests/test_pipeline_api_compatibility.py
+- tests/recognizers/test_trba_infer.py
+- docs/sphinx/pipeline_usage.rst
+
+9) Docs versions switcher moved to left sidebar Contents (local)
+- Added a `Versions` section in left navigation for static docs paths like `/0.1.11/en/...`.
+- Versions list currently includes `0.1.11` and `0.1.10` and preserves current page path when switching.
+- Replaced top-button approach for version switching with sidebar navigation.
+
+Files:
+- docs/sphinx/conf.py
+- docs/sphinx/_static/version_sidebar.js
+- .github/workflows/docs.yml
+
+10) Archived static docs for 0.1.10 (local)
+- Added frozen docs snapshot at `docs/sphinx/_archive/0.1.10`.
+- Updated GitHub Pages workflow to stop rebuilding legacy docs.
+- Workflow now copies archived `0.1.10` into `_site/0.1.10` and builds only latest docs (`0.1.11`).
+
+Files:
+- docs/sphinx/_archive/0.1.10/*
+- .github/workflows/docs.yml
+
 Summary:
 - v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fixes).

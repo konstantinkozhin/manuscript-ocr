@@ -32,9 +32,6 @@ class Pipeline:
         Text corrector instance (None to skip correction)
     min_text_size : int
         Minimum text box size in pixels (width and height)
-    rotate_threshold : float
-        Aspect ratio threshold for automatic rotation of vertical text crops.
-        If ``height > width * rotate_threshold``, crop is rotated 90° clockwise.
 
     Examples
     --------
@@ -61,10 +58,6 @@ class Pipeline:
     >>> from manuscript.correctors import CharLM
     >>> corrector = CharLM()
     >>> pipeline = Pipeline(corrector=corrector)
-
-    Disable automatic rotation of vertical text:
-
-    >>> pipeline = Pipeline(rotate_threshold=0)
     """
 
     def __init__(
@@ -73,7 +66,6 @@ class Pipeline:
         recognizer: Optional[TRBA] = None,
         corrector: Optional["BaseCorrector"] = None,
         min_text_size: int = 5,
-        rotate_threshold: float = 1.5,
     ):
         """
         Initialize OCR pipeline.
@@ -91,18 +83,11 @@ class Pipeline:
         min_text_size : int, optional
             Minimum text size in pixels. Boxes smaller than this will be
             filtered out before recognition. Default is 5.
-        rotate_threshold : float, optional
-            Aspect ratio threshold for automatic rotation of vertical text.
-            If ``height > width * rotate_threshold``, the crop is rotated
-            90 degrees clockwise to convert vertical text to horizontal.
-            Set to ``None`` or ``0`` to disable automatic rotation.
-            Default is 1.5.
         """
         self.detector = detector if detector is not None else EAST()
         self.recognizer = recognizer if recognizer is not None else TRBA()
         self.corrector = corrector
         self.min_text_size = min_text_size
-        self.rotate_threshold = rotate_threshold
 
         self._last_detection_page: Optional[Page] = None
         self._last_recognition_page: Optional[Page] = None
@@ -344,36 +329,7 @@ class Pipeline:
             if region_image.size == 0:
                 return None
 
-            region_image = self._prepare_crop(region_image)
-
             return region_image if region_image.size > 0 else None
         except Exception:
             return None
 
-    def _prepare_crop(self, crop: np.ndarray) -> np.ndarray:
-        """
-        Prepare crop for recognition, rotating vertical text if needed.
-
-        If the crop height is significantly greater than width (based on
-        ``rotate_threshold``), the image is rotated 90 degrees clockwise
-        to convert vertical text to horizontal orientation.
-
-        Parameters
-        ----------
-        crop : np.ndarray
-            Cropped word image (H, W, 3) or (H, W)
-
-        Returns
-        -------
-        np.ndarray
-            Prepared crop, possibly rotated
-        """
-        if not self.rotate_threshold:
-            return crop
-
-        height, width = crop.shape[:2]
-
-        if height > width * self.rotate_threshold:
-            crop = np.rot90(crop, k=-1)
-
-        return crop

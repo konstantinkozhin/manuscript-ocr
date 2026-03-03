@@ -26,7 +26,6 @@ jobs:
     env:
       LATEST_DOCS_VERSION: "0.1.11"
       LEGACY_DOCS_VERSION: "0.1.10"
-      LEGACY_DOCS_REF: "origin/main"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -47,6 +46,7 @@ jobs:
       - name: Build latest version docs
         run: |
           cd docs/sphinx
+          rm -rf _site/${LATEST_DOCS_VERSION}
           mkdir -p _site/${LATEST_DOCS_VERSION}/en _site/${LATEST_DOCS_VERSION}/ru
           # Update translation templates for current docs
           sphinx-build -b gettext . _build/gettext
@@ -55,14 +55,11 @@ jobs:
           sphinx-build -b html -D language=en -D release=${LATEST_DOCS_VERSION} -D version=${LATEST_DOCS_VERSION} . _site/${LATEST_DOCS_VERSION}/en
           sphinx-build -b html -D language=ru -D release=${LATEST_DOCS_VERSION} -D version=${LATEST_DOCS_VERSION} . _site/${LATEST_DOCS_VERSION}/ru
 
-      - name: Build legacy version docs
+      - name: Copy archived legacy docs
         run: |
-          git worktree add _legacy "${LEGACY_DOCS_REF}"
-          pushd _legacy/docs/sphinx
-          sphinx-build -b html -D language=en -D release=${LEGACY_DOCS_VERSION} -D version=${LEGACY_DOCS_VERSION} . ../../../docs/sphinx/_site/${LEGACY_DOCS_VERSION}/en
-          sphinx-build -b html -D language=ru -D release=${LEGACY_DOCS_VERSION} -D version=${LEGACY_DOCS_VERSION} . ../../../docs/sphinx/_site/${LEGACY_DOCS_VERSION}/ru
-          popd
-          git worktree remove _legacy --force
+          test -d docs/sphinx/_archive/${LEGACY_DOCS_VERSION}
+          rm -rf docs/sphinx/_site/${LEGACY_DOCS_VERSION}
+          cp -a docs/sphinx/_archive/${LEGACY_DOCS_VERSION} docs/sphinx/_site/${LEGACY_DOCS_VERSION}
 
       - name: Create site index and version metadata
         run: |

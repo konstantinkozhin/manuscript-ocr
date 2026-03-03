@@ -342,7 +342,7 @@ Built-in Model Configuration
     detector = EAST(
         weights="east_50_g1",        # weight selection
         score_thresh=0.8,            # confidence threshold
-        nms_thresh=0.2,              # NMS threshold
+        iou_threshold=0.2,           # IoU threshold for NMS
         device="cpu"                 # device (cpu/cuda)
     )
 
@@ -362,13 +362,17 @@ Size Filtering
     # Ignore text blocks smaller than 10 pixels
     pipeline = Pipeline(min_text_size=10)
 
-Automatic Rotation Control
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Automatic Rotation Control (TRBA)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
+    from manuscript.recognizers import TRBA
+
     # Enable automatic rotation of vertical text (default)
-    pipeline = Pipeline(rotate_threshold=1.5)
+    recognizer = TRBA(rotate_threshold=1.5)
+    pipeline = Pipeline(recognizer=recognizer)
 
     # Disable automatic rotation
-    pipeline = Pipeline(rotate_threshold=0)
+    recognizer = TRBA(rotate_threshold=0)
+    pipeline = Pipeline(recognizer=recognizer)

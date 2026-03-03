@@ -413,182 +413,8 @@ def test_pipeline_partial_initialization():
     assert pipeline2.recognizer is custom_recognizer
 
 
-class TestPipelineRotateThreshold:
-    """Tests for automatic rotation of vertical text boxes."""
-
-    def test_rotate_threshold_default_value(self):
-        """Test that rotate_threshold has default value of 1.5."""
-        detector = DummyDetector()
-        recognizer = DummyRecognizer()
-        pipeline = Pipeline(detector=detector, recognizer=recognizer)
-        
-        assert pipeline.rotate_threshold == 1.5
-
-    def test_rotate_threshold_custom_value(self):
-        """Test that rotate_threshold can be set to custom value."""
-        detector = DummyDetector()
-        recognizer = DummyRecognizer()
-        pipeline = Pipeline(
-            detector=detector, 
-            recognizer=recognizer, 
-            rotate_threshold=2.0
-        )
-        
-        assert pipeline.rotate_threshold == 2.0
-
-    def test_rotate_threshold_disabled_with_zero(self):
-        """Test that rotate_threshold can be disabled with 0."""
-        detector = DummyDetector()
-        recognizer = DummyRecognizer()
-        pipeline = Pipeline(
-            detector=detector, 
-            recognizer=recognizer, 
-            rotate_threshold=0
-        )
-        
-        assert pipeline.rotate_threshold == 0
-
-    def test_rotate_threshold_disabled_with_none(self):
-        """Test that rotate_threshold can be disabled with None."""
-        detector = DummyDetector()
-        recognizer = DummyRecognizer()
-        pipeline = Pipeline(
-            detector=detector, 
-            recognizer=recognizer, 
-            rotate_threshold=None
-        )
-        
-        assert pipeline.rotate_threshold is None
-
-    def test_prepare_crop_rotates_vertical_image(self):
-        """Test that _prepare_crop rotates vertical images."""
-        detector = DummyDetector()
-        recognizer = DummyRecognizer()
-        pipeline = Pipeline(
-            detector=detector, 
-            recognizer=recognizer, 
-            rotate_threshold=1.5
-        )
-        
-        # Create a vertical image (height > width * 1.5)
-        # height=100, width=50 => 100 > 50*1.5 = 75 => should rotate
-        vertical_crop = np.zeros((100, 50, 3), dtype=np.uint8)
-        vertical_crop[0, 0] = [255, 0, 0]  # Mark top-left corner red
-        
-        result = pipeline._prepare_crop(vertical_crop)
-        
-        # After 90° clockwise rotation: (100, 50) -> (50, 100)
-        assert result.shape == (50, 100, 3)
-        # After clockwise rotation, top-left goes to top-right
-        assert np.array_equal(result[0, 99], [255, 0, 0])
-
-    def test_prepare_crop_does_not_rotate_horizontal_image(self):
-        """Test that _prepare_crop does not rotate horizontal images."""
-        detector = DummyDetector()
-        recognizer = DummyRecognizer()
-        pipeline = Pipeline(
-            detector=detector, 
-            recognizer=recognizer, 
-            rotate_threshold=1.5
-        )
-        
-        # Create a horizontal image (height <= width * 1.5)
-        # height=50, width=100 => 50 <= 100*1.5 = 150 => should NOT rotate
-        horizontal_crop = np.zeros((50, 100, 3), dtype=np.uint8)
-        
-        result = pipeline._prepare_crop(horizontal_crop)
-        
-        # Should remain unchanged
-        assert result.shape == (50, 100, 3)
-
-    def test_prepare_crop_does_not_rotate_square_image(self):
-        """Test that _prepare_crop does not rotate square images."""
-        detector = DummyDetector()
-        recognizer = DummyRecognizer()
-        pipeline = Pipeline(
-            detector=detector, 
-            recognizer=recognizer, 
-            rotate_threshold=1.5
-        )
-        
-        # Create a square image (height = width)
-        # height=100, width=100 => 100 <= 100*1.5 = 150 => should NOT rotate
-        square_crop = np.zeros((100, 100, 3), dtype=np.uint8)
-        
-        result = pipeline._prepare_crop(square_crop)
-        
-        # Should remain unchanged
-        assert result.shape == (100, 100, 3)
-
-    def test_prepare_crop_threshold_boundary(self):
-        """Test boundary case for rotate_threshold."""
-        detector = DummyDetector()
-        recognizer = DummyRecognizer()
-        pipeline = Pipeline(
-            detector=detector, 
-            recognizer=recognizer, 
-            rotate_threshold=1.5
-        )
-        
-        # Exactly at boundary: height=150, width=100 => 150 > 100*1.5 = 150 is False
-        # Should NOT rotate
-        boundary_crop = np.zeros((150, 100, 3), dtype=np.uint8)
-        result = pipeline._prepare_crop(boundary_crop)
-        assert result.shape == (150, 100, 3)
-        
-        # Just above boundary: height=151, width=100 => 151 > 150 is True
-        # Should rotate
-        above_boundary_crop = np.zeros((151, 100, 3), dtype=np.uint8)
-        result = pipeline._prepare_crop(above_boundary_crop)
-        assert result.shape == (100, 151, 3)
-
-    def test_prepare_crop_disabled_does_not_rotate(self):
-        """Test that disabled rotate_threshold does not rotate any image."""
-        detector = DummyDetector()
-        recognizer = DummyRecognizer()
-        
-        # Test with rotate_threshold=0
-        pipeline = Pipeline(
-            detector=detector, 
-            recognizer=recognizer, 
-            rotate_threshold=0
-        )
-        
-        vertical_crop = np.zeros((100, 50, 3), dtype=np.uint8)
-        result = pipeline._prepare_crop(vertical_crop)
-        assert result.shape == (100, 50, 3)  # Should remain unchanged
-        
-        # Test with rotate_threshold=None
-        pipeline_none = Pipeline(
-            detector=detector, 
-            recognizer=recognizer, 
-            rotate_threshold=None
-        )
-        
-        result_none = pipeline_none._prepare_crop(vertical_crop)
-        assert result_none.shape == (100, 50, 3)  # Should remain unchanged
-
-    def test_prepare_crop_grayscale_image(self):
-        """Test that _prepare_crop works with grayscale images."""
-        detector = DummyDetector()
-        recognizer = DummyRecognizer()
-        pipeline = Pipeline(
-            detector=detector, 
-            recognizer=recognizer, 
-            rotate_threshold=1.5
-        )
-        
-        # Create a vertical grayscale image
-        vertical_gray = np.zeros((100, 50), dtype=np.uint8)
-        
-        result = pipeline._prepare_crop(vertical_gray)
-        
-        # Should be rotated
-        assert result.shape == (50, 100)
-
-
-class TestPipelineRotateIntegration:
-    """Integration tests for rotation in full pipeline."""
+class TestPipelineCropIntegration:
+    """Integration tests for crop extraction in full pipeline."""
 
     def test_pipeline_with_vertical_word(self):
         """Test pipeline correctly processes vertical word boxes."""
@@ -625,22 +451,16 @@ class TestPipelineRotateIntegration:
         detector = VerticalWordDetector()
         recognizer = ShapeTrackingRecognizer()
         
-        # Pipeline with rotation enabled
-        pipeline = Pipeline(
-            detector=detector,
-            recognizer=recognizer,
-            rotate_threshold=1.5
-        )
+        pipeline = Pipeline(detector=detector, recognizer=recognizer)
         
         # Create test image large enough for the box
         img = np.zeros((200, 200, 3), dtype=np.uint8)
         
         result = pipeline.predict(img, recognize_text=True)
         
-        # The vertical crop (20x100) should be rotated to (100x20)
-        # height=100, width=20 => 100 > 20*1.5=30 => rotates
+        # Pipeline does not rotate crops; recognizer handles orientation.
         assert len(recognizer.received_shapes) == 1
         received_h, received_w = recognizer.received_shapes[0][:2]
-        # After rotation, width should be greater than height
-        assert received_w > received_h
+        assert received_h > received_w
+
 

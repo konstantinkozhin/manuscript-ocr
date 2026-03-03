@@ -362,13 +362,17 @@ Size Filtering
     # Ignore text blocks smaller than 10 pixels
     pipeline = Pipeline(min_text_size=10)
 
-Automatic Rotation Control
-~~~~~~~~~~~~~~~~~~~~~~~~~~~
+Automatic Rotation Control (TRBA)
+~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 .. code-block:: python
 
+    from manuscript.recognizers import TRBA
+
     # Enable automatic rotation of vertical text (default)
-    pipeline = Pipeline(rotate_threshold=1.5)
+    recognizer = TRBA(rotate_threshold=1.5)
+    pipeline = Pipeline(recognizer=recognizer)
 
     # Disable automatic rotation
-    pipeline = Pipeline(rotate_threshold=0)
+    recognizer = TRBA(rotate_threshold=0)
+    pipeline = Pipeline(recognizer=recognizer)

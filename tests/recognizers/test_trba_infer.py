@@ -227,6 +227,77 @@ class TestTRBAPreprocessing:
         assert preprocessed.shape == (1, 3, 64, 256)
         assert preprocessed.dtype == np.float32
 
+    def test_prepare_crop_rotates_vertical_image(self, tmp_path):
+        """Test that TRBA rotates vertical crops before recognition."""
+        weights_file = tmp_path / "model.onnx"
+        config_file = tmp_path / "model.json"
+        charset_file = tmp_path / "model.txt"
+
+        weights_file.write_text("mock_onnx")
+        config_file.write_text('{"max_len": 25, "hidden_size": 256, "img_h": 64, "img_w": 256}')
+        charset_file.write_text("<PAD>\n<SOS>\n<EOS>\na\nb\nc")
+
+        recognizer = TRBA(
+            weights=str(weights_file),
+            config=str(config_file),
+            charset=str(charset_file),
+            device="cpu",
+            rotate_threshold=1.5,
+        )
+
+        vertical_crop = np.zeros((100, 50, 3), dtype=np.uint8)
+        vertical_crop[0, 0] = [255, 0, 0]
+
+        result = recognizer._prepare_crop(vertical_crop)
+
+        assert result.shape == (50, 100, 3)
+        assert np.array_equal(result[0, 99], [255, 0, 0])
+
+    def test_prepare_crop_can_be_disabled(self, tmp_path):
+        """Test that rotation can be disabled in TRBA."""
+        weights_file = tmp_path / "model.onnx"
+        config_file = tmp_path / "model.json"
+        charset_file = tmp_path / "model.txt"
+
+        weights_file.write_text("mock_onnx")
+        config_file.write_text('{"max_len": 25, "hidden_size": 256, "img_h": 64, "img_w": 256}')
+        charset_file.write_text("<PAD>\n<SOS>\n<EOS>\na\nb\nc")
+
+        recognizer = TRBA(
+            weights=str(weights_file),
+            config=str(config_file),
+            charset=str(charset_file),
+            device="cpu",
+            rotate_threshold=0,
+        )
+
+        vertical_crop = np.zeros((100, 50, 3), dtype=np.uint8)
+        result = recognizer._prepare_crop(vertical_crop)
+
+        assert result.shape == (100, 50, 3)
+
+    def test_preprocess_uses_prepare_crop(self, tmp_path):
+        """Test that preprocessing calls crop-orientation logic."""
+        weights_file = tmp_path / "model.onnx"
+        config_file = tmp_path / "model.json"
+        charset_file = tmp_path / "model.txt"
+
+        weights_file.write_text("mock_onnx")
+        config_file.write_text('{"max_len": 25, "hidden_size": 256, "img_h": 64, "img_w": 256}')
+        charset_file.write_text("<PAD>\n<SOS>\n<EOS>\na\nb\nc")
+
+        recognizer = TRBA(
+            weights=str(weights_file),
+            config=str(config_file),
+            charset=str(charset_file),
+            device="cpu",
+        )
+
+        vertical_crop = np.zeros((100, 50, 3), dtype=np.uint8)
+        with patch.object(recognizer, "_prepare_crop", wraps=recognizer._prepare_crop) as mocked:
+            recognizer._preprocess_image(vertical_crop)
+            mocked.assert_called_once()
+
 
 class TestTRBAAPI:
     """Tests for the public API"""

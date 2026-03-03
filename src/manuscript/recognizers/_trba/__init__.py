@@ -60,6 +60,11 @@ class TRBA(BaseModel):
         - CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``
 
         Default is ``None`` (CPU).
+    rotate_threshold : float or None, optional
+        Aspect-ratio threshold for rotating vertical word crops before
+        recognition. If ``height > width * rotate_threshold``, crop is
+        rotated 90 degrees clockwise. Set to ``0`` or ``None`` to disable.
+        Default is ``1.5``.
     **kwargs
         Additional configuration options (reserved for future use).
 
@@ -128,6 +133,7 @@ class TRBA(BaseModel):
         config: Optional[str] = None,
         charset: Optional[str] = None,
         device: Optional[str] = None,
+        rotate_threshold: Optional[float] = 1.5,
         **kwargs,
     ):
         # Initialize BaseModel (resolves weights and device)
@@ -174,6 +180,7 @@ class TRBA(BaseModel):
 
         # Initialize ONNX session
         self.onnx_session = None
+        self.rotate_threshold = rotate_threshold
 
     def _resolve_config(self, config: Optional[str]) -> str:
         """
@@ -327,6 +334,7 @@ class TRBA(BaseModel):
         """
         # Load image using unified read_image utility (handles all formats)
         img = read_image(image)  # Returns RGB uint8 [H, W, 3]
+        img = self._prepare_crop(img)
 
         # Resize with aspect ratio preservation and padding (like ResizeAndPadA)
         h, w = img.shape[:2]
@@ -360,6 +368,21 @@ class TRBA(BaseModel):
         img_batch = np.expand_dims(img_chw, axis=0)  # [1, 3, H, W]
 
         return img_batch
+
+    def _prepare_crop(self, crop: np.ndarray) -> np.ndarray:
+        """
+        Rotate vertical crops to horizontal orientation before recognition.
+
+        If ``rotate_threshold`` is enabled and ``height > width * rotate_threshold``,
+        image is rotated 90 degrees clockwise.
+        """
+        if not self.rotate_threshold:
+            return crop
+
+        height, width = crop.shape[:2]
+        if height > width * self.rotate_threshold:
+            crop = np.rot90(crop, k=-1)
+        return crop
 
     def predict(
         self,

@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-01-24 15:20+0700\n"
+"POT-Creation-Date: 2026-03-03 15:31+0700\n"
 "PO-Revision-Date: 2026-01-24 15:30+0700\n"
 "Last-Translator: Konstantin Kozhin\n"
 "Language: ru\n"
@@ -18,7 +18,7 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
+"Generated-By: Babel 2.18.0\n"
 
 #: ../../pipeline_usage.rst:2 749ebab203ae4312a2aa1e06dee503f8
 msgid "Pipeline Usage Guide"
@@ -30,8 +30,8 @@ msgid ""
 " detectors, recognizers, and correctors that implement a simple "
 "interface."
 msgstr ""
-"Класс Pipeline в ``manuscript-ocr`` спроектирован для работы с **любыми** "
-"детекторами, распознавателями и корректорами, реализующими простой "
+"Класс Pipeline в ``manuscript-ocr`` спроектирован для работы с **любыми**"
+" детекторами, распознавателями и корректорами, реализующими простой "
 "интерфейс."
 
 #: ../../pipeline_usage.rst:7 58dbd801c9ab4c62a31ed3757636cb0f
@@ -79,8 +79,8 @@ msgid ""
 "A recognizer class must implement a ``predict`` method that takes a list "
 "of images and returns a list of results:"
 msgstr ""
-"Класс распознавателя должен реализовать метод ``predict``, который принимает "
-"список изображений и возвращает список результатов:"
+"Класс распознавателя должен реализовать метод ``predict``, который "
+"принимает список изображений и возвращает список результатов:"
 
 #: ../../pipeline_usage.rst:75 ../../pipeline_usage.rst:106
 #: 0ea9dc0c79b84a7688ea398f6de3619b 57290a52c0534ecc921f3f06b917b831
@@ -172,6 +172,7 @@ msgid "Size Filtering"
 msgstr "Фильтрация по размеру"
 
 #: ../../pipeline_usage.rst:366 6e3224244c5249a1a683989ef8b15f97
-msgid "Automatic Rotation Control"
+#, fuzzy
+msgid "Automatic Rotation Control (TRBA)"
 msgstr "Управление автоматическим поворотом"
 

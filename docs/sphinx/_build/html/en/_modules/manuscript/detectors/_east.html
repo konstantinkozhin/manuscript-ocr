@@ -5,17 +5,17 @@
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>manuscript.detectors._east &mdash; manuscript-ocr 0.1.9 documentation</title>
+  <title>manuscript.detectors._east &mdash; manuscript-ocr 0.1.11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
       <link rel="stylesheet" type="text/css" href="../../../_static/language_switcher.css?v=d768f156" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
-      <script src="../../../_static/documentation_options.js?v=8618f531"></script>
-      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../../_static/documentation_options.js?v=1e825a29"></script>
+      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
       <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
       <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
 
@@ -513,7 +513,7 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#replacing-detector-or-recognizer">Replacing Detector or Recognizer</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#built-in-model-configuration">Built-in Model Configuration</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#size-filtering">Size Filtering</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#automatic-rotation-control">Automatic Rotation Control</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#automatic-rotation-control-trba">Automatic Rotation Control (TRBA)</a></li>
 </ul>
 </li>
 </ul>
@@ -529,7 +529,6 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.rotate_threshold"><code class="docutils literal notranslate"><span class="pre">Pipeline.rotate_threshold</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
@@ -553,26 +552,26 @@ window.addEventListener("load", load);</script>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/detectors.html">Detectors</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/recognizers.html">Recognizers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -989,9 +988,9 @@ window.addEventListener("load", load);</script>
                     <span class="c1"># Merge: extend x-coordinates, keep y from original</span>
                     <span class="n">merged_box</span> <span class="o">=</span> <span class="p">(</span>
                         <span class="nb">min</span><span class="p">(</span><span class="n">box1</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">box2</span><span class="p">[</span><span class="mi">0</span><span class="p">]),</span>  <span class="c1"># x0: take minimum</span>
-                        <span class="n">box1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>                 <span class="c1"># y0: keep from original</span>
+                        <span class="n">box1</span><span class="p">[</span><span class="mi">1</span><span class="p">],</span>  <span class="c1"># y0: keep from original</span>
                         <span class="nb">max</span><span class="p">(</span><span class="n">box1</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">box2</span><span class="p">[</span><span class="mi">2</span><span class="p">]),</span>  <span class="c1"># x1: take maximum</span>
-                        <span class="n">box1</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>                 <span class="c1"># y1: keep from original</span>
+                        <span class="n">box1</span><span class="p">[</span><span class="mi">3</span><span class="p">],</span>  <span class="c1"># y1: keep from original</span>
                     <span class="p">)</span>
                     <span class="n">avg_score</span> <span class="o">=</span> <span class="p">(</span><span class="n">score1</span> <span class="o">+</span> <span class="n">score2</span><span class="p">)</span> <span class="o">/</span> <span class="mi">2</span>
                     <span class="n">merged</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">merged_box</span><span class="p">,</span> <span class="n">avg_score</span><span class="p">))</span>
@@ -1153,8 +1152,12 @@ window.addEventListener("load", load);</script>
             <span class="n">final_quads_flipped</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_inference_on_image</span><span class="p">(</span><span class="n">img_flipped</span><span class="p">)</span>
 
             <span class="c1"># Scale both to original size first</span>
-            <span class="n">scaled_orig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale_boxes_to_original</span><span class="p">(</span><span class="n">final_quads_nms</span><span class="p">,</span> <span class="p">(</span><span class="n">orig_h</span><span class="p">,</span> <span class="n">orig_w</span><span class="p">))</span>
-            <span class="n">scaled_flipped</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale_boxes_to_original</span><span class="p">(</span><span class="n">final_quads_flipped</span><span class="p">,</span> <span class="p">(</span><span class="n">orig_h</span><span class="p">,</span> <span class="n">orig_w</span><span class="p">))</span>
+            <span class="n">scaled_orig</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale_boxes_to_original</span><span class="p">(</span>
+                <span class="n">final_quads_nms</span><span class="p">,</span> <span class="p">(</span><span class="n">orig_h</span><span class="p">,</span> <span class="n">orig_w</span><span class="p">)</span>
+            <span class="p">)</span>
+            <span class="n">scaled_flipped</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_scale_boxes_to_original</span><span class="p">(</span>
+                <span class="n">final_quads_flipped</span><span class="p">,</span> <span class="p">(</span><span class="n">orig_h</span><span class="p">,</span> <span class="n">orig_w</span><span class="p">)</span>
+            <span class="p">)</span>
 
             <span class="c1"># Convert to axis-aligned boxes for IoU matching</span>
             <span class="c1"># Keep track of original quads for non-axis-aligned output</span>
@@ -1177,7 +1180,9 @@ window.addEventListener("load", load);</script>
                 <span class="n">x0_mirrored</span> <span class="o">=</span> <span class="n">orig_w</span> <span class="o">-</span> <span class="n">x1</span>
                 <span class="n">x1_mirrored</span> <span class="o">=</span> <span class="n">orig_w</span> <span class="o">-</span> <span class="n">x0</span>
                 <span class="n">score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">quad</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
-                <span class="n">boxes_flipped</span><span class="o">.</span><span class="n">append</span><span class="p">(((</span><span class="nb">int</span><span class="p">(</span><span class="n">x0_mirrored</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y0</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">x1_mirrored</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y1</span><span class="p">)),</span> <span class="n">score</span><span class="p">))</span>
+                <span class="n">boxes_flipped</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">((</span><span class="nb">int</span><span class="p">(</span><span class="n">x0_mirrored</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y0</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">x1_mirrored</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y1</span><span class="p">)),</span> <span class="n">score</span><span class="p">)</span>
+                <span class="p">)</span>
 
             <span class="c1"># Find which original boxes have matches in flipped view</span>
             <span class="n">matched_orig_indices</span> <span class="o">=</span> <span class="p">[]</span>
@@ -1232,9 +1237,7 @@ window.addEventListener("load", load);</script>
                 <span class="n">blocks</span><span class="o">=</span><span class="p">[</span><span class="n">Block</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="p">[</span><span class="n">Line</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="n">words</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">)],</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">)]</span>
             <span class="p">)</span>
             <span class="n">page</span> <span class="o">=</span> <span class="n">organize_page</span><span class="p">(</span>
-                <span class="n">initial_page</span><span class="p">,</span>
-                <span class="n">max_splits</span><span class="o">=</span><span class="n">max_columns</span><span class="p">,</span>
-                <span class="n">use_columns</span><span class="o">=</span><span class="n">split_into_columns</span>
+                <span class="n">initial_page</span><span class="p">,</span> <span class="n">max_splits</span><span class="o">=</span><span class="n">max_columns</span><span class="p">,</span> <span class="n">use_columns</span><span class="o">=</span><span class="n">split_into_columns</span>
             <span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">words</span><span class="p">):</span>
@@ -1261,21 +1264,25 @@ window.addEventListener("load", load);</script>
         <span class="n">model_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;resnet_quad&quot;</span><span class="p">,</span>
         <span class="n">backbone_name</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;resnet50&quot;</span><span class="p">,</span>
         <span class="n">pretrained_backbone</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">freeze_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">freeze_first</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">target_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1024</span><span class="p">,</span>
         <span class="n">score_geo_scale</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">float</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">score_map_shrink_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.3</span><span class="p">,</span>
         <span class="n">epochs</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">500</span><span class="p">,</span>
         <span class="n">batch_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">3</span><span class="p">,</span>
         <span class="n">accumulation_steps</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
-        <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-3</span><span class="p">,</span>
+        <span class="n">lr</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1e-4</span><span class="p">,</span>
+        <span class="n">lr_scheduler</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;cosine_restart&quot;</span><span class="p">,</span>
+        <span class="n">lr_scheduler_params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">augmentation_config</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">grad_clip</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">5.0</span><span class="p">,</span>
         <span class="n">early_stop</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">100</span><span class="p">,</span>
-        <span class="n">use_sam</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">use_sam</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">sam_type</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;asam&quot;</span><span class="p">,</span>
-        <span class="n">use_lookahead</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">use_lookahead</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">use_ema</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">use_multiscale</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-        <span class="n">use_ohem</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
+        <span class="n">use_ohem</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">ohem_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.5</span><span class="p">,</span>
         <span class="n">use_focal_geo</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">focal_gamma</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">2.0</span><span class="p">,</span>
@@ -1321,6 +1328,8 @@ window.addEventListener("load", load);</script>
 <span class="sd">        score_geo_scale : float, optional</span>
 <span class="sd">            Multiplier to recover original coordinates from score/geo maps.</span>
 <span class="sd">            If None, automatically taken from the model. Default ``None``.</span>
+<span class="sd">        score_map_shrink_ratio : float, optional</span>
+<span class="sd">            Shrink ratio for score map. Default ``0.3``.</span>
 <span class="sd">        epochs : int, optional</span>
 <span class="sd">            Number of training epochs. Default ``500``.</span>
 <span class="sd">        batch_size : int, optional</span>
@@ -1336,6 +1345,32 @@ window.addEventListener("load", load);</script>
 <span class="sd">            Default is ``1`` (no accumulation).</span>
 <span class="sd">        lr : float, optional</span>
 <span class="sd">            Learning rate. Default ``1e-3``.</span>
+<span class="sd">        lr_scheduler : {&quot;cosine_restart&quot;, &quot;cosine&quot;, &quot;linear&quot;, &quot;step&quot;, &quot;exponential&quot;, &quot;plateau&quot;, &quot;none&quot;}, optional</span>
+<span class="sd">            Learning rate scheduler type. Default ``&quot;cosine_restart&quot;``.</span>
+<span class="sd">        lr_scheduler_params : dict, optional</span>
+<span class="sd">            Extra scheduler parameters (depends on scheduler type). Common keys:</span>
+
+<span class="sd">            - ``cosine_restart``: ``t0``, ``t_mult``, ``eta_min``</span>
+<span class="sd">            - ``cosine``: ``t_max``, ``eta_min``</span>
+<span class="sd">            - ``linear``: ``final_factor``</span>
+<span class="sd">            - ``step``: ``step_size``, ``gamma``</span>
+<span class="sd">            - ``exponential``: ``gamma``</span>
+<span class="sd">            - ``plateau``: ``factor``, ``patience``, ``min_lr``</span>
+<span class="sd">        augmentation_config : dict, optional</span>
+<span class="sd">            Full augmentation configuration passed to ``EASTDataset``. This is the</span>
+<span class="sd">            preferred place for all augmentation settings. Any keys here override the</span>
+<span class="sd">            corresponding defaults. Supported keys include:</span>
+
+<span class="sd">            - ``flip_prob``, ``color_jitter``</span>
+<span class="sd">            - ``small_rotate_prob``, ``small_rotate_deg``</span>
+<span class="sd">            - ``perspective_prob``, ``perspective_scale``</span>
+<span class="sd">            - ``blur_prob``, ``blur_ksize_range``</span>
+<span class="sd">            - ``noise_prob``, ``noise_std``, ``salt_pepper_prob``</span>
+<span class="sd">            - ``jpeg_prob``, ``jpeg_quality_range``</span>
+<span class="sd">            - ``shading_prob``, ``shading_strength``</span>
+<span class="sd">            - ``gamma_prob``, ``gamma_range``</span>
+<span class="sd">            - ``downscale_prob``, ``downscale_range``</span>
+<span class="sd">            - ``negative_prob``</span>
 <span class="sd">        grad_clip : float, optional</span>
 <span class="sd">            Gradient clipping value (L2 norm). Default ``5.0``.</span>
 <span class="sd">        early_stop : int, optional</span>
@@ -1360,10 +1395,13 @@ window.addEventListener("load", load);</script>
 <span class="sd">        focal_gamma : float, optional</span>
 <span class="sd">            Gamma for focal geometry loss. Default ``2.0``.</span>
 <span class="sd">        resume_from : str or Path, optional</span>
-<span class="sd">            Resume training from a previous experiment:</span>
+<span class="sd">            Resume training from a previous experiment or initialize from local weights:</span>
 <span class="sd">            a) experiment directory,</span>
 <span class="sd">            b) `.../checkpoints/`,</span>
-<span class="sd">            c) direct path to `last_state.pt`.</span>
+<span class="sd">            c) direct path to full-state checkpoint (`last_state.pt`).</span>
+<span class="sd">            If a weights-only file is provided (e.g. `best.pth`), model weights</span>
+<span class="sd">            are loaded, but training starts in the current</span>
+<span class="sd">            ``experiment_root/model_name`` directory.</span>
 <span class="sd">            Default ``None``.</span>
 <span class="sd">        val_interval : int, optional</span>
 <span class="sd">            Run validation every N epochs. Default ``1``.</span>
@@ -1415,6 +1453,38 @@ window.addEventListener("load", load);</script>
 <span class="sd">        ...     val_interval=3,</span>
 <span class="sd">        ... )</span>
 <span class="sd">        &gt;&gt;&gt; print(&quot;Best checkpoint loaded:&quot;, best_model)</span>
+
+<span class="sd">        Configure augmentations via ``augmentation_config``:</span>
+
+<span class="sd">        &gt;&gt;&gt; aug_cfg = {</span>
+<span class="sd">        ...     &quot;flip_prob&quot;: 0.02,</span>
+<span class="sd">        ...     &quot;color_jitter&quot;: (0.1, 0.1, 0.1, 0.05),</span>
+<span class="sd">        ...     &quot;small_rotate_prob&quot;: 0.15,</span>
+<span class="sd">        ...     &quot;small_rotate_deg&quot;: 1.5,</span>
+<span class="sd">        ...     &quot;perspective_prob&quot;: 0.08,</span>
+<span class="sd">        ...     &quot;perspective_scale&quot;: 0.015,</span>
+<span class="sd">        ...     &quot;blur_prob&quot;: 0.1,</span>
+<span class="sd">        ...     &quot;blur_ksize_range&quot;: (3, 5),</span>
+<span class="sd">        ...     &quot;noise_prob&quot;: 0.1,</span>
+<span class="sd">        ...     &quot;noise_std&quot;: 0.008,</span>
+<span class="sd">        ...     &quot;salt_pepper_prob&quot;: 0.0005,</span>
+<span class="sd">        ...     &quot;jpeg_prob&quot;: 0.1,</span>
+<span class="sd">        ...     &quot;jpeg_quality_range&quot;: (75, 95),</span>
+<span class="sd">        ...     &quot;shading_prob&quot;: 0.1,</span>
+<span class="sd">        ...     &quot;shading_strength&quot;: 0.1,</span>
+<span class="sd">        ...     &quot;gamma_prob&quot;: 0.2,</span>
+<span class="sd">        ...     &quot;gamma_range&quot;: (0.95, 1.05),</span>
+<span class="sd">        ...     &quot;downscale_prob&quot;: 0.1,</span>
+<span class="sd">        ...     &quot;downscale_range&quot;: (0.7, 0.95),</span>
+<span class="sd">        ...     &quot;negative_prob&quot;: 0.05,</span>
+<span class="sd">        ... }</span>
+<span class="sd">        &gt;&gt;&gt; best_model = EAST.train(</span>
+<span class="sd">        ...     train_images=train_images,</span>
+<span class="sd">        ...     train_anns=train_anns,</span>
+<span class="sd">        ...     val_images=val_images,</span>
+<span class="sd">        ...     val_anns=val_anns,</span>
+<span class="sd">        ...     augmentation_config=aug_cfg,</span>
+<span class="sd">        ... )</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="ow">not</span> <span class="n">_TORCH_AVAILABLE</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ImportError</span><span class="p">(</span>
@@ -1434,12 +1504,40 @@ window.addEventListener("load", load);</script>
         <span class="k">if</span> <span class="n">score_geo_scale</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">score_geo_scale</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">score_scale</span>
 
+        <span class="n">base_augmentation_config</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;flip_prob&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+            <span class="s2">&quot;color_jitter&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span>
+            <span class="s2">&quot;small_rotate_prob&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+            <span class="s2">&quot;small_rotate_deg&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+            <span class="s2">&quot;perspective_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">&quot;perspective_scale&quot;</span><span class="p">:</span> <span class="mf">0.015</span><span class="p">,</span>
+            <span class="s2">&quot;blur_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">&quot;blur_ksize_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+            <span class="s2">&quot;noise_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">&quot;noise_std&quot;</span><span class="p">:</span> <span class="mf">0.008</span><span class="p">,</span>
+            <span class="s2">&quot;salt_pepper_prob&quot;</span><span class="p">:</span> <span class="mf">0.0005</span><span class="p">,</span>
+            <span class="s2">&quot;jpeg_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">&quot;jpeg_quality_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">75</span><span class="p">,</span> <span class="mi">95</span><span class="p">),</span>
+            <span class="s2">&quot;shading_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">&quot;shading_strength&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">&quot;gamma_prob&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+            <span class="s2">&quot;gamma_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">),</span>
+            <span class="s2">&quot;downscale_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">&quot;downscale_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">),</span>
+            <span class="s2">&quot;negative_prob&quot;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
+        <span class="p">}</span>
+        <span class="n">aug_cfg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">base_augmentation_config</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">augmentation_config</span><span class="p">:</span>
+            <span class="n">aug_cfg</span><span class="o">.</span><span class="n">update</span><span class="p">(</span><span class="n">augmentation_config</span><span class="p">)</span>
+
         <span class="k">def</span><span class="w"> </span><span class="nf">make_dataset</span><span class="p">(</span><span class="n">imgs</span><span class="p">,</span> <span class="n">anns</span><span class="p">,</span> <span class="n">name</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">):</span>
             <span class="k">return</span> <span class="n">EASTDataset</span><span class="p">(</span>
                 <span class="n">images_folder</span><span class="o">=</span><span class="n">imgs</span><span class="p">,</span>
                 <span class="n">coco_annotation_file</span><span class="o">=</span><span class="n">anns</span><span class="p">,</span>
                 <span class="n">target_size</span><span class="o">=</span><span class="n">target_size</span><span class="p">,</span>
                 <span class="n">score_geo_scale</span><span class="o">=</span><span class="n">score_geo_scale</span><span class="p">,</span>
+                <span class="n">shrink_ratio</span><span class="o">=</span><span class="n">score_map_shrink_ratio</span><span class="p">,</span>
+                <span class="o">**</span><span class="n">aug_cfg</span><span class="p">,</span>
                 <span class="n">dataset_name</span><span class="o">=</span><span class="n">name</span><span class="p">,</span>
             <span class="p">)</span>
 
@@ -1527,8 +1625,16 @@ window.addEventListener("load", load);</script>
             <span class="k">return</span> <span class="p">(</span><span class="n">Path</span><span class="o">.</span><span class="n">cwd</span><span class="p">()</span> <span class="o">/</span> <span class="n">p</span><span class="p">)</span><span class="o">.</span><span class="n">resolve</span><span class="p">()</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_is_experiment_checkpoint</span><span class="p">(</span><span class="n">file_path</span><span class="p">:</span> <span class="n">Path</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+            <span class="c1"># Only full-state checkpoint files should force reusing source experiment dir.</span>
+            <span class="c1"># Weights-only files (e.g. best.pth) should initialize model in a new experiment.</span>
+            <span class="n">state_checkpoint_names</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;last_state.pt&quot;</span><span class="p">,</span> <span class="s2">&quot;checkpoint_last.pth&quot;</span><span class="p">,</span> <span class="s2">&quot;checkpoint_last.pt&quot;</span><span class="p">}</span>
+            <span class="k">if</span> <span class="n">file_path</span><span class="o">.</span><span class="n">name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">state_checkpoint_names</span><span class="p">:</span>
+                <span class="k">return</span> <span class="kc">False</span>
+
             <span class="n">parent</span> <span class="o">=</span> <span class="n">file_path</span><span class="o">.</span><span class="n">parent</span>
-            <span class="k">return</span> <span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;checkpoints&quot;</span> <span class="ow">or</span> <span class="p">(</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;training_config.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+            <span class="k">if</span> <span class="n">parent</span><span class="o">.</span><span class="n">name</span> <span class="o">==</span> <span class="s2">&quot;checkpoints&quot;</span><span class="p">:</span>
+                <span class="k">return</span> <span class="p">(</span><span class="n">parent</span><span class="o">.</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;training_config.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
+            <span class="k">return</span> <span class="p">(</span><span class="n">parent</span> <span class="o">/</span> <span class="s2">&quot;training_config.json&quot;</span><span class="p">)</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span>
 
         <span class="k">def</span><span class="w"> </span><span class="nf">_resolve_resume_target</span><span class="p">(</span>
             <span class="n">target</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">],</span>
@@ -1560,7 +1666,9 @@ window.addEventListener("load", load);</script>
             <span class="n">resume_state</span> <span class="o">=</span> <span class="n">default_state</span> <span class="k">if</span> <span class="n">default_state</span><span class="o">.</span><span class="n">exists</span><span class="p">()</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="k">return</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">experiment_dir</span><span class="p">)),</span> <span class="n">resume_state</span>
 
-        <span class="n">default_experiment_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">experiment_root</span><span class="p">,</span> <span class="n">model_name</span><span class="p">))</span>
+        <span class="n">default_experiment_dir</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">abspath</span><span class="p">(</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">experiment_root</span><span class="p">,</span> <span class="n">model_name</span><span class="p">)</span>
+        <span class="p">)</span>
         <span class="n">resume_state_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Path</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="k">if</span> <span class="n">resume_from</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">experiment_dir</span> <span class="o">=</span> <span class="n">default_experiment_dir</span>
@@ -1581,6 +1689,8 @@ window.addEventListener("load", load);</script>
             <span class="n">batch_size</span><span class="o">=</span><span class="n">batch_size</span><span class="p">,</span>
             <span class="n">accumulation_steps</span><span class="o">=</span><span class="n">accumulation_steps</span><span class="p">,</span>
             <span class="n">lr</span><span class="o">=</span><span class="n">lr</span><span class="p">,</span>
+            <span class="n">lr_scheduler</span><span class="o">=</span><span class="n">lr_scheduler</span><span class="p">,</span>
+            <span class="n">lr_scheduler_params</span><span class="o">=</span><span class="n">lr_scheduler_params</span><span class="p">,</span>
             <span class="n">grad_clip</span><span class="o">=</span><span class="n">grad_clip</span><span class="p">,</span>
             <span class="n">early_stop</span><span class="o">=</span><span class="n">early_stop</span><span class="p">,</span>
             <span class="n">use_sam</span><span class="o">=</span><span class="n">use_sam</span><span class="p">,</span>
@@ -1603,6 +1713,8 @@ window.addEventListener("load", load);</script>
             <span class="n">resume_state_path</span><span class="o">=</span><span class="p">(</span>
                 <span class="n">os</span><span class="o">.</span><span class="n">fspath</span><span class="p">(</span><span class="n">resume_state_path</span><span class="p">)</span> <span class="k">if</span> <span class="n">resume_state_path</span> <span class="k">else</span> <span class="kc">None</span>
             <span class="p">),</span>
+            <span class="n">score_map_shrink_ratio</span><span class="o">=</span><span class="n">score_map_shrink_ratio</span><span class="p">,</span>
+            <span class="n">augmentation_config</span><span class="o">=</span><span class="n">aug_cfg</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">best_model</span></div>
 
@@ -1681,7 +1793,7 @@ window.addEventListener("load", load);</script>
 <span class="sd">        Export with automatic backbone detection:</span>
 
 <span class="sd">        &gt;&gt;&gt; from manuscript.detectors import EAST</span>
-<span class="sd">        &gt;&gt;&gt; EAST.export_to_onnx(</span>
+<span class="sd">        &gt;&gt;&gt; EAST.export(</span>
 <span class="sd">        ...     weights_path=&quot;east_resnet50.pth&quot;,</span>
 <span class="sd">        ...     output_path=&quot;east_model.onnx&quot;</span>
 <span class="sd">        ... )</span>
@@ -1691,7 +1803,7 @@ window.addEventListener("load", load);</script>
 
 <span class="sd">        Export with explicit backbone:</span>
 
-<span class="sd">        &gt;&gt;&gt; EAST.export_to_onnx(</span>
+<span class="sd">        &gt;&gt;&gt; EAST.export(</span>
 <span class="sd">        ...     weights_path=&quot;custom_weights.pth&quot;,</span>
 <span class="sd">        ...     output_path=&quot;custom_model.onnx&quot;,</span>
 <span class="sd">        ...     backbone_name=&quot;resnet101&quot;,</span>

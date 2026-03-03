@@ -1518,12 +1518,12 @@ def run_training(cfg: Config, device: str = "cuda"):
     
     try:
         logger.info("Attempting to export best model to ONNX...")
-        from manuscript.recognizers._trba import export_to_onnx
+        from manuscript.recognizers import TRBA
         
         onnx_path = os.path.join(exp_dir, "best_acc_model.onnx")
         config_path = os.path.join(exp_dir, "config.json")
         
-        export_to_onnx(
+        TRBA.export(
             weights_path=best_acc_weights_path,
             config_path=config_path,
             charset_path=charset_dest,
