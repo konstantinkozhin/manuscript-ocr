@@ -87,6 +87,7 @@ Files:
 - Added frozen docs snapshot at `docs/sphinx/_archive/0.1.10`.
 - Updated GitHub Pages workflow to stop rebuilding legacy docs.
 - Workflow now copies archived `0.1.10` into `_site/0.1.10` and builds only latest docs (`0.1.11`).
+- Restricted `deploy` job to `main/master`, so docs CI on feature/release branches (e.g. `v_0_1_11`) builds without failing on protected `github-pages` environment.
 
 Files:
 - docs/sphinx/_archive/0.1.10/*
