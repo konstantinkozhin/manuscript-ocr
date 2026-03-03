@@ -13,7 +13,8 @@ sys.path.insert(0, os.path.abspath("../../src"))
 project = "manuscript-ocr"
 copyright = "2026, Konstantin Kozhin"
 author = "Konstantin Kozhin"
-release = "0.1.10"
+release = os.environ.get("DOCS_RELEASE", "0.1.10")
+version = os.environ.get("DOCS_VERSION", release)
 
 # -- General configuration ---------------------------------------------------
 extensions = [

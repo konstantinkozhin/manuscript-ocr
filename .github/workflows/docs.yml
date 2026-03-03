@@ -6,6 +6,7 @@ on:
       - main
       - master
       - onnyx
+      - v_0_1_11
   workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
@@ -22,9 +23,15 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+    env:
+      LATEST_DOCS_VERSION: "0.1.11"
+      LEGACY_DOCS_VERSION: "0.1.10"
+      LEGACY_DOCS_REF: "origin/main"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v5
@@ -37,24 +44,59 @@ jobs:
           pip install sphinx sphinx-rtd-theme numpydoc sphinx-autodoc-typehints sphinxcontrib-mermaid sphinx-intl
           pip install -e .
 
-      - name: Build documentation
+      - name: Build latest version docs
         run: |
           cd docs/sphinx
-          # Update translation templates
+          mkdir -p _site/${LATEST_DOCS_VERSION}/en _site/${LATEST_DOCS_VERSION}/ru
+          # Update translation templates for current docs
           sphinx-build -b gettext . _build/gettext
           sphinx-intl update -p _build/gettext -l ru
-          # Build English documentation
-          sphinx-build -b html . _build/html/en
-          # Build Russian documentation
-          sphinx-build -b html -D language=ru . _build/html/ru
-          # Create redirect at root
-          echo '<!DOCTYPE html><html><head><meta charset="utf-8"><meta http-equiv="refresh" content="0; url=en/index.html"><title>Redirecting...</title></head><body><p>Redirecting to <a href="en/index.html">English documentation</a>...</p></body></html>' > _build/html/index.html
-          touch _build/html/.nojekyll
+          # Build latest docs (EN/RU)
+          sphinx-build -b html -D language=en -D release=${LATEST_DOCS_VERSION} -D version=${LATEST_DOCS_VERSION} . _site/${LATEST_DOCS_VERSION}/en
+          sphinx-build -b html -D language=ru -D release=${LATEST_DOCS_VERSION} -D version=${LATEST_DOCS_VERSION} . _site/${LATEST_DOCS_VERSION}/ru
+
+      - name: Build legacy version docs
+        run: |
+          git worktree add _legacy "${LEGACY_DOCS_REF}"
+          pushd _legacy/docs/sphinx
+          sphinx-build -b html -D language=en -D release=${LEGACY_DOCS_VERSION} -D version=${LEGACY_DOCS_VERSION} . ../../../docs/sphinx/_site/${LEGACY_DOCS_VERSION}/en
+          sphinx-build -b html -D language=ru -D release=${LEGACY_DOCS_VERSION} -D version=${LEGACY_DOCS_VERSION} . ../../../docs/sphinx/_site/${LEGACY_DOCS_VERSION}/ru
+          popd
+          git worktree remove _legacy --force
+
+      - name: Create site index and version metadata
+        run: |
+          cat > docs/sphinx/_site/index.html <<'HTML'
+          <!DOCTYPE html>
+          <html lang="en">
+          <head>
+            <meta charset="utf-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1">
+            <meta http-equiv="refresh" content="0; url=0.1.11/en/index.html">
+            <title>manuscript-ocr docs</title>
+          </head>
+          <body>
+            <p>Redirecting to <a href="0.1.11/en/index.html">latest docs (0.1.11)</a>...</p>
+            <p>Available versions:</p>
+            <ul>
+              <li><a href="0.1.11/en/index.html">0.1.11 (EN)</a> | <a href="0.1.11/ru/index.html">0.1.11 (RU)</a></li>
+              <li><a href="0.1.10/en/index.html">0.1.10 (EN)</a> | <a href="0.1.10/ru/index.html">0.1.10 (RU)</a></li>
+            </ul>
+          </body>
+          </html>
+          HTML
+          cat > docs/sphinx/_site/versions.json <<'JSON'
+          {
+            "latest": "0.1.11",
+            "versions": ["0.1.11", "0.1.10"]
+          }
+          JSON
+          touch docs/sphinx/_site/.nojekyll
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: docs/sphinx/_build/html
+          path: docs/sphinx/_site
 
   deploy:
     environment:

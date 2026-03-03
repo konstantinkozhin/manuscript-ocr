@@ -43,5 +43,22 @@ File:
 File:
 - src/manuscript/api/base.py
 
+6) Docs fix for EAST parameter name (local)
+- Replaced deprecated/invalid example parameter nms_thresh with iou_threshold in Pipeline usage docs.
+
+Files:
+- docs/PIPELINE_API.md
+- docs/sphinx/pipeline_usage.rst
+
+7) Versioned static docs deployment (local)
+- Updated GitHub Pages workflow to publish two documentation versions: 0.1.11 (latest) and 0.1.10 (legacy).
+- Added root index redirect and versions metadata file for static hosting.
+- Added docs deploy trigger for branch v_0_1_11.
+- Updated Sphinx config to allow release/version override via environment variables.
+
+Files:
+- .github/workflows/docs.yml
+- docs/sphinx/conf.py
+
 Summary:
 - v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fixes).

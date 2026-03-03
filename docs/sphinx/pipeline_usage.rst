@@ -342,7 +342,7 @@ Built-in Model Configuration
     detector = EAST(
         weights="east_50_g1",        # weight selection
         score_thresh=0.8,            # confidence threshold
-        nms_thresh=0.2,              # NMS threshold
+        iou_threshold=0.2,           # IoU threshold for NMS
         device="cpu"                 # device (cpu/cuda)
     )
 

@@ -370,7 +370,7 @@ from manuscript.recognizers import TRBA
 detector = EAST(
     weights="east_50_g1",        # выбор весов
     score_thresh=0.8,            # порог уверенности
-    nms_thresh=0.2,              # порог NMS
+    iou_threshold=0.2,           # IoU-порог для NMS
     device="cpu"                 # устройство (cpu/cuda)
 )
 
