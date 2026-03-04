@@ -22,7 +22,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
-    <link rel="next" title="Recognizers" href="recognizers.html" />
+    <link rel="next" title="Layouts" href="layouts.html" />
     <link rel="prev" title="Data Structures" href="data.html" /> 
 </head>
 
@@ -51,57 +51,37 @@
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#quick-start">Quick Start</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#main-components">Main Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#pipeline-defaults">Pipeline Defaults</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../pipeline_usage.html">Pipeline Usage Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#detector-requirements">Detector Requirements</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#result-structure">Result Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#stage-contracts">Stage Contracts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#detector">Detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#recognizer">Recognizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#layout">Layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#corrector">Corrector</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#recognizer-requirements">Recognizer Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#corrector-requirements">Corrector Requirements</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#built-in-charlm-corrector">Built-in CharLM Corrector</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#compatible-implementation-examples">Compatible Implementation Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#complete-detector-example">Complete Detector Example</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#using-custom-components">Using Custom Components</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#pipeline-usage-examples">Pipeline Usage Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#basic-usage">Basic Usage</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#detection-only-without-recognition">Detection Only (Without Recognition)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#with-visualization">With Visualization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#export-import-page-to-json">Export/Import Page to JSON</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#with-profiling">With Profiling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#batch-processing">Batch Processing</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#component-configuration">Component Configuration</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#replacing-detector-or-recognizer">Replacing Detector or Recognizer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#built-in-model-configuration">Built-in Model Configuration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#size-filtering">Size Filtering</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#automatic-rotation-control-trba">Automatic Rotation Control (TRBA)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#disable-stages">Disable Stages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#layout-placement">Layout Placement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../structure.html">Library Structure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../structure.html#module-descriptions">Module Descriptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure.html#overview">Overview</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="pipeline.html">Pipeline</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_layout_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_layout_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
 </ul>
@@ -127,6 +107,14 @@
 <li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -279,7 +267,7 @@ For GPU acceleration, install: <code class="docutils literal notranslate"><span 
 <tr class="row-even"><td><p><a class="reference internal" href="#manuscript.detectors.EAST.export" title="manuscript.detectors.EAST.export"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export</span></code></a>(weights_path, output_path[, ...])</p></td>
 <td><p>Export EAST PyTorch model to ONNX format.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#manuscript.detectors.EAST.predict" title="manuscript.detectors.EAST.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(img_or_path[, return_maps, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#manuscript.detectors.EAST.predict" title="manuscript.detectors.EAST.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(img_or_path[, return_maps])</p></td>
 <td><p>Run EAST inference and return detection results.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">runtime_providers</span></code>()</p></td>
@@ -330,7 +318,7 @@ For GPU acceleration, install: <code class="docutils literal notranslate"><span 
 
 <dl class="py method">
 <dt class="sig sig-object py" id="manuscript.detectors.EAST.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_or_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_maps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_reading_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_into_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_east.html#EAST.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.detectors.EAST.predict" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_or_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_maps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_east.html#EAST.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.detectors.EAST.predict" title="Link to this definition"></a></dt>
 <dd><p>Run EAST inference and return detection results.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
@@ -339,25 +327,15 @@ For GPU acceleration, install: <code class="docutils literal notranslate"><span 
 with shape <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W,</span> <span class="pre">3)</span></code> in <code class="docutils literal notranslate"><span class="pre">uint8</span></code> format.</p></li>
 <li><p><strong>return_maps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, returns raw model score and geometry maps under keys
 <code class="docutils literal notranslate"><span class="pre">&quot;score_map&quot;</span></code> and <code class="docutils literal notranslate"><span class="pre">&quot;geo_map&quot;</span></code>. Default is False.</p></li>
-<li><p><strong>sort_reading_order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, sorts detected words in natural reading order
-(left-to-right, top-to-bottom) and groups them into text lines.
-Default is True.</p></li>
-<li><p><strong>split_into_columns</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True and <code class="docutils literal notranslate"><span class="pre">sort_reading_order=True</span></code>, segments the page into
-columns (separate Blocks). If False, treats entire page as single
-column. Only used when <code class="docutils literal notranslate"><span class="pre">sort_reading_order=True</span></code>. Default is True.</p></li>
-<li><p><strong>max_columns</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum number of columns to detect when <code class="docutils literal notranslate"><span class="pre">split_into_columns=True</span></code>.
-Higher values allow more columns to be detected. Only used when
-<code class="docutils literal notranslate"><span class="pre">sort_reading_order=True</span></code> and <code class="docutils literal notranslate"><span class="pre">split_into_columns=True</span></code>.
-Default is 10.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Returns<span class="colon">:</span></dt>
 <dd class="field-even"><p><p>Dictionary with the following keys:</p>
 <ul class="simple">
 <li><dl class="simple">
-<dt><code class="docutils literal notranslate"><span class="pre">&quot;page&quot;</span></code><span class="classifier">Page</span></dt><dd><p>Parsed detection result as a Page object containing Block(s) with
-Line(s) of Word objects. Each Word has polygon coordinates and
-confidence scores. Words and Lines have reading order indices.</p>
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;page&quot;</span></code><span class="classifier">Page</span></dt><dd><p>Parsed detection result as a Page object containing a single
+Block with a single Line of Word objects. Each Word has polygon
+coordinates, confidence score, and sequential <code class="docutils literal notranslate"><span class="pre">order</span></code> index.</p>
 </dd>
 </dl>
 </li>
@@ -382,7 +360,7 @@ confidence scores. Words and Lines have reading order indices.</p>
 <p>The method performs:
 (1) image loading, (2) resizing and normalization, (3) model inference,
 (4) quad decoding, (5) NMS, (6) box expansion, (7) scaling coordinates
-back to original size, (8) optional reading order sorting into lines.</p>
+back to original size.</p>
 <p><strong>Test-Time Augmentation (TTA):</strong></p>
 <p>When <code class="docutils literal notranslate"><span class="pre">use_tta=True</span></code> is set during initialization, the method runs
 inference on both the original and horizontally flipped image, then
@@ -689,7 +667,7 @@ checkpoint and architecture that could lead to incorrect exports.</p>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
         <a href="data.html" class="btn btn-neutral float-left" title="Data Structures" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
-        <a href="recognizers.html" class="btn btn-neutral float-right" title="Recognizers" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="layouts.html" class="btn btn-neutral float-right" title="Layouts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

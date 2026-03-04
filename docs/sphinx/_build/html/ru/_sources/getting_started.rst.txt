@@ -61,9 +61,20 @@ Main Components
 
 - :class:`~manuscript.Pipeline` - High-level OCR pipeline
 - :class:`~manuscript.detectors.EAST` - Text detector
+- :class:`~manuscript.layouts.SimpleSorting` - Layout ordering model
 - :class:`~manuscript.recognizers.TRBA` - Text recognizer
 - :class:`~manuscript.correctors.CharLM` - Character-level text corrector
 - :class:`~manuscript.data.Page` - Page data structure
 - :class:`~manuscript.data.Block` - Block data structure
 - :class:`~manuscript.data.Line` - Line data structure
 - :class:`~manuscript.data.Word` - Word data structure
+
+Pipeline Defaults
+-----------------
+
+``Pipeline()`` uses:
+
+- ``EAST`` detector
+- ``SimpleSorting`` layout
+- ``TRBA`` recognizer
+- no corrector (``None``)

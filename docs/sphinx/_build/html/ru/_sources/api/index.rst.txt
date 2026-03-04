@@ -9,6 +9,7 @@ This section contains the complete API reference for manuscript-ocr.
    pipeline
    data
    detectors
+   layouts
    recognizers
    correctors
    utils

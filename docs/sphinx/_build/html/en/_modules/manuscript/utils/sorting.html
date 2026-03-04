@@ -452,6 +452,7 @@ mermaid.initialize(
 
 window.addEventListener("load", load);</script>
       <script src="../../../_static/language_switcher.js?v=db730534"></script>
+      <script src="../../../_static/version_sidebar.js?v=edadfa97"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -482,57 +483,37 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#quick-start">Quick Start</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#main-components">Main Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#pipeline-defaults">Pipeline Defaults</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pipeline_usage.html">Pipeline Usage Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#detector-requirements">Detector Requirements</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#result-structure">Result Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#stage-contracts">Stage Contracts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#detector">Detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#recognizer">Recognizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#layout">Layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#corrector">Corrector</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#recognizer-requirements">Recognizer Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#corrector-requirements">Corrector Requirements</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#built-in-charlm-corrector">Built-in CharLM Corrector</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#compatible-implementation-examples">Compatible Implementation Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#complete-detector-example">Complete Detector Example</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#using-custom-components">Using Custom Components</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#pipeline-usage-examples">Pipeline Usage Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#basic-usage">Basic Usage</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#detection-only-without-recognition">Detection Only (Without Recognition)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#with-visualization">With Visualization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#export-import-page-to-json">Export/Import Page to JSON</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#with-profiling">With Profiling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#batch-processing">Batch Processing</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#component-configuration">Component Configuration</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#replacing-detector-or-recognizer">Replacing Detector or Recognizer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#built-in-model-configuration">Built-in Model Configuration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#size-filtering">Size Filtering</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#automatic-rotation-control-trba">Automatic Rotation Control (TRBA)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#disable-stages">Disable Stages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#layout-placement">Layout Placement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Library Structure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../structure.html#module-descriptions">Module Descriptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../structure.html#overview">Overview</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/pipeline.html">Pipeline</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.last_layout_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_layout_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
 </ul>
@@ -558,6 +539,14 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -628,312 +617,8 @@ window.addEventListener("load", load);</script>
            <div itemprop="articleBody">
              
   <h1>Source code for manuscript.utils.sorting</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span>
-
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-
-<span class="kn">from</span><span class="w"> </span><span class="nn">..data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">Line</span><span class="p">,</span> <span class="n">Page</span><span class="p">,</span> <span class="n">Word</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_resolve_intersections</span><span class="p">(</span>
-    <span class="n">boxes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Resolve intersecting boxes by shrinking them iteratively.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    boxes : list of tuple</span>
-<span class="sd">        List of boxes in format (x_min, y_min, x_max, y_max).</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    list of tuple</span>
-<span class="sd">        List of resolved boxes with reduced overlaps.</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; boxes = [(10, 10, 55, 30), (50, 10, 100, 30)]  # Overlapping</span>
-<span class="sd">    &gt;&gt;&gt; resolved = _resolve_intersections(boxes)</span>
-<span class="sd">    &gt;&gt;&gt; len(resolved)</span>
-<span class="sd">    2</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    - Iteratively shrinks boxes by 10% when overlaps detected</span>
-<span class="sd">    - Maximum 50 iterations to prevent infinite loops</span>
-<span class="sd">    - May not eliminate all overlaps for complex cases</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">intersect</span><span class="p">(</span><span class="n">b1</span><span class="p">,</span> <span class="n">b2</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Check if two boxes intersect.&quot;&quot;&quot;</span>
-        <span class="k">return</span> <span class="ow">not</span> <span class="p">(</span>
-            <span class="n">b1</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b2</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">b2</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b1</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="ow">or</span> <span class="n">b1</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b2</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="ow">or</span> <span class="n">b2</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">b1</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span>
-        <span class="p">)</span>
-
-    <span class="n">resolved</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span>
-    <span class="n">max_iterations</span> <span class="o">=</span> <span class="mi">50</span>
-
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_iterations</span><span class="p">):</span>
-        <span class="n">changed</span> <span class="o">=</span> <span class="kc">False</span>
-        <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">resolved</span><span class="p">)):</span>
-            <span class="k">for</span> <span class="n">j</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">i</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="nb">len</span><span class="p">(</span><span class="n">resolved</span><span class="p">)):</span>
-                <span class="k">if</span> <span class="n">intersect</span><span class="p">(</span><span class="n">resolved</span><span class="p">[</span><span class="n">i</span><span class="p">],</span> <span class="n">resolved</span><span class="p">[</span><span class="n">j</span><span class="p">]):</span>
-                    <span class="c1"># Shrink both boxes by 10%</span>
-                    <span class="n">x0</span><span class="p">,</span> <span class="n">y0</span><span class="p">,</span> <span class="n">x1</span><span class="p">,</span> <span class="n">y1</span> <span class="o">=</span> <span class="n">resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
-                    <span class="n">x0b</span><span class="p">,</span> <span class="n">y0b</span><span class="p">,</span> <span class="n">x1b</span><span class="p">,</span> <span class="n">y1b</span> <span class="o">=</span> <span class="n">resolved</span><span class="p">[</span><span class="n">j</span><span class="p">]</span>
-
-                    <span class="n">resolved</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">x0</span><span class="p">,</span>
-                        <span class="n">y0</span><span class="p">,</span>
-                        <span class="nb">int</span><span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="p">(</span><span class="n">x1</span> <span class="o">-</span> <span class="n">x0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">),</span>
-                        <span class="nb">int</span><span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="p">(</span><span class="n">y1</span> <span class="o">-</span> <span class="n">y0</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">),</span>
-                    <span class="p">)</span>
-                    <span class="n">resolved</span><span class="p">[</span><span class="n">j</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span>
-                        <span class="n">x0b</span><span class="p">,</span>
-                        <span class="n">y0b</span><span class="p">,</span>
-                        <span class="nb">int</span><span class="p">(</span><span class="n">x1b</span> <span class="o">-</span> <span class="p">(</span><span class="n">x1b</span> <span class="o">-</span> <span class="n">x0b</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">),</span>
-                        <span class="nb">int</span><span class="p">(</span><span class="n">y1b</span> <span class="o">-</span> <span class="p">(</span><span class="n">y1b</span> <span class="o">-</span> <span class="n">y0b</span><span class="p">)</span> <span class="o">*</span> <span class="mf">0.1</span><span class="p">),</span>
-                    <span class="p">)</span>
-                    <span class="n">changed</span> <span class="o">=</span> <span class="kc">True</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">changed</span><span class="p">:</span>
-            <span class="k">break</span>
-
-    <span class="k">return</span> <span class="n">resolved</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_find_gaps</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Find centers of empty vertical regions within a range.&quot;&quot;&quot;</span>
-    <span class="n">segs</span> <span class="o">=</span> <span class="p">[</span>
-        <span class="p">(</span><span class="nb">max</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">],</span> <span class="n">start</span><span class="p">),</span> <span class="nb">min</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">],</span> <span class="n">end</span><span class="p">))</span>
-        <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">boxes</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">start</span> <span class="ow">or</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">end</span><span class="p">)</span>
-    <span class="p">]</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">segs</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[]</span>
-    <span class="n">segs</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-    <span class="n">merged</span> <span class="o">=</span> <span class="p">[</span><span class="n">segs</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
-    <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">segs</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
-        <span class="n">ms</span><span class="p">,</span> <span class="n">me</span> <span class="o">=</span> <span class="n">merged</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
-        <span class="k">if</span> <span class="n">s</span> <span class="o">&lt;=</span> <span class="n">me</span><span class="p">:</span>
-            <span class="n">merged</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span> <span class="o">=</span> <span class="p">(</span><span class="n">ms</span><span class="p">,</span> <span class="nb">max</span><span class="p">(</span><span class="n">me</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="n">merged</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
-    <span class="n">gaps</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="n">prev_end</span> <span class="o">=</span> <span class="n">start</span>
-    <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">merged</span><span class="p">:</span>
-        <span class="k">if</span> <span class="n">s</span> <span class="o">&gt;</span> <span class="n">prev_end</span><span class="p">:</span>
-            <span class="n">gaps</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">prev_end</span><span class="p">,</span> <span class="n">s</span><span class="p">))</span>
-        <span class="n">prev_end</span> <span class="o">=</span> <span class="n">e</span>
-    <span class="k">if</span> <span class="n">prev_end</span> <span class="o">&lt;</span> <span class="n">end</span><span class="p">:</span>
-        <span class="n">gaps</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">prev_end</span><span class="p">,</span> <span class="n">end</span><span class="p">))</span>
-    <span class="k">return</span> <span class="p">[(</span><span class="n">a</span> <span class="o">+</span> <span class="n">b</span><span class="p">)</span> <span class="o">//</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">a</span><span class="p">,</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">gaps</span> <span class="k">if</span> <span class="n">b</span> <span class="o">-</span> <span class="n">a</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">]</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_emptiness</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">start</span><span class="p">,</span> <span class="n">end</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">float</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Calculate emptiness ratio of a column region.&quot;&quot;&quot;</span>
-    <span class="n">col</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">boxes</span> <span class="k">if</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">start</span> <span class="ow">and</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">end</span><span class="p">]</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">col</span><span class="p">:</span>
-        <span class="k">return</span> <span class="mf">1.0</span>
-    <span class="n">min_y</span><span class="p">,</span> <span class="n">min_x</span> <span class="o">=</span> <span class="nb">min</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">col</span><span class="p">),</span> <span class="nb">max</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">col</span><span class="p">)</span>
-    <span class="n">rect</span> <span class="o">=</span> <span class="p">(</span><span class="n">end</span> <span class="o">-</span> <span class="n">start</span><span class="p">)</span> <span class="o">*</span> <span class="p">(</span><span class="n">min_x</span> <span class="o">-</span> <span class="n">min_y</span><span class="p">)</span>
-    <span class="n">area</span> <span class="o">=</span> <span class="nb">sum</span><span class="p">((</span><span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">-</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span> <span class="o">*</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">])</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">col</span><span class="p">)</span>
-    <span class="k">return</span> <span class="p">(</span><span class="n">rect</span> <span class="o">-</span> <span class="n">area</span><span class="p">)</span> <span class="o">/</span> <span class="n">rect</span> <span class="k">if</span> <span class="n">rect</span> <span class="k">else</span> <span class="mf">1.0</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_segment_columns</span><span class="p">(</span>
-    <span class="n">boxes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
-    <span class="n">max_splits</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Segment boxes into columns using vertical gaps.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    boxes : list of tuple</span>
-<span class="sd">        List of boxes in format (x_min, y_min, x_max, y_max).</span>
-<span class="sd">    max_splits : int, default=10</span>
-<span class="sd">        Maximum number of column splits to detect.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    list of list of tuple</span>
-<span class="sd">        List of columns, where each column is a list of boxes.</span>
-<span class="sd">        Columns are sorted left-to-right.</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    - Finds optimal vertical split points by analyzing empty regions</span>
-<span class="sd">    - Filters out empty columns</span>
-<span class="sd">    - Useful for multi-column document layouts</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">boxes</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[]</span>
-
-    <span class="n">img_width</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">boxes</span><span class="p">)</span>
-    <span class="n">segments</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="n">img_width</span><span class="p">)]</span>
-    <span class="n">separators</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">for</span> <span class="n">_</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="n">max_splits</span> <span class="ow">or</span> <span class="n">img_width</span><span class="p">):</span>
-        <span class="n">best</span> <span class="o">=</span> <span class="kc">None</span>
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">segments</span><span class="p">):</span>
-            <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">_find_gaps</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">):</span>
-                <span class="k">if</span> <span class="ow">not</span> <span class="p">(</span>
-                    <span class="nb">any</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">s</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">boxes</span><span class="p">)</span>
-                    <span class="ow">and</span> <span class="nb">any</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">x</span> <span class="ow">and</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">e</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">boxes</span><span class="p">)</span>
-                <span class="p">):</span>
-                    <span class="k">continue</span>
-                <span class="n">score</span> <span class="o">=</span> <span class="n">_emptiness</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">s</span><span class="p">,</span> <span class="n">x</span><span class="p">)</span> <span class="o">+</span> <span class="n">_emptiness</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">e</span><span class="p">)</span>
-                <span class="k">if</span> <span class="n">best</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="n">score</span> <span class="o">&lt;</span> <span class="n">best</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
-                    <span class="n">best</span> <span class="o">=</span> <span class="p">(</span><span class="n">score</span><span class="p">,</span> <span class="n">x</span><span class="p">,</span> <span class="n">idx</span><span class="p">)</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">best</span><span class="p">:</span>
-            <span class="k">break</span>
-        <span class="n">_</span><span class="p">,</span> <span class="n">x_split</span><span class="p">,</span> <span class="n">idx</span> <span class="o">=</span> <span class="n">best</span>
-        <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="o">=</span> <span class="n">segments</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">idx</span><span class="p">)</span>
-        <span class="n">separators</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">x_split</span><span class="p">)</span>
-        <span class="n">segments</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span><span class="p">,</span> <span class="p">(</span><span class="n">s</span><span class="p">,</span> <span class="n">x_split</span><span class="p">))</span>
-        <span class="n">segments</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="n">idx</span> <span class="o">+</span> <span class="mi">1</span><span class="p">,</span> <span class="p">(</span><span class="n">x_split</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
-        <span class="n">segments</span><span class="o">.</span><span class="n">sort</span><span class="p">()</span>
-
-    <span class="n">parts</span> <span class="o">=</span> <span class="p">[(</span><span class="mi">0</span><span class="p">,</span> <span class="n">img_width</span><span class="p">)]</span>
-    <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">separators</span><span class="p">:</span>
-        <span class="n">new_parts</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">:</span>
-            <span class="k">if</span> <span class="n">s</span> <span class="o">&lt;</span> <span class="n">x</span> <span class="o">&lt;</span> <span class="n">e</span><span class="p">:</span>
-                <span class="n">new_parts</span> <span class="o">+=</span> <span class="p">[(</span><span class="n">s</span><span class="p">,</span> <span class="n">x</span><span class="p">),</span> <span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">e</span><span class="p">)]</span>
-            <span class="k">else</span><span class="p">:</span>
-                <span class="n">new_parts</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">s</span><span class="p">,</span> <span class="n">e</span><span class="p">))</span>
-        <span class="n">parts</span> <span class="o">=</span> <span class="n">new_parts</span>
-
-    <span class="n">cols</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]]]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">s</span><span class="p">,</span> <span class="n">e</span> <span class="ow">in</span> <span class="n">parts</span><span class="p">:</span>
-        <span class="n">col</span> <span class="o">=</span> <span class="p">[</span><span class="n">b</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">boxes</span> <span class="k">if</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">&gt;=</span> <span class="n">s</span> <span class="ow">and</span> <span class="n">b</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="o">&lt;=</span> <span class="n">e</span><span class="p">]</span>
-        <span class="n">cols</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">col</span><span class="p">)</span>
-
-    <span class="n">cols</span> <span class="o">=</span> <span class="p">[</span><span class="n">c</span> <span class="k">for</span> <span class="n">c</span> <span class="ow">in</span> <span class="n">cols</span> <span class="k">if</span> <span class="n">c</span><span class="p">]</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">cols</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[]</span>
-
-    <span class="k">return</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">cols</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">c</span><span class="p">:</span> <span class="nb">min</span><span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">c</span><span class="p">))</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_sort_into_lines</span><span class="p">(</span>
-    <span class="n">boxes</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]],</span>
-    <span class="n">y_tol_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.6</span><span class="p">,</span>
-    <span class="n">x_gap_ratio</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">inf</span><span class="p">,</span>
-    <span class="n">use_columns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
-    <span class="n">max_columns</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">10</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Sort boxes into text lines with reading order, optionally segmenting into columns first.</span>
-
-<span class="sd">    Groups boxes into lines based on vertical proximity, resolving any overlaps first.</span>
-<span class="sd">    Each line contains boxes sorted left-to-right, and lines are ordered top-to-bottom.</span>
-<span class="sd">    If use_columns=True, first segments boxes into columns, then sorts each column separately.</span>
-
-<span class="sd">    Parameters</span>
-<span class="sd">    ----------</span>
-<span class="sd">    boxes : list of tuple</span>
-<span class="sd">        List of boxes in format (x_min, y_min, x_max, y_max).</span>
-<span class="sd">    y_tol_ratio : float, default=0.6</span>
-<span class="sd">        Vertical tolerance as a ratio of average box height for grouping boxes</span>
-<span class="sd">        into the same line. Boxes within this vertical distance are considered</span>
-<span class="sd">        part of the same line.</span>
-<span class="sd">    x_gap_ratio : float, default=np.inf</span>
-<span class="sd">        Maximum horizontal gap as a ratio of average box height for boxes to be</span>
-<span class="sd">        considered part of the same line. Use np.inf for no horizontal constraint.</span>
-<span class="sd">    use_columns : bool, default=True</span>
-<span class="sd">        If True, first segment boxes into columns using vertical gaps, then sort</span>
-<span class="sd">        each column independently. Each column becomes a separate block.</span>
-<span class="sd">    max_columns : int, default=10</span>
-<span class="sd">        Maximum number of columns to detect when use_columns=True.</span>
-
-<span class="sd">    Returns</span>
-<span class="sd">    -------</span>
-<span class="sd">    list of list of tuple</span>
-<span class="sd">        List of lines, where each line is a list of boxes sorted left-to-right.</span>
-<span class="sd">        Lines are sorted top-to-bottom. Original box coordinates are preserved.</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; boxes = [(10, 10, 50, 30), (60, 10, 100, 30), (10, 50, 50, 70)]</span>
-<span class="sd">    &gt;&gt;&gt; lines = sort_into_lines(boxes)</span>
-<span class="sd">    &gt;&gt;&gt; len(lines)  # Two lines detected</span>
-<span class="sd">    2</span>
-<span class="sd">    &gt;&gt;&gt; len(lines[0])  # First line has 2 boxes</span>
-<span class="sd">    2</span>
-<span class="sd">    &gt;&gt;&gt; lines[0][0]  # First box in first line</span>
-<span class="sd">    (10, 10, 50, 30)</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    - First resolves box overlaps by iterative shrinking</span>
-<span class="sd">    - Groups boxes into lines based on vertical center proximity</span>
-<span class="sd">    - Within each line, boxes are sorted left-to-right</span>
-<span class="sd">    - Returns original (non-shrunk) boxes in grouped structure</span>
-<span class="sd">    - Useful for converting flat detection output to line-based structure</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">boxes</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[]</span>
-
-    <span class="n">compressed</span> <span class="o">=</span> <span class="n">_resolve_intersections</span><span class="p">(</span><span class="n">boxes</span><span class="p">)</span>
-    <span class="n">mapping</span> <span class="o">=</span> <span class="p">{</span><span class="n">c</span><span class="p">:</span> <span class="n">o</span> <span class="k">for</span> <span class="n">c</span><span class="p">,</span> <span class="n">o</span> <span class="ow">in</span> <span class="nb">zip</span><span class="p">(</span><span class="n">compressed</span><span class="p">,</span> <span class="n">boxes</span><span class="p">)}</span>
-
-    <span class="k">if</span> <span class="n">use_columns</span><span class="p">:</span>
-        <span class="n">columns</span> <span class="o">=</span> <span class="n">_segment_columns</span><span class="p">(</span><span class="n">compressed</span><span class="p">,</span> <span class="n">max_splits</span><span class="o">=</span><span class="n">max_columns</span><span class="p">)</span>
-        <span class="n">all_lines</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">column_boxes</span> <span class="ow">in</span> <span class="n">columns</span><span class="p">:</span>
-            <span class="n">column_lines</span> <span class="o">=</span> <span class="n">_sort_column_into_lines</span><span class="p">(</span>
-                <span class="n">column_boxes</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">y_tol_ratio</span><span class="p">,</span> <span class="n">x_gap_ratio</span>
-            <span class="p">)</span>
-            <span class="n">all_lines</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">column_lines</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">all_lines</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">_sort_column_into_lines</span><span class="p">(</span><span class="n">compressed</span><span class="p">,</span> <span class="n">mapping</span><span class="p">,</span> <span class="n">y_tol_ratio</span><span class="p">,</span> <span class="n">x_gap_ratio</span><span class="p">)</span>
-
-
-<span class="k">def</span><span class="w"> </span><span class="nf">_sort_column_into_lines</span><span class="p">(</span>
-    <span class="n">compressed</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]],</span>
-    <span class="n">mapping</span><span class="p">:</span> <span class="nb">dict</span><span class="p">,</span>
-    <span class="n">y_tol_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-    <span class="n">x_gap_ratio</span><span class="p">:</span> <span class="nb">float</span><span class="p">,</span>
-<span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;Helper function to sort a single column of boxes into lines.&quot;&quot;&quot;</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">compressed</span><span class="p">:</span>
-        <span class="k">return</span> <span class="p">[]</span>
-
-    <span class="n">avg_h</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([</span><span class="n">b</span><span class="p">[</span><span class="mi">3</span><span class="p">]</span> <span class="o">-</span> <span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">compressed</span><span class="p">])</span>
-    <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
-
-    <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="nb">sorted</span><span class="p">(</span><span class="n">compressed</span><span class="p">,</span> <span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span><span class="p">):</span>
-        <span class="n">cy</span> <span class="o">=</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span>
-        <span class="n">placed</span> <span class="o">=</span> <span class="kc">False</span>
-
-        <span class="k">for</span> <span class="n">ln</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
-            <span class="n">line_cy</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([(</span><span class="n">v</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">v</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ln</span><span class="p">])</span>
-            <span class="n">last_x1</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="n">v</span><span class="p">[</span><span class="mi">2</span><span class="p">]</span> <span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">ln</span><span class="p">)</span>
-
-            <span class="k">if</span> <span class="p">(</span>
-                <span class="nb">abs</span><span class="p">(</span><span class="n">cy</span> <span class="o">-</span> <span class="n">line_cy</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">avg_h</span> <span class="o">*</span> <span class="n">y_tol_ratio</span>
-                <span class="ow">and</span> <span class="p">(</span><span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">-</span> <span class="n">last_x1</span><span class="p">)</span> <span class="o">&lt;=</span> <span class="n">avg_h</span> <span class="o">*</span> <span class="n">x_gap_ratio</span>
-            <span class="p">):</span>
-                <span class="n">ln</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">b</span><span class="p">)</span>
-                <span class="n">placed</span> <span class="o">=</span> <span class="kc">True</span>
-                <span class="k">break</span>
-
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">placed</span><span class="p">:</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">([</span><span class="n">b</span><span class="p">])</span>
-
-    <span class="n">lines</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">ln</span><span class="p">:</span> <span class="n">np</span><span class="o">.</span><span class="n">mean</span><span class="p">([(</span><span class="n">b</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span> <span class="o">+</span> <span class="n">b</span><span class="p">[</span><span class="mi">3</span><span class="p">])</span> <span class="o">/</span> <span class="mi">2</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">ln</span><span class="p">]))</span>
-
-    <span class="n">result</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">ln</span> <span class="ow">in</span> <span class="n">lines</span><span class="p">:</span>
-        <span class="n">ln</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">b</span><span class="p">:</span> <span class="n">b</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
-        <span class="n">original_line</span> <span class="o">=</span> <span class="p">[</span><span class="n">mapping</span><span class="p">[</span><span class="n">b</span><span class="p">]</span> <span class="k">for</span> <span class="n">b</span> <span class="ow">in</span> <span class="n">ln</span><span class="p">]</span>
-        <span class="n">result</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">original_line</span><span class="p">)</span>
-
-    <span class="k">return</span> <span class="n">result</span>
+<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">..data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">..layouts</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleSorting</span>
 
 
 <div class="viewcode-block" id="organize_page">
@@ -944,111 +629,24 @@ window.addEventListener("load", load);</script>
     <span class="n">use_columns</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Organize words in a Page into structured Blocks, Lines, and reading order.</span>
-
-<span class="sd">    Takes a Page with unorganized words and returns a new Page where:</span>
-<span class="sd">    - Words are grouped into columns (Blocks)</span>
-<span class="sd">    - Each Block contains Lines of Words</span>
-<span class="sd">    - Words within Lines are ordered left-to-right</span>
-<span class="sd">    - Lines within Blocks are ordered top-to-bottom</span>
-<span class="sd">    - Blocks are ordered left-to-right (for columns)</span>
+<span class="sd">    Compatibility wrapper around ``SimpleSorting`` layout model.</span>
 
 <span class="sd">    Parameters</span>
 <span class="sd">    ----------</span>
 <span class="sd">    page : Page</span>
-<span class="sd">        Input Page object. Can contain either:</span>
-<span class="sd">        - Words in unstructured blocks/lines</span>
-<span class="sd">        - Direct list of words without proper organization</span>
+<span class="sd">        Input page with detected words.</span>
 <span class="sd">    max_splits : int, optional</span>
-<span class="sd">        Maximum number of column splits to attempt when segmenting.</span>
-<span class="sd">        Higher values allow more columns to be detected. Default is 10.</span>
+<span class="sd">        Maximum number of column split attempts. Default is 10.</span>
 <span class="sd">    use_columns : bool, optional</span>
-<span class="sd">        If True, segments the page into columns (separate Blocks).</span>
-<span class="sd">        If False, treats entire page as single column. Default is True.</span>
+<span class="sd">        If True, segment into columns before line grouping. Default is True.</span>
 
 <span class="sd">    Returns</span>
 <span class="sd">    -------</span>
 <span class="sd">    Page</span>
-<span class="sd">        New Page object with organized Blocks, Lines, and reading order set.</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; from manuscript.detectors import EAST</span>
-<span class="sd">    &gt;&gt;&gt; from manuscript.utils import organize_page</span>
-<span class="sd">    &gt;&gt;&gt;</span>
-<span class="sd">    &gt;&gt;&gt; detector = EAST()</span>
-<span class="sd">    &gt;&gt;&gt; result = detector.predict(&quot;image.jpg&quot;, sort_reading_order=False)</span>
-<span class="sd">    &gt;&gt;&gt; page = result[&quot;page&quot;]</span>
-<span class="sd">    &gt;&gt;&gt;</span>
-<span class="sd">    &gt;&gt;&gt; # Organize into structured reading order</span>
-<span class="sd">    &gt;&gt;&gt; organized_page = organize_page(page, max_splits=5)</span>
-<span class="sd">    &gt;&gt;&gt;</span>
-<span class="sd">    &gt;&gt;&gt; # Access first word in first line of first block</span>
-<span class="sd">    &gt;&gt;&gt; first_word = organized_page.blocks[0].lines[0].words[0]</span>
-<span class="sd">    &gt;&gt;&gt; print(f&quot;Word order: {first_word.order}&quot;)</span>
-
-<span class="sd">    Notes</span>
-<span class="sd">    -----</span>
-<span class="sd">    This function extracts all words from the input Page (regardless of their</span>
-<span class="sd">    current organization), converts them to bounding boxes, performs column</span>
-<span class="sd">    segmentation and line sorting, then rebuilds a clean Page structure.</span>
-
-<span class="sd">    The function preserves all Word attributes (polygon, confidence, text, etc.)</span>
-<span class="sd">    while updating the `order` field for reading sequence.</span>
+<span class="sd">        Organized page.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
-    <span class="c1"># Extract all words from the page</span>
-    <span class="n">all_words</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Word</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">page</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
-            <span class="n">all_words</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">words</span><span class="p">)</span>
-
-    <span class="c1"># If no words found, return empty page</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">all_words</span><span class="p">:</span>
-        <span class="k">return</span> <span class="n">Page</span><span class="p">(</span><span class="n">blocks</span><span class="o">=</span><span class="p">[</span><span class="n">Block</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="p">[</span><span class="n">Line</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="p">[],</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">)],</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">)])</span>
-
-    <span class="c1"># Convert words to boxes for sorting</span>
-    <span class="n">word_to_box</span> <span class="o">=</span> <span class="p">{}</span>
-    <span class="n">boxes</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">all_words</span><span class="p">:</span>
-        <span class="n">poly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">polygon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">int32</span><span class="p">)</span>
-        <span class="n">x_min</span><span class="p">,</span> <span class="n">y_min</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">min</span><span class="p">(</span><span class="n">poly</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">x_max</span><span class="p">,</span> <span class="n">y_max</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">max</span><span class="p">(</span><span class="n">poly</span><span class="p">,</span> <span class="n">axis</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-        <span class="n">box</span> <span class="o">=</span> <span class="p">(</span><span class="nb">int</span><span class="p">(</span><span class="n">x_min</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y_min</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">x_max</span><span class="p">),</span> <span class="nb">int</span><span class="p">(</span><span class="n">y_max</span><span class="p">))</span>
-        <span class="n">boxes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">box</span><span class="p">)</span>
-        <span class="n">word_to_box</span><span class="p">[</span><span class="n">box</span><span class="p">]</span> <span class="o">=</span> <span class="n">word</span>
-
-    <span class="c1"># Segment into columns if requested</span>
-    <span class="k">if</span> <span class="n">use_columns</span><span class="p">:</span>
-        <span class="n">columns</span> <span class="o">=</span> <span class="n">_segment_columns</span><span class="p">(</span><span class="n">boxes</span><span class="p">,</span> <span class="n">max_splits</span><span class="o">=</span><span class="n">max_splits</span><span class="p">)</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">columns</span> <span class="o">=</span> <span class="p">[</span><span class="n">boxes</span><span class="p">]</span>
-
-    <span class="c1"># Create blocks from columns</span>
-    <span class="n">blocks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-    <span class="k">for</span> <span class="n">block_idx</span><span class="p">,</span> <span class="n">column_boxes</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">columns</span><span class="p">):</span>
-        <span class="c1"># Sort this column into lines</span>
-        <span class="n">lines_in_column</span> <span class="o">=</span> <span class="n">_sort_into_lines</span><span class="p">(</span><span class="n">column_boxes</span><span class="p">,</span> <span class="n">use_columns</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-
-        <span class="c1"># Convert to Line objects with ordered Words</span>
-        <span class="n">lines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Line</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
-        <span class="k">for</span> <span class="n">line_idx</span><span class="p">,</span> <span class="n">line_boxes</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">lines_in_column</span><span class="p">):</span>
-            <span class="n">line_words</span> <span class="o">=</span> <span class="p">[]</span>
-            <span class="k">for</span> <span class="n">word_idx</span><span class="p">,</span> <span class="n">box</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">line_boxes</span><span class="p">):</span>
-                <span class="n">word</span> <span class="o">=</span> <span class="n">word_to_box</span><span class="p">[</span><span class="n">box</span><span class="p">]</span>
-                <span class="c1"># Set word order within the line</span>
-                <span class="n">word</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">word_idx</span>
-                <span class="n">line_words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">word</span><span class="p">)</span>
-
-            <span class="c1"># Create Line with order</span>
-            <span class="n">line</span> <span class="o">=</span> <span class="n">Line</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="n">line_words</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">line_idx</span><span class="p">)</span>
-            <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">line</span><span class="p">)</span>
-
-        <span class="c1"># Create Block for this column</span>
-        <span class="n">block</span> <span class="o">=</span> <span class="n">Block</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="n">lines</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="n">block_idx</span><span class="p">)</span>
-        <span class="n">blocks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">block</span><span class="p">)</span>
-
-    <span class="c1"># Create Page with organized Blocks</span>
-    <span class="k">return</span> <span class="n">Page</span><span class="p">(</span><span class="n">blocks</span><span class="o">=</span><span class="n">blocks</span><span class="p">)</span></div>
+    <span class="n">layout</span> <span class="o">=</span> <span class="n">SimpleSorting</span><span class="p">(</span><span class="n">max_splits</span><span class="o">=</span><span class="n">max_splits</span><span class="p">,</span> <span class="n">use_columns</span><span class="o">=</span><span class="n">use_columns</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">layout</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">page</span><span class="p">)</span></div>
 
 </pre></div>
 

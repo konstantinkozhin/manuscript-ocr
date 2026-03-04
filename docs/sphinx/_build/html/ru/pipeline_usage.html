@@ -52,57 +52,37 @@
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Установка</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#quick-start">Быстрый старт</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#main-components">Основные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#pipeline-defaults">Pipeline Defaults</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Руководство по использованию Pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#detector-requirements">Требования к детектору</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#result-structure">Структура результата</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#stage-contracts">Stage Contracts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#detector">Detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#recognizer">Recognizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#layout">Layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corrector">Corrector</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="#recognizer-requirements">Требования к распознавателю</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#corrector-requirements">Требования к корректору</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#built-in-charlm-corrector">Встроенный корректор CharLM</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#compatible-implementation-examples">Примеры совместимых реализаций</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#complete-detector-example">Полный пример детектора</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#using-custom-components">Использование кастомных компонентов</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#pipeline-usage-examples">Примеры использования Pipeline</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#basic-usage">Базовое использование</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#detection-only-without-recognition">Только детекция (без распознавания)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#with-visualization">С визуализацией</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#intermediate-results">Промежуточные результаты</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#export-import-page-to-json">Экспорт/импорт Page в JSON</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#with-profiling">С профилированием</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#batch-processing">Пакетная обработка</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="#component-configuration">Настройка компонентов</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="#replacing-detector-or-recognizer">Замена детектора или распознавателя</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#built-in-model-configuration">Настройка встроенных моделей</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#size-filtering">Фильтрация по размеру</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#automatic-rotation-control-trba">Automatic Rotation Control (TRBA)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-usage">Базовое использование</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#disable-stages">Disable Stages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-placement">Layout Placement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#intermediate-results">Промежуточные результаты</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Структура библиотеки</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="structure.html#module-descriptions">Описание модулей</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structure.html#overview">Overview</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">Справочник API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/pipeline.html">Конвейер</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_layout_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_layout_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
 </ul>
@@ -128,6 +108,14 @@
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -199,356 +187,141 @@
              
   <section id="pipeline-usage-guide">
 <h1>Руководство по использованию Pipeline<a class="headerlink" href="#pipeline-usage-guide" title="Ссылка на этот заголовок"></a></h1>
-<p>Класс Pipeline в <code class="docutils literal notranslate"><span class="pre">manuscript-ocr</span></code> спроектирован для работы с <strong>любыми</strong> детекторами, распознавателями и корректорами, реализующими простой интерфейс.</p>
-<section id="detector-requirements">
-<h2>Требования к детектору<a class="headerlink" href="#detector-requirements" title="Ссылка на этот заголовок"></a></h2>
-<p>Класс детектора должен реализовать метод <code class="docutils literal notranslate"><span class="pre">predict</span></code>, который принимает изображение и возвращает словарь с ключом <code class="docutils literal notranslate"><span class="pre">&quot;page&quot;</span></code>:</p>
+<p>The pipeline is stage-based and passes one <code class="docutils literal notranslate"><span class="pre">Page</span></code> object through the stages:</p>
+<p><code class="docutils literal notranslate"><span class="pre">detector</span> <span class="pre">-&gt;</span> <span class="pre">layout</span> <span class="pre">-&gt;</span> <span class="pre">recognizer</span> <span class="pre">-&gt;</span> <span class="pre">corrector</span></code></p>
+<p>By default, <code class="docutils literal notranslate"><span class="pre">Pipeline()</span></code> creates:</p>
+<ul class="simple">
+<li><p>detector: <code class="docutils literal notranslate"><span class="pre">EAST()</span></code></p></li>
+<li><p>layout: <code class="docutils literal notranslate"><span class="pre">SimpleSorting()</span></code></p></li>
+<li><p>recognizer: <code class="docutils literal notranslate"><span class="pre">TRBA()</span></code></p></li>
+<li><p>corrector: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+</ul>
+<section id="stage-contracts">
+<h2>Stage Contracts<a class="headerlink" href="#stage-contracts" title="Ссылка на этот заголовок"></a></h2>
+<section id="detector">
+<h3>Detector<a class="headerlink" href="#detector" title="Ссылка на этот заголовок"></a></h3>
+<p>Detector must implement:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Parameters:</span>
-<span class="sd">    - image: file path (str) or numpy array (H, W, 3) in uint8</span>
-
-<span class="sd">    Returns dictionary:</span>
-<span class="sd">    {</span>
-<span class="sd">        &quot;page&quot;: Page  # Page object with detection results</span>
-<span class="sd">    }</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">pass</span>
-</pre></div>
-</div>
-<section id="result-structure">
-<h3>Структура результата<a class="headerlink" href="#result-structure" title="Ссылка на этот заголовок"></a></h3>
-<p>Результат должен содержать объект <code class="docutils literal notranslate"><span class="pre">Page</span></code> с иерархией: <strong>Page</strong> → <strong>Block</strong> → <strong>Line</strong> → <strong>Word</strong></p>
-<p>См. <code class="docutils literal notranslate"><span class="pre">src/manuscript/data/structures.py</span></code> для подробной документации по структурам данных.</p>
-<p><strong>Минимальный пример создания Page:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Word</span><span class="p">,</span> <span class="n">Line</span><span class="p">,</span> <span class="n">Block</span><span class="p">,</span> <span class="n">Page</span>
-
-<span class="c1"># Create a word with coordinates and detection confidence</span>
-<span class="n">word</span> <span class="o">=</span> <span class="n">Word</span><span class="p">(</span>
-    <span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
-    <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.95</span>
-<span class="p">)</span>
-
-<span class="c1"># Group words into a line</span>
-<span class="n">line</span> <span class="o">=</span> <span class="n">Line</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="p">[</span><span class="n">word</span><span class="p">])</span>
-
-<span class="c1"># Group lines into a block</span>
-<span class="n">block</span> <span class="o">=</span> <span class="n">Block</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="p">[</span><span class="n">line</span><span class="p">])</span>
-
-<span class="c1"># Create a page</span>
-<span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="p">(</span><span class="n">blocks</span><span class="o">=</span><span class="p">[</span><span class="n">block</span><span class="p">])</span>
+    <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;page&quot;</span><span class="p">:</span> <span class="n">page</span><span class="p">}</span>
 </pre></div>
 </div>
 </section>
-</section>
-<section id="recognizer-requirements">
-<h2>Требования к распознавателю<a class="headerlink" href="#recognizer-requirements" title="Ссылка на этот заголовок"></a></h2>
-<p>A recognizer class must implement a <code class="docutils literal notranslate"><span class="pre">predict</span></code> method that takes a <code class="docutils literal notranslate"><span class="pre">Page</span></code> object and optionally the source image, then returns updated <code class="docutils literal notranslate"><span class="pre">Page</span></code>:</p>
+<section id="recognizer">
+<h3>Recognizer<a class="headerlink" href="#recognizer" title="Ссылка на этот заголовок"></a></h3>
+<p>Recognizer must implement:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Parameters:</span>
-<span class="sd">    - page: Page object with detected words</span>
-<span class="sd">    - image: optional source image (for crop extraction / context)</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">    - Page: Page object where recognizer fills word.text and</span>
-<span class="sd">      word.recognition_confidence</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">pass</span>
-</pre></div>
-</div>
-<p><strong>Пример:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span>
-
-<span class="k">class</span><span class="w"> </span><span class="nc">MyRecognizer</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
-                    <span class="c1"># Your recognition logic</span>
-                    <span class="n">word</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="s2">&quot;recognized_text&quot;</span>
-                    <span class="n">word</span><span class="o">.</span><span class="n">recognition_confidence</span> <span class="o">=</span> <span class="mf">0.92</span>
-        <span class="k">return</span> <span class="n">result</span>
+    <span class="o">...</span>
 </pre></div>
 </div>
 </section>
-<section id="corrector-requirements">
-<h2>Требования к корректору<a class="headerlink" href="#corrector-requirements" title="Ссылка на этот заголовок"></a></h2>
-<p>A corrector class must implement a <code class="docutils literal notranslate"><span class="pre">predict</span></code> method that takes a <code class="docutils literal notranslate"><span class="pre">Page</span></code> object and optionally the source image, then returns a corrected <code class="docutils literal notranslate"><span class="pre">Page</span></code>:</p>
+<section id="layout">
+<h3>Layout<a class="headerlink" href="#layout" title="Ссылка на этот заголовок"></a></h3>
+<p>Layout model must implement:</p>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
-<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    Parameters:</span>
-<span class="sd">    - page: Page object with recognized text</span>
-<span class="sd">    - image: optional source image (for context-aware correction)</span>
-
-<span class="sd">    Returns:</span>
-<span class="sd">    - Page: Page object with corrected text</span>
-<span class="sd">    &quot;&quot;&quot;</span>
-    <span class="k">pass</span>
+    <span class="o">...</span>
 </pre></div>
 </div>
-<p><strong>Пример:</strong></p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Optional</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span>
-
-<span class="k">class</span><span class="w"> </span><span class="nc">MyCorrector</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
-        <span class="n">result</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-        <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
-            <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
-                <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
-                    <span class="k">if</span> <span class="n">word</span><span class="o">.</span><span class="n">text</span><span class="p">:</span>
-                        <span class="c1"># Your correction logic</span>
-                        <span class="n">word</span><span class="o">.</span><span class="n">text</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_correct</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">result</span>
-
-    <span class="k">def</span><span class="w"> </span><span class="nf">_correct</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">text</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
-        <span class="c1"># Text correction logic</span>
-        <span class="k">return</span> <span class="n">text</span>
-</pre></div>
-</div>
-<section id="built-in-charlm-corrector">
-<h3>Встроенный корректор CharLM<a class="headerlink" href="#built-in-charlm-corrector" title="Ссылка на этот заголовок"></a></h3>
-<p>CharLM — это символьная языковая модель на основе Transformer для исправления ошибок OCR:</p>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharLM</span>
-
-<span class="c1"># With default settings</span>
-<span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">()</span>
-
-<span class="c1"># With custom parameters</span>
-<span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;prereform_charlm_g1&quot;</span><span class="p">,</span>  <span class="c1"># or &quot;modern_charlm_g1&quot;</span>
-    <span class="n">mask_threshold</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>            <span class="c1"># confidence threshold for correction</span>
-    <span class="n">apply_threshold</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>           <span class="c1"># minimum model confidence</span>
-    <span class="n">max_edits</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>                    <span class="c1"># max edits per word</span>
-    <span class="n">min_word_len</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>                 <span class="c1"># min word length for correction</span>
-    <span class="n">lexicon</span><span class="o">=</span><span class="s2">&quot;prereform_words&quot;</span>       <span class="c1"># lexicon of known words</span>
-<span class="p">)</span>
+</section>
+<section id="corrector">
+<h3>Corrector<a class="headerlink" href="#corrector" title="Ссылка на этот заголовок"></a></h3>
+<p>Corrector must implement:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
+    <span class="o">...</span>
 </pre></div>
 </div>
 </section>
 </section>
-<section id="compatible-implementation-examples">
-<h2>Примеры совместимых реализаций<a class="headerlink" href="#compatible-implementation-examples" title="Ссылка на этот заголовок"></a></h2>
-<section id="complete-detector-example">
-<h3>Полный пример детектора<a class="headerlink" href="#complete-detector-example" title="Ссылка на этот заголовок"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Word</span><span class="p">,</span> <span class="n">Line</span><span class="p">,</span> <span class="n">Block</span><span class="p">,</span> <span class="n">Page</span>
-
-<span class="k">class</span><span class="w"> </span><span class="nc">MyDetector</span><span class="p">:</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">):</span>
-        <span class="c1"># Your image detection logic</span>
-        <span class="c1"># ...</span>
-
-        <span class="c1"># Create result</span>
-        <span class="n">words</span> <span class="o">=</span> <span class="p">[</span>
-            <span class="n">Word</span><span class="p">(</span>
-                <span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
-                <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.95</span>
-            <span class="p">),</span>
-            <span class="n">Word</span><span class="p">(</span>
-                <span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">110</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">200</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">110</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
-                <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.92</span>
-            <span class="p">),</span>
-        <span class="p">]</span>
-
-        <span class="n">line</span> <span class="o">=</span> <span class="n">Line</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="n">words</span><span class="p">)</span>
-        <span class="n">block</span> <span class="o">=</span> <span class="n">Block</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="p">[</span><span class="n">line</span><span class="p">])</span>
-        <span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="p">(</span><span class="n">blocks</span><span class="o">=</span><span class="p">[</span><span class="n">block</span><span class="p">])</span>
-
-        <span class="k">return</span> <span class="p">{</span><span class="s2">&quot;page&quot;</span><span class="p">:</span> <span class="n">page</span><span class="p">}</span>
-</pre></div>
-</div>
-</section>
-<section id="using-custom-components">
-<h3>Использование кастомных компонентов<a class="headerlink" href="#using-custom-components" title="Ссылка на этот заголовок"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">my_package</span><span class="w"> </span><span class="kn">import</span> <span class="n">MyDetector</span><span class="p">,</span> <span class="n">MyRecognizer</span><span class="p">,</span> <span class="n">MyCorrector</span>
-
-<span class="c1"># Use custom detector and recognizer</span>
-<span class="n">detector</span> <span class="o">=</span> <span class="n">MyDetector</span><span class="p">()</span>
-<span class="n">recognizer</span> <span class="o">=</span> <span class="n">MyRecognizer</span><span class="p">()</span>
-<span class="n">corrector</span> <span class="o">=</span> <span class="n">MyCorrector</span><span class="p">()</span>
-
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
-    <span class="n">detector</span><span class="o">=</span><span class="n">detector</span><span class="p">,</span>
-    <span class="n">recognizer</span><span class="o">=</span><span class="n">recognizer</span><span class="p">,</span>
-    <span class="n">corrector</span><span class="o">=</span><span class="n">corrector</span>
-<span class="p">)</span>
-
-<span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="pipeline-usage-examples">
-<h2>Примеры использования Pipeline<a class="headerlink" href="#pipeline-usage-examples" title="Ссылка на этот заголовок"></a></h2>
 <section id="basic-usage">
-<h3>Базовое использование<a class="headerlink" href="#basic-usage" title="Ссылка на этот заголовок"></a></h3>
+<h2>Базовое использование<a class="headerlink" href="#basic-usage" title="Ссылка на этот заголовок"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
 
-<span class="c1"># Initialize with default models</span>
 <span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">()</span>
-
-<span class="c1"># Process image</span>
 <span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">)</span>
 <span class="n">page</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">]</span>
-
-<span class="c1"># Extract text</span>
 <span class="n">text</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
 <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="detection-only-without-recognition">
-<h3>Только детекция (без распознавания)<a class="headerlink" href="#detection-only-without-recognition" title="Ссылка на этот заголовок"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">,</span> <span class="n">recognize_text</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-<span class="n">page</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">]</span>
+<section id="disable-stages">
+<h2>Disable Stages<a class="headerlink" href="#disable-stages" title="Ссылка на этот заголовок"></a></h2>
+<p>You can disable optional stages via <code class="docutils literal notranslate"><span class="pre">None</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
 
-<span class="c1"># Words have polygon and detection_confidence, but no text</span>
-<span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">page</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
-    <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
-        <span class="k">for</span> <span class="n">word</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Polygon: </span><span class="si">{</span><span class="n">word</span><span class="o">.</span><span class="n">polygon</span><span class="si">}</span><span class="s2">, Confidence: </span><span class="si">{</span><span class="n">word</span><span class="o">.</span><span class="n">detection_confidence</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+<span class="c1"># Detection + layout only</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">recognizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">corrector</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># Detection + recognition only</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">corrector</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># Detection + layout + recognition (no correction)</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">corrector</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
-<section id="with-visualization">
-<h3>С визуализацией<a class="headerlink" href="#with-visualization" title="Ссылка на этот заголовок"></a></h3>
+<section id="layout-placement">
+<h2>Layout Placement<a class="headerlink" href="#layout-placement" title="Ссылка на этот заголовок"></a></h2>
+<p>Use <code class="docutils literal notranslate"><span class="pre">layout_after</span></code> to choose where layout runs:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;detector&quot;</span></code> (default)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;recognizer&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;corrector&quot;</span></code></p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.layouts</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleSorting</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">layout</span><span class="o">=</span><span class="n">SimpleSorting</span><span class="p">(),</span>
+    <span class="n">layout_after</span><span class="o">=</span><span class="s2">&quot;recognizer&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>If the anchor stage is disabled (for example, <code class="docutils literal notranslate"><span class="pre">recognizer=None</span></code> with
+<code class="docutils literal notranslate"><span class="pre">layout_after=&quot;recognizer&quot;</span></code>), layout still executes in that slot.</p>
+</section>
+<section id="built-in-components">
+<h2>Built-in Components<a class="headerlink" href="#built-in-components" title="Ссылка на этот заголовок"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.layouts</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleSorting</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.recognizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRBA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharLM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="n">detector</span> <span class="o">=</span> <span class="n">EAST</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;east_50_g1&quot;</span><span class="p">,</span> <span class="n">score_thresh</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">layout</span> <span class="o">=</span> <span class="n">SimpleSorting</span><span class="p">(</span><span class="n">max_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">use_columns</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;trba_lite_g1&quot;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">)</span>
+<span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">()</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">detector</span><span class="o">=</span><span class="n">detector</span><span class="p">,</span>
+    <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
+    <span class="n">recognizer</span><span class="o">=</span><span class="n">recognizer</span><span class="p">,</span>
+    <span class="n">corrector</span><span class="o">=</span><span class="n">corrector</span><span class="p">,</span>
+    <span class="n">layout_after</span><span class="o">=</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span>
+    <span class="n">min_text_size</span><span class="o">=</span><span class="mi">5</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="visualization-and-profiling">
+<h2>Visualization and Profiling<a class="headerlink" href="#visualization-and-profiling" title="Ссылка на этот заголовок"></a></h2>
 <div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">,</span> <span class="n">vis_img</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">,</span> <span class="n">vis</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 <span class="n">vis_img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;output_visualization.jpg&quot;</span><span class="p">)</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
 </pre></div>
 </div>
 </section>
 <section id="intermediate-results">
-<h3>Промежуточные результаты<a class="headerlink" href="#intermediate-results" title="Ссылка на этот заголовок"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharLM</span>
-
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">corrector</span><span class="o">=</span><span class="n">CharLM</span><span class="p">())</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">)</span>
-
-<span class="c1"># Result after detection (before recognition)</span>
-<span class="n">detection_page</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">last_detection_page</span>
-
-<span class="c1"># Result after recognition (before correction)</span>
-<span class="n">recognition_page</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">last_recognition_page</span>
-
-<span class="c1"># Result after correction (None if corrector not used)</span>
-<span class="n">correction_page</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">last_correction_page</span>
-</pre></div>
-</div>
-</section>
-<section id="export-import-page-to-json">
-<h3>Экспорт/импорт Page в JSON<a class="headerlink" href="#export-import-page-to-json" title="Ссылка на этот заголовок"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">page</span> <span class="o">=</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">]</span>
-
-<span class="c1"># Save to file</span>
-<span class="n">page</span><span class="o">.</span><span class="n">to_json</span><span class="p">(</span><span class="s2">&quot;result.json&quot;</span><span class="p">)</span>
-
-<span class="c1"># Get as string</span>
-<span class="n">json_str</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">to_json</span><span class="p">()</span>
-
-<span class="c1"># Load from file</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span>
-<span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s2">&quot;result.json&quot;</span><span class="p">)</span>
-
-<span class="c1"># Load from string</span>
-<span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s1">&#39;{&quot;blocks&quot;: [...]}&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="with-profiling">
-<h3>С профилированием<a class="headerlink" href="#with-profiling" title="Ссылка на этот заголовок"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Prints execution time for each stage</span>
-<span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-<span class="c1"># Output:</span>
-<span class="c1"># Detection: 0.123s</span>
-<span class="c1"># Load image for crops: 0.005s</span>
-<span class="c1"># Extract 45 crops: 0.012s</span>
-<span class="c1"># Recognition: 0.234s</span>
-<span class="c1"># Pipeline total: 0.374s</span>
-</pre></div>
-</div>
-</section>
-<section id="batch-processing">
-<h3>Пакетная обработка<a class="headerlink" href="#batch-processing" title="Ссылка на этот заголовок"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">images</span> <span class="o">=</span> <span class="p">[</span><span class="s2">&quot;page1.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;page2.jpg&quot;</span><span class="p">,</span> <span class="s2">&quot;page3.jpg&quot;</span><span class="p">]</span>
-<span class="n">results</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">process_batch</span><span class="p">(</span><span class="n">images</span><span class="p">)</span>
-
-<span class="k">for</span> <span class="n">result</span> <span class="ow">in</span> <span class="n">results</span><span class="p">:</span>
-    <span class="n">text</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">])</span>
-    <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-</section>
-<section id="component-configuration">
-<h2>Настройка компонентов<a class="headerlink" href="#component-configuration" title="Ссылка на этот заголовок"></a></h2>
-<section id="replacing-detector-or-recognizer">
-<h3>Замена детектора или распознавателя<a class="headerlink" href="#replacing-detector-or-recognizer" title="Ссылка на этот заголовок"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
-
-<span class="c1"># Only custom detector, default recognizer</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">my_package</span><span class="w"> </span><span class="kn">import</span> <span class="n">MyCustomDetector</span>
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">detector</span><span class="o">=</span><span class="n">MyCustomDetector</span><span class="p">())</span>
-
-<span class="c1"># Only custom recognizer, default detector</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">my_package</span><span class="w"> </span><span class="kn">import</span> <span class="n">MyCustomRecognizer</span>
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">recognizer</span><span class="o">=</span><span class="n">MyCustomRecognizer</span><span class="p">())</span>
-
-<span class="c1"># Both components custom</span>
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">detector</span><span class="o">=</span><span class="n">MyCustomDetector</span><span class="p">(),</span> <span class="n">recognizer</span><span class="o">=</span><span class="n">MyCustomRecognizer</span><span class="p">())</span>
-</pre></div>
-</div>
-</section>
-<section id="built-in-model-configuration">
-<h3>Настройка встроенных моделей<a class="headerlink" href="#built-in-model-configuration" title="Ссылка на этот заголовок"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.recognizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRBA</span>
-
-<span class="c1"># EAST with settings</span>
-<span class="n">detector</span> <span class="o">=</span> <span class="n">EAST</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;east_50_g1&quot;</span><span class="p">,</span>        <span class="c1"># weight selection</span>
-    <span class="n">score_thresh</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span>            <span class="c1"># confidence threshold</span>
-    <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.2</span><span class="p">,</span>           <span class="c1"># IoU threshold for NMS</span>
-    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cpu&quot;</span>                 <span class="c1"># device (cpu/cuda)</span>
-<span class="p">)</span>
-
-<span class="c1"># TRBA with settings</span>
-<span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">(</span>
-    <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;trba_lite_g1&quot;</span><span class="p">,</span>      <span class="c1"># weight selection</span>
-    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span>                <span class="c1"># GPU for acceleration</span>
-<span class="p">)</span>
-
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">detector</span><span class="p">,</span> <span class="n">recognizer</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="size-filtering">
-<h3>Фильтрация по размеру<a class="headerlink" href="#size-filtering" title="Ссылка на этот заголовок"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="c1"># Ignore text blocks smaller than 10 pixels</span>
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">min_text_size</span><span class="o">=</span><span class="mi">10</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
-<section id="automatic-rotation-control-trba">
-<h3>Automatic Rotation Control (TRBA)<a class="headerlink" href="#automatic-rotation-control-trba" title="Ссылка на этот заголовок"></a></h3>
-<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.recognizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRBA</span>
-
-<span class="c1"># Enable automatic rotation of vertical text (default)</span>
-<span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">(</span><span class="n">rotate_threshold</span><span class="o">=</span><span class="mf">1.5</span><span class="p">)</span>
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">recognizer</span><span class="o">=</span><span class="n">recognizer</span><span class="p">)</span>
-
-<span class="c1"># Disable automatic rotation</span>
-<span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">(</span><span class="n">rotate_threshold</span><span class="o">=</span><span class="mi">0</span><span class="p">)</span>
-<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">recognizer</span><span class="o">=</span><span class="n">recognizer</span><span class="p">)</span>
-</pre></div>
-</div>
-</section>
+<h2>Промежуточные результаты<a class="headerlink" href="#intermediate-results" title="Ссылка на этот заголовок"></a></h2>
+<p>After each run, the pipeline keeps snapshots:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pipeline.last_detection_page</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pipeline.last_layout_page</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pipeline.last_recognition_page</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pipeline.last_correction_page</span></code></p></li>
+</ul>
+<p>Skipped stages keep corresponding <code class="docutils literal notranslate"><span class="pre">last_*</span></code> value as <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
 </section>
 </section>
 

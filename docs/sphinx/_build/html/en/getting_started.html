@@ -51,57 +51,37 @@
 <li class="toctree-l2"><a class="reference internal" href="#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#quick-start">Quick Start</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-components">Main Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#pipeline-defaults">Pipeline Defaults</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline_usage.html">Pipeline Usage Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#detector-requirements">Detector Requirements</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#result-structure">Result Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#stage-contracts">Stage Contracts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#detector">Detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#recognizer">Recognizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#layout">Layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#corrector">Corrector</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#recognizer-requirements">Recognizer Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#corrector-requirements">Corrector Requirements</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#built-in-charlm-corrector">Built-in CharLM Corrector</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#compatible-implementation-examples">Compatible Implementation Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#complete-detector-example">Complete Detector Example</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#using-custom-components">Using Custom Components</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#pipeline-usage-examples">Pipeline Usage Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#basic-usage">Basic Usage</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#detection-only-without-recognition">Detection Only (Without Recognition)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#with-visualization">With Visualization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#export-import-page-to-json">Export/Import Page to JSON</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#with-profiling">With Profiling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#batch-processing">Batch Processing</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#component-configuration">Component Configuration</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#replacing-detector-or-recognizer">Replacing Detector or Recognizer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#built-in-model-configuration">Built-in Model Configuration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#size-filtering">Size Filtering</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#automatic-rotation-control-trba">Automatic Rotation Control (TRBA)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#disable-stages">Disable Stages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#layout-placement">Layout Placement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Library Structure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="structure.html#module-descriptions">Module Descriptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structure.html#overview">Overview</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/pipeline.html">Pipeline</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_layout_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_layout_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
 </ul>
@@ -127,6 +107,14 @@
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -248,12 +236,23 @@ pip<span class="w"> </span>install<span class="w"> </span>onnxruntime-silicon
 <ul class="simple">
 <li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code> - High-level OCR pipeline</p></li>
 <li><p><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST" title="manuscript.detectors.EAST"><code class="xref py py-class docutils literal notranslate"><span class="pre">EAST</span></code></a> - Text detector</p></li>
+<li><p><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting" title="manuscript.layouts.SimpleSorting"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a> - Layout ordering model</p></li>
 <li><p><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA" title="manuscript.recognizers.TRBA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TRBA</span></code></a> - Text recognizer</p></li>
 <li><p><a class="reference internal" href="api/correctors.html#manuscript.correctors.CharLM" title="manuscript.correctors.CharLM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharLM</span></code></a> - Character-level text corrector</p></li>
 <li><p><a class="reference internal" href="api/data.html#manuscript.data.Page" title="manuscript.data.Page"><code class="xref py py-class docutils literal notranslate"><span class="pre">Page</span></code></a> - Page data structure</p></li>
 <li><p><a class="reference internal" href="api/data.html#manuscript.data.Block" title="manuscript.data.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> - Block data structure</p></li>
 <li><p><a class="reference internal" href="api/data.html#manuscript.data.Line" title="manuscript.data.Line"><code class="xref py py-class docutils literal notranslate"><span class="pre">Line</span></code></a> - Line data structure</p></li>
 <li><p><a class="reference internal" href="api/data.html#manuscript.data.Word" title="manuscript.data.Word"><code class="xref py py-class docutils literal notranslate"><span class="pre">Word</span></code></a> - Word data structure</p></li>
+</ul>
+</section>
+<section id="pipeline-defaults">
+<h2>Pipeline Defaults<a class="headerlink" href="#pipeline-defaults" title="Link to this heading"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">Pipeline()</span></code> uses:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">EAST</span></code> detector</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code> layout</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">TRBA</span></code> recognizer</p></li>
+<li><p>no corrector (<code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
 </ul>
 </section>
 </section>

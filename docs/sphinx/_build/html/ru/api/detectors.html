@@ -23,7 +23,7 @@
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Алфавитный указатель" href="../genindex.html" />
     <link rel="search" title="Поиск" href="../search.html" />
-    <link rel="next" title="Распознаватели" href="recognizers.html" />
+    <link rel="next" title="Layouts" href="layouts.html" />
     <link rel="prev" title="Структуры данных" href="data.html" /> 
 </head>
 
@@ -52,57 +52,37 @@
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#installation">Установка</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#quick-start">Быстрый старт</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#main-components">Основные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#pipeline-defaults">Pipeline Defaults</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../pipeline_usage.html">Руководство по использованию Pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#detector-requirements">Требования к детектору</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#result-structure">Структура результата</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#stage-contracts">Stage Contracts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#detector">Detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#recognizer">Recognizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#layout">Layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#corrector">Corrector</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#recognizer-requirements">Требования к распознавателю</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#corrector-requirements">Требования к корректору</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#built-in-charlm-corrector">Встроенный корректор CharLM</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#compatible-implementation-examples">Примеры совместимых реализаций</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#complete-detector-example">Полный пример детектора</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#using-custom-components">Использование кастомных компонентов</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#pipeline-usage-examples">Примеры использования Pipeline</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#basic-usage">Базовое использование</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#detection-only-without-recognition">Только детекция (без распознавания)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#with-visualization">С визуализацией</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#intermediate-results">Промежуточные результаты</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#export-import-page-to-json">Экспорт/импорт Page в JSON</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#with-profiling">С профилированием</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#batch-processing">Пакетная обработка</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#component-configuration">Настройка компонентов</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#replacing-detector-or-recognizer">Замена детектора или распознавателя</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#built-in-model-configuration">Настройка встроенных моделей</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#size-filtering">Фильтрация по размеру</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#automatic-rotation-control-trba">Automatic Rotation Control (TRBA)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#basic-usage">Базовое использование</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#disable-stages">Disable Stages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#layout-placement">Layout Placement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#intermediate-results">Промежуточные результаты</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../structure.html">Структура библиотеки</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../structure.html#module-descriptions">Описание модулей</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure.html#overview">Overview</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Справочник API</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="pipeline.html">Конвейер</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_layout_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_layout_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
 </ul>
@@ -128,6 +108,14 @@
 <li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -250,7 +238,7 @@ merged. Default is 0.1.</p></li>
 <tr class="row-even"><td><p><a class="reference internal" href="#manuscript.detectors.EAST.export" title="manuscript.detectors.EAST.export"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export</span></code></a>(weights_path, output_path[, ...])</p></td>
 <td><p>Экспорт модели EAST из PyTorch в формат ONNX.</p></td>
 </tr>
-<tr class="row-odd"><td><p><a class="reference internal" href="#manuscript.detectors.EAST.predict" title="manuscript.detectors.EAST.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(img_or_path[, return_maps, ...])</p></td>
+<tr class="row-odd"><td><p><a class="reference internal" href="#manuscript.detectors.EAST.predict" title="manuscript.detectors.EAST.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(img_or_path[, return_maps])</p></td>
 <td><p>Запуск инференса EAST и возврат результатов детекции.</p></td>
 </tr>
 <tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">runtime_providers</span></code>()</p></td>
@@ -301,27 +289,47 @@ merged. Default is 0.1.</p></li>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="manuscript.detectors.EAST.predict">
-<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_or_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_maps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sort_reading_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">split_into_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_columns</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">10</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_east.html#EAST.predict"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.detectors.EAST.predict" title="Ссылка на это определение"></a></dt>
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_or_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">return_maps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_east.html#EAST.predict"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.detectors.EAST.predict" title="Ссылка на это определение"></a></dt>
 <dd><p>Запуск инференса EAST и возврат результатов детекции.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Параметры<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
 <li><p><strong>img_or_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a>) – Путь к файлу изображения или RGB-изображение в виде массива NumPy формата <code class="docutils literal notranslate"><span class="pre">uint8</span></code> с формой <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W,</span> <span class="pre">3)</span></code>.</p></li>
 <li><p><strong>return_maps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True, возвращает необработанные карты оценок и геометрии под ключами <code class="docutils literal notranslate"><span class="pre">&quot;score_map&quot;</span></code> и <code class="docutils literal notranslate"><span class="pre">&quot;geo_map&quot;</span></code>. По умолчанию False.</p></li>
-<li><p><strong>sort_reading_order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True, сортирует обнаруженные слова в естественном порядке чтения (слева направо, сверху вниз) и группирует их в строки. По умолчанию True.</p></li>
-<li><p><strong>split_into_columns</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Если True и <code class="docutils literal notranslate"><span class="pre">sort_reading_order=True</span></code>, сегментирует страницу на колонки (отдельные Blocks). Если False, вся страница рассматривается как одна колонка. Используется только при <code class="docutils literal notranslate"><span class="pre">sort_reading_order=True</span></code>. По умолчанию True.</p></li>
-<li><p><strong>max_columns</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Максимальное количество колонок для обнаружения при <code class="docutils literal notranslate"><span class="pre">split_into_columns=True</span></code>. Большие значения позволяют обнаруживать больше колонок. Используется только при <code class="docutils literal notranslate"><span class="pre">sort_reading_order=True</span></code> и <code class="docutils literal notranslate"><span class="pre">split_into_columns=True</span></code>. По умолчанию 10.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Результат<span class="colon">:</span></dt>
-<dd class="field-even"><p>Словарь со следующими ключами:  - <code class="docutils literal notranslate"><span class="pre">&quot;page&quot;</span></code> : Page     Разобранный результат детекции в виде объекта Page, содержащего Block(и) со Line(ами) объектов Word. Каждый Word содержит координаты полигона и оценки уверенности. Слова и строки имеют индексы порядка чтения.  - <code class="docutils literal notranslate"><span class="pre">&quot;score_map&quot;</span></code> : numpy.ndarray или None     Необработанная карта оценок, если <code class="docutils literal notranslate"><span class="pre">return_maps=True</span></code>.  - <code class="docutils literal notranslate"><span class="pre">&quot;geo_map&quot;</span></code> : numpy.ndarray или None     Необработанная карта геометрии, если <code class="docutils literal notranslate"><span class="pre">return_maps=True</span></code>.</p>
+<dd class="field-even"><p><p>Словарь со следующими ключами:</p>
+<ul class="simple">
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;page&quot;</span></code><span class="classifier">Page</span></dt><dd><p>Parsed detection result as a Page object containing a single
+Block with a single Line of Word objects. Each Word has polygon
+coordinates, confidence score, and sequential <code class="docutils literal notranslate"><span class="pre">order</span></code> index.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;score_map&quot;</span></code><span class="classifier">numpy.ndarray или None</span></dt><dd><p>Необработанная карта оценок, полученная сетью, если <code class="docutils literal notranslate"><span class="pre">return_maps=True</span></code>.</p>
+</dd>
+</dl>
+</li>
+<li><dl class="simple">
+<dt><code class="docutils literal notranslate"><span class="pre">&quot;geo_map&quot;</span></code><span class="classifier">numpy.ndarray или None</span></dt><dd><p>Необработанная карта геометрии, если <code class="docutils literal notranslate"><span class="pre">return_maps=True</span></code>.</p>
+</dd>
+</dl>
+</li>
+</ul>
+</p>
 </dd>
 <dt class="field-odd">Тип результата<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)">dict</a></p>
 </dd>
 </dl>
 <p class="rubric">Заметки</p>
-<p>Метод выполняет: (1) загрузку изображения, (2) изменение размера и нормализацию, (3) инференс модели, (4) декодирование четырёхугольников, (5) NMS, (6) расширение боксов, (7) масштабирование координат обратно к исходному размеру, (8) опциональную сортировку по порядку чтения с группировкой в строки.</p>
+<p>The method performs:
+(1) image loading, (2) resizing and normalization, (3) model inference,
+(4) quad decoding, (5) NMS, (6) box expansion, (7) scaling coordinates
+back to original size.</p>
 <p><strong>Test-Time Augmentation (TTA):</strong></p>
 <p>When <code class="docutils literal notranslate"><span class="pre">use_tta=True</span></code> is set during initialization, the method runs
 inference on both the original and horizontally flipped image, then
@@ -596,7 +604,7 @@ Default <code class="docutils literal notranslate"><span class="pre">None</span>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Нижняя область">
         <a href="data.html" class="btn btn-neutral float-left" title="Структуры данных" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Предыдущая</a>
-        <a href="recognizers.html" class="btn btn-neutral float-right" title="Распознаватели" accesskey="n" rel="next">Следующая <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="layouts.html" class="btn btn-neutral float-right" title="Layouts" accesskey="n" rel="next">Следующая <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

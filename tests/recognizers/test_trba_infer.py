@@ -334,7 +334,7 @@ class TestTRBAAPI:
 class TestTRBAPredictPageInterface:
     """Tests for Page-based recognizer API."""
 
-    def _create_recognizer(self, tmp_path):
+    def _create_recognizer(self, tmp_path, min_text_size: int = 5):
         weights_file = tmp_path / "model.onnx"
         config_file = tmp_path / "model.json"
         charset_file = tmp_path / "model.txt"
@@ -348,6 +348,7 @@ class TestTRBAPredictPageInterface:
             config=str(config_file),
             charset=str(charset_file),
             device="cpu",
+            min_text_size=min_text_size,
         )
 
     @staticmethod
@@ -377,7 +378,7 @@ class TestTRBAPredictPageInterface:
                 {"text": "word2", "confidence": 0.85},
             ],
         ) as mocked:
-            result = recognizer.predict(page, image=image, min_text_size=1)
+            result = recognizer.predict(page, image=image)
 
         assert isinstance(result, Page)
         assert result is not page
@@ -399,7 +400,7 @@ class TestTRBAPredictPageInterface:
         assert result.blocks[0].lines[0].words[1].text is None
 
     def test_predict_respects_min_text_size(self, tmp_path):
-        recognizer = self._create_recognizer(tmp_path)
+        recognizer = self._create_recognizer(tmp_path, min_text_size=5)
         page = Page(
             blocks=[
                 Block(
@@ -427,7 +428,7 @@ class TestTRBAPredictPageInterface:
             "_predict_word_images",
             return_value=[{"text": "big", "confidence": 0.88}],
         ) as mocked:
-            result = recognizer.predict(page, image=image, min_text_size=5)
+            result = recognizer.predict(page, image=image)
 
         assert result.blocks[0].lines[0].words[0].text is None
         assert result.blocks[0].lines[0].words[1].text == "big"

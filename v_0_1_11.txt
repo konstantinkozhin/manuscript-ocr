@@ -126,5 +126,47 @@ Files:
 - docs/sphinx/structure.rst
 - src/manuscript/api/LIBRARY_STRUCTURE.md
 
+13) New Layout stage extracted from detector and integrated into Pipeline (local)
+- Added new module `manuscript.layouts` with `SimpleSorting`.
+- Moved reading-order and column organization logic out of `EAST` into `SimpleSorting.predict(page, image=None)`.
+- `EAST.predict` now performs detection only and returns raw `Page` with sequential `word.order`.
+- Kept `manuscript.utils.organize_page` as compatibility wrapper over `SimpleSorting`.
+- `Pipeline` now supports `layout` and `layout_after` (`detector`/`recognizer`/`corrector`), default is after detector.
+- Removed `recognize_text` from `Pipeline.predict`; optional stages are now disabled via `None` (`layout`, `recognizer`, `corrector`).
+- Added `last_layout_page` property and updated stage snapshot behavior for skipped stages.
+- Reworked pipeline API tests and added dedicated layout tests.
+- Updated Sphinx/Markdown documentation and API structure references for the new stage.
+
+Files:
+- src/manuscript/layouts/__init__.py
+- src/manuscript/layouts/_simplesorting/__init__.py
+- src/manuscript/detectors/_east/__init__.py
+- src/manuscript/utils/sorting.py
+- src/manuscript/_pipeline.py
+- src/manuscript/__init__.py
+- src/manuscript/api/LIBRARY_STRUCTURE.md
+- tests/layouts/test_simplesorting.py
+- tests/test_pipeline_api_compatibility.py
+- docs/PIPELINE_API.md
+- docs/sphinx/pipeline_usage.rst
+- docs/sphinx/api/index.rst
+- docs/sphinx/api/layouts.rst
+- docs/sphinx/structure.rst
+- docs/sphinx/getting_started.rst
+- docs/sphinx/conf.py
+
+14) Recognition size threshold moved from Pipeline to TRBA (local)
+- Removed `min_text_size` from `Pipeline` constructor and internal recognizer forwarding.
+- Added `min_text_size` parameter to `TRBA(...)` so recognition filtering is configured at recognizer level.
+- Updated tests and docs to use `TRBA(min_text_size=...)` instead of `Pipeline(min_text_size=...)`.
+
+Files:
+- src/manuscript/_pipeline.py
+- src/manuscript/recognizers/_trba/__init__.py
+- tests/test_pipeline_api_compatibility.py
+- tests/recognizers/test_trba_infer.py
+- docs/PIPELINE_API.md
+- docs/sphinx/pipeline_usage.rst
+
 Summary:
 - v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fixes).

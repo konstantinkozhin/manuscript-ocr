@@ -486,57 +486,37 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#quick-start">Quick Start</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#main-components">Main Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#pipeline-defaults">Pipeline Defaults</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline_usage.html">Pipeline Usage Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#detector-requirements">Detector Requirements</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#result-structure">Result Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#stage-contracts">Stage Contracts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#detector">Detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#recognizer">Recognizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#layout">Layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#corrector">Corrector</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#recognizer-requirements">Recognizer Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#corrector-requirements">Corrector Requirements</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#built-in-charlm-corrector">Built-in CharLM Corrector</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#compatible-implementation-examples">Compatible Implementation Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#complete-detector-example">Complete Detector Example</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#using-custom-components">Using Custom Components</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#pipeline-usage-examples">Pipeline Usage Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#basic-usage">Basic Usage</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#detection-only-without-recognition">Detection Only (Without Recognition)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#with-visualization">With Visualization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#export-import-page-to-json">Export/Import Page to JSON</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#with-profiling">With Profiling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#batch-processing">Batch Processing</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#component-configuration">Component Configuration</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#replacing-detector-or-recognizer">Replacing Detector or Recognizer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#built-in-model-configuration">Built-in Model Configuration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#size-filtering">Size Filtering</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#automatic-rotation-control-trba">Automatic Rotation Control (TRBA)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#disable-stages">Disable Stages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#layout-placement">Layout Placement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Library Structure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="#module-descriptions">Module Descriptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#overview">Overview</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/pipeline.html">Pipeline</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_layout_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_layout_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
 </ul>
@@ -562,6 +542,14 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -633,108 +621,42 @@ window.addEventListener("load", load);</script>
              
   <section id="library-structure">
 <h1>Library Structure<a class="headerlink" href="#library-structure" title="Link to this heading"></a></h1>
-<p>Overview of the manuscript-ocr library architecture.</p>
 <pre  class="mermaid">
         graph LR
-    %% Main package
     manuscript[manuscript]
 
-    %% Core modules
-    manuscript --&gt; Pipeline[&quot;Pipeline&lt;br/&gt;&lt;i&gt;Главный класс для OCR&lt;/i&gt;&quot;]
-    manuscript --&gt; data[&quot;data&lt;br/&gt;&lt;i&gt;Структуры данных&lt;/i&gt;&quot;]
-    manuscript --&gt; detectors[&quot;detectors&lt;br/&gt;&lt;i&gt;Детекторы текста&lt;/i&gt;&quot;]
-    manuscript --&gt; recognizers[&quot;recognizers&lt;br/&gt;&lt;i&gt;Распознаватели текста&lt;/i&gt;&quot;]
-    manuscript --&gt; utils[&quot;utils&lt;br/&gt;&lt;i&gt;Утилиты&lt;/i&gt;&quot;]
-    manuscript --&gt; api[&quot;api&lt;br/&gt;&lt;i&gt;API базовые классы&lt;/i&gt;&quot;]
+    manuscript --&gt; Pipeline[Pipeline]
+    manuscript --&gt; data[data]
+    manuscript --&gt; detectors[detectors]
+    manuscript --&gt; layouts[layouts]
+    manuscript --&gt; recognizers[recognizers]
+    manuscript --&gt; correctors[correctors]
+    manuscript --&gt; utils[utils]
+    manuscript --&gt; api[api]
 
-    %% Pipeline methods
-    Pipeline --&gt; p_predict[&quot;predict()&lt;br/&gt;&lt;i&gt;→ Dict | Tuple[Dict, Image]&lt;/i&gt;&quot;]
-    Pipeline --&gt; p_get_text[&quot;get_text()&lt;br/&gt;&lt;i&gt;→ str&lt;/i&gt;&quot;]
+    Pipeline --&gt; p1[predict]
+    Pipeline --&gt; p2[get_text]
+    Pipeline --&gt; p3[last_detection_page]
+    Pipeline --&gt; p4[last_layout_page]
+    Pipeline --&gt; p5[last_recognition_page]
+    Pipeline --&gt; p6[last_correction_page]
 
-    %% Data structures
-    data --&gt; Page[&quot;Page&quot;]
-    data --&gt; Block[&quot;Block&quot;]
-    data --&gt; Line[&quot;Line&quot;]
-    data --&gt; Word[&quot;Word&quot;]
+    detectors --&gt; EAST[EAST]
+    layouts --&gt; SimpleSorting[SimpleSorting]
+    recognizers --&gt; TRBA[TRBA]
+    correctors --&gt; CharLM[CharLM]
 
-    Page --&gt; page_blocks[&quot;blocks: List[Block]&quot;]
-    Block --&gt; block_lines[&quot;lines: List[Line]&quot;]
-    Block --&gt; block_order[&quot;order: Optional[int]&quot;]
-    Line --&gt; line_words[&quot;words: List[Word]&quot;]
-    Line --&gt; line_order[&quot;order: Optional[int]&quot;]
-    Word --&gt; word_polygon[&quot;polygon: List[(x,y)]&quot;]
-    Word --&gt; word_det_conf[&quot;detection_confidence: float&quot;]
-    Word --&gt; word_text[&quot;text: Optional[str]&quot;]
-    Word --&gt; word_rec_conf[&quot;recognition_confidence: Optional[float]&quot;]
-    Word --&gt; word_order[&quot;order: Optional[int]&quot;]
-
-    %% Detectors
-    detectors --&gt; EAST[&quot;EAST&lt;br/&gt;&lt;i&gt;Efficient and Accurate Scene Text Detector&lt;/i&gt;&quot;]
-    EAST --&gt; east_predict[&quot;predict()&lt;br/&gt;&lt;i&gt;→ Dict[str, Any]&lt;/i&gt;&quot;]
-    EAST --&gt; east_train[&quot;train()&lt;br/&gt;&lt;i&gt;→ None&lt;/i&gt;&quot;]
-    EAST --&gt; east_export[&quot;export()&lt;br/&gt;&lt;i&gt;→ str&lt;/i&gt;&quot;]
-
-    %% Recognizers
-    recognizers --&gt; TRBA[&quot;TRBA&lt;br/&gt;&lt;i&gt;Text Recognition with BiLSTM + Attention&lt;/i&gt;&quot;]
-    TRBA --&gt; trba_predict[&quot;predict(page, image=None)&lt;br/&gt;&lt;i&gt;→ Page&lt;/i&gt;&quot;]
-    TRBA --&gt; trba_train[&quot;train()&lt;br/&gt;&lt;i&gt;→ None&lt;/i&gt;&quot;]
-    TRBA --&gt; trba_export[&quot;export()&lt;br/&gt;&lt;i&gt;→ str&lt;/i&gt;&quot;]
-
-    %% Utils submodules
-    utils --&gt; io[&quot;io&lt;br/&gt;&lt;i&gt;Чтение/запись&lt;/i&gt;&quot;]
-    utils --&gt; visualization[&quot;visualization&lt;br/&gt;&lt;i&gt;Визуализация результатов&lt;/i&gt;&quot;]
-    utils --&gt; sorting[&quot;sorting&lt;br/&gt;&lt;i&gt;Сортировка и организация&lt;/i&gt;&quot;]
-    utils --&gt; training[&quot;training&lt;br/&gt;&lt;i&gt;Обучение моделей&lt;/i&gt;&quot;]
-
-    %% IO functions
-    io --&gt; read_image[&quot;read_image()&lt;br/&gt;&lt;i&gt;→ np.ndarray&lt;/i&gt;&quot;]
-
-    %% Visualization functions
-    visualization --&gt; visualize_page[&quot;visualize_page()&lt;br/&gt;&lt;i&gt;→ Image&lt;/i&gt;&quot;]
-
-    %% Sorting functions
-    sorting --&gt; organize_page[&quot;organize_page()&lt;br/&gt;&lt;i&gt;→ Page&lt;/i&gt;&quot;]
-
-    %% Training functions
-    training --&gt; set_seed[&quot;set_seed()&lt;br/&gt;&lt;i&gt;→ None&lt;/i&gt;&quot;]
-
-    %% API
-    api --&gt; BaseModel[&quot;BaseModel&lt;br/&gt;&lt;i&gt;Базовый класс для моделей&lt;/i&gt;&quot;]
-    BaseModel --&gt; base_predict[&quot;predict() &lt;i&gt;abstract&lt;/i&gt;&quot;]
-
-    %% Styles
-    style manuscript fill:#1f2937,color:#ffffff,stroke:#111827,stroke-width:2px
-    style Pipeline fill:#fde68a,color:#111827,stroke:#92400e,stroke-width:2px
-
-    style data fill:#bbf7d0,color:#064e3b,stroke:#047857
-    style detectors fill:#bfdbfe,color:#1e3a8a,stroke:#2563eb
-    style recognizers fill:#ddd6fe,color:#4c1d95,stroke:#7c3aed
-    style utils fill:#fed7aa,color:#7c2d12,stroke:#ea580c
-    style api fill:#fecaca,color:#7f1d1d,stroke:#dc2626
-    </pre><section id="module-descriptions">
-<h2>Module Descriptions<a class="headerlink" href="#module-descriptions" title="Link to this heading"></a></h2>
-<dl class="simple">
-<dt><strong>Pipeline</strong></dt><dd><p>The main high-level interface that combines detection and recognition
-into a single OCR workflow.</p>
-</dd>
-<dt><strong>data</strong></dt><dd><p>Data structures (<code class="docutils literal notranslate"><span class="pre">Page</span></code>, <code class="docutils literal notranslate"><span class="pre">Block</span></code>, <code class="docutils literal notranslate"><span class="pre">Line</span></code>, <code class="docutils literal notranslate"><span class="pre">Word</span></code>) for representing
-OCR results in a hierarchical format.</p>
-</dd>
-<dt><strong>detectors</strong></dt><dd><p>Text detection models. Currently includes <code class="docutils literal notranslate"><span class="pre">EAST</span></code> (Efficient and Accurate
-Scene Text Detector).</p>
-</dd>
-<dt><strong>recognizers</strong></dt><dd><p>Text recognition models. Currently includes <code class="docutils literal notranslate"><span class="pre">TRBA</span></code> (Text Recognition with
-BiLSTM and Attention mechanism).</p>
-</dd>
-<dt><strong>utils</strong></dt><dd><p>Utility functions for:</p>
+    utils --&gt; organize_page[organize_page wrapper]
+    </pre><section id="overview">
+<h2>Overview<a class="headerlink" href="#overview" title="Link to this heading"></a></h2>
 <ul class="simple">
-<li><p>I/O operations (<code class="docutils literal notranslate"><span class="pre">read_image</span></code>)</p></li>
-<li><p>Visualization (<code class="docutils literal notranslate"><span class="pre">visualize_page</span></code>)</p></li>
-<li><p>Sorting and organization (<code class="docutils literal notranslate"><span class="pre">organize_page</span></code>)</p></li>
-<li><p>Training utilities (<code class="docutils literal notranslate"><span class="pre">set_seed</span></code>)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code> orchestrates OCR stages.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">detectors</span></code> provide detection models.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">layouts</span></code> provide ordering/grouping models (for example <code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code>).</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">recognizers</span></code> provide text recognition models.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">correctors</span></code> provide text post-processing models.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">utils.organize_page</span></code> remains as a compatibility wrapper over layout logic.</p></li>
 </ul>
-</dd>
-</dl>
 </section>
 </section>
 

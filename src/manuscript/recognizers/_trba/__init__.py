@@ -66,6 +66,9 @@ class TRBA(BaseModel):
         recognition. If ``height > width * rotate_threshold``, crop is
         rotated 90 degrees clockwise. Set to ``0`` or ``None`` to disable.
         Default is ``1.5``.
+    min_text_size : int, optional
+        Minimum crop width/height in pixels to run recognition for a word.
+        Words below this threshold are skipped. Default is ``5``.
     **kwargs
         Additional configuration options (reserved for future use).
 
@@ -135,6 +138,7 @@ class TRBA(BaseModel):
         charset: Optional[str] = None,
         device: Optional[str] = None,
         rotate_threshold: Optional[float] = 1.5,
+        min_text_size: int = 5,
         **kwargs,
     ):
         # Initialize BaseModel (resolves weights and device)
@@ -182,6 +186,7 @@ class TRBA(BaseModel):
         # Initialize ONNX session
         self.onnx_session = None
         self.rotate_threshold = rotate_threshold
+        self.min_text_size = min_text_size
 
     def _resolve_config(self, config: Optional[str]) -> str:
         """
@@ -485,7 +490,6 @@ class TRBA(BaseModel):
         page: Page,
         image: Optional[Union[np.ndarray, str, Path, Image.Image]] = None,
         batch_size: int = 32,
-        min_text_size: int = 5,
     ) -> Page:
         """
         Recognize text for words in a ``Page`` and return updated ``Page``.
@@ -500,9 +504,6 @@ class TRBA(BaseModel):
         batch_size : int, optional
             Number of word crops to process simultaneously. Larger batches are
             faster but require more memory. Default is 32.
-        min_text_size : int, optional
-            Minimum crop width/height in pixels to run recognition for a word.
-            Words below this threshold are left unchanged. Default is 5.
 
         Returns
         -------
@@ -542,7 +543,7 @@ class TRBA(BaseModel):
                     width = x_max - x_min
                     height = y_max - y_min
 
-                    if width < min_text_size or height < min_text_size:
+                    if width < self.min_text_size or height < self.min_text_size:
                         continue
 
                     region_image = self._extract_word_image(
@@ -1230,4 +1231,3 @@ class TRBA(BaseModel):
         print(f"\nInput shape: [batch_size, 3, {img_h}, {img_w}]")
         print(f"Output shape: [batch_size, {max_length}, {num_classes}]")
         print(f"Decoding: Greedy (argmax over last dimension)")
-

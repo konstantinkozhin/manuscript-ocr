@@ -9,7 +9,7 @@ import onnxruntime as ort
 from manuscript.api.base import BaseModel
 
 from ...data import Block, Line, Page, Word
-from ...utils import read_image, organize_page
+from ...utils import read_image
 from .lanms import locality_aware_nms
 from .utils import (
     decode_quads_from_maps,
@@ -412,9 +412,6 @@ class EAST(BaseModel):
         self,
         img_or_path: Union[str, Path, np.ndarray],
         return_maps: bool = False,
-        sort_reading_order: bool = True,
-        split_into_columns: bool = True,
-        max_columns: int = 10,
     ) -> Dict[str, Any]:
         """
         Run EAST inference and return detection results.
@@ -427,19 +424,6 @@ class EAST(BaseModel):
         return_maps : bool, optional
             If True, returns raw model score and geometry maps under keys
             ``"score_map"`` and ``"geo_map"``. Default is False.
-        sort_reading_order : bool, optional
-            If True, sorts detected words in natural reading order
-            (left-to-right, top-to-bottom) and groups them into text lines.
-            Default is True.
-        split_into_columns : bool, optional
-            If True and ``sort_reading_order=True``, segments the page into
-            columns (separate Blocks). If False, treats entire page as single
-            column. Only used when ``sort_reading_order=True``. Default is True.
-        max_columns : int, optional
-            Maximum number of columns to detect when ``split_into_columns=True``.
-            Higher values allow more columns to be detected. Only used when
-            ``sort_reading_order=True`` and ``split_into_columns=True``.
-            Default is 10.
 
         Returns
         -------
@@ -447,9 +431,9 @@ class EAST(BaseModel):
             Dictionary with the following keys:
 
             - ``"page"`` : Page
-                Parsed detection result as a Page object containing Block(s) with
-                Line(s) of Word objects. Each Word has polygon coordinates and
-                confidence scores. Words and Lines have reading order indices.
+                Parsed detection result as a Page object containing a single
+                Block with a single Line of Word objects. Each Word has polygon
+                coordinates, confidence score, and sequential ``order`` index.
             - ``"score_map"`` : numpy.ndarray or None
                 Raw score map produced by the network if ``return_maps=True``.
             - ``"geo_map"`` : numpy.ndarray or None
@@ -460,7 +444,7 @@ class EAST(BaseModel):
         The method performs:
         (1) image loading, (2) resizing and normalization, (3) model inference,
         (4) quad decoding, (5) NMS, (6) box expansion, (7) scaling coordinates
-        back to original size, (8) optional reading order sorting into lines.
+        back to original size.
 
         **Test-Time Augmentation (TTA):**
 
@@ -595,17 +579,10 @@ class EAST(BaseModel):
             score = float(np.clip(quad[8], 0.0, 1.0))
             words.append(Word(polygon=pts.tolist(), detection_confidence=score))
 
-        if sort_reading_order and len(words) > 0:
-            initial_page = Page(
-                blocks=[Block(lines=[Line(words=words, order=0)], order=0)]
-            )
-            page = organize_page(
-                initial_page, max_splits=max_columns, use_columns=split_into_columns
-            )
-        else:
-            for idx, w in enumerate(words):
-                w.order = idx
-            page = Page(blocks=[Block(lines=[Line(words=words, order=0)], order=0)])
+        for idx, w in enumerate(words):
+            w.order = idx
+
+        page = Page(blocks=[Block(lines=[Line(words=words, order=0)], order=0)])
 
         return {
             "page": page,

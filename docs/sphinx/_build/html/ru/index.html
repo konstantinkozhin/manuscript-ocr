@@ -51,57 +51,37 @@
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Установка</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#quick-start">Быстрый старт</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#main-components">Основные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#pipeline-defaults">Pipeline Defaults</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline_usage.html">Руководство по использованию Pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#detector-requirements">Требования к детектору</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#result-structure">Структура результата</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#stage-contracts">Stage Contracts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#detector">Detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#recognizer">Recognizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#layout">Layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#corrector">Corrector</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#recognizer-requirements">Требования к распознавателю</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#corrector-requirements">Требования к корректору</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#built-in-charlm-corrector">Встроенный корректор CharLM</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#compatible-implementation-examples">Примеры совместимых реализаций</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#complete-detector-example">Полный пример детектора</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#using-custom-components">Использование кастомных компонентов</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#pipeline-usage-examples">Примеры использования Pipeline</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#basic-usage">Базовое использование</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#detection-only-without-recognition">Только детекция (без распознавания)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#with-visualization">С визуализацией</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#intermediate-results">Промежуточные результаты</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#export-import-page-to-json">Экспорт/импорт Page в JSON</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#with-profiling">С профилированием</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#batch-processing">Пакетная обработка</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#component-configuration">Настройка компонентов</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#replacing-detector-or-recognizer">Замена детектора или распознавателя</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#built-in-model-configuration">Настройка встроенных моделей</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#size-filtering">Фильтрация по размеру</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#automatic-rotation-control-trba">Automatic Rotation Control (TRBA)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#basic-usage">Базовое использование</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#disable-stages">Disable Stages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#layout-placement">Layout Placement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#intermediate-results">Промежуточные результаты</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Структура библиотеки</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="structure.html#module-descriptions">Описание модулей</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structure.html#overview">Overview</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">Справочник API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/pipeline.html">Конвейер</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_layout_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_layout_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
 </ul>
@@ -127,6 +107,14 @@
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -207,25 +195,28 @@
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Установка</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#quick-start">Быстрый старт</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#main-components">Основные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#pipeline-defaults">Pipeline Defaults</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline_usage.html">Руководство по использованию Pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#detector-requirements">Требования к детектору</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#recognizer-requirements">Требования к распознавателю</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#corrector-requirements">Требования к корректору</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#compatible-implementation-examples">Примеры совместимых реализаций</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#pipeline-usage-examples">Примеры использования Pipeline</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#component-configuration">Настройка компонентов</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#stage-contracts">Stage Contracts</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#basic-usage">Базовое использование</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#disable-stages">Disable Stages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#layout-placement">Layout Placement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#intermediate-results">Промежуточные результаты</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Структура библиотеки</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="structure.html#module-descriptions">Описание модулей</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structure.html#overview">Overview</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">Справочник API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/pipeline.html">Конвейер</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/data.html">Структуры данных</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/detectors.html">Детекторы</a></li>
+<li class="toctree-l2"><a class="reference internal" href="api/layouts.html">Layouts</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/recognizers.html">Распознаватели</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/correctors.html">Корректоры</a></li>
 <li class="toctree-l2"><a class="reference internal" href="api/utils.html">Утилиты</a></li>

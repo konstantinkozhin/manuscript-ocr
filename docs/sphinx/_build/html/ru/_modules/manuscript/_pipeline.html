@@ -484,57 +484,37 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#installation">Установка</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#quick-start">Быстрый старт</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#main-components">Основные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#pipeline-defaults">Pipeline Defaults</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../pipeline_usage.html">Руководство по использованию Pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#detector-requirements">Требования к детектору</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#result-structure">Структура результата</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#stage-contracts">Stage Contracts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#detector">Detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#recognizer">Recognizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#layout">Layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#corrector">Corrector</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#recognizer-requirements">Требования к распознавателю</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#corrector-requirements">Требования к корректору</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#built-in-charlm-corrector">Встроенный корректор CharLM</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#compatible-implementation-examples">Примеры совместимых реализаций</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#complete-detector-example">Полный пример детектора</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#using-custom-components">Использование кастомных компонентов</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#pipeline-usage-examples">Примеры использования Pipeline</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#basic-usage">Базовое использование</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#detection-only-without-recognition">Только детекция (без распознавания)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#with-visualization">С визуализацией</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#intermediate-results">Промежуточные результаты</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#export-import-page-to-json">Экспорт/импорт Page в JSON</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#with-profiling">С профилированием</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#batch-processing">Пакетная обработка</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#component-configuration">Настройка компонентов</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#replacing-detector-or-recognizer">Замена детектора или распознавателя</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#built-in-model-configuration">Настройка встроенных моделей</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#size-filtering">Фильтрация по размеру</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../pipeline_usage.html#automatic-rotation-control-trba">Automatic Rotation Control (TRBA)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#basic-usage">Базовое использование</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#disable-stages">Disable Stages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#layout-placement">Layout Placement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#intermediate-results">Промежуточные результаты</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../structure.html">Структура библиотеки</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../structure.html#module-descriptions">Описание модулей</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../structure.html#overview">Overview</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../api/index.html">Справочник API</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../api/pipeline.html">Конвейер</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.last_layout_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_layout_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
 </ul>
@@ -560,6 +540,14 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../api/layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../api/layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -630,78 +618,47 @@ window.addEventListener("load", load);</script>
            <div itemprop="articleBody">
              
   <h1>Исходный код manuscript._pipeline</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 
 <span class="kn">from</span><span class="w"> </span><span class="nn">.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.layouts</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleSorting</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.recognizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRBA</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_image</span><span class="p">,</span> <span class="n">visualize_page</span>
 
 <span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
     <span class="kn">from</span><span class="w"> </span><span class="nn">.api.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span> <span class="k">as</span> <span class="n">BaseCorrector</span>
 
+<span class="n">_DEFAULT</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
+<span class="n">_VALID_LAYOUT_AFTER</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span> <span class="s2">&quot;recognizer&quot;</span><span class="p">,</span> <span class="s2">&quot;corrector&quot;</span><span class="p">}</span>
+
 
 <div class="viewcode-block" id="Pipeline">
 <a class="viewcode-back" href="../../api/pipeline.html#manuscript._pipeline.Pipeline">[документация]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Pipeline</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    High-level OCR pipeline combining text detection, recognition, and correction.</span>
+<span class="sd">    High-level OCR pipeline with configurable stage ordering.</span>
 
-<span class="sd">    The Pipeline class orchestrates EAST detector, TRBA recognizer, and optional</span>
-<span class="sd">    text corrector to perform complete OCR workflow:</span>
-<span class="sd">    detection -&gt; recognition -&gt; correction -&gt; result merging.</span>
-
-<span class="sd">    Attributes</span>
-<span class="sd">    ----------</span>
-<span class="sd">    detector : EAST</span>
-<span class="sd">        Text detector instance</span>
-<span class="sd">    recognizer : TRBA</span>
-<span class="sd">        Text recognizer instance</span>
-<span class="sd">    corrector : BaseCorrector, optional</span>
-<span class="sd">        Text corrector instance (None to skip correction)</span>
-<span class="sd">    min_text_size : int</span>
-<span class="sd">        Minimum text box size in pixels (width and height)</span>
-
-<span class="sd">    Examples</span>
-<span class="sd">    --------</span>
-<span class="sd">    Create pipeline with default models:</span>
-
-<span class="sd">    &gt;&gt;&gt; from manuscript import Pipeline</span>
-<span class="sd">    &gt;&gt;&gt; pipeline = Pipeline()</span>
-<span class="sd">    &gt;&gt;&gt; result = pipeline.predict(&quot;document.jpg&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; text = pipeline.get_text(result[&quot;page&quot;])</span>
-<span class="sd">    &gt;&gt;&gt; print(text)</span>
-
-<span class="sd">    Create pipeline with custom models:</span>
-
-<span class="sd">    &gt;&gt;&gt; from manuscript import Pipeline</span>
-<span class="sd">    &gt;&gt;&gt; from manuscript.detectors import EAST</span>
-<span class="sd">    &gt;&gt;&gt; from manuscript.recognizers import TRBA</span>
-<span class="sd">    &gt;&gt;&gt; detector = EAST(weights=&quot;east_50_g1&quot;, score_thresh=0.8)</span>
-<span class="sd">    &gt;&gt;&gt; recognizer = TRBA(weights=&quot;trba_lite_g1&quot;, device=&quot;cuda&quot;)</span>
-<span class="sd">    &gt;&gt;&gt; pipeline = Pipeline(detector=detector, recognizer=recognizer)</span>
-
-<span class="sd">    Create pipeline with text correction:</span>
-
-<span class="sd">    &gt;&gt;&gt; from manuscript import Pipeline</span>
-<span class="sd">    &gt;&gt;&gt; from manuscript.correctors import CharLM</span>
-<span class="sd">    &gt;&gt;&gt; corrector = CharLM()</span>
-<span class="sd">    &gt;&gt;&gt; pipeline = Pipeline(corrector=corrector)</span>
+<span class="sd">    Default pipeline:</span>
+<span class="sd">    ``detector -&gt; layout -&gt; recognizer``.</span>
+<span class="sd">    ``corrector`` is optional and disabled by default.</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
 <div class="viewcode-block" id="Pipeline.__init__">
 <a class="viewcode-back" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.__init__">[документация]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">detector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">EAST</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="n">recognizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">TRBA</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">detector</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">_DEFAULT</span><span class="p">,</span>
+        <span class="n">layout</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">_DEFAULT</span><span class="p">,</span>
+        <span class="n">recognizer</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">_DEFAULT</span><span class="p">,</span>
         <span class="n">corrector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;BaseCorrector&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">layout_after</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;detector&quot;</span><span class="p">,</span>
         <span class="n">min_text_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -709,198 +666,199 @@ window.addEventListener("load", load);</script>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
-<span class="sd">        detector : EAST, optional</span>
-<span class="sd">            Text detector instance. If None, creates default EAST detector.</span>
-<span class="sd">        recognizer : TRBA, optional</span>
-<span class="sd">            Text recognizer instance. If None, creates default TRBA recognizer.</span>
-<span class="sd">        corrector : BaseCorrector, optional</span>
-<span class="sd">            Text corrector instance. If None, no text correction is applied.</span>
-<span class="sd">            The corrector receives a Page object after recognition and returns</span>
-<span class="sd">            a corrected Page object.</span>
+<span class="sd">        detector : object, optional</span>
+<span class="sd">            Detector instance with ``predict(image) -&gt; {&quot;page&quot;: Page}``.</span>
+<span class="sd">            If omitted, default ``EAST()`` is used.</span>
+<span class="sd">            Detector cannot be disabled.</span>
+<span class="sd">        layout : object or None, optional</span>
+<span class="sd">            Layout model instance with ``predict(page, image=None) -&gt; Page``.</span>
+<span class="sd">            If omitted, default ``SimpleSorting()`` is used.</span>
+<span class="sd">            Pass ``None`` to disable layout stage.</span>
+<span class="sd">        recognizer : object or None, optional</span>
+<span class="sd">            Recognizer instance with ``predict(page, image=None, ...) -&gt; Page``.</span>
+<span class="sd">            If omitted, default ``TRBA()`` is used.</span>
+<span class="sd">            Pass ``None`` to disable recognition stage.</span>
+<span class="sd">        corrector : object or None, optional</span>
+<span class="sd">            Corrector instance with ``predict(page, image=None) -&gt; Page``.</span>
+<span class="sd">            Default is ``None`` (disabled).</span>
+<span class="sd">        layout_after : {&quot;detector&quot;, &quot;recognizer&quot;, &quot;corrector&quot;}, optional</span>
+<span class="sd">            Slot where layout stage is executed. Default is ``&quot;detector&quot;``.</span>
 <span class="sd">        min_text_size : int, optional</span>
-<span class="sd">            Minimum text size in pixels. Boxes smaller than this will be</span>
-<span class="sd">            filtered out before recognition. Default is 5.</span>
+<span class="sd">            Minimum text box size in pixels (width and height) passed to</span>
+<span class="sd">            recognizers that support ``min_text_size``. Default is 5.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">detector</span> <span class="k">if</span> <span class="n">detector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">EAST</span><span class="p">()</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span> <span class="o">=</span> <span class="n">recognizer</span> <span class="k">if</span> <span class="n">recognizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span> <span class="k">else</span> <span class="n">TRBA</span><span class="p">()</span>
+        <span class="k">if</span> <span class="n">detector</span> <span class="ow">is</span> <span class="n">_DEFAULT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">EAST</span><span class="p">()</span>
+        <span class="k">elif</span> <span class="n">detector</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;detector cannot be None&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">detector</span>
+
+        <span class="k">if</span> <span class="n">layout</span> <span class="ow">is</span> <span class="n">_DEFAULT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">SimpleSorting</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">layout</span>
+
+        <span class="k">if</span> <span class="n">recognizer</span> <span class="ow">is</span> <span class="n">_DEFAULT</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">()</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span> <span class="o">=</span> <span class="n">recognizer</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">corrector</span> <span class="o">=</span> <span class="n">corrector</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">min_text_size</span> <span class="o">=</span> <span class="n">min_text_size</span>
 
+        <span class="k">if</span> <span class="n">layout_after</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_VALID_LAYOUT_AFTER</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                <span class="sa">f</span><span class="s2">&quot;layout_after must be one of </span><span class="si">{</span><span class="n">_VALID_LAYOUT_AFTER</span><span class="si">}</span><span class="s2">, got: </span><span class="si">{</span><span class="n">layout_after</span><span class="si">}</span><span class="s2">&quot;</span>
+            <span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">layout_after</span> <span class="o">=</span> <span class="n">layout_after</span>
+
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_detection_page</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Page</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_layout_page</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Page</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_recognition_page</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Page</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_correction_page</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Page</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_filter_predict_kwargs</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
+        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
+            <span class="k">return</span> <span class="p">{}</span>
+
+        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_KEYWORD</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
+            <span class="k">return</span> <span class="n">kwargs</span>
+
+        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">params</span><span class="p">}</span>
+
+    <span class="nd">@staticmethod</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">_call_predict</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
+        <span class="n">filtered_kwargs</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">_filter_predict_kwargs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="o">**</span><span class="n">filtered_kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Pipeline.predict">
 <a class="viewcode-back" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.predict">[документация]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">image</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">],</span>
-        <span class="n">recognize_text</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">vis</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="n">profile</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">,</span> <span class="nb">tuple</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Page</span><span class="p">],</span> <span class="nb">tuple</span><span class="p">]:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Run OCR pipeline on a single image.</span>
+<span class="sd">        Run pipeline on a single image.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        image : str, Path, numpy.ndarray, or PIL.Image</span>
-<span class="sd">            Input image. Can be:</span>
-<span class="sd">            - Path to image file (str or Path)</span>
-<span class="sd">            - RGB numpy array with shape (H, W, 3) in uint8</span>
-<span class="sd">            - PIL Image object</span>
-<span class="sd">        recognize_text : bool, optional</span>
-<span class="sd">            If True, performs both detection and recognition.</span>
-<span class="sd">            If False, performs only detection. Default is True.</span>
+<span class="sd">            Input image.</span>
 <span class="sd">        vis : bool, optional</span>
-<span class="sd">            If True, returns visualization image along with results.</span>
-<span class="sd">            Default is False.</span>
+<span class="sd">            If True, returns visualization image together with result.</span>
 <span class="sd">        profile : bool, optional</span>
-<span class="sd">            If True, prints timing information for each pipeline stage.</span>
-<span class="sd">            Default is False.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        dict or tuple</span>
-<span class="sd">            If vis=False:</span>
-<span class="sd">                dict with keys:</span>
-<span class="sd">                - &quot;page&quot; : Page object with detection/recognition results</span>
-
-<span class="sd">            If vis=True:</span>
-<span class="sd">                tuple of (result_dict, vis_image)</span>
-
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
-<span class="sd">        Basic usage:</span>
-
-<span class="sd">        &gt;&gt;&gt; pipeline = Pipeline()</span>
-<span class="sd">        &gt;&gt;&gt; result = pipeline.predict(&quot;document.jpg&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; page = result[&quot;page&quot;]</span>
-<span class="sd">        &gt;&gt;&gt; print(page.blocks[0].lines[0].words[0].text)</span>
-
-<span class="sd">        Detection only:</span>
-
-<span class="sd">        &gt;&gt;&gt; result = pipeline.predict(&quot;document.jpg&quot;, recognize_text=False)</span>
-<span class="sd">        &gt;&gt;&gt; # Words will have polygon and detection_confidence but no text</span>
-
-<span class="sd">        With visualization:</span>
-
-<span class="sd">        &gt;&gt;&gt; result, vis_img = pipeline.predict(&quot;document.jpg&quot;, vis=True)</span>
-<span class="sd">        &gt;&gt;&gt; vis_img.show()</span>
-
-<span class="sd">        With profiling:</span>
-
-<span class="sd">        &gt;&gt;&gt; result = pipeline.predict(&quot;document.jpg&quot;, profile=True)</span>
-<span class="sd">        # Prints timing for each stage</span>
+<span class="sd">            If True, prints timing per stage.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
 
-        <span class="c1"># ---- DETECTION ----</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_detection_page</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_layout_page</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_recognition_page</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_last_correction_page</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="n">image_array_cache</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">get_image_array</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+            <span class="k">nonlocal</span> <span class="n">image_array_cache</span>
+            <span class="k">if</span> <span class="n">image_array_cache</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+                <span class="n">image_array_cache</span> <span class="o">=</span> <span class="n">read_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Load image: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">image_array_cache</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">run_layout_slot</span><span class="p">(</span><span class="n">anchor</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="ow">is</span> <span class="kc">None</span> <span class="ow">or</span> <span class="bp">self</span><span class="o">.</span><span class="n">layout_after</span> <span class="o">!=</span> <span class="n">anchor</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">page</span>
+
+            <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">layout_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="s2">&quot;image&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_predict_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}):</span>
+                <span class="n">layout_kwargs</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_image_array</span><span class="p">()</span>
+            <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">layout_kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_layout_page</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Layout (</span><span class="si">{</span><span class="n">anchor</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">page</span>
+
+        <span class="c1"># Detection</span>
         <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">detection_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span>
-            <span class="n">image</span><span class="p">,</span> <span class="n">return_maps</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">sort_reading_order</span><span class="o">=</span><span class="kc">True</span>
+        <span class="n">detection_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_predict_kwargs</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;return_maps&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
         <span class="p">)</span>
+        <span class="n">detection_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="o">**</span><span class="n">detection_kwargs</span><span class="p">)</span>
         <span class="n">page</span><span class="p">:</span> <span class="n">Page</span> <span class="o">=</span> <span class="n">detection_result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">]</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_detection_page</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
         <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Detection: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
 
-        <span class="c1"># ---- If recognition not needed ----</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="n">recognize_text</span><span class="p">:</span>
-            <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;page&quot;</span><span class="p">:</span> <span class="n">page</span><span class="p">}</span>
+        <span class="c1"># After detector slot</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">run_layout_slot</span><span class="p">(</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span>
 
-            <span class="k">if</span> <span class="n">vis</span><span class="p">:</span>
-                <span class="n">img_array</span> <span class="o">=</span> <span class="n">read_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-                <span class="n">pil_img</span> <span class="o">=</span> <span class="p">(</span>
-                    <span class="n">image</span>
-                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">)</span>
-                    <span class="k">else</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">img_array</span><span class="p">)</span>
-                <span class="p">)</span>
-                <span class="n">vis_img</span> <span class="o">=</span> <span class="n">visualize_page</span><span class="p">(</span><span class="n">pil_img</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">show_order</span><span class="o">=</span><span class="kc">False</span><span class="p">)</span>
-                <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">vis_img</span>
+        <span class="c1"># Recognition slot</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
+            <span class="n">recognizer_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_predict_kwargs</span><span class="p">(</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="p">,</span>
+                <span class="p">{</span>
+                    <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
+                    <span class="s2">&quot;min_text_size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_text_size</span><span class="p">,</span>
+                <span class="p">},</span>
+            <span class="p">)</span>
+            <span class="k">if</span> <span class="s2">&quot;image&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_predict_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}):</span>
+                <span class="n">recognizer_kwargs</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_image_array</span><span class="p">()</span>
+            <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">recognizer_kwargs</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_last_recognition_page</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Recognition: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
 
-            <span class="k">return</span> <span class="n">result</span>
+        <span class="c1"># After recognizer slot</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">run_layout_slot</span><span class="p">(</span><span class="s2">&quot;recognizer&quot;</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span>
 
-        <span class="c1"># ---- LOAD IMAGE FOR RECOGNITION ----</span>
-        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">image_array</span> <span class="o">=</span> <span class="n">read_image</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Load image for recognition: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
-
-        <span class="c1"># ---- RECOGNITION ----</span>
-        <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">recognizer_kwargs</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="n">image_array</span><span class="p">}</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">predict_params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="o">.</span><span class="n">predict</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
-            <span class="k">if</span> <span class="s2">&quot;batch_size&quot;</span> <span class="ow">in</span> <span class="n">predict_params</span><span class="p">:</span>
-                <span class="n">recognizer_kwargs</span><span class="p">[</span><span class="s2">&quot;batch_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="mi">32</span>
-            <span class="k">if</span> <span class="s2">&quot;min_text_size&quot;</span> <span class="ow">in</span> <span class="n">predict_params</span><span class="p">:</span>
-                <span class="n">recognizer_kwargs</span><span class="p">[</span><span class="s2">&quot;min_text_size&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_text_size</span>
-        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
-            <span class="k">pass</span>
-
-        <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="o">**</span><span class="n">recognizer_kwargs</span><span class="p">)</span>
-        <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
-            <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Recognition: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
-
-        <span class="bp">self</span><span class="o">.</span><span class="n">_last_recognition_page</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-
-        <span class="c1"># ---- CORRECTION ----</span>
+        <span class="c1"># Correction slot</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">corrector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-            <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">corrector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+            <span class="n">corrector_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+            <span class="k">if</span> <span class="s2">&quot;image&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_predict_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">corrector</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}):</span>
+                <span class="n">corrector_kwargs</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_image_array</span><span class="p">()</span>
+            <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">corrector</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">corrector_kwargs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_correction_page</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Correction: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
-        <span class="k">else</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">_last_correction_page</span> <span class="o">=</span> <span class="kc">None</span>
+
+        <span class="c1"># After corrector slot</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">run_layout_slot</span><span class="p">(</span><span class="s2">&quot;corrector&quot;</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span>
 
         <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Pipeline total: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">start_time</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
 
-        <span class="n">result</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;page&quot;</span><span class="p">:</span> <span class="n">page</span><span class="p">}</span>
+        <span class="n">result</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Page</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;page&quot;</span><span class="p">:</span> <span class="n">page</span><span class="p">}</span>
 
-        <span class="k">if</span> <span class="n">vis</span><span class="p">:</span>
-            <span class="n">pil_img</span> <span class="o">=</span> <span class="p">(</span>
-                <span class="n">image</span>
-                <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">)</span>
-                <span class="k">else</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">image_array</span><span class="p">)</span>
-            <span class="p">)</span>
-            <span class="n">vis_img</span> <span class="o">=</span> <span class="n">visualize_page</span><span class="p">(</span><span class="n">pil_img</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">show_order</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
-            <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">vis_img</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">vis</span><span class="p">:</span>
+            <span class="k">return</span> <span class="n">result</span>
 
-        <span class="k">return</span> <span class="n">result</span></div>
+        <span class="n">image_array</span> <span class="o">=</span> <span class="n">get_image_array</span><span class="p">()</span>
+        <span class="n">pil_img</span> <span class="o">=</span> <span class="n">image</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="n">Image</span><span class="o">.</span><span class="n">Image</span><span class="p">)</span> <span class="k">else</span> <span class="n">Image</span><span class="o">.</span><span class="n">fromarray</span><span class="p">(</span><span class="n">image_array</span><span class="p">)</span>
+        <span class="n">vis_img</span> <span class="o">=</span> <span class="n">visualize_page</span><span class="p">(</span><span class="n">pil_img</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">show_order</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">result</span><span class="p">,</span> <span class="n">vis_img</span></div>
 
 
 <div class="viewcode-block" id="Pipeline.get_text">
 <a class="viewcode-back" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.get_text">[документация]</a>
     <span class="k">def</span><span class="w"> </span><span class="nf">get_text</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Extract plain text from Page object.</span>
-
-<span class="sd">        Parameters</span>
-<span class="sd">        ----------</span>
-<span class="sd">        page : Page</span>
-<span class="sd">            Page object with recognition results.</span>
-
-<span class="sd">        Returns</span>
-<span class="sd">        -------</span>
-<span class="sd">        str</span>
-<span class="sd">            Extracted text with lines separated by newlines.</span>
-
-<span class="sd">        Examples</span>
-<span class="sd">        --------</span>
-<span class="sd">        &gt;&gt;&gt; pipeline = Pipeline()</span>
-<span class="sd">        &gt;&gt;&gt; result = pipeline.predict(&quot;document.jpg&quot;)</span>
-<span class="sd">        &gt;&gt;&gt; text = pipeline.get_text(result[&quot;page&quot;])</span>
-<span class="sd">        &gt;&gt;&gt; print(text)</span>
+<span class="sd">        Extract plain text from ``Page`` object.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">page</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
-                <span class="c1"># Extract text from words in the line</span>
                 <span class="n">texts</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">words</span> <span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">text</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">texts</span><span class="p">:</span>
                     <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">texts</span><span class="p">))</span>
@@ -912,13 +870,16 @@ window.addEventListener("load", load);</script>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_detection_page</span>
 
     <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">last_layout_page</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Page</span><span class="p">]:</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_layout_page</span>
+
+    <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">last_recognition_page</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Page</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_recognition_page</span>
 
     <span class="nd">@property</span>
     <span class="k">def</span><span class="w"> </span><span class="nf">last_correction_page</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Page</span><span class="p">]:</span>
         <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_last_correction_page</span></div>
-
 
 </pre></div>
 

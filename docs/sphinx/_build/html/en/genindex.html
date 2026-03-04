@@ -483,57 +483,37 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#quick-start">Quick Start</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#main-components">Main Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#pipeline-defaults">Pipeline Defaults</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline_usage.html">Pipeline Usage Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#detector-requirements">Detector Requirements</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#result-structure">Result Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#stage-contracts">Stage Contracts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#detector">Detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#recognizer">Recognizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#layout">Layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#corrector">Corrector</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#recognizer-requirements">Recognizer Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#corrector-requirements">Corrector Requirements</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#built-in-charlm-corrector">Built-in CharLM Corrector</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#compatible-implementation-examples">Compatible Implementation Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#complete-detector-example">Complete Detector Example</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#using-custom-components">Using Custom Components</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#pipeline-usage-examples">Pipeline Usage Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#basic-usage">Basic Usage</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#detection-only-without-recognition">Detection Only (Without Recognition)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#with-visualization">With Visualization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#export-import-page-to-json">Export/Import Page to JSON</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#with-profiling">With Profiling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#batch-processing">Batch Processing</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#component-configuration">Component Configuration</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#replacing-detector-or-recognizer">Replacing Detector or Recognizer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#built-in-model-configuration">Built-in Model Configuration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#size-filtering">Size Filtering</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#automatic-rotation-control-trba">Automatic Rotation Control (TRBA)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#disable-stages">Disable Stages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#layout-placement">Layout Placement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Library Structure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="structure.html#module-descriptions">Module Descriptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structure.html#overview">Overview</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="api/pipeline.html">Pipeline</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_layout_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_layout_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
 </ul>
@@ -559,6 +539,14 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -661,6 +649,8 @@ window.addEventListener("load", load);</script>
 </li>
         <li><a href="api/detectors.html#manuscript.detectors.EAST.__init__">(manuscript.detectors.EAST method)</a>
 </li>
+        <li><a href="api/layouts.html#manuscript.layouts.SimpleSorting.__init__">(manuscript.layouts.SimpleSorting method)</a>
+</li>
         <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.__init__">(manuscript.recognizers.TRBA method)</a>
 </li>
       </ul></li>
@@ -690,8 +680,6 @@ window.addEventListener("load", load);</script>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.config_registry">config_registry (manuscript.recognizers.TRBA attribute)</a>
 </li>
-      <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline.corrector">corrector (manuscript._pipeline.Pipeline attribute)</a>
-</li>
       <li><a href="api/utils.html#manuscript.utils.create_page_from_text">create_page_from_text() (in module manuscript.utils)</a>
 </li>
   </ul></td>
@@ -713,8 +701,6 @@ window.addEventListener("load", load);</script>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#id1">detection_confidence (manuscript.data.Word attribute)</a>, <a href="api/data.html#manuscript.data.Word.detection_confidence">[1]</a>
-</li>
-      <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline.detector">detector (manuscript._pipeline.Pipeline attribute)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -758,10 +744,12 @@ window.addEventListener("load", load);</script>
 </li>
       <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline.last_detection_page">last_detection_page (manuscript._pipeline.Pipeline property)</a>
 </li>
-      <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page">last_recognition_page (manuscript._pipeline.Pipeline property)</a>
+      <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline.last_layout_page">last_layout_page (manuscript._pipeline.Pipeline property)</a>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page">last_recognition_page (manuscript._pipeline.Pipeline property)</a>
+</li>
       <li><a href="api/correctors.html#manuscript.correctors.CharLM.lexicon_registry">lexicon_registry (manuscript.correctors.CharLM attribute)</a>
 </li>
       <li><a href="api/data.html#manuscript.data.Line">Line (class in manuscript.data)</a>
@@ -796,6 +784,13 @@ window.addEventListener("load", load);</script>
 </li>
       </ul></li>
       <li>
+    manuscript.layouts
+
+      <ul>
+        <li><a href="api/layouts.html#module-manuscript.layouts">module</a>
+</li>
+      </ul></li>
+      <li>
     manuscript.recognizers
 
       <ul>
@@ -811,8 +806,6 @@ window.addEventListener("load", load);</script>
         <li><a href="api/utils.html#module-manuscript.utils">module</a>
 </li>
       </ul></li>
-      <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size">min_text_size (manuscript._pipeline.Pipeline attribute)</a>
-</li>
       <li>
     module
 
@@ -822,6 +815,8 @@ window.addEventListener("load", load);</script>
         <li><a href="api/data.html#module-manuscript.data">manuscript.data</a>
 </li>
         <li><a href="api/detectors.html#module-manuscript.detectors">manuscript.detectors</a>
+</li>
+        <li><a href="api/layouts.html#module-manuscript.layouts">manuscript.layouts</a>
 </li>
         <li><a href="api/recognizers.html#module-manuscript.recognizers">manuscript.recognizers</a>
 </li>
@@ -865,6 +860,8 @@ window.addEventListener("load", load);</script>
 </li>
         <li><a href="api/detectors.html#manuscript.detectors.EAST.predict">(manuscript.detectors.EAST method)</a>
 </li>
+        <li><a href="api/layouts.html#manuscript.layouts.SimpleSorting.predict">(manuscript.layouts.SimpleSorting method)</a>
+</li>
         <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.predict">(manuscript.recognizers.TRBA method)</a>
 </li>
       </ul></li>
@@ -890,8 +887,6 @@ window.addEventListener("load", load);</script>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#id3">recognition_confidence (manuscript.data.Word attribute)</a>, <a href="api/data.html#manuscript.data.Word.recognition_confidence">[1]</a>
 </li>
-      <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline.recognizer">recognizer (manuscript._pipeline.Pipeline attribute)</a>
-</li>
   </ul></td>
 </tr></table>
 
@@ -899,6 +894,10 @@ window.addEventListener("load", load);</script>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/utils.html#manuscript.utils.set_seed">set_seed() (in module manuscript.utils)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/layouts.html#manuscript.layouts.SimpleSorting">SimpleSorting (class in manuscript.layouts)</a>
 </li>
   </ul></td>
 </tr></table>

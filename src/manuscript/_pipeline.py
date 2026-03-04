@@ -1,264 +1,228 @@
-import time
 import inspect
+import time
 from pathlib import Path
-from typing import Dict, List, Optional, Union, TYPE_CHECKING
+from typing import Any, Dict, Optional, TYPE_CHECKING, Union
 
 import numpy as np
 from PIL import Image
 
 from .data import Page
 from .detectors import EAST
+from .layouts import SimpleSorting
 from .recognizers import TRBA
 from .utils import read_image, visualize_page
 
 if TYPE_CHECKING:
     from .api.base import BaseModel as BaseCorrector
 
+_DEFAULT = object()
+_VALID_LAYOUT_AFTER = {"detector", "recognizer", "corrector"}
+
 
 class Pipeline:
     """
-    High-level OCR pipeline combining text detection, recognition, and correction.
+    High-level OCR pipeline with configurable stage ordering.
 
-    The Pipeline class orchestrates EAST detector, TRBA recognizer, and optional
-    text corrector to perform complete OCR workflow:
-    detection -> recognition -> correction -> result merging.
-
-    Attributes
-    ----------
-    detector : EAST
-        Text detector instance
-    recognizer : TRBA
-        Text recognizer instance
-    corrector : BaseCorrector, optional
-        Text corrector instance (None to skip correction)
-    min_text_size : int
-        Minimum text box size in pixels (width and height)
-
-    Examples
-    --------
-    Create pipeline with default models:
-
-    >>> from manuscript import Pipeline
-    >>> pipeline = Pipeline()
-    >>> result = pipeline.predict("document.jpg")
-    >>> text = pipeline.get_text(result["page"])
-    >>> print(text)
-
-    Create pipeline with custom models:
-
-    >>> from manuscript import Pipeline
-    >>> from manuscript.detectors import EAST
-    >>> from manuscript.recognizers import TRBA
-    >>> detector = EAST(weights="east_50_g1", score_thresh=0.8)
-    >>> recognizer = TRBA(weights="trba_lite_g1", device="cuda")
-    >>> pipeline = Pipeline(detector=detector, recognizer=recognizer)
-
-    Create pipeline with text correction:
-
-    >>> from manuscript import Pipeline
-    >>> from manuscript.correctors import CharLM
-    >>> corrector = CharLM()
-    >>> pipeline = Pipeline(corrector=corrector)
+    Default pipeline:
+    ``detector -> layout -> recognizer``.
+    ``corrector`` is optional and disabled by default.
     """
 
     def __init__(
         self,
-        detector: Optional[EAST] = None,
-        recognizer: Optional[TRBA] = None,
+        detector: Any = _DEFAULT,
+        layout: Any = _DEFAULT,
+        recognizer: Any = _DEFAULT,
         corrector: Optional["BaseCorrector"] = None,
-        min_text_size: int = 5,
+        layout_after: str = "detector",
     ):
         """
         Initialize OCR pipeline.
 
         Parameters
         ----------
-        detector : EAST, optional
-            Text detector instance. If None, creates default EAST detector.
-        recognizer : TRBA, optional
-            Text recognizer instance. If None, creates default TRBA recognizer.
-        corrector : BaseCorrector, optional
-            Text corrector instance. If None, no text correction is applied.
-            The corrector receives a Page object after recognition and returns
-            a corrected Page object.
-        min_text_size : int, optional
-            Minimum text size in pixels. Boxes smaller than this will be
-            filtered out before recognition. Default is 5.
+        detector : object, optional
+            Detector instance with ``predict(image) -> {"page": Page}``.
+            If omitted, default ``EAST()`` is used.
+            Detector cannot be disabled.
+        layout : object or None, optional
+            Layout model instance with ``predict(page, image=None) -> Page``.
+            If omitted, default ``SimpleSorting()`` is used.
+            Pass ``None`` to disable layout stage.
+        recognizer : object or None, optional
+            Recognizer instance with ``predict(page, image=None, ...) -> Page``.
+            If omitted, default ``TRBA()`` is used.
+            Pass ``None`` to disable recognition stage.
+        corrector : object or None, optional
+            Corrector instance with ``predict(page, image=None) -> Page``.
+            Default is ``None`` (disabled).
+        layout_after : {"detector", "recognizer", "corrector"}, optional
+            Slot where layout stage is executed. Default is ``"detector"``.
         """
-        self.detector = detector if detector is not None else EAST()
-        self.recognizer = recognizer if recognizer is not None else TRBA()
+        if detector is _DEFAULT:
+            self.detector = EAST()
+        elif detector is None:
+            raise ValueError("detector cannot be None")
+        else:
+            self.detector = detector
+
+        if layout is _DEFAULT:
+            self.layout = SimpleSorting()
+        else:
+            self.layout = layout
+
+        if recognizer is _DEFAULT:
+            self.recognizer = TRBA()
+        else:
+            self.recognizer = recognizer
+
         self.corrector = corrector
-        self.min_text_size = min_text_size
+
+        if layout_after not in _VALID_LAYOUT_AFTER:
+            raise ValueError(
+                f"layout_after must be one of {_VALID_LAYOUT_AFTER}, got: {layout_after}"
+            )
+        self.layout_after = layout_after
 
         self._last_detection_page: Optional[Page] = None
+        self._last_layout_page: Optional[Page] = None
         self._last_recognition_page: Optional[Page] = None
         self._last_correction_page: Optional[Page] = None
+
+    @staticmethod
+    def _filter_predict_kwargs(model: Any, kwargs: Dict[str, Any]) -> Dict[str, Any]:
+        try:
+            params = inspect.signature(model.predict).parameters
+        except (TypeError, ValueError):
+            return {}
+
+        if any(p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values()):
+            return kwargs
+
+        return {k: v for k, v in kwargs.items() if k in params}
+
+    @staticmethod
+    def _call_predict(model: Any, page: Page, kwargs: Dict[str, Any]) -> Page:
+        filtered_kwargs = Pipeline._filter_predict_kwargs(model, kwargs)
+        return model.predict(page, **filtered_kwargs)
 
     def predict(
         self,
         image: Union[str, Path, np.ndarray, Image.Image],
-        recognize_text: bool = True,
         vis: bool = False,
         profile: bool = False,
-    ) -> Union[Dict, tuple]:
+    ) -> Union[Dict[str, Page], tuple]:
         """
-        Run OCR pipeline on a single image.
+        Run pipeline on a single image.
 
         Parameters
         ----------
         image : str, Path, numpy.ndarray, or PIL.Image
-            Input image. Can be:
-            - Path to image file (str or Path)
-            - RGB numpy array with shape (H, W, 3) in uint8
-            - PIL Image object
-        recognize_text : bool, optional
-            If True, performs both detection and recognition.
-            If False, performs only detection. Default is True.
+            Input image.
         vis : bool, optional
-            If True, returns visualization image along with results.
-            Default is False.
+            If True, returns visualization image together with result.
         profile : bool, optional
-            If True, prints timing information for each pipeline stage.
-            Default is False.
-
-        Returns
-        -------
-        dict or tuple
-            If vis=False:
-                dict with keys:
-                - "page" : Page object with detection/recognition results
-
-            If vis=True:
-                tuple of (result_dict, vis_image)
-
-        Examples
-        --------
-        Basic usage:
-
-        >>> pipeline = Pipeline()
-        >>> result = pipeline.predict("document.jpg")
-        >>> page = result["page"]
-        >>> print(page.blocks[0].lines[0].words[0].text)
-
-        Detection only:
-
-        >>> result = pipeline.predict("document.jpg", recognize_text=False)
-        >>> # Words will have polygon and detection_confidence but no text
-
-        With visualization:
-
-        >>> result, vis_img = pipeline.predict("document.jpg", vis=True)
-        >>> vis_img.show()
-
-        With profiling:
-
-        >>> result = pipeline.predict("document.jpg", profile=True)
-        # Prints timing for each stage
+            If True, prints timing per stage.
         """
         start_time = time.time()
 
-        # ---- DETECTION ----
+        self._last_detection_page = None
+        self._last_layout_page = None
+        self._last_recognition_page = None
+        self._last_correction_page = None
+
+        image_array_cache: Optional[np.ndarray] = None
+
+        def get_image_array() -> np.ndarray:
+            nonlocal image_array_cache
+            if image_array_cache is None:
+                t0 = time.time()
+                image_array_cache = read_image(image)
+                if profile:
+                    print(f"Load image: {time.time() - t0:.3f}s")
+            return image_array_cache
+
+        def run_layout_slot(anchor: str, page: Page) -> Page:
+            if self.layout is None or self.layout_after != anchor:
+                return page
+
+            t0 = time.time()
+            layout_kwargs: Dict[str, Any] = {}
+            if "image" in self._filter_predict_kwargs(self.layout, {"image": None}):
+                layout_kwargs["image"] = get_image_array()
+            page = self._call_predict(self.layout, page, layout_kwargs)
+            self._last_layout_page = page.model_copy(deep=True)
+            if profile:
+                print(f"Layout ({anchor}): {time.time() - t0:.3f}s")
+            return page
+
+        # Detection
         t0 = time.time()
-        detection_result = self.detector.predict(
-            image, return_maps=False, sort_reading_order=True
+        detection_kwargs = self._filter_predict_kwargs(
+            self.detector, {"return_maps": False}
         )
+        detection_result = self.detector.predict(image, **detection_kwargs)
         page: Page = detection_result["page"]
         self._last_detection_page = page.model_copy(deep=True)
-
         if profile:
             print(f"Detection: {time.time() - t0:.3f}s")
 
-        # ---- If recognition not needed ----
-        if not recognize_text:
-            result = {"page": page}
+        # After detector slot
+        page = run_layout_slot("detector", page)
 
-            if vis:
-                img_array = read_image(image)
-                pil_img = (
-                    image
-                    if isinstance(image, Image.Image)
-                    else Image.fromarray(img_array)
-                )
-                vis_img = visualize_page(pil_img, page, show_order=False)
-                return result, vis_img
+        # Recognition slot
+        if self.recognizer is not None:
+            t0 = time.time()
+            recognizer_kwargs = self._filter_predict_kwargs(
+                self.recognizer,
+                {
+                    "batch_size": 32,
+                },
+            )
+            if "image" in self._filter_predict_kwargs(self.recognizer, {"image": None}):
+                recognizer_kwargs["image"] = get_image_array()
+            page = self._call_predict(self.recognizer, page, recognizer_kwargs)
+            self._last_recognition_page = page.model_copy(deep=True)
+            if profile:
+                print(f"Recognition: {time.time() - t0:.3f}s")
 
-            return result
+        # After recognizer slot
+        page = run_layout_slot("recognizer", page)
 
-        # ---- LOAD IMAGE FOR RECOGNITION ----
-        t0 = time.time()
-        image_array = read_image(image)
-        if profile:
-            print(f"Load image for recognition: {time.time() - t0:.3f}s")
-
-        # ---- RECOGNITION ----
-        t0 = time.time()
-        recognizer_kwargs = {"image": image_array}
-        try:
-            predict_params = inspect.signature(self.recognizer.predict).parameters
-            if "batch_size" in predict_params:
-                recognizer_kwargs["batch_size"] = 32
-            if "min_text_size" in predict_params:
-                recognizer_kwargs["min_text_size"] = self.min_text_size
-        except (TypeError, ValueError):
-            pass
-
-        page = self.recognizer.predict(page, **recognizer_kwargs)
-        if profile:
-            print(f"Recognition: {time.time() - t0:.3f}s")
-
-        self._last_recognition_page = page.model_copy(deep=True)
-
-        # ---- CORRECTION ----
+        # Correction slot
         if self.corrector is not None:
             t0 = time.time()
-            page = self.corrector.predict(page)
+            corrector_kwargs: Dict[str, Any] = {}
+            if "image" in self._filter_predict_kwargs(self.corrector, {"image": None}):
+                corrector_kwargs["image"] = get_image_array()
+            page = self._call_predict(self.corrector, page, corrector_kwargs)
             self._last_correction_page = page.model_copy(deep=True)
             if profile:
                 print(f"Correction: {time.time() - t0:.3f}s")
-        else:
-            self._last_correction_page = None
+
+        # After corrector slot
+        page = run_layout_slot("corrector", page)
 
         if profile:
             print(f"Pipeline total: {time.time() - start_time:.3f}s")
 
-        result = {"page": page}
+        result: Dict[str, Page] = {"page": page}
 
-        if vis:
-            pil_img = (
-                image
-                if isinstance(image, Image.Image)
-                else Image.fromarray(image_array)
-            )
-            vis_img = visualize_page(pil_img, page, show_order=True)
-            return result, vis_img
+        if not vis:
+            return result
 
-        return result
+        image_array = get_image_array()
+        pil_img = image if isinstance(image, Image.Image) else Image.fromarray(image_array)
+        vis_img = visualize_page(pil_img, page, show_order=True)
+        return result, vis_img
 
     def get_text(self, page: Page) -> str:
         """
-        Extract plain text from Page object.
-
-        Parameters
-        ----------
-        page : Page
-            Page object with recognition results.
-
-        Returns
-        -------
-        str
-            Extracted text with lines separated by newlines.
-
-        Examples
-        --------
-        >>> pipeline = Pipeline()
-        >>> result = pipeline.predict("document.jpg")
-        >>> text = pipeline.get_text(result["page"])
-        >>> print(text)
+        Extract plain text from ``Page`` object.
         """
         lines = []
         for block in page.blocks:
             for line in block.lines:
-                # Extract text from words in the line
                 texts = [w.text for w in line.words if w.text]
                 if texts:
                     lines.append(" ".join(texts))
@@ -269,10 +233,13 @@ class Pipeline:
         return self._last_detection_page
 
     @property
+    def last_layout_page(self) -> Optional[Page]:
+        return self._last_layout_page
+
+    @property
     def last_recognition_page(self) -> Optional[Page]:
         return self._last_recognition_page
 
     @property
     def last_correction_page(self) -> Optional[Page]:
         return self._last_correction_page
-
