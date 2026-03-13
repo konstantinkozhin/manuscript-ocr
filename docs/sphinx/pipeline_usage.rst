@@ -132,6 +132,64 @@ Built-in Components
         layout_after="detector",
     )
 
+TRBA Region Preparation
+-----------------------
+
+``TRBA`` keeps the current default crop behavior, but now allows crop
+preparation customization when needed.
+
+Default behavior is unchanged:
+
+- ``region_preparer="bbox"`` extracts axis-aligned bounding boxes
+- ``rotate_threshold=1.5`` auto-rotates tall crops before recognition
+- ``min_text_size=5`` skips tiny detections
+
+Built-in preparer presets:
+
+- ``"bbox"``: legacy axis-aligned crop behavior
+- ``"polygon_mask"``: tight crop with pixels outside the polygon masked to white
+- ``"quad_warp"``: perspective rectification for 4-point polygons, with bbox fallback
+
+.. code-block:: python
+
+    from manuscript.recognizers import TRBA
+
+    recognizer = TRBA(region_preparer="bbox")
+    recognizer = TRBA(region_preparer="polygon_mask")
+    recognizer = TRBA(region_preparer="quad_warp")
+    recognizer = TRBA(
+        region_preparer="bbox",
+        region_preparer_options={"pad": 2},
+    )
+
+``region_preparer_options`` is reserved for built-in preset configuration:
+
+- ``"bbox"`` / ``"polygon_mask"``: ``pad``
+- ``"polygon_mask"``: ``background``
+- ``"quad_warp"``: ``output_size=(width, height)``, ``fallback_to_bbox``
+
+For advanced cases, you can inject hooks into ``TRBA`` instead of writing a
+full custom recognizer:
+
+.. code-block:: python
+
+    import numpy as np
+
+    def my_preparer(page, image, recognizer=None, options=None):
+        regions = []
+        for block in page.blocks:
+            for line in block.lines:
+                for word in line.words:
+                    poly = np.asarray(word.polygon, dtype=np.float32)
+                    crop = image[10:40, 10:80]
+                    regions.append({"word": word, "image": crop, "polygon": poly})
+        return regions
+
+    recognizer = TRBA(region_preparer=my_preparer)
+
+If you need complete control over recognition logic, the simplest route is
+still to provide your own recognizer class with ``predict(page, image) -> Page``.
+
 Visualization and Profiling
 ---------------------------
 

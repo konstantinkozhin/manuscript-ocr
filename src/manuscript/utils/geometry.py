@@ -1,5 +1,6 @@
-from typing import Union, Tuple
+from typing import Optional, Union, Tuple
 
+import cv2
 import numpy as np
 from shapely.geometry import Polygon
 
@@ -29,5 +30,178 @@ def _box_iou(
     
     if union_area <= 0:
         return 0.0
-    
+
     return inter_area / union_area
+
+
+def polygon_to_bbox(
+    polygon: Union[np.ndarray, Tuple[Tuple[float, float], ...]],
+    image_shape: Optional[Tuple[int, ...]] = None,
+    pad: float = 0.0,
+) -> Optional[Tuple[int, int, int, int]]:
+    """
+    Convert polygon to a clipped axis-aligned bounding box.
+
+    Parameters
+    ----------
+    polygon : array-like of shape (N, 2)
+        Polygon vertices in image coordinates.
+    image_shape : tuple, optional
+        Source image shape used for clipping.
+    pad : float, optional
+        Extra padding in pixels around the polygon. Default is ``0``.
+
+    Returns
+    -------
+    tuple or None
+        Bounding box as ``(x1, y1, x2, y2)`` or ``None`` if invalid.
+    """
+    pts = np.asarray(polygon, dtype=np.float32)
+    if pts.ndim != 2 or pts.shape[1] != 2 or pts.size == 0:
+        return None
+
+    x_min, y_min = np.min(pts, axis=0)
+    x_max, y_max = np.max(pts, axis=0)
+
+    if pad:
+        x1 = int(np.floor(x_min - pad))
+        y1 = int(np.floor(y_min - pad))
+        x2 = int(np.ceil(x_max + pad))
+        y2 = int(np.ceil(y_max + pad))
+    else:
+        # Preserve legacy crop behavior for the default bbox preset.
+        x1 = int(x_min)
+        y1 = int(y_min)
+        x2 = int(x_max)
+        y2 = int(y_max)
+
+    if image_shape is not None:
+        height, width = image_shape[:2]
+        x1 = max(0, x1)
+        y1 = max(0, y1)
+        x2 = min(width, x2)
+        y2 = min(height, y2)
+
+    if x2 <= x1 or y2 <= y1:
+        return None
+
+    return x1, y1, x2, y2
+
+
+def crop_axis_aligned(
+    image: np.ndarray,
+    polygon: Union[np.ndarray, Tuple[Tuple[float, float], ...]],
+    pad: float = 0.0,
+) -> Optional[np.ndarray]:
+    """
+    Crop an axis-aligned rectangle covering the polygon.
+    """
+    bbox = polygon_to_bbox(polygon, image_shape=image.shape, pad=pad)
+    if bbox is None:
+        return None
+
+    x1, y1, x2, y2 = bbox
+    crop = image[y1:y2, x1:x2]
+    if crop.size == 0:
+        return None
+    return crop.copy()
+
+
+def crop_polygon_mask(
+    image: np.ndarray,
+    polygon: Union[np.ndarray, Tuple[Tuple[float, float], ...]],
+    pad: float = 0.0,
+    background: int = 255,
+) -> Optional[np.ndarray]:
+    """
+    Crop the polygon bounding box and mask pixels outside the polygon.
+    """
+    pts = np.asarray(polygon, dtype=np.float32)
+    bbox = polygon_to_bbox(pts, image_shape=image.shape, pad=pad)
+    if bbox is None:
+        return None
+
+    x1, y1, x2, y2 = bbox
+    crop = image[y1:y2, x1:x2].copy()
+    if crop.size == 0:
+        return None
+
+    shifted = pts.copy()
+    shifted[:, 0] -= x1
+    shifted[:, 1] -= y1
+
+    mask = np.zeros(crop.shape[:2], dtype=np.uint8)
+    cv2.fillPoly(mask, [shifted.astype(np.int32)], 255)
+
+    result = np.full_like(crop, background)
+    if crop.ndim == 2:
+        result[mask == 255] = crop[mask == 255]
+    else:
+        result[mask == 255] = crop[mask == 255]
+    return result
+
+
+def order_quad_points(
+    points: Union[np.ndarray, Tuple[Tuple[float, float], ...]]
+) -> np.ndarray:
+    """
+    Order 4 polygon points as top-left, top-right, bottom-right, bottom-left.
+    """
+    pts = np.asarray(points, dtype=np.float32)
+    if pts.shape != (4, 2):
+        raise ValueError(f"Expected 4 points with shape (4, 2), got: {pts.shape}")
+
+    rect = np.zeros((4, 2), dtype=np.float32)
+    sums = pts.sum(axis=1)
+    rect[0] = pts[np.argmin(sums)]
+    rect[2] = pts[np.argmax(sums)]
+
+    diffs = np.diff(pts, axis=1)
+    rect[1] = pts[np.argmin(diffs)]
+    rect[3] = pts[np.argmax(diffs)]
+    return rect
+
+
+def warp_quad(
+    image: np.ndarray,
+    polygon: Union[np.ndarray, Tuple[Tuple[float, float], ...]],
+    output_size: Optional[Tuple[int, int]] = None,
+    background: int = 255,
+) -> Optional[np.ndarray]:
+    """
+    Perspective-warp a quadrilateral polygon into a rectified crop.
+    """
+    pts = np.asarray(polygon, dtype=np.float32)
+    if pts.shape != (4, 2):
+        return None
+
+    rect = order_quad_points(pts)
+
+    if output_size is None:
+        top_width = np.linalg.norm(rect[1] - rect[0])
+        bottom_width = np.linalg.norm(rect[2] - rect[3])
+        left_height = np.linalg.norm(rect[3] - rect[0])
+        right_height = np.linalg.norm(rect[2] - rect[1])
+        width = max(int(round(max(top_width, bottom_width))), 1)
+        height = max(int(round(max(left_height, right_height))), 1)
+    else:
+        width = max(int(output_size[0]), 1)
+        height = max(int(output_size[1]), 1)
+
+    dst = np.array(
+        [[0, 0], [width - 1, 0], [width - 1, height - 1], [0, height - 1]],
+        dtype=np.float32,
+    )
+    matrix = cv2.getPerspectiveTransform(rect, dst)
+    border_value = background if image.ndim == 2 else (background, background, background)
+    warped = cv2.warpPerspective(
+        image,
+        matrix,
+        (width, height),
+        flags=cv2.INTER_LINEAR,
+        borderMode=cv2.BORDER_CONSTANT,
+        borderValue=border_value,
+    )
+    if warped.size == 0:
+        return None
+    return warped

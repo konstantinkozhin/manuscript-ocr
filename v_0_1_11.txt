@@ -168,5 +168,39 @@ Files:
 - docs/PIPELINE_API.md
 - docs/sphinx/pipeline_usage.rst
 
+15) TRBA crop preparation presets and hooks (local)
+- Preserved the default recognizer behavior with axis-aligned bbox extraction plus auto-rotation.
+- Added configurable `region_preparer` presets: `bbox`, `polygon_mask`, and `quad_warp`.
+- Added `region_preparer_options` for built-in preset tuning and `region_predictor` hook for advanced reuse of the TRBA recognizer pipeline.
+- Moved crop geometry decisions out of model preprocessing and into the region-preparation stage.
+- Added reusable geometry helpers for axis-aligned crop, polygon masking, and quadrilateral warping.
+- Updated recognizer tests and user-facing docs, including Russian Sphinx translations.
+
+Files:
+- src/manuscript/recognizers/_trba/__init__.py
+- src/manuscript/recognizers/__init__.py
+- src/manuscript/utils/geometry.py
+- src/manuscript/utils/__init__.py
+- tests/recognizers/test_trba_infer.py
+- docs/PIPELINE_API.md
+- docs/sphinx/pipeline_usage.rst
+- docs/sphinx/locale/ru/LC_MESSAGES/pipeline_usage.po
+
+16) EAST training quad-source policy and unified segmentation parsing (local)
+- Unified COCO `segmentation` parsing between dataset filtering and quad loading, including multipart polygon handling.
+- Added `quad_source` to `EASTDataset` and `EAST.train(..., augmentation_config=...)` with modes:
+  `auto`, `as_is`, and `min_area_rect`.
+- Default `auto` mode now preserves existing 4-point polygons as-is and falls back to `minAreaRect` only for longer polygons.
+- Added tests for multipart segmentations, quad-preserving behavior, legacy `min_area_rect`, and train-time config forwarding.
+- Updated API docs and Russian translations for the new EAST training geometry policy.
+
+Files:
+- src/manuscript/detectors/_east/dataset.py
+- src/manuscript/detectors/_east/__init__.py
+- tests/detectors/east/test_dataset.py
+- tests/detectors/east/test_east_train_export.py
+- docs/sphinx/api/detectors.rst
+- docs/sphinx/locale/ru/LC_MESSAGES/api/detectors.po
+
 Summary:
 - v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fixes).

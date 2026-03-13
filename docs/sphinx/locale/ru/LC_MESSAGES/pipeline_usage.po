@@ -175,4 +175,92 @@ msgstr "Фильтрация по размеру"
 #, fuzzy
 msgid "Automatic Rotation Control (TRBA)"
 msgstr "Управление автоматическим поворотом"
+#: ../../pipeline_usage.rst:100
+msgid "TRBA Region Preparation"
+msgstr "Подготовка регионов в TRBA"
 
+#: ../../pipeline_usage.rst:102
+msgid ""
+"``TRBA`` keeps the current default crop behavior, but now allows crop "
+"preparation customization when needed."
+msgstr ""
+"``TRBA`` сохраняет текущее поведение по умолчанию для вырезания кропов, "
+"но теперь позволяет настраивать подготовку регионов при необходимости."
+
+#: ../../pipeline_usage.rst:105
+msgid "Default behavior is unchanged:"
+msgstr "Поведение по умолчанию не изменилось:"
+
+#: ../../pipeline_usage.rst:107
+msgid "``region_preparer=\"bbox\"`` extracts axis-aligned bounding boxes"
+msgstr "``region_preparer=\"bbox\"`` вырезает осеориентированные bounding box"
+
+#: ../../pipeline_usage.rst:108
+msgid ""
+"``rotate_threshold=1.5`` auto-rotates tall crops before recognition"
+msgstr ""
+"``rotate_threshold=1.5`` автоматически поворачивает высокие кропы перед "
+"распознаванием"
+
+#: ../../pipeline_usage.rst:109
+msgid "``min_text_size=5`` skips tiny detections"
+msgstr "``min_text_size=5`` пропускает слишком маленькие детекции"
+
+#: ../../pipeline_usage.rst:111
+msgid "Built-in preparer presets:"
+msgstr "Встроенные пресеты preparer:"
+
+#: ../../pipeline_usage.rst:113
+msgid "``\"bbox\"``: legacy axis-aligned crop behavior"
+msgstr "``\"bbox\"``: прежнее поведение с осеориентированными кропами"
+
+#: ../../pipeline_usage.rst:114
+msgid ""
+"``\"polygon_mask\"``: tight crop with pixels outside the polygon masked to "
+"white"
+msgstr ""
+"``\"polygon_mask\"``: плотный кроп с маскированием пикселей вне полигона в белый цвет"
+
+#: ../../pipeline_usage.rst:115
+msgid ""
+"``\"quad_warp\"``: perspective rectification for 4-point polygons, with "
+"bbox fallback"
+msgstr ""
+"``\"quad_warp\"``: перспективное выравнивание для 4-точечных полигонов с "
+"fallback на bbox"
+
+#: ../../pipeline_usage.rst:124
+msgid ""
+"``region_preparer_options`` is reserved for built-in preset configuration:"
+msgstr ""
+"``region_preparer_options`` зарезервирован для настройки встроенных пресетов:"
+
+#: ../../pipeline_usage.rst:126
+msgid "``\"bbox\"`` / ``\"polygon_mask\"``: ``pad``"
+msgstr "``\"bbox\"`` / ``\"polygon_mask\"``: ``pad``"
+
+#: ../../pipeline_usage.rst:127
+msgid "``\"polygon_mask\"``: ``background``"
+msgstr "``\"polygon_mask\"``: ``background``"
+
+#: ../../pipeline_usage.rst:128
+msgid "``\"quad_warp\"``: ``output_size=(width, height)``, ``fallback_to_bbox``"
+msgstr "``\"quad_warp\"``: ``output_size=(width, height)``, ``fallback_to_bbox``"
+
+#: ../../pipeline_usage.rst:130
+msgid ""
+"For advanced cases, you can inject hooks into ``TRBA`` instead of writing a "
+"full custom recognizer:"
+msgstr ""
+"Для продвинутых сценариев можно передать hook'и в ``TRBA`` вместо "
+"написания полностью кастомного распознавателя:"
+
+#: ../../pipeline_usage.rst:143
+msgid ""
+"If you need complete control over recognition logic, the simplest route is "
+"still to provide your own recognizer class with ``predict(page, image) -> "
+"Page``."
+msgstr ""
+"Если нужен полный контроль над логикой распознавания, самым простым "
+"вариантом остаётся собственный класс recognizer с ``predict(page, image) -> "
+"Page``."

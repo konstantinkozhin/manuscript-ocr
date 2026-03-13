@@ -211,6 +211,39 @@ class TestEASTTrain:
             assert "experiment_dir" in call_kwargs
             assert "custom_model" in call_kwargs["experiment_dir"]
 
+    def test_train_passes_quad_source_via_augmentation_config(self, tmp_path):
+        """Test quad_source is forwarded into dataset/training augmentation config."""
+        train_img_dir = tmp_path / "train" / "images"
+        train_img_dir.mkdir(parents=True)
+        (train_img_dir / "img.jpg").write_bytes(b"fake")
+
+        train_ann = tmp_path / "train" / "ann.json"
+        train_ann.write_text(json.dumps({"images": [], "annotations": []}))
+
+        val_img_dir = tmp_path / "val" / "images"
+        val_img_dir.mkdir(parents=True)
+        (val_img_dir / "val.jpg").write_bytes(b"fake")
+
+        val_ann = tmp_path / "val" / "ann.json"
+        val_ann.write_text(json.dumps({"images": [], "annotations": []}))
+
+        with patch("manuscript.detectors._east._run_training") as mock_train:
+            mock_model = MagicMock()
+            mock_train.return_value = mock_model
+
+            EAST.train(
+                train_images=str(train_img_dir),
+                train_anns=str(train_ann),
+                val_images=str(val_img_dir),
+                val_anns=str(val_ann),
+                experiment_root=str(tmp_path / "exp"),
+                augmentation_config={"quad_source": "as_is"},
+                epochs=1,
+            )
+
+            _, call_kwargs = mock_train.call_args
+            assert call_kwargs["augmentation_config"]["quad_source"] == "as_is"
+
     def test_train_with_resume_from(self, tmp_path):
         """Test train with resume_from parameter."""
         # Create checkpoint file

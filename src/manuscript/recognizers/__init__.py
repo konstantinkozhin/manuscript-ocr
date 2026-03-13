@@ -1,3 +1,3 @@
-from ._trba import TRBA
+from ._trba import TRBA, TextPrediction, TextRegion
 
-__all__ = ["TRBA"]
+__all__ = ["TRBA", "TextRegion", "TextPrediction"]

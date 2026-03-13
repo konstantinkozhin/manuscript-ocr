@@ -698,6 +698,11 @@ class EAST(BaseModel):
             preferred place for all augmentation settings. Any keys here override the
             corresponding defaults. Supported keys include:
 
+            - ``quad_source`` for COCO polygon-to-quad conversion:
+              ``"auto"`` preserves 4-point polygons and falls back to
+              ``"min_area_rect"`` for longer polygons, ``"as_is"`` accepts only
+              4-point polygons, and ``"min_area_rect"`` always fits the minimum-area
+              rectangle
             - ``flip_prob``, ``color_jitter``
             - ``small_rotate_prob``, ``small_rotate_deg``
             - ``perspective_prob``, ``perspective_scale``
@@ -794,6 +799,7 @@ class EAST(BaseModel):
         Configure augmentations via ``augmentation_config``:
 
         >>> aug_cfg = {
+        ...     "quad_source": "auto",
         ...     "flip_prob": 0.02,
         ...     "color_jitter": (0.1, 0.1, 0.1, 0.05),
         ...     "small_rotate_prob": 0.15,
@@ -842,6 +848,7 @@ class EAST(BaseModel):
             score_geo_scale = model.score_scale
 
         base_augmentation_config = {
+            "quad_source": "auto",
             "flip_prob": 0.01,
             "color_jitter": (0.1, 0.1, 0.1, 0.05),
             "small_rotate_prob": 0.2,

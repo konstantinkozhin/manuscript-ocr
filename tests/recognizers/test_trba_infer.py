@@ -277,8 +277,8 @@ class TestTRBAPreprocessing:
 
         assert result.shape == (100, 50, 3)
 
-    def test_preprocess_uses_prepare_crop(self, tmp_path):
-        """Test that preprocessing calls crop-orientation logic."""
+    def test_preprocess_does_not_use_prepare_crop(self, tmp_path):
+        """Prepared-crop orientation should happen before model preprocessing."""
         weights_file = tmp_path / "model.onnx"
         config_file = tmp_path / "model.json"
         charset_file = tmp_path / "model.txt"
@@ -297,7 +297,7 @@ class TestTRBAPreprocessing:
         vertical_crop = np.zeros((100, 50, 3), dtype=np.uint8)
         with patch.object(recognizer, "_prepare_crop", wraps=recognizer._prepare_crop) as mocked:
             recognizer._preprocess_image(vertical_crop)
-            mocked.assert_called_once()
+            mocked.assert_not_called()
 
 
 class TestTRBAAPI:
@@ -334,7 +334,7 @@ class TestTRBAAPI:
 class TestTRBAPredictPageInterface:
     """Tests for Page-based recognizer API."""
 
-    def _create_recognizer(self, tmp_path, min_text_size: int = 5):
+    def _create_recognizer(self, tmp_path, min_text_size: int = 5, **kwargs):
         weights_file = tmp_path / "model.onnx"
         config_file = tmp_path / "model.json"
         charset_file = tmp_path / "model.txt"
@@ -349,6 +349,7 @@ class TestTRBAPredictPageInterface:
             charset=str(charset_file),
             device="cpu",
             min_text_size=min_text_size,
+            **kwargs,
         )
 
     @staticmethod
@@ -366,19 +367,24 @@ class TestTRBAPredictPageInterface:
         return Page(blocks=[Block(lines=[Line(words=words)])])
 
     def test_predict_accepts_page_and_returns_page(self, tmp_path):
-        recognizer = self._create_recognizer(tmp_path)
+        calls = {}
+
+        def region_predictor(regions, batch_size=32, recognizer=None):
+            calls["count"] = len(regions)
+            calls["batch_size"] = batch_size
+            return [
+                {"text": "word1", "confidence": 0.9},
+                {"text": "word2", "confidence": 0.85},
+            ]
+
+        recognizer = self._create_recognizer(
+            tmp_path,
+            region_predictor=region_predictor,
+        )
         page = self._create_page()
         image = np.zeros((64, 180, 3), dtype=np.uint8)
 
-        with patch.object(
-            recognizer,
-            "_predict_word_images",
-            return_value=[
-                {"text": "word1", "confidence": 0.9},
-                {"text": "word2", "confidence": 0.85},
-            ],
-        ) as mocked:
-            result = recognizer.predict(page, image=image)
+        result = recognizer.predict(page, image=image)
 
         assert isinstance(result, Page)
         assert result is not page
@@ -386,7 +392,7 @@ class TestTRBAPredictPageInterface:
         assert result.blocks[0].lines[0].words[1].text == "word2"
         assert result.blocks[0].lines[0].words[0].recognition_confidence == 0.9
         assert result.blocks[0].lines[0].words[1].recognition_confidence == 0.85
-        mocked.assert_called_once()
+        assert calls == {"count": 2, "batch_size": 32}
 
     def test_predict_without_image_returns_copy(self, tmp_path):
         recognizer = self._create_recognizer(tmp_path)
@@ -400,7 +406,17 @@ class TestTRBAPredictPageInterface:
         assert result.blocks[0].lines[0].words[1].text is None
 
     def test_predict_respects_min_text_size(self, tmp_path):
-        recognizer = self._create_recognizer(tmp_path, min_text_size=5)
+        calls = {}
+
+        def region_predictor(regions, batch_size=32, recognizer=None):
+            calls["count"] = len(regions)
+            return [{"text": "big", "confidence": 0.88}]
+
+        recognizer = self._create_recognizer(
+            tmp_path,
+            min_text_size=5,
+            region_predictor=region_predictor,
+        )
         page = Page(
             blocks=[
                 Block(
@@ -423,13 +439,195 @@ class TestTRBAPredictPageInterface:
         )
         image = np.zeros((64, 180, 3), dtype=np.uint8)
 
-        with patch.object(
-            recognizer,
-            "_predict_word_images",
-            return_value=[{"text": "big", "confidence": 0.88}],
-        ) as mocked:
-            result = recognizer.predict(page, image=image)
+        result = recognizer.predict(page, image=image)
 
         assert result.blocks[0].lines[0].words[0].text is None
         assert result.blocks[0].lines[0].words[1].text == "big"
-        mocked.assert_called_once()
+        assert calls == {"count": 1}
+
+    def test_default_bbox_preparer_rotates_before_prediction(self, tmp_path):
+        captured = {}
+
+        def region_predictor(regions, batch_size=32, recognizer=None):
+            captured["shape"] = regions[0].image.shape
+            captured["pixel"] = regions[0].image[0, 99].tolist()
+            return [{"text": "rot", "confidence": 0.91}]
+
+        recognizer = self._create_recognizer(
+            tmp_path,
+            region_predictor=region_predictor,
+            rotate_threshold=1.5,
+        )
+        page = Page(
+            blocks=[
+                Block(
+                    lines=[
+                        Line(
+                            words=[
+                                Word(
+                                    polygon=[
+                                        (10.0, 10.0),
+                                        (60.0, 10.0),
+                                        (60.0, 110.0),
+                                        (10.0, 110.0),
+                                    ],
+                                    detection_confidence=0.95,
+                                )
+                            ]
+                        )
+                    ]
+                )
+            ]
+        )
+        image = np.zeros((128, 128, 3), dtype=np.uint8)
+        image[10, 10] = [255, 0, 0]
+
+        result = recognizer.predict(page, image=image)
+
+        assert captured["shape"] == (50, 100, 3)
+        assert captured["pixel"] == [255, 0, 0]
+        assert result.blocks[0].lines[0].words[0].text == "rot"
+
+    def test_polygon_mask_preset_masks_background(self, tmp_path):
+        captured = {}
+
+        def region_predictor(regions, batch_size=32, recognizer=None):
+            captured["image"] = regions[0].image.copy()
+            return [{"text": "mask", "confidence": 0.9}]
+
+        recognizer = self._create_recognizer(
+            tmp_path,
+            region_preparer="polygon_mask",
+            region_predictor=region_predictor,
+        )
+        page = Page(
+            blocks=[
+                Block(
+                    lines=[
+                        Line(
+                            words=[
+                                Word(
+                                    polygon=[
+                                        (20.0, 10.0),
+                                        (50.0, 10.0),
+                                        (40.0, 40.0),
+                                        (10.0, 40.0),
+                                    ],
+                                    detection_confidence=0.95,
+                                )
+                            ]
+                        )
+                    ]
+                )
+            ]
+        )
+        image = np.full((64, 64, 3), [10, 20, 30], dtype=np.uint8)
+
+        recognizer.predict(page, image=image)
+
+        assert captured["image"][0, 0].tolist() == [255, 255, 255]
+        assert captured["image"][15, 15].tolist() == [10, 20, 30]
+
+    def test_quad_warp_preset_uses_natural_rectified_size(self, tmp_path):
+        captured = {}
+
+        def region_predictor(regions, batch_size=32, recognizer=None):
+            captured["shape"] = regions[0].image.shape
+            return [{"text": "warp", "confidence": 0.9}]
+
+        recognizer = self._create_recognizer(
+            tmp_path,
+            region_preparer="quad_warp",
+            region_predictor=region_predictor,
+        )
+        polygon = [
+            (10.0, 10.0),
+            (70.0, 20.0),
+            (60.0, 50.0),
+            (0.0, 40.0),
+        ]
+        page = Page(
+            blocks=[
+                Block(
+                    lines=[
+                        Line(
+                            words=[
+                                Word(
+                                    polygon=polygon,
+                                    detection_confidence=0.9,
+                                )
+                            ]
+                        )
+                    ]
+                )
+            ]
+        )
+        image = np.full((64, 80, 3), 200, dtype=np.uint8)
+
+        recognizer.predict(page, image=image)
+
+        assert captured["shape"][:2] == (32, 61)
+
+    def test_custom_region_preparer_and_predictor_hooks(self, tmp_path):
+        captured = {}
+
+        def region_preparer(page, image, recognizer=None, options=None):
+            words = page.blocks[0].lines[0].words
+            return [
+                {
+                    "word": words[0],
+                    "image": image[10:40, 10:80],
+                    "polygon": np.array(words[0].polygon, dtype=np.float32),
+                    "meta": {"source": "custom"},
+                },
+                {
+                    "word": words[1],
+                    "image": image[10:40, 90:160],
+                    "polygon": np.array(words[1].polygon, dtype=np.float32),
+                },
+            ]
+
+        def region_predictor(regions, batch_size=32, recognizer=None, page=None, image=None):
+            captured["metas"] = [region.meta for region in regions]
+            captured["batch_size"] = batch_size
+            return [
+                {"text": "custom1", "confidence": 0.8},
+                {"text": "custom2", "confidence": 0.7},
+            ]
+
+        recognizer = self._create_recognizer(
+            tmp_path,
+            region_preparer=region_preparer,
+            region_predictor=region_predictor,
+        )
+        page = self._create_page()
+        image = np.zeros((64, 180, 3), dtype=np.uint8)
+
+        result = recognizer.predict(page, image=image)
+
+        assert captured["batch_size"] == 32
+        assert captured["metas"][0]["source"] == "custom"
+        assert result.blocks[0].lines[0].words[0].text == "custom1"
+        assert result.blocks[0].lines[0].words[1].text == "custom2"
+
+    def test_invalid_region_preparer_preset_raises(self, tmp_path):
+        with patch('manuscript.api.base.BaseModel._download_http'):
+            weights_file = tmp_path / "model.onnx"
+            config_file = tmp_path / "model.json"
+            charset_file = tmp_path / "model.txt"
+
+            weights_file.write_text("mock_onnx")
+            config_file.write_text('{"max_len": 25, "hidden_size": 256, "img_h": 64, "img_w": 256}')
+            charset_file.write_text("<PAD>\n<SOS>\n<EOS>\na\nb\nc")
+
+            try:
+                TRBA(
+                    weights=str(weights_file),
+                    config=str(config_file),
+                    charset=str(charset_file),
+                    device="cpu",
+                    region_preparer="unknown",
+                )
+                assert False, "Expected ValueError for invalid region_preparer"
+            except ValueError as exc:
+                assert "region_preparer" in str(exc)

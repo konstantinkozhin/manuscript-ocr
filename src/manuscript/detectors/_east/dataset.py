@@ -2,6 +2,7 @@ import os
 import json
 import warnings
 from pathlib import Path
+from typing import Iterable, List, Optional
 
 import cv2
 import numpy as np
@@ -62,6 +63,7 @@ class EASTDataset(Dataset):
         target_size=512,
         score_geo_scale=0.25,
         shrink_ratio=0.3,
+        quad_source="auto",
         flip_prob=0.01,
         small_rotate_prob=0.2,
         small_rotate_deg=2.0,
@@ -89,6 +91,7 @@ class EASTDataset(Dataset):
         self.target_size = target_size
         self.score_geo_scale = score_geo_scale
         self.shrink_ratio = float(shrink_ratio)
+        self.quad_source = str(quad_source)
         self.flip_prob = float(flip_prob)
         self.small_rotate_prob = float(small_rotate_prob)
         self.small_rotate_deg = float(small_rotate_deg)
@@ -114,6 +117,10 @@ class EASTDataset(Dataset):
 
         if self.shrink_ratio < 0:
             raise ValueError("shrink_ratio must be >= 0")
+        if self.quad_source not in {"auto", "as_is", "min_area_rect"}:
+            raise ValueError(
+                "quad_source must be one of {'auto', 'as_is', 'min_area_rect'}"
+            )
         if not (0.0 <= self.flip_prob <= 1.0):
             raise ValueError("flip_prob must be in [0, 1]")
         if not (0.0 <= self.small_rotate_prob <= 1.0):
@@ -183,6 +190,76 @@ class EASTDataset(Dataset):
         for ann in data["annotations"]:
             self.annots.setdefault(ann["image_id"], []).append(ann)
         self._filter_invalid()
+
+    @staticmethod
+    def _iter_annotation_polygons(ann: dict) -> Iterable[np.ndarray]:
+        seg = ann.get("segmentation")
+        if seg is None:
+            return []
+
+        if isinstance(seg, dict):
+            # COCO RLE masks are not supported by EAST quad target generation.
+            return []
+
+        if not isinstance(seg, (list, tuple)) or len(seg) == 0:
+            return []
+
+        if isinstance(seg[0], (list, tuple, np.ndarray)):
+            seg_parts = seg
+        else:
+            seg_parts = [seg]
+
+        polygons: List[np.ndarray] = []
+        for seg_poly in seg_parts:
+            pts_raw = np.asarray(seg_poly, dtype=np.float32)
+            if pts_raw.ndim == 1:
+                if pts_raw.size < 8 or pts_raw.size % 2 != 0:
+                    continue
+                pts = pts_raw.reshape(-1, 2)
+            elif pts_raw.ndim == 2 and pts_raw.shape[1] == 2:
+                if pts_raw.shape[0] < 4:
+                    continue
+                pts = pts_raw
+            else:
+                continue
+
+            polygons.append(pts.astype(np.float32))
+
+        return polygons
+
+    def _polygon_to_quad(self, pts: np.ndarray) -> Optional[np.ndarray]:
+        pts = np.asarray(pts, dtype=np.float32).reshape(-1, 2)
+        if pts.shape[0] < 4:
+            return None
+
+        if self.quad_source == "as_is":
+            if pts.shape[0] != 4:
+                return None
+            return order_vertices_clockwise(pts)
+
+        if self.quad_source == "auto" and pts.shape[0] == 4:
+            return order_vertices_clockwise(pts)
+
+        rect = cv2.minAreaRect(pts)
+        box = cv2.boxPoints(rect)
+        return order_vertices_clockwise(box)
+
+    def _annotation_to_quads(
+        self,
+        ann: dict,
+        scale_x: float = 1.0,
+        scale_y: float = 1.0,
+    ) -> List[np.ndarray]:
+        quads: List[np.ndarray] = []
+        for pts in self._iter_annotation_polygons(ann):
+            quad = self._polygon_to_quad(pts)
+            if quad is None:
+                continue
+            quad = quad.astype(np.float32).copy()
+            quad[:, 0] *= scale_x
+            quad[:, 1] *= scale_y
+            quads.append(quad)
+        return quads
 
     @staticmethod
     def _should_apply(prob: float, force: bool) -> bool:
@@ -416,22 +493,7 @@ class EASTDataset(Dataset):
         scale_y = self.target_size / info["height"]
 
         for ann in anns:
-            if "segmentation" not in ann:
-                continue
-            seg = ann["segmentation"]
-            if len(seg) == 0:
-                continue
-            seg_parts = seg if isinstance(seg[0], list) else [seg]
-            for seg_poly in seg_parts:
-                pts = np.array(seg_poly, dtype=np.float32).reshape(-1, 2)
-                if pts.size == 0:
-                    continue
-                rect = cv2.minAreaRect(pts)
-                box = cv2.boxPoints(rect)
-                quad = order_vertices_clockwise(box)
-                quad[:, 0] *= scale_x
-                quad[:, 1] *= scale_y
-                quads.append(quad)
+            quads.extend(self._annotation_to_quads(ann, scale_x=scale_x, scale_y=scale_y))
 
         return img_resized, quads
 
@@ -500,12 +562,9 @@ class EASTDataset(Dataset):
 
             has_valid = False
             for ann in anns:
-                seg = ann.get("segmentation")
-                if seg:
-                    pts = np.array(seg, dtype=np.float32).reshape(-1, 2)
-                    if pts.shape[0] >= 4:
-                        has_valid = True
-                        break
+                if self._annotation_to_quads(ann):
+                    has_valid = True
+                    break
             if not has_valid:
                 invalid_ids.append(img_id)
         for img_id in invalid_ids:

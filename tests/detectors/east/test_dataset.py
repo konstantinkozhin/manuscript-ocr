@@ -166,6 +166,18 @@ class TestEASTDataset:
         assert dataset.target_size == 512
         assert dataset.score_geo_scale == 0.25
         assert dataset.images_folder == img_dir
+        assert dataset.quad_source == "auto"
+
+    def test_east_dataset_invalid_quad_source(self, simple_dataset):
+        """Test validation for quad_source mode."""
+        img_dir, ann_file = simple_dataset
+
+        with pytest.raises(ValueError, match="quad_source"):
+            EASTDataset(
+                images_folder=img_dir,
+                coco_annotation_file=ann_file,
+                quad_source="unknown",
+            )
 
     def test_east_dataset_len(self, simple_dataset):
         """Test __len__ method"""
@@ -450,6 +462,129 @@ class TestEASTDataset:
 
         # Should have at least 1 valid quad
         assert target["quads"].shape[0] >= 1
+
+    def test_east_dataset_multipart_segmentation(self, tmp_path):
+        """Multipart polygon annotations should be parsed consistently."""
+        annotations = {
+            "images": [{"id": 1, "file_name": "test.jpg", "width": 400, "height": 400}],
+            "annotations": [
+                {
+                    "id": 1,
+                    "image_id": 1,
+                    "segmentation": [
+                        [10, 10, 80, 10, 80, 40, 10, 40],
+                        [120, 60, 220, 60, 220, 100, 120, 100],
+                    ],
+                }
+            ],
+        }
+
+        ann_file = tmp_path / "annotations.json"
+        ann_file.write_text(json.dumps(annotations), encoding="utf-8")
+
+        img_dir = tmp_path / "images"
+        img_dir.mkdir()
+        img = np.zeros((400, 400, 3), dtype=np.uint8)
+        cv2.imwrite(str(img_dir / "test.jpg"), img)
+
+        dataset = EASTDataset(str(img_dir), str(ann_file), target_size=400)
+
+        assert len(dataset) == 1
+        _, target = dataset[0]
+        assert target["quads"].shape[0] == 2
+
+    def test_east_dataset_quad_source_auto_preserves_4point_polygons(self, tmp_path):
+        """quad_source='auto' should keep 4-point polygons without minAreaRect."""
+        polygon = [100, 100, 220, 120, 200, 210, 80, 190]
+        annotations = {
+            "images": [{"id": 1, "file_name": "test.jpg", "width": 400, "height": 400}],
+            "annotations": [{"id": 1, "image_id": 1, "segmentation": [polygon]}],
+        }
+
+        ann_file = tmp_path / "annotations.json"
+        ann_file.write_text(json.dumps(annotations), encoding="utf-8")
+
+        img_dir = tmp_path / "images"
+        img_dir.mkdir()
+        img = np.zeros((400, 400, 3), dtype=np.uint8)
+        cv2.imwrite(str(img_dir / "test.jpg"), img)
+
+        dataset = EASTDataset(
+            str(img_dir),
+            str(ann_file),
+            target_size=400,
+            quad_source="auto",
+        )
+        _, quads = dataset._load_image_and_quads(0)
+
+        expected = order_vertices_clockwise(np.array(polygon, dtype=np.float32).reshape(4, 2))
+        assert len(quads) == 1
+        assert np.allclose(quads[0], expected)
+
+    def test_east_dataset_quad_source_min_area_rect_forces_fit(self, tmp_path):
+        """quad_source='min_area_rect' should still fit a rectangle."""
+        polygon = [100, 100, 220, 120, 200, 210, 80, 190]
+        annotations = {
+            "images": [{"id": 1, "file_name": "test.jpg", "width": 400, "height": 400}],
+            "annotations": [{"id": 1, "image_id": 1, "segmentation": [polygon]}],
+        }
+
+        ann_file = tmp_path / "annotations.json"
+        ann_file.write_text(json.dumps(annotations), encoding="utf-8")
+
+        img_dir = tmp_path / "images"
+        img_dir.mkdir()
+        img = np.zeros((400, 400, 3), dtype=np.uint8)
+        cv2.imwrite(str(img_dir / "test.jpg"), img)
+
+        dataset = EASTDataset(
+            str(img_dir),
+            str(ann_file),
+            target_size=400,
+            quad_source="min_area_rect",
+        )
+        _, quads = dataset._load_image_and_quads(0)
+
+        original_quad = order_vertices_clockwise(np.array(polygon, dtype=np.float32).reshape(4, 2))
+        assert len(quads) == 1
+        assert not np.allclose(quads[0], original_quad)
+
+    def test_east_dataset_quad_source_as_is_skips_non_quads(self, tmp_path):
+        """quad_source='as_is' should ignore polygons that are not 4-point quads."""
+        annotations = {
+            "images": [{"id": 1, "file_name": "test.jpg", "width": 400, "height": 400}],
+            "annotations": [
+                {
+                    "id": 1,
+                    "image_id": 1,
+                    "segmentation": [[10, 10, 80, 10, 80, 40, 10, 40]],
+                },
+                {
+                    "id": 2,
+                    "image_id": 1,
+                    "segmentation": [[150, 150, 220, 140, 260, 190, 210, 240, 140, 220]],
+                },
+            ],
+        }
+
+        ann_file = tmp_path / "annotations.json"
+        ann_file.write_text(json.dumps(annotations), encoding="utf-8")
+
+        img_dir = tmp_path / "images"
+        img_dir.mkdir()
+        img = np.zeros((400, 400, 3), dtype=np.uint8)
+        cv2.imwrite(str(img_dir / "test.jpg"), img)
+
+        dataset = EASTDataset(
+            str(img_dir),
+            str(ann_file),
+            target_size=400,
+            quad_source="as_is",
+        )
+        _, target = dataset[0]
+
+        assert len(dataset) == 1
+        assert target["quads"].shape[0] == 1
 
     def test_east_dataset_scaling(self, tmp_path):
         """Test correct coordinate scaling"""

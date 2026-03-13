@@ -1,8 +1,10 @@
+import inspect
 import os
 import json
 import traceback
+from dataclasses import dataclass, field
 from pathlib import Path
-from typing import List, Union, Optional, Sequence, Dict, Any
+from typing import Callable, List, Union, Optional, Sequence, Dict, Any
 
 import cv2
 import numpy as np
@@ -10,8 +12,14 @@ import onnxruntime as ort
 from PIL import Image
 
 from manuscript.api.base import BaseModel
-from manuscript.data import Page
-from manuscript.utils import read_image
+from manuscript.data import Page, Word
+from manuscript.utils import (
+    crop_axis_aligned,
+    crop_polygon_mask,
+    polygon_to_bbox,
+    read_image,
+    warp_quad,
+)
 
 from .data.transforms import load_charset
 
@@ -28,6 +36,32 @@ except ImportError as exc:
     _TRAINING_AVAILABLE = False
     _TRAINING_IMPORT_ERROR = exc
     _TRAINING_IMPORT_TRACEBACK = traceback.format_exc()
+
+
+@dataclass(slots=True)
+class TextRegion:
+    """
+    Prepared text crop associated with a specific ``Word`` object.
+    """
+
+    word: Word
+    image: np.ndarray
+    polygon: np.ndarray
+    meta: Dict[str, Any] = field(default_factory=dict)
+
+
+@dataclass(slots=True)
+class TextPrediction:
+    """
+    Recognition result for a single prepared text crop.
+    """
+
+    text: Optional[str]
+    confidence: Optional[float] = None
+    meta: Dict[str, Any] = field(default_factory=dict)
+
+
+_REGION_PREPARER_PRESETS = {"bbox", "polygon_mask", "quad_warp"}
 
 
 class TRBA(BaseModel):
@@ -66,6 +100,22 @@ class TRBA(BaseModel):
         recognition. If ``height > width * rotate_threshold``, crop is
         rotated 90 degrees clockwise. Set to ``0`` or ``None`` to disable.
         Default is ``1.5``.
+    region_preparer : {"bbox", "polygon_mask", "quad_warp"} or callable, optional
+        Strategy used to convert ``Page`` polygons into recognition crops.
+        ``"bbox"`` preserves the current behavior and extracts axis-aligned
+        bounding boxes. ``"polygon_mask"`` masks pixels outside the polygon
+        inside a tight crop. ``"quad_warp"`` rectifies 4-point polygons with a
+        perspective transform before recognition. A custom callable may also be
+        provided and should return a list of prepared text regions. Default is
+        ``"bbox"``.
+    region_preparer_options : dict or None, optional
+        Optional configuration for built-in region preparers. Defaults to
+        ``None``. Typical options are ``pad`` for ``"bbox"`` and
+        ``"polygon_mask"``, or ``output_size=(width, height)`` for
+        ``"quad_warp"``.
+    region_predictor : callable or None, optional
+        Optional hook that receives prepared text regions and returns
+        predictions. If ``None``, uses the built-in TRBA ONNX predictor.
     min_text_size : int, optional
         Minimum crop width/height in pixels to run recognition for a word.
         Words below this threshold are skipped. Default is ``5``.
@@ -138,6 +188,9 @@ class TRBA(BaseModel):
         charset: Optional[str] = None,
         device: Optional[str] = None,
         rotate_threshold: Optional[float] = 1.5,
+        region_preparer: Union[str, Callable[..., Sequence[Any]]] = "bbox",
+        region_preparer_options: Optional[Dict[str, Any]] = None,
+        region_predictor: Optional[Callable[..., Sequence[Any]]] = None,
         min_text_size: int = 5,
         **kwargs,
     ):
@@ -186,6 +239,11 @@ class TRBA(BaseModel):
         # Initialize ONNX session
         self.onnx_session = None
         self.rotate_threshold = rotate_threshold
+        self.region_preparer = self._validate_region_preparer(region_preparer)
+        self.region_preparer_options = dict(region_preparer_options or {})
+        if region_predictor is not None and not callable(region_predictor):
+            raise TypeError("region_predictor must be callable or None")
+        self.region_predictor = region_predictor
         self.min_text_size = min_text_size
 
     def _resolve_config(self, config: Optional[str]) -> str:
@@ -307,6 +365,36 @@ class TRBA(BaseModel):
             f"Please specify charset explicitly or ensure charset file has same name as weights."
         )
 
+    @staticmethod
+    def _validate_region_preparer(
+        region_preparer: Union[str, Callable[..., Sequence[Any]]]
+    ) -> Union[str, Callable[..., Sequence[Any]]]:
+        if isinstance(region_preparer, str):
+            if region_preparer not in _REGION_PREPARER_PRESETS:
+                raise ValueError(
+                    f"region_preparer must be one of {_REGION_PREPARER_PRESETS}, "
+                    f"got: {region_preparer}"
+                )
+            return region_preparer
+
+        if not callable(region_preparer):
+            raise TypeError("region_preparer must be a preset name or callable")
+        return region_preparer
+
+    @staticmethod
+    def _filter_callable_kwargs(
+        func: Callable[..., Any], kwargs: Dict[str, Any]
+    ) -> Dict[str, Any]:
+        try:
+            params = inspect.signature(func).parameters
+        except (TypeError, ValueError):
+            return {}
+
+        if any(p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values()):
+            return kwargs
+
+        return {k: v for k, v in kwargs.items() if k in params}
+
     def _initialize_session(self):
         """Initialize ONNX Runtime session (lazy loading)."""
         if self.onnx_session is not None:
@@ -314,164 +402,325 @@ class TRBA(BaseModel):
 
         providers = self.runtime_providers()
         self.onnx_session = ort.InferenceSession(str(self.weights), providers=providers)
-        
         self._log_device_info(self.onnx_session)
 
     def _preprocess_image(
         self, image: Union[np.ndarray, str, Path, Image.Image]
     ) -> np.ndarray:
         """
-        Preprocess image for ONNX inference. Returns [1, 3, H, W] numpy array.
-
-        Applies same preprocessing as training:
-        1. Load image (supports str, Path, np.ndarray, PIL.Image)
-        2. Resize with aspect ratio preservation and padding
-        3. Normalize with mean=0.5, std=0.5
-
-        Parameters
-        ----------
-        image : str, Path, np.ndarray, or PIL.Image
-            Input image in any supported format.
-
-        Returns
-        -------
-        np.ndarray
-            Preprocessed image tensor with shape [1, 3, H, W].
+        Preprocess a prepared crop for ONNX inference and return ``[1, 3, H, W]``.
         """
-        # Load image using unified read_image utility (handles all formats)
         img = read_image(image)  # Returns RGB uint8 [H, W, 3]
-        img = self._prepare_crop(img)
 
-        # Resize with aspect ratio preservation and padding (like ResizeAndPadA)
         h, w = img.shape[:2]
         scale = min(self.img_h / max(h, 1), self.img_w / max(w, 1))
         new_w = max(1, int(round(w * scale)))
         new_h = max(1, int(round(h * scale)))
 
-        # Choose interpolation
         if new_h < h or new_w < w:
             interp = cv2.INTER_AREA
         else:
             interp = cv2.INTER_LINEAR
 
         img_resized = cv2.resize(img, (new_w, new_h), interpolation=interp)
-
-        # Create white canvas and paste resized image
         canvas = np.full((self.img_h, self.img_w, 3), 255, dtype=np.uint8)
 
-        # Center vertically, left align horizontally
         y_offset = (self.img_h - new_h) // 2
         x_offset = 0
-
         canvas[y_offset : y_offset + new_h, x_offset : x_offset + new_w] = img_resized
 
-        # Normalize: mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)
-        # Equivalent to: (x / 255.0 - 0.5) / 0.5 = (x - 127.5) / 127.5
         img_normalized = (canvas.astype(np.float32) - 127.5) / 127.5
+        img_chw = np.transpose(img_normalized, (2, 0, 1))
+        return np.expand_dims(img_chw, axis=0)
 
-        # Convert to CHW format and add batch dimension
-        img_chw = np.transpose(img_normalized, (2, 0, 1))  # HWC -> CHW
-        img_batch = np.expand_dims(img_chw, axis=0)  # [1, 3, H, W]
-
-        return img_batch
-
-    def _prepare_crop(self, crop: np.ndarray) -> np.ndarray:
+    def _apply_region_rotation(self, crop: np.ndarray) -> np.ndarray:
         """
-        Rotate vertical crops to horizontal orientation before recognition.
-
-        If ``rotate_threshold`` is enabled and ``height > width * rotate_threshold``,
-        image is rotated 90 degrees clockwise.
+        Rotate tall crops to horizontal orientation when auto-rotation is enabled.
         """
         if not self.rotate_threshold:
             return crop
 
         height, width = crop.shape[:2]
         if height > width * self.rotate_threshold:
-            crop = np.rot90(crop, k=-1)
+            return np.rot90(crop, k=-1)
         return crop
+
+    def _prepare_crop(self, crop: np.ndarray) -> np.ndarray:
+        """
+        Backward-compatible alias for crop orientation logic.
+        """
+        return self._apply_region_rotation(crop)
+
     def _extract_word_image(
         self, image: np.ndarray, polygon: np.ndarray
     ) -> Optional[np.ndarray]:
         """
-        Extract word crop using polygon bounding box.
+        Backward-compatible axis-aligned word crop helper.
         """
-        try:
-            x_min, y_min = np.min(polygon, axis=0)
-            x_max, y_max = np.max(polygon, axis=0)
+        return crop_axis_aligned(image, polygon, pad=0)
 
-            h, w = image.shape[:2]
-            x1 = max(0, int(x_min))
-            y1 = max(0, int(y_min))
-            x2 = min(w, int(x_max))
-            y2 = min(h, int(y_max))
+    @staticmethod
+    def _normalize_text_regions(regions: Sequence[Any]) -> List[TextRegion]:
+        normalized: List[TextRegion] = []
+        for region in regions:
+            if isinstance(region, TextRegion):
+                normalized.append(
+                    TextRegion(
+                        word=region.word,
+                        image=read_image(region.image),
+                        polygon=np.asarray(region.polygon, dtype=np.float32),
+                        meta=dict(region.meta),
+                    )
+                )
+                continue
 
-            region_image = image[y1:y2, x1:x2]
-            if region_image.size == 0:
-                return None
+            if not isinstance(region, dict):
+                raise TypeError(
+                    "Each prepared region must be a TextRegion or dict with at "
+                    "least 'word' and 'image' keys"
+                )
 
-            return region_image
-        except Exception:
-            return None
+            if "word" not in region or "image" not in region:
+                raise ValueError(
+                    "Prepared region dict must contain 'word' and 'image' keys"
+                )
 
-    def _predict_word_images(
+            word = region["word"]
+            polygon = region.get("polygon", getattr(word, "polygon", None))
+            if polygon is None:
+                raise ValueError("Prepared region must include polygon coordinates")
+
+            normalized.append(
+                TextRegion(
+                    word=word,
+                    image=read_image(region["image"]),
+                    polygon=np.asarray(polygon, dtype=np.float32),
+                    meta=dict(region.get("meta", {})),
+                )
+            )
+
+        return normalized
+
+    @staticmethod
+    def _normalize_text_predictions(predictions: Sequence[Any]) -> List[TextPrediction]:
+        normalized: List[TextPrediction] = []
+        for prediction in predictions:
+            if prediction is None:
+                normalized.append(TextPrediction(text=None, confidence=None))
+                continue
+
+            if isinstance(prediction, TextPrediction):
+                normalized.append(
+                    TextPrediction(
+                        text=prediction.text,
+                        confidence=prediction.confidence,
+                        meta=dict(prediction.meta),
+                    )
+                )
+                continue
+
+            if not isinstance(prediction, dict):
+                raise TypeError(
+                    "Each prediction must be a TextPrediction, dict, or None"
+                )
+
+            normalized.append(
+                TextPrediction(
+                    text=prediction.get("text"),
+                    confidence=prediction.get(
+                        "confidence", prediction.get("recognition_confidence")
+                    ),
+                    meta=dict(prediction.get("meta", {})),
+                )
+            )
+
+        return normalized
+
+    def _iter_candidate_words(self, page: Page):
+        for block in page.blocks:
+            for line in block.lines:
+                for word in line.words:
+                    poly = np.asarray(word.polygon, dtype=np.float32)
+                    if poly.size == 0:
+                        continue
+
+                    bbox = polygon_to_bbox(poly)
+                    if bbox is None:
+                        continue
+
+                    x1, y1, x2, y2 = bbox
+                    if (x2 - x1) < self.min_text_size or (y2 - y1) < self.min_text_size:
+                        continue
+
+                    yield word, poly
+
+    def _prepare_bbox_regions(
+        self, page: Page, image: np.ndarray, options: Optional[Dict[str, Any]] = None
+    ) -> List[TextRegion]:
+        options = dict(options or {})
+        pad = float(options.get("pad", 0))
+        regions: List[TextRegion] = []
+
+        for word, poly in self._iter_candidate_words(page):
+            crop = crop_axis_aligned(image, poly, pad=pad)
+            if crop is None:
+                continue
+
+            regions.append(
+                TextRegion(
+                    word=word,
+                    image=self._apply_region_rotation(crop),
+                    polygon=poly,
+                    meta={"region_preparer": "bbox", "pad": pad},
+                )
+            )
+
+        return regions
+
+    def _prepare_polygon_mask_regions(
+        self, page: Page, image: np.ndarray, options: Optional[Dict[str, Any]] = None
+    ) -> List[TextRegion]:
+        options = dict(options or {})
+        pad = float(options.get("pad", 0))
+        background = int(options.get("background", 255))
+        regions: List[TextRegion] = []
+
+        for word, poly in self._iter_candidate_words(page):
+            crop = crop_polygon_mask(image, poly, pad=pad, background=background)
+            if crop is None:
+                continue
+
+            regions.append(
+                TextRegion(
+                    word=word,
+                    image=self._apply_region_rotation(crop),
+                    polygon=poly,
+                    meta={
+                        "region_preparer": "polygon_mask",
+                        "pad": pad,
+                        "background": background,
+                    },
+                )
+            )
+
+        return regions
+
+    def _prepare_quad_warp_regions(
+        self, page: Page, image: np.ndarray, options: Optional[Dict[str, Any]] = None
+    ) -> List[TextRegion]:
+        options = dict(options or {})
+        raw_output_size = options.get("output_size")
+        fallback_to_bbox = bool(options.get("fallback_to_bbox", True))
+        output_size = None
+        if raw_output_size is not None:
+            if not isinstance(raw_output_size, (list, tuple)) or len(raw_output_size) != 2:
+                raise ValueError(
+                    "quad_warp output_size must be a tuple/list like (width, height)"
+                )
+            output_size = (int(raw_output_size[0]), int(raw_output_size[1]))
+
+        regions: List[TextRegion] = []
+
+        for word, poly in self._iter_candidate_words(page):
+            crop = warp_quad(image, poly, output_size=output_size)
+            used_fallback = False
+            if crop is None and fallback_to_bbox:
+                crop = crop_axis_aligned(image, poly, pad=0)
+                used_fallback = True
+            if crop is None:
+                continue
+
+            regions.append(
+                TextRegion(
+                    word=word,
+                    image=self._apply_region_rotation(crop),
+                    polygon=poly,
+                    meta={
+                        "region_preparer": "quad_warp",
+                        "output_size": output_size,
+                        "fallback_to_bbox": used_fallback,
+                    },
+                )
+            )
+
+        return regions
+
+    def _prepare_text_regions(
         self,
-        images: List[Union[np.ndarray, str, Path, Image.Image]],
+        page: Page,
+        image: np.ndarray,
+        options: Optional[Dict[str, Any]] = None,
+    ) -> List[TextRegion]:
+        preset = self.region_preparer
+        if not isinstance(preset, str):
+            raise TypeError("_prepare_text_regions is available only for preset preparers")
+
+        if preset == "bbox":
+            return self._prepare_bbox_regions(page, image, options=options)
+        if preset == "polygon_mask":
+            return self._prepare_polygon_mask_regions(page, image, options=options)
+        if preset == "quad_warp":
+            return self._prepare_quad_warp_regions(page, image, options=options)
+
+        raise ValueError(f"Unsupported region_preparer preset: {preset}")
+
+    def _call_region_preparer(self, page: Page, image: np.ndarray) -> List[TextRegion]:
+        preparer = self.region_preparer
+        if isinstance(preparer, str):
+            return self._prepare_text_regions(
+                page=page,
+                image=image,
+                options=self.region_preparer_options,
+            )
+
+        kwargs = self._filter_callable_kwargs(
+            preparer,
+            {
+                "page": page,
+                "image": image,
+                "recognizer": self,
+                "options": dict(self.region_preparer_options),
+            },
+        )
+        return self._normalize_text_regions(preparer(**kwargs))
+
+    def _predict_text_images(
+        self,
+        regions: Sequence[TextRegion],
         batch_size: int = 32,
-    ) -> List[Dict[str, Any]]:
+    ) -> List[TextPrediction]:
         """
-        Run ONNX inference on prepared word image list.
+        Run ONNX inference on prepared text regions.
         """
-        # Initialize session on first call
         if self.onnx_session is None:
             self._initialize_session()
 
-        if not images:
+        if not regions:
             return []
 
-        results: List[Dict[str, Any]] = []
+        results: List[TextPrediction] = []
 
-        # Process images in batches
-        for i in range(0, len(images), batch_size):
-            batch_images = images[i : i + batch_size]
+        for i in range(0, len(regions), batch_size):
+            batch_regions = regions[i : i + batch_size]
+            batch_tensors = [self._preprocess_image(region.image)[0] for region in batch_regions]
+            batch_input = np.stack(batch_tensors, axis=0)
 
-            # Preprocess batch
-            batch_tensors = []
-            for img in batch_images:
-                tensor = self._preprocess_image(img)  # [1, 3, H, W]
-                batch_tensors.append(tensor[0])  # Remove batch dim
-
-            batch_input = np.stack(batch_tensors, axis=0)  # [B, 3, H, W]
-
-            # ONNX inference
             input_name = self.onnx_session.get_inputs()[0].name
             output_name = self.onnx_session.get_outputs()[0].name
+            logits = self.onnx_session.run([output_name], {input_name: batch_input})[0]
 
-            ort_outputs = self.onnx_session.run(
-                [output_name], {input_name: batch_input}
-            )
-            logits = ort_outputs[0]  # [B, max_length, num_classes]
+            preds = np.argmax(logits, axis=-1)
+            probs = self._softmax(logits, axis=-1)
 
-            # Decode predictions
-            preds = np.argmax(logits, axis=-1)  # [B, max_length]
-
-            # Calculate confidence (softmax + mean prob)
-            probs = self._softmax(logits, axis=-1)  # [B, T, num_classes]
-
-            for j in range(len(batch_images)):
-                pred_row = preds[j]  # [max_length]
-
-                # Decode to text
+            for j in range(len(batch_regions)):
+                pred_row = preds[j]
                 decoded_chars = []
                 for token_id in pred_row:
                     if token_id == self.eos_id:
                         break
-                    if token_id not in [self.pad_id, self.sos_id]:
-                        if token_id < len(self.itos):
-                            decoded_chars.append(self.itos[token_id])
+                    if token_id not in [self.pad_id, self.sos_id] and token_id < len(self.itos):
+                        decoded_chars.append(self.itos[token_id])
 
-                text = "".join(decoded_chars)
-
-                # Calculate confidence
                 seq_probs = []
                 for t, token_id in enumerate(pred_row):
                     if token_id == self.eos_id:
@@ -479,11 +728,71 @@ class TRBA(BaseModel):
                     if token_id not in [self.pad_id, self.sos_id]:
                         seq_probs.append(probs[j, t, token_id])
 
-                confidence = float(np.mean(seq_probs)) if seq_probs else 0.0
-
-                results.append({"text": text, "confidence": confidence})
+                results.append(
+                    TextPrediction(
+                        text="".join(decoded_chars),
+                        confidence=float(np.mean(seq_probs)) if seq_probs else 0.0,
+                    )
+                )
 
         return results
+
+    def _predict_word_images(
+        self,
+        images: List[Union[np.ndarray, str, Path, Image.Image]],
+        batch_size: int = 32,
+    ) -> List[Dict[str, Any]]:
+        """
+        Backward-compatible wrapper for raw image list inference.
+        """
+        regions = [
+            TextRegion(
+                word=None,
+                image=read_image(image),
+                polygon=np.empty((0, 2), dtype=np.float32),
+                meta={"region_preparer": "legacy_raw_images"},
+            )
+            for image in images
+        ]
+        predictions = self._predict_text_images(regions, batch_size=batch_size)
+        return [
+            {"text": prediction.text, "confidence": prediction.confidence, "meta": dict(prediction.meta)}
+            for prediction in predictions
+        ]
+
+    def _call_region_predictor(
+        self,
+        regions: List[TextRegion],
+        batch_size: int,
+        page: Page,
+        image: np.ndarray,
+    ) -> List[TextPrediction]:
+        predictor = self.region_predictor or self._predict_text_images
+        kwargs = self._filter_callable_kwargs(
+            predictor,
+            {
+                "regions": regions,
+                "batch_size": batch_size,
+                "recognizer": self,
+                "page": page,
+                "image": image,
+            },
+        )
+        predictions = predictor(**kwargs)
+        return self._normalize_text_predictions(predictions)
+
+    @staticmethod
+    def _apply_text_predictions(
+        regions: Sequence[TextRegion], predictions: Sequence[TextPrediction]
+    ) -> None:
+        if len(regions) != len(predictions):
+            raise ValueError(
+                "region_predictor must return the same number of predictions as regions"
+            )
+
+        for region, prediction in zip(regions, predictions):
+            region.word.text = prediction.text
+            region.word.recognition_confidence = prediction.confidence
 
     def predict(
         self,
@@ -499,73 +808,33 @@ class TRBA(BaseModel):
         page : Page
             Page object with detected word polygons.
         image : str, Path, numpy.ndarray, or PIL.Image, optional
-            Source page image used to extract word crops. If ``None``,
+            Source page image used to extract text regions. If ``None``,
             recognition is skipped and a deep copy of ``page`` is returned.
         batch_size : int, optional
-            Number of word crops to process simultaneously. Larger batches are
-            faster but require more memory. Default is 32.
+            Number of prepared text regions to process simultaneously.
 
         Returns
         -------
         Page
             New Page object with recognized ``text`` and
             ``recognition_confidence`` filled for processed words.
-
-        Examples
-        --------
-        Recognize words inside detected page:
-
-        >>> from manuscript.detectors import EAST
-        >>> from manuscript.recognizers import TRBA
-        >>> detector = EAST()
-        >>> recognizer = TRBA()
-        >>> det = detector.predict("page.jpg")
-        >>> recognized_page = recognizer.predict(det["page"], image="page.jpg")
         """
         result_page = page.model_copy(deep=True)
-
         if image is None:
             return result_page
 
         image_array = read_image(image)
-        word_images: List[np.ndarray] = []
-        word_objects = []
-
-        for block in result_page.blocks:
-            for line in block.lines:
-                for word in line.words:
-                    poly = np.array(word.polygon, dtype=np.float32)
-                    if poly.size == 0:
-                        continue
-
-                    x_min, y_min = np.min(poly, axis=0)
-                    x_max, y_max = np.max(poly, axis=0)
-                    width = x_max - x_min
-                    height = y_max - y_min
-
-                    if width < self.min_text_size or height < self.min_text_size:
-                        continue
-
-                    region_image = self._extract_word_image(
-                        image_array, poly.astype(np.int32)
-                    )
-                    if region_image is None or region_image.size == 0:
-                        continue
-
-                    word_images.append(region_image)
-                    word_objects.append(word)
-
-        if not word_images:
+        regions = self._call_region_preparer(result_page, image_array)
+        if not regions:
             return result_page
 
-        recognition_results = self._predict_word_images(
-            word_images, batch_size=batch_size
+        predictions = self._call_region_predictor(
+            regions=regions,
+            batch_size=batch_size,
+            page=result_page,
+            image=image_array,
         )
-
-        for word_obj, rec in zip(word_objects, recognition_results):
-            word_obj.text = rec["text"]
-            word_obj.recognition_confidence = rec["confidence"]
-
+        self._apply_text_predictions(regions, predictions)
         return result_page
 
     @staticmethod

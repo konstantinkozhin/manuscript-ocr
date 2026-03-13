@@ -1031,3 +1031,42 @@ msgstr ""
 #~ "`.../checkpoints/`, c) прямой путь к "
 #~ "`last_state.pt`. По умолчанию ``None``."
 
+#: ../../api/detectors.rst:9
+msgid "EAST Training Quads"
+msgstr "Квадрилатерали для обучения EAST"
+
+#: ../../api/detectors.rst:11
+msgid ""
+"EAST training expects quadrilateral targets. When loading COCO "
+"``segmentation`` polygons, use ``augmentation_config[\"quad_source\"]`` in "
+"``EAST.train(...)`` to control how polygons are converted into 4-point "
+"training quads:"
+msgstr ""
+"Обучение EAST ожидает цели в виде четырехугольников. При загрузке "
+"полигонов COCO ``segmentation`` используйте "
+"``augmentation_config[\"quad_source\"]`` в ``EAST.train(...)``, чтобы "
+"управлять тем, как полигоны преобразуются в 4-точечные обучающие квады:"
+
+#: ../../api/detectors.rst:16
+msgid ""
+"``\"auto\"`` keeps existing 4-point polygons as-is and falls back to "
+"``minAreaRect`` for longer polygons."
+msgstr ""
+"``\"auto\"`` сохраняет готовые 4-точечные полигоны как есть и использует "
+"``minAreaRect`` только для полигонов с большим числом вершин."
+
+#: ../../api/detectors.rst:18
+msgid ""
+"``\"as_is\"`` accepts only 4-point polygons and skips polygons with a "
+"different number of vertices."
+msgstr ""
+"``\"as_is\"`` принимает только 4-точечные полигоны и пропускает полигоны "
+"с другим числом вершин."
+
+#: ../../api/detectors.rst:20
+msgid ""
+"``\"min_area_rect\"`` always fits the minimum-area rectangle and matches "
+"the legacy conversion path."
+msgstr ""
+"``\"min_area_rect\"`` всегда строит прямоугольник минимальной площади и "
+"соответствует старому пути преобразования."
