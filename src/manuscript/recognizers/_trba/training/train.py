@@ -399,6 +399,13 @@ def visualize_predictions_tensorboard(
                 target.cpu(), itos, pad_id=pad_id, eos_id=eos_id, blank_id=blank_id
             )
 
+            # Decode context for display
+            ctx_text = ""
+            if ctx is not None:
+                ctx_ids = ctx[0].cpu().tolist()
+                ctx_chars = [itos[c] for c in ctx_ids if c != pad_id and c < len(itos)]
+                ctx_text = "".join(ctx_chars)
+
             # Prediction
             fwd_kwargs = dict(forward_kwargs)
             if ctx is not None:
@@ -432,7 +439,7 @@ def visualize_predictions_tensorboard(
 
             # Добавляем область для текста
             img_h, img_w = img_pil.size[1], img_pil.size[0]
-            text_height = 60
+            text_height = 85 if ctx_text else 60
             new_img = Image.new(
                 "RGB", (img_w, img_h + text_height), color=(255, 255, 255)
             )
@@ -450,9 +457,13 @@ def visualize_predictions_tensorboard(
             is_correct = gt_text == pred_text
             color_gt = (0, 128, 0) if is_correct else (255, 0, 0)
 
-            draw.text((5, img_h + 5), f"GT:   {gt_text}", fill=color_gt, font=font)
+            y_offset = img_h + 5
+            if ctx_text:
+                draw.text((5, y_offset), f"Ctx:  {ctx_text}", fill=(128, 128, 128), font=font)
+                y_offset += 25
+            draw.text((5, y_offset), f"GT:   {gt_text}", fill=color_gt, font=font)
             draw.text(
-                (5, img_h + 30), f"Pred: {pred_text}", fill=(0, 0, 255), font=font
+                (5, y_offset + 25), f"Pred: {pred_text}", fill=(0, 0, 255), font=font
             )
 
             # Обратно в тензор
@@ -1202,6 +1213,9 @@ def run_training(cfg: Config, device: str = "cuda"):
 
             # Валидация только с attention decoder (CTC используется только при обучении)
             eval_modes = {"attention": {"mode": "attention", "decoder": "attention"}}
+            # При use_context добавляем отдельную оценку без контекста для сравнения
+            if use_context:
+                eval_modes["attention_no_ctx"] = {"mode": "attention", "decoder": "attention"}
 
             aggregate_mode_stats = {
                 mode_name: {
@@ -1262,11 +1276,13 @@ def run_training(cfg: Config, device: str = "cuda"):
 
                         preds_batch = {}
                         for mode_name, mode_cfg in eval_modes.items():
+                            # attention_no_ctx: инференс без контекста для сравнения
+                            ctx_for_eval = None if mode_name.endswith("_no_ctx") else context_ids
                             result = model(
                                 imgs,
                                 is_train=False,
                                 batch_max_length=max_len,
-                                context_ids=context_ids,
+                                context_ids=ctx_for_eval,
                             )
                             decoder_type = mode_cfg["decoder"]
                             if decoder_type == "attention":
@@ -1353,6 +1369,16 @@ def run_training(cfg: Config, device: str = "cuda"):
             writer.add_scalar("Accuracy/val_attention", val_acc, epoch)
             writer.add_scalar("CER/val_attention", val_cer, epoch)
             writer.add_scalar("WER/val_attention", val_wer, epoch)
+
+            # Если обучаем с контекстом — логируем метрики без контекста для сравнения
+            if use_context and "attention_no_ctx" in aggregate_mode_stats:
+                val_acc_nc, val_cer_nc, val_wer_nc = _finalize("attention_no_ctx")
+                writer.add_scalar("Accuracy/val_attention_no_ctx", val_acc_nc, epoch)
+                writer.add_scalar("CER/val_attention_no_ctx", val_cer_nc, epoch)
+                writer.add_scalar("WER/val_attention_no_ctx", val_wer_nc, epoch)
+                logger.info(
+                    f"  Val no_ctx: acc={val_acc_nc:.4f}, CER={val_cer_nc:.4f}, WER={val_wer_nc:.4f}"
+                )
 
             # Визуализация случайных примеров в TensorBoard
             if val_loaders_individual:
