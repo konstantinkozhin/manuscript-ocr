@@ -1194,8 +1194,7 @@ class TRBA(BaseModel):
         # - None/False/"none": skip
         # - "default"/True: use release weights
         # - str: path/URL to .pth/.pt/.ckpt
-        if pretrain_weights is not None:
-            config_payload["pretrain_weights"] = pretrain_weights
+        config_payload["pretrain_weights"] = pretrain_weights
 
         if extra_config:
             config_payload.update(extra_config)

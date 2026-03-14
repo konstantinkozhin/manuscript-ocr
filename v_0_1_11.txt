@@ -202,5 +202,14 @@ Files:
 - docs/sphinx/api/detectors.rst
 - docs/sphinx/locale/ru/LC_MESSAGES/api/detectors.po
 
+17) TRBA pretrain_weights=None bug fix (local)
+- Fixed bug where passing `pretrain_weights=None` (train from scratch) still loaded default pretrained weights.
+- Cause: `None` was not forwarded into training config due to `if pretrain_weights is not None` guard,
+  so `getattr(cfg, "pretrain_weights", "default")` fell back to `"default"` and loaded release weights.
+- Fix: `pretrain_weights` is now always written into config_payload regardless of its value.
+
+File:
+- src/manuscript/recognizers/_trba/__init__.py
+
 Summary:
 - v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fixes).
