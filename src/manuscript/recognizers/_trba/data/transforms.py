@@ -168,6 +168,37 @@ def pack_attention_targets(texts, stoi, max_len, drop_blank=True):
     return text_in, target_y, lengths
 
 
+def pack_context_tokens(contexts, stoi, max_len, drop_blank=True):
+    """Pack context strings into a padded token tensor [B, max_len]."""
+    if not _TORCH_AVAILABLE:
+        raise ImportError(
+            "pack_context_tokens requires PyTorch. Install with: pip install manuscript-ocr[dev]"
+        )
+
+    PAD = stoi["<PAD>"]
+    BLANK = stoi.get("<BLANK>", None)
+    B = len(contexts)
+
+    result = torch.full((B, max_len), PAD, dtype=torch.long)
+
+    for i, ctx in enumerate(contexts):
+        ids = []
+        for ch in ctx:
+            if ch not in stoi:
+                continue
+            idx = stoi[ch]
+            if drop_blank and BLANK is not None and idx == BLANK:
+                continue
+            ids.append(idx)
+
+        L = min(len(ids), max_len)
+        if L > 0:
+            # Right-align context (most recent chars are last)
+            result[i, max_len - L :] = torch.tensor(ids[-L:], dtype=torch.long)
+
+    return result
+
+
 def get_train_transform(params, img_h, img_w):
     """Get training transforms (requires albumentations and torch)."""
     if not _TORCH_AVAILABLE:

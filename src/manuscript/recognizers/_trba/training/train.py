@@ -246,6 +246,8 @@ def split_train_val(
     val_transform,
     encoding="utf-8",
     val_size=3000,
+    context_window=0,
+    no_context_prob=0.2,
 ):
     train_sets, val_sets = [], []
     for c, r in zip(csvs, roots):
@@ -257,6 +259,8 @@ def split_train_val(
             img_max_width=img_w,
             transform=None,
             encoding=encoding,
+            context_window=context_window,
+            no_context_prob=no_context_prob,
         )
         n_val = min(val_size, len(full_ds))
         n_train = len(full_ds) - n_val
@@ -351,7 +355,12 @@ def visualize_predictions_tensorboard(
 
     while len(samples_collected) < num_samples and attempts < max_attempts:
         batch_idx = random.randint(0, num_batches - 1)
-        imgs, text_in, target_y, lengths = all_batches[batch_idx]
+        batch = all_batches[batch_idx]
+        if len(batch) == 5:
+            imgs, text_in, target_y, lengths, context_ids = batch
+        else:
+            imgs, text_in, target_y, lengths = batch
+            context_ids = None
 
         batch_size = imgs.size(0)
         if batch_size == 0:
@@ -362,8 +371,9 @@ def visualize_predictions_tensorboard(
         sample_key = (batch_idx, sample_idx)
 
         if sample_key not in [s[0] for s in samples_collected]:
+            ctx_slice = context_ids[sample_idx : sample_idx + 1] if context_ids is not None else None
             samples_collected.append(
-                (sample_key, imgs[sample_idx : sample_idx + 1], target_y[sample_idx])
+                (sample_key, imgs[sample_idx : sample_idx + 1], target_y[sample_idx], ctx_slice)
             )
 
         attempts += 1
@@ -381,7 +391,7 @@ def visualize_predictions_tensorboard(
     images_with_text = []
 
     with torch.no_grad():
-        for idx, (sample_key, img, target) in enumerate(samples_collected, 1):
+        for idx, (sample_key, img, target, ctx) in enumerate(samples_collected, 1):
             img_device = img.to(device)
 
             # Ground truth
@@ -390,7 +400,10 @@ def visualize_predictions_tensorboard(
             )
 
             # Prediction
-            result = model(img_device, **forward_kwargs)
+            fwd_kwargs = dict(forward_kwargs)
+            if ctx is not None:
+                fwd_kwargs["context_ids"] = ctx.to(device)
+            result = model(img_device, **fwd_kwargs)
 
             # Get predictions based on mode
             if mode == "attention":
@@ -504,6 +517,14 @@ def run_training(cfg: Config, device: str = "cuda"):
     max_len = getattr(cfg, "max_len", 25)
     hidden_size = getattr(cfg, "hidden_size", 256)
 
+    # context
+    context_window = getattr(cfg, "context_window", 0)
+    context_dim = getattr(cfg, "context_dim", 128)
+    context_embed_dim = getattr(cfg, "context_embed_dim", 64)
+    context_hidden_dim = getattr(cfg, "context_hidden_dim", 128)
+    no_context_prob = getattr(cfg, "no_context_prob", 0.2)
+    use_context = context_window > 0
+
     # оптимизация
     batch_size = getattr(cfg, "batch_size", 32)
     epochs = getattr(cfg, "epochs", 20)
@@ -602,6 +623,8 @@ def run_training(cfg: Config, device: str = "cuda"):
     BLANK = stoi.get("<BLANK>", None)
     num_classes = len(itos)
     logger.info(f"Charset loaded: {num_classes} tokens")
+    if use_context:
+        logger.info(f"Context: window={context_window}, dim={context_dim}, no_context_prob={no_context_prob}")
     
     # Копируем charset в папку эксперимента
     charset_dest = os.path.join(exp_dir, "charset.txt")
@@ -632,6 +655,9 @@ def run_training(cfg: Config, device: str = "cuda"):
         pad_id=PAD,
         blank_id=BLANK,
         use_ctc_head=use_ctc_head,
+        context_dim=context_dim if use_context else 0,
+        context_embed_dim=context_embed_dim,
+        context_hidden_dim=context_hidden_dim,
     ).to(device)
 
     pretrain_src = getattr(cfg, "pretrain_weights", "default")
@@ -852,6 +878,8 @@ def run_training(cfg: Config, device: str = "cuda"):
                     encoding=encoding,
                     max_len=max_len,
                     strict_max_len=True,
+                    context_window=context_window,
+                    no_context_prob=no_context_prob,
                 )
                 val_ds = OCRDatasetAttn(
                     val_csvs[i],
@@ -863,6 +891,8 @@ def run_training(cfg: Config, device: str = "cuda"):
                     encoding=encoding,
                     max_len=max_len,
                     strict_max_len=True,
+                    context_window=context_window,
+                    no_context_prob=0.0,
                 )
                 train_sets.append(train_ds)
                 val_sets.append(val_ds)
@@ -877,6 +907,8 @@ def run_training(cfg: Config, device: str = "cuda"):
                     encoding=encoding,
                     max_len=max_len,
                     strict_max_len=True,
+                    context_window=context_window,
+                    no_context_prob=no_context_prob,
                 )
                 n_val = min(3000 if val_size is None else val_size, len(full_ds))
                 n_train = len(full_ds) - n_val
@@ -902,13 +934,15 @@ def run_training(cfg: Config, device: str = "cuda"):
             val_transform,
             encoding=encoding,
             val_size=val_size,
+            context_window=context_window,
+            no_context_prob=no_context_prob,
         )
 
     collate_train = OCRDatasetAttn.make_collate_attn(
-        stoi, max_len=max_len, drop_blank=True
+        stoi, max_len=max_len, drop_blank=True, context_window=context_window
     )
     collate_val = OCRDatasetAttn.make_collate_attn(
-        stoi, max_len=max_len, drop_blank=True
+        stoi, max_len=max_len, drop_blank=True, context_window=context_window
     )
 
     if train_proportions is not None:
@@ -1071,7 +1105,13 @@ def run_training(cfg: Config, device: str = "cuda"):
         total_attn_loss = 0.0
         total_ctc_loss = 0.0
         pbar = tqdm(train_loader, desc=f"Train {epoch}/{epochs}", leave=False)
-        for imgs, text_in, target_y, lengths in pbar:
+        for batch in pbar:
+            if use_context:
+                imgs, text_in, target_y, lengths, context_ids = batch
+                context_ids = context_ids.to(device, non_blocking=pin_memory)
+            else:
+                imgs, text_in, target_y, lengths = batch
+                context_ids = None
             imgs = imgs.to(device, non_blocking=pin_memory)
             text_in = text_in.to(device, non_blocking=pin_memory)
             target_y = target_y.to(device, non_blocking=pin_memory)
@@ -1085,6 +1125,7 @@ def run_training(cfg: Config, device: str = "cuda"):
                     text=text_in,
                     is_train=True,
                     batch_max_length=max_len,
+                    context_ids=context_ids,
                 )
 
                 # Compute dual loss (attention + CTC)
@@ -1183,7 +1224,13 @@ def run_training(cfg: Config, device: str = "cuda"):
                     leave=False,
                 )
                 with torch.no_grad():
-                    for imgs, text_in, target_y, lengths in pbar_val:
+                    for val_batch in pbar_val:
+                        if use_context:
+                            imgs, text_in, target_y, lengths, context_ids = val_batch
+                            context_ids = context_ids.to(device, non_blocking=pin_memory)
+                        else:
+                            imgs, text_in, target_y, lengths = val_batch
+                            context_ids = None
                         imgs = imgs.to(device, non_blocking=pin_memory)
                         text_in = text_in.to(device, non_blocking=pin_memory)
                         target_y = target_y.to(device, non_blocking=pin_memory)
@@ -1194,6 +1241,7 @@ def run_training(cfg: Config, device: str = "cuda"):
                                 text=text_in,
                                 is_train=True,
                                 batch_max_length=max_len,
+                                context_ids=context_ids,
                             )
                             attn_logits = result["attention_logits"]
                             ctc_logits = result["ctc_logits"]
@@ -1218,6 +1266,7 @@ def run_training(cfg: Config, device: str = "cuda"):
                                 imgs,
                                 is_train=False,
                                 batch_max_length=max_len,
+                                context_ids=context_ids,
                             )
                             decoder_type = mode_cfg["decoder"]
                             if decoder_type == "attention":

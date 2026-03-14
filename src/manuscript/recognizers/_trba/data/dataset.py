@@ -33,6 +33,8 @@ class OCRDatasetAttn(Dataset):
         validate_image: bool = True,
         max_len: Optional[int] = None,
         strict_max_len: bool = True,
+        context_window: int = 0,
+        no_context_prob: float = 0.2,
     ):
         self.images_dir = images_dir
         self.img_h = img_height
@@ -48,6 +50,8 @@ class OCRDatasetAttn(Dataset):
         self._validate_image = validate_image
         self._max_len = max_len
         self._strict_max_len = strict_max_len
+        self._context_window = context_window
+        self._no_context_prob = no_context_prob
 
         self._reasons = {
             "bad_row": 0, "empty_fname": 0, "empty_label": 0,
@@ -60,7 +64,7 @@ class OCRDatasetAttn(Dataset):
 
         rows = self._read_rows(csv_path)
         self._maybe_detect_header(rows)
-        self._build_samples(rows, num_workers)
+        self._build_samples(rows, num_workers if context_window == 0 else 0)
 
         self._invalid_mask = [False] * len(self.samples)
         self._checked_mask = [not self._validate_image] * len(self.samples)
@@ -78,6 +82,26 @@ class OCRDatasetAttn(Dataset):
     def __len__(self):
         return len(self.samples)
 
+    def _get_context(self, idx: int) -> str:
+        """Build context string from preceding samples (up to context_window chars)."""
+        if self._context_window <= 0:
+            return ""
+        if random.random() < self._no_context_prob:
+            return ""
+        words = []
+        total = 0
+        i = idx - 1
+        while i >= 0 and total < self._context_window:
+            _, label = self.samples[i]
+            words.append(label)
+            total += len(label) + 1  # +1 for space separator
+            i -= 1
+        if not words:
+            return ""
+        words.reverse()
+        context = " ".join(words)
+        return context[-self._context_window:]
+
     def __getitem__(self, idx):
         if not (0 <= idx < len(self.samples)):
             raise IndexError(idx)
@@ -94,7 +118,8 @@ class OCRDatasetAttn(Dataset):
                 tensor = augmented["image"]
             else:
                 tensor = torch.from_numpy(img).permute(2, 0, 1).float() / 255.0
-            return tensor, label
+            context = self._get_context(idx)
+            return (tensor, label) if self._context_window == 0 else (tensor, label, context)
 
         attempts = self._max_getitem_retries
         current_idx = idx
@@ -120,7 +145,8 @@ class OCRDatasetAttn(Dataset):
                 tensor = augmented["image"]
             else:
                 tensor = torch.from_numpy(img).permute(2, 0, 1).float() / 255.0
-            return tensor, label
+            context = self._get_context(current_idx)
+            return (tensor, label) if self._context_window == 0 else (tensor, label, context)
 
         raise RuntimeError("Failed to fetch a valid sample after lazy validation retries.")
 
@@ -141,13 +167,21 @@ class OCRDatasetAttn(Dataset):
         raise RuntimeError("No valid samples remain after filtering unreadable images.")
 
     @staticmethod
-    def make_collate_attn(stoi, max_len: int, drop_blank: bool = True):
+    def make_collate_attn(stoi, max_len: int, drop_blank: bool = True, context_window: int = 0):
         def collate(batch):
-            imgs, labels_text = zip(*batch)
+            if context_window > 0:
+                imgs, labels_text, contexts = zip(*batch)
+            else:
+                imgs, labels_text = zip(*batch)
+                contexts = None
             imgs = torch.stack(imgs)
             text_in, target_y, lengths = pack_attention_targets(
                 labels_text, stoi=stoi, max_len=max_len, drop_blank=drop_blank
             )
+            if contexts is not None:
+                from .transforms import pack_context_tokens
+                context_ids = pack_context_tokens(contexts, stoi=stoi, max_len=context_window, drop_blank=drop_blank)
+                return imgs, text_in, target_y, lengths, context_ids
             return imgs, text_in, target_y, lengths
         return collate
 

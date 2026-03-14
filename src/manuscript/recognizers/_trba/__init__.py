@@ -218,6 +218,9 @@ class TRBA(BaseModel):
         self.cnn_in_channels = config_dict.get("cnn_in_channels", 3)
         self.cnn_out_channels = config_dict.get("cnn_out_channels", 512)
         self.cnn_backbone = config_dict.get("cnn_backbone", "seresnet31")
+        self.context_window = config_dict.get("context_window", 0)
+        self.context_dim = config_dict.get("context_dim", 0)
+        self._use_context = self.context_window > 0 and self.context_dim > 0
 
         # Load charset
         if not Path(self.charset_path).exists():
@@ -698,6 +701,9 @@ class TRBA(BaseModel):
         if not regions:
             return []
 
+        if self._use_context:
+            return self._predict_text_images_with_context(regions)
+
         results: List[TextPrediction] = []
 
         for i in range(0, len(regions), batch_size):
@@ -734,6 +740,75 @@ class TRBA(BaseModel):
                         confidence=float(np.mean(seq_probs)) if seq_probs else 0.0,
                     )
                 )
+
+        return results
+
+    def _encode_context_ids(self, context_str: str) -> np.ndarray:
+        """Encode context string into token ids array [1, context_window]."""
+        ids = []
+        for ch in context_str:
+            if ch in self.stoi:
+                idx = self.stoi[ch]
+                if self.blank_id is not None and idx == self.blank_id:
+                    continue
+                ids.append(idx)
+
+        result = np.full((1, self.context_window), self.pad_id, dtype=np.int64)
+        L = min(len(ids), self.context_window)
+        if L > 0:
+            result[0, self.context_window - L :] = ids[-L:]
+        return result
+
+    def _predict_text_images_with_context(
+        self,
+        regions: Sequence[TextRegion],
+    ) -> List[TextPrediction]:
+        """Sequential inference with context from previously recognized words."""
+        results: List[TextPrediction] = []
+        recognized_texts: List[str] = []
+
+        input_names = [inp.name for inp in self.onnx_session.get_inputs()]
+        output_name = self.onnx_session.get_outputs()[0].name
+        has_context_input = len(input_names) > 1
+
+        for region in regions:
+            img_tensor = self._preprocess_image(region.image)
+
+            feeds = {input_names[0]: img_tensor}
+            if has_context_input:
+                context_str = " ".join(recognized_texts)
+                context_str = context_str[-self.context_window:] if context_str else ""
+                context_ids = self._encode_context_ids(context_str)
+                feeds[input_names[1]] = context_ids
+
+            logits = self.onnx_session.run([output_name], feeds)[0]
+
+            pred_row = np.argmax(logits[0], axis=-1)
+            prob_row = self._softmax(logits, axis=-1)[0]
+
+            decoded_chars = []
+            for token_id in pred_row:
+                if token_id == self.eos_id:
+                    break
+                if token_id not in [self.pad_id, self.sos_id] and token_id < len(self.itos):
+                    decoded_chars.append(self.itos[token_id])
+
+            seq_probs = []
+            for t, token_id in enumerate(pred_row):
+                if token_id == self.eos_id:
+                    break
+                if token_id not in [self.pad_id, self.sos_id]:
+                    seq_probs.append(prob_row[t, token_id])
+
+            text = "".join(decoded_chars)
+            recognized_texts.append(text)
+
+            results.append(
+                TextPrediction(
+                    text=text,
+                    confidence=float(np.mean(seq_probs)) if seq_probs else 0.0,
+                )
+            )
 
         return results
 
@@ -884,6 +959,11 @@ class TRBA(BaseModel):
         freeze_enc_rnn: str = "none",
         freeze_attention: str = "none",
         pretrain_weights: Optional[object] = "default",
+        context_window: int = 0,
+        context_dim: int = 128,
+        context_embed_dim: int = 64,
+        context_hidden_dim: int = 128,
+        no_context_prob: float = 0.2,
         **extra_config: Any,
     ):
         """
@@ -1205,6 +1285,13 @@ class TRBA(BaseModel):
         config_payload["freeze_enc_rnn"] = freeze_enc_rnn
         config_payload["freeze_attention"] = freeze_attention
 
+        # Context parameters
+        config_payload["context_window"] = context_window
+        config_payload["context_dim"] = context_dim
+        config_payload["context_embed_dim"] = context_embed_dim
+        config_payload["context_hidden_dim"] = context_hidden_dim
+        config_payload["no_context_prob"] = no_context_prob
+
         config = Config(config_payload)
         return run_training(config, device=device)
 
@@ -1342,6 +1429,11 @@ class TRBA(BaseModel):
         cnn_in_channels = config.get("cnn_in_channels", 3)
         cnn_out_channels = config.get("cnn_out_channels", 512)
         cnn_backbone = config.get("cnn_backbone", "seresnet31")
+        context_window = config.get("context_window", 0)
+        context_dim = config.get("context_dim", 0)
+        context_embed_dim = config.get("context_embed_dim", 64)
+        context_hidden_dim = config.get("context_hidden_dim", 128)
+        use_context = context_window > 0 and context_dim > 0
 
         # Load charset to determine num_classes
         print(f"Loading charset from {charset_path}...")
@@ -1384,6 +1476,9 @@ class TRBA(BaseModel):
             pad_id=stoi["<PAD>"],
             blank_id=stoi.get("<BLANK>", None),
             use_ctc_head=False,
+            context_dim=context_dim if use_context else 0,
+            context_embed_dim=context_embed_dim,
+            context_hidden_dim=context_hidden_dim,
         )
 
         print(f"   Token IDs:")
@@ -1406,18 +1501,31 @@ class TRBA(BaseModel):
         print(
             f"   ONNX will use: {max_length + 1} steps (max_length + 1 for compatibility)"
         )
-        onnx_model = TRBAONNXWrapper(model, max_length=max_length + 1)
+        onnx_model = TRBAONNXWrapper(model, max_length=max_length + 1, context_window=context_window)
         onnx_model.eval()
 
         # Create dummy input
         dummy_input = torch.randn(1, 3, img_h, img_w)
+        export_args = (dummy_input,)
+        input_names = ["input"]
+        dynamic_axes = {
+            "input": {0: "batch_size"},
+            "logits": {0: "batch_size"},
+        }
+
+        if use_context:
+            dummy_context = torch.zeros(1, context_window, dtype=torch.long)
+            export_args = (dummy_input, dummy_context)
+            input_names.append("context_ids")
+            dynamic_axes["context_ids"] = {0: "batch_size"}
+            print(f"   Context: window={context_window}, dim={context_dim}")
 
         print(f"Input shape: {dummy_input.shape}")
 
         # Test model before export
         print(f"\nTesting model before export...")
         with torch.no_grad():
-            output = onnx_model(dummy_input)
+            output = onnx_model(*export_args)
 
         print(f"Output shape: {output.shape}")
         print(f"Expected: [1, {max_length + 1}, {num_classes}] (max_length + 1 steps)")
@@ -1426,17 +1534,14 @@ class TRBA(BaseModel):
         print(f"\nExporting to ONNX (opset {opset_version})...")
         torch.onnx.export(
             onnx_model,
-            dummy_input,
+            export_args,
             str(output_path),
             export_params=True,
             opset_version=opset_version,
             do_constant_folding=True,
-            input_names=["input"],
+            input_names=input_names,
             output_names=["logits"],
-            dynamic_axes={
-                "input": {0: "batch_size"},
-                "logits": {0: "batch_size"},
-            },
+            dynamic_axes=dynamic_axes,
             verbose=False,
         )
 
@@ -1474,6 +1579,8 @@ class TRBA(BaseModel):
             session = ort.InferenceSession(str(output_path))
 
             ort_inputs = {"input": dummy_input.numpy()}
+            if use_context:
+                ort_inputs["context_ids"] = dummy_context.numpy()
             ort_outputs = session.run(None, ort_inputs)
 
             print(f"[OK] ONNX inference works!")

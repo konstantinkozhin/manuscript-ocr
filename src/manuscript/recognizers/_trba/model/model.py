@@ -14,6 +14,47 @@ CNN_BACKBONES = {
 }
 
 
+class TextContextEncoder(nn.Module):
+    """Encodes preceding text context into a fixed-size vector.
+
+    Uses character embeddings followed by a unidirectional LSTM.
+    The last hidden state is projected to ``output_dim``.
+    When context is empty (all padding), returns a zero vector.
+    """
+
+    def __init__(
+        self,
+        num_chars: int,
+        embed_dim: int = 64,
+        hidden_dim: int = 128,
+        output_dim: int = 128,
+        pad_id: int = 0,
+    ):
+        super().__init__()
+        self.pad_id = pad_id
+        self.output_dim = output_dim
+        self.embedding = nn.Embedding(num_chars, embed_dim, padding_idx=pad_id)
+        self.rnn = nn.LSTM(embed_dim, hidden_dim, batch_first=True)
+        self.proj = nn.Linear(hidden_dim, output_dim)
+
+    def forward(self, context_ids: torch.Tensor) -> torch.Tensor:
+        """Encode context token ids into a vector.
+
+        Args:
+            context_ids: ``[B, L]`` token ids (0-padded).
+
+        Returns:
+            ``[B, output_dim]`` context vector (zeros when input is all-pad).
+        """
+        mask = (context_ids != self.pad_id).any(dim=1)  # [B]
+        emb = self.embedding(context_ids)  # [B, L, E]
+        _, (h_n, _) = self.rnn(emb)  # h_n: [1, B, H]
+        out = self.proj(h_n.squeeze(0))  # [B, D]
+        # Zero-out context for samples with no context
+        out = out * mask.unsqueeze(1).float()
+        return out
+
+
 class BidirectionalLSTM(nn.Module):
     def __init__(self, input_size, hidden_size, output_size):
         super().__init__()
@@ -33,20 +74,24 @@ class TRBAONNXWrapper(nn.Module):
     ONNX wrapper for TRBA model.
     """
     
-    def __init__(self, trba_model, max_length: int = 40):
+    def __init__(self, trba_model, max_length: int = 40, context_window: int = 0):
         """
         Args:
             trba_model: TRBAModel instance
             max_length: Maximum decoding length
+            context_window: Context token length (0 = no context)
         """
         super().__init__()
         self.model = trba_model
         self.max_length = max_length
+        self.context_window = context_window
+        self.use_context = context_window > 0 and trba_model.context_encoder is not None
         
-    def forward(self, x: torch.Tensor) -> torch.Tensor:
+    def forward(self, x: torch.Tensor, context_ids: Optional[torch.Tensor] = None) -> torch.Tensor:
         """
         Args:
             x: [B, 3, H, W] - input images
+            context_ids: [B, context_window] - context token ids (optional)
             
         Returns:
             logits: [B, max_length, num_classes] - logits for each position
@@ -56,7 +101,8 @@ class TRBAONNXWrapper(nn.Module):
             text=None,
             is_train=False,
             batch_max_length=self.max_length,
-            onnx_mode=True
+            onnx_mode=True,
+            context_ids=context_ids,
         )
         return logits
 
@@ -269,6 +315,9 @@ class TRBAModel(nn.Module):
         blank_id: Optional[int] = 3,
         enc_dropout_p: float = 0.1,
         use_ctc_head: bool = True,
+        context_dim: int = 0,
+        context_embed_dim: int = 64,
+        context_hidden_dim: int = 128,
     ):
         super().__init__()
 
@@ -279,6 +328,7 @@ class TRBAModel(nn.Module):
         self.img_w = img_w
         self.use_ctc_head = use_ctc_head
         self.cnn_backbone = cnn_backbone.lower()
+        self.context_dim = context_dim
 
         # ===== CNN Encoder =====
         backbone_cls = CNN_BACKBONES.get(self.cnn_backbone)
@@ -293,8 +343,20 @@ class TRBAModel(nn.Module):
             out_channels=cnn_out_channels,
         )
 
+        # ===== Text Context Encoder (optional) =====
+        if context_dim > 0:
+            self.context_encoder = TextContextEncoder(
+                num_chars=num_classes,
+                embed_dim=context_embed_dim,
+                hidden_dim=context_hidden_dim,
+                output_dim=context_dim,
+                pad_id=pad_id,
+            )
+        else:
+            self.context_encoder = None
+
         # ===== BiRNN Encoder =====
-        enc_dim = self.cnn.out_channels
+        enc_dim = self.cnn.out_channels + context_dim
 
         encoder_layers = []
         for i in range(num_encoder_layers):
@@ -326,7 +388,9 @@ class TRBAModel(nn.Module):
                 blank=blank_id, reduction="mean", zero_infinity=True
             )
 
-    def encode(self, x: torch.Tensor) -> torch.Tensor:
+    def encode(
+        self, x: torch.Tensor, context_ids: Optional[torch.Tensor] = None
+    ) -> torch.Tensor:
         # CNN
         f = self.cnn(x)  # [B, C, H', W']
 
@@ -335,6 +399,17 @@ class TRBAModel(nn.Module):
 
         # Permute for RNN
         f = f.permute(0, 2, 1)  # [B, W', C]
+
+        # Fuse text context if available
+        if self.context_encoder is not None and context_ids is not None:
+            ctx = self.context_encoder(context_ids)  # [B, D_ctx]
+            ctx = ctx.unsqueeze(1).expand(-1, f.size(1), -1)  # [B, W', D_ctx]
+            f = torch.cat([f, ctx], dim=2)  # [B, W', C + D_ctx]
+        elif self.context_encoder is not None:
+            # No context provided — pad with zeros
+            B, W_len = f.size(0), f.size(1)
+            zeros = torch.zeros(B, W_len, self.context_dim, device=f.device, dtype=f.dtype)
+            f = torch.cat([f, zeros], dim=2)  # [B, W', C + D_ctx]
 
         # BiRNN encoder 
         f = self.enc_rnn(f)  # [B, W', hidden_size]
@@ -349,6 +424,7 @@ class TRBAModel(nn.Module):
         is_train: bool = False,
         batch_max_length: int = 25,
         onnx_mode: bool = False,
+        context_ids: Optional[torch.Tensor] = None,
     ) -> Tuple[torch.Tensor, Optional[torch.Tensor]]:
         """
         Forward pass for Attention decoding.
@@ -359,12 +435,13 @@ class TRBAModel(nn.Module):
             is_train: training or inference mode
             batch_max_length: maximum sequence length
             onnx_mode: ONNX mode (always max_length steps)
+            context_ids: [B, L] preceding text context token ids (optional)
 
         Returns:
             logits: [B, T, num_classes]
             preds: [B, T] (inference only) or None
         """
-        enc_output = self.encode(x)  # [B, W, hidden_size]
+        enc_output = self.encode(x, context_ids=context_ids)  # [B, W, hidden_size]
 
         if is_train:
             assert text is not None, "text is required for training"
@@ -385,6 +462,7 @@ class TRBAModel(nn.Module):
         is_train: bool = True,
         batch_max_length: int = 25,
         onnx_mode: bool = False,
+        context_ids: Optional[torch.Tensor] = None,
     ) -> Dict[str, Any]:
         """
         Unified forward pass.
@@ -395,6 +473,7 @@ class TRBAModel(nn.Module):
             is_train: training mode
             batch_max_length: maximum sequence length
             onnx_mode: True for ONNX export (always max_length steps)
+            context_ids: [B, L] preceding text context token ids (optional)
 
         Returns:
             dict with keys:
@@ -404,7 +483,7 @@ class TRBAModel(nn.Module):
         """
         result: Dict[str, Any] = {}
         
-        enc_output = self.encode(x)
+        enc_output = self.encode(x, context_ids=context_ids)
 
         # CTC head
         if self.use_ctc_head:
