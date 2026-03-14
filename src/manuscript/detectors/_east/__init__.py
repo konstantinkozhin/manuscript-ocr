@@ -626,6 +626,7 @@ class EAST(BaseModel):
         resume_from: Optional[Union[str, Path]] = None,
         val_interval: int = 1,
         num_workers: int = 0,
+        log_collage: bool = True,
         device: Optional["torch.device"] = None,
     ) -> "torch.nn.Module":
         """
@@ -750,6 +751,9 @@ class EAST(BaseModel):
         num_workers : int, optional
             Number of worker processes for data loading. Set to 0 for single-process
             loading (safer on Windows). Default ``0``.
+        log_collage : bool, optional
+            Whether to generate and log validation collage images to TensorBoard.
+            Disable to save memory on GPUs with limited VRAM. Default ``True``.
         device : torch.device, optional
             CUDA or CPU device. Auto-selects if None.
 
@@ -1059,6 +1063,7 @@ class EAST(BaseModel):
             ),
             score_map_shrink_ratio=score_map_shrink_ratio,
             augmentation_config=aug_cfg,
+            log_collage=log_collage,
         )
         return best_model
 

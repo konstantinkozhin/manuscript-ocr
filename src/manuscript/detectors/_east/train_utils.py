@@ -227,6 +227,7 @@ def _run_training(
     resume_state_path: Optional[str] = None,
     score_map_shrink_ratio: Optional[float] = None,
     augmentation_config: Optional[Dict[str, Any]] = None,
+    log_collage: bool = True,
 ):
     experiment_dir = os.path.abspath(os.fspath(experiment_dir))
     log_dir = os.path.join(experiment_dir, "logs")
@@ -429,7 +430,11 @@ def _run_training(
     collage_samples = 4
 
     def make_collage(tag: str, epoch: int):
-        """Create validation collage with predictions from ONNX export."""
+        """Create validation collage with predictions."""
+        if not log_collage:
+            return
+        if device.type == "cuda":
+            torch.cuda.empty_cache()
         vis_model = ema_model if use_ema else model
         
         for ds_name, dataset in collage_sources:
@@ -452,7 +457,10 @@ def _run_training(
                 dataformats="HWC",
             )
 
-    make_collage("start", max(start_epoch - 1, 0))
+    try:
+        make_collage("start", max(start_epoch - 1, 0))
+    except Exception as e:
+        print(f"[WARNING] Collage creation failed (start): {e}")
 
     if start_epoch > num_epochs:
         print(
@@ -460,6 +468,45 @@ def _run_training(
         )
         writer.close()
         return ema_model if use_ema else model
+
+    # --- Pre-training validation (epoch 0) ---
+    pre_epoch = max(start_epoch - 1, 0)
+    model.eval()
+    if use_ema:
+        ema_model.eval()
+    eval_model_pre = ema_model if use_ema else model
+    pre_val_loss = 0.0
+    pre_val_batches = 0
+    pre_dice_sum = 0.0
+    pre_dice_count = 0
+    with torch.no_grad():
+        for ds_name, ds_loader in val_eval_loaders:
+            for imgs, tgt in ds_loader:
+                imgs = imgs.to(device)
+                gt_s = tgt["score_map"].to(device)
+                gt_g = tgt["geo_map"].to(device)
+                out = eval_model_pre(imgs)
+                ps = F.interpolate(
+                    out["score"], size=gt_s.shape[-2:],
+                    mode="bilinear", align_corners=False,
+                )
+                pg = F.interpolate(
+                    out["geometry"], size=gt_s.shape[-2:],
+                    mode="bilinear", align_corners=False,
+                )
+                batch_loss = criterion(gt_s, ps, gt_g, pg).item()
+                pre_val_loss += batch_loss
+                pre_val_batches += 1
+                dice_vals = dice_coefficient(ps, gt_s)
+                pre_dice_sum += dice_vals.sum().item()
+                pre_dice_count += dice_vals.numel()
+    avg_pre_val = pre_val_loss / max(pre_val_batches, 1)
+    pre_dice = pre_dice_sum / pre_dice_count if pre_dice_count > 0 else 0.0
+    writer.add_scalar("Loss/Val", avg_pre_val, pre_epoch)
+    writer.add_scalar("Dice/Val", pre_dice, pre_epoch)
+    print(f"Pre-training validation: Loss={avg_pre_val:.4f}, Dice={pre_dice:.4f}")
+    if device.type == "cuda":
+        torch.cuda.empty_cache()
 
     for epoch in range(start_epoch, num_epochs + 1):
         model.train()
@@ -664,7 +711,10 @@ def _run_training(
                     print(f"Early stopping at epoch {epoch}")
                     should_stop = True
 
-            make_collage("Predictions", epoch)
+            try:
+                make_collage("Predictions", epoch)
+            except Exception as e:
+                print(f"[WARNING] Collage creation failed at epoch {epoch}: {e}")
 
             if device.type == "cuda":
                 torch.cuda.empty_cache()
@@ -751,13 +801,13 @@ def _collage_batch(
         pg = out["geometry"][0].cpu().numpy().transpose(1, 2, 0)
 
         pred_quads = decode_quads_from_maps(
-            ps, pg, score_thresh=0.7, scale=1 / model.score_scale, quantization=1
+            ps, pg, score_thresh=0.6, scale=1 / model.score_scale, quantization=2
         )
         
         if len(pred_quads) > 0:
             pred_quads = locality_aware_nms(
                 pred_quads.astype(np.float32), 
-                iou_threshold=0.2,
+                iou_threshold=0.05,
                 iou_threshold_standard=0.05
             )
 

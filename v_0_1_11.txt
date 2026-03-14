@@ -211,5 +211,18 @@ Files:
 File:
 - src/manuscript/recognizers/_trba/__init__.py
 
+18) EAST training stability: collage crash fix, pre-training validation, and decode alignment (local)
+- Wrapped `make_collage` calls in try/except so collage failures no longer crash training.
+- Added `log_collage` parameter to `EAST.train(...)` (default True) to optionally disable collage generation.
+- Added `torch.cuda.empty_cache()` before collage creation to prevent CUDA OOM.
+- Aligned `decode_quads_from_maps` parameters in collage visualization with inference defaults
+  (score_thresh=0.6, quantization=2, iou_threshold=0.05) instead of aggressive values (0.7, 1, 0.2).
+- Added pre-training validation pass (epoch 0) that computes and logs Loss/Val and Dice/Val
+  before any weight updates, providing a baseline for comparing training progress.
+
+Files:
+- src/manuscript/detectors/_east/train_utils.py
+- src/manuscript/detectors/_east/__init__.py
+
 Summary:
 - v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fixes).
