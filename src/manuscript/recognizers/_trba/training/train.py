@@ -437,8 +437,16 @@ def visualize_predictions_tensorboard(
             img_np = (img_np.transpose(1, 2, 0) * 255).astype(np.uint8)
             img_pil = Image.fromarray(img_np)
 
-            # Добавляем область для текста
+            # Расширяем до минимальной ширины для читаемости текста
             img_h, img_w = img_pil.size[1], img_pil.size[0]
+            min_w = 450
+            if img_w < min_w:
+                padded = Image.new("RGB", (min_w, img_h), color=(255, 255, 255))
+                padded.paste(img_pil, (0, 0))
+                img_pil = padded
+                img_w = min_w
+
+            # Добавляем область для текста
             text_height = 85 if ctx_text else 60
             new_img = Image.new(
                 "RGB", (img_w, img_h + text_height), color=(255, 255, 255)
@@ -459,7 +467,9 @@ def visualize_predictions_tensorboard(
 
             y_offset = img_h + 5
             if ctx_text:
-                draw.text((5, y_offset), f"Ctx:  {ctx_text}", fill=(128, 128, 128), font=font)
+                # Показываем конец контекста (самый релевантный)
+                ctx_display = ctx_text if len(ctx_text) <= 40 else "..." + ctx_text[-37:]
+                draw.text((5, y_offset), f"Ctx:  {ctx_display}", fill=(128, 128, 128), font=font)
                 y_offset += 25
             draw.text((5, y_offset), f"GT:   {gt_text}", fill=color_gt, font=font)
             draw.text(
@@ -478,7 +488,7 @@ def visualize_predictions_tensorboard(
     # Создаем сетку
     grid = torchvision.utils.make_grid(
         images_with_text,
-        nrow=min(5, len(images_with_text)),
+        nrow=min(2, len(images_with_text)),
         padding=10,
         normalize=False,
         pad_value=1.0,
