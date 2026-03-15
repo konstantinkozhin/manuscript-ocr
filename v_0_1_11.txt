@@ -224,5 +224,88 @@ Files:
 - src/manuscript/detectors/_east/train_utils.py
 - src/manuscript/detectors/_east/__init__.py
 
+19) EAST training: dual best-model checkpoints and combined early stopping (local)
+- Best model is now saved to two separate files: `best_loss.pth` (lowest val loss) and `best_dice.pth` (highest val Dice).
+- Early stopping now triggers only when BOTH patience counters (`patience_loss` and `patience_dice`) reach `early_stop` epochs without improvement.
+- Resume (`last_state.pt`) now stores and restores `best_val_dice`, `patience_loss`, and `patience_dice` instead of single `patience`.
+- ONNX export at end of training uses `best_loss.pth` with fallback to `best_dice.pth`.
+- A console message is printed each time a new best checkpoint is saved, showing the metric value.
+
+File:
+- src/manuscript/detectors/_east/train_utils.py
+
+20) EAST augmentation expansion: 8 new augmentations (local)
+- Added 8 new augmentation methods to `EASTDataset`, all configurable via `augmentation_config` in `EAST.train`.
+
+Geometric (with quad coordinate transformation):
+- `vflip` — vertical flip (`vflip_prob=0.0` by default, off for documents).
+- `shear` — affine shear along X/Y axes (`shear_prob=0.15`, `shear_deg=5.0`).
+- `random_crop` — random crop + resize back to target_size (`random_crop_prob=0.2`, `random_crop_scale=(0.7,1.0)`).
+- `mosaic` — 4-image 2×2 mosaic with random center split (`mosaic_prob=0.0` by default, enable for scene/license-plate datasets).
+
+Photometric (no coordinate change):
+- `motion_blur` — directional motion blur at random angle (`motion_blur_prob=0.1`, `motion_blur_ksize_range=(3,9)`).
+- `hsv` — independent hue/saturation/value shift (`hsv_prob=0.15`, `hsv_h=0.015`, `hsv_s=0.3`, `hsv_v=0.2`).
+- `cutout` — random rectangular fill with mean color (`cutout_prob=0.15`, `cutout_num_holes=2`, `cutout_hole_size_range=(0.05,0.15)`).
+- `elastic` — elastic grid distortion via Gaussian-smoothed displacement fields (`elastic_prob=0.1`, `elastic_alpha=20.0`, `elastic_sigma=4.0`).
+- `fog` — directional fog gradient blending image with white mist (`fog_prob=0.1`, `fog_strength_range=(0.1,0.4)`, `fog_direction="random"`).
+  Directions: `top`, `bottom`, `left`, `right`, `random`. Simulates glare, mist, and uneven lighting typical in outdoor/mobile photography.
+
+All new augmentations are added to `list_augmentations()` and `preview_augmentation()`.
+Default probabilities are conservative — new augmentations do not degrade document/manuscript training out of the box.
+Mosaic is off (`0.0`) by default and should be enabled explicitly for mixed-scene or license-plate datasets.
+
+Files:
+- src/manuscript/detectors/_east/dataset.py
+- src/manuscript/detectors/_east/__init__.py
+
+21) EAST augmentation expansion: CutMix, RICAP, ResizeMix (local)
+- Added 3 mixing augmentations to `EASTDataset`, all off by default (`prob=0.0`) and configurable via
+  `augmentation_config` in `EAST.train`.
+- All three augmentations are **mutually exclusive per sample** — the first one that fires (by probability)
+  is applied; the rest are skipped. This preserves the expected sample distribution.
+
+CutMix (`cutmix_prob`, `cutmix_alpha`):
+- Cuts a rectangular patch from a randomly sampled second image and pastes it over the base image.
+- Patch size is proportional to √(1 − λ) where λ ~ Beta(alpha, alpha).
+- Label logic for quads:
+  - Base-image quads whose bounding box **overlaps** the cut region are discarded (conservative; avoids
+    partial-text labels).
+  - Second-image quads that fall **entirely inside** the cut region are added to the label set.
+- Default: `cutmix_prob=0.0`, `cutmix_alpha=1.0`.
+- Enable for scene/license-plate/mixed datasets where detecting partially occluded text is important.
+
+RICAP (`ricap_prob`, `ricap_beta`):
+- Randomly crops regions from 4 different images and assembles them into a single 2×2 grid at a
+  randomly sampled center split (Beta-distributed around 0.5).
+- Crop origin for each tile is randomly chosen inside the source image.
+- Label logic for quads:
+  - Each tile's quads are translated by (crop_origin → tile_canvas_offset).
+  - Only quads fully contained within their tile's canvas region are kept.
+- Default: `ricap_prob=0.0`, `ricap_beta=0.3`.
+- More aggressive spatial mixing than Mosaic; best for highly varied scene datasets.
+
+ResizeMix (`resizemix_prob`, `resizemix_scale_range`):
+- Downscales a second image to a small thumbnail (scale sampled uniformly from `resizemix_scale_range`)
+  and pastes it at a random location on the base image.
+- Preserves the entire source image context at a small scale (unlike CutMix which only copies a crop).
+- Label logic for quads:
+  - Base-image quads that do **not** overlap the paste region are kept.
+  - Second-image quads are scaled (by the resize factor) and offset into the paste location; only those
+    fully contained within the paste region are added.
+- Default: `resizemix_prob=0.0`, `resizemix_scale_range=(0.1, 0.8)`.
+- Useful for improving small-text detection generalization; the pasted thumbnail teaches scale invariance.
+
+Implementation notes:
+- All three methods return `None` (skip) when dataset has fewer than 2 images.
+- `list_augmentations()` now includes `"cutmix"`, `"ricap"`, `"resizemix"`.
+- `preview_augmentation(idx, name)` supports all three new names.
+- Mutual-exclusion ordering in `__getitem__`: mosaic → cutmix → ricap → resizemix (first hit wins).
+- No torchvision/external mixing libraries used — custom implementation for direct quad-label compatibility.
+
+Files:
+- src/manuscript/detectors/_east/dataset.py
+- src/manuscript/detectors/_east/__init__.py
+
 Summary:
 - v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fixes).
