@@ -8,7 +8,13 @@ from pathlib import Path
 from typing import Union, Optional, Dict, Any, List
 
 import torch
-import torch.cuda.amp as amp
+import torch.cuda.amp as amp  # noqa: F401 (scaler still uses cuda.amp.GradScaler)
+from torch.amp import autocast as _amp_autocast
+
+
+def _autocast():
+    """Совместимый autocast: использует torch.amp.autocast для подавления FutureWarning."""
+    return _amp_autocast("cuda")
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
@@ -1221,7 +1227,7 @@ def run_training(cfg: Config, device: str = "cuda"):
                         _imgs = _imgs.to(device, non_blocking=pin_memory)
                         _text_in = _text_in.to(device, non_blocking=pin_memory)
                         _target_y = _target_y.to(device, non_blocking=pin_memory)
-                        with amp.autocast():
+                        with _autocast():
                             _res = model(_imgs, text=_text_in, is_train=True, batch_max_length=max_len)
                             _al = criterion(
                                 _res["attention_logits"].reshape(-1, _res["attention_logits"].size(-1)),
@@ -1305,7 +1311,7 @@ def run_training(cfg: Config, device: str = "cuda"):
             lengths = lengths.to(device, non_blocking=pin_memory)
 
             optimizer.zero_grad(set_to_none=True)
-            with amp.autocast():
+            with _autocast():
                 # New unified API
                 result = model(
                     imgs,
@@ -1415,7 +1421,7 @@ def run_training(cfg: Config, device: str = "cuda"):
                         text_in = text_in.to(device, non_blocking=pin_memory)
                         target_y = target_y.to(device, non_blocking=pin_memory)
 
-                        with amp.autocast():
+                        with _autocast():
                             result = model(
                                 imgs,
                                 text=text_in,

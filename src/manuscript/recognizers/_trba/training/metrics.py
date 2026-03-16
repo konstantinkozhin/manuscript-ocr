@@ -45,8 +45,11 @@ def compute_cer(references: List[str], predictions: List[str]) -> float:
     """
     if len(references) == 0:
         return 0.0
+    # CER требует непустые строки; заменяем пустые на пробел
+    refs = [r if r else " " for r in references]
+    preds = [p if p else " " for p in predictions]
     metric = get_cer_metric()
-    return metric.compute(predictions=predictions, references=references)
+    return metric.compute(predictions=preds, references=refs)
 
 
 def compute_wer(references: List[str], predictions: List[str]) -> float:
@@ -62,8 +65,11 @@ def compute_wer(references: List[str], predictions: List[str]) -> float:
     """
     if len(references) == 0:
         return 0.0
+    # WER требует хотя бы одно слово в каждой строке; заменяем пустые на пробел
+    refs = [r if r else " " for r in references]
+    preds = [p if p else " " for p in predictions]
     metric = get_wer_metric()
-    return metric.compute(predictions=predictions, references=references)
+    return metric.compute(predictions=preds, references=refs)
 
 
 def compute_accuracy(references: List[str], predictions: List[str]) -> float:
