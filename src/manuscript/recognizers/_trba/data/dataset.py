@@ -12,6 +12,7 @@ from tqdm import tqdm
 from ....utils import read_image
 from .transforms import (
     build_file_index,
+    make_text_mosaic,
     pack_attention_targets,
 )
 
@@ -33,6 +34,9 @@ class OCRDatasetAttn(Dataset):
         validate_image: bool = True,
         max_len: Optional[int] = None,
         strict_max_len: bool = True,
+        text_mosaic_prob: float = 0.0,
+        text_mosaic_n_words: int = 2,
+        text_mosaic_gap_ratio: float = 0.15,
     ):
         self.images_dir = images_dir
         self.img_h = img_height
@@ -48,6 +52,9 @@ class OCRDatasetAttn(Dataset):
         self._validate_image = validate_image
         self._max_len = max_len
         self._strict_max_len = strict_max_len
+        self._text_mosaic_prob = float(text_mosaic_prob)
+        self._text_mosaic_n_words = max(2, int(text_mosaic_n_words))
+        self._text_mosaic_gap_ratio = float(text_mosaic_gap_ratio)
 
         self._reasons = {
             "bad_row": 0, "empty_fname": 0, "empty_label": 0,
@@ -89,6 +96,8 @@ class OCRDatasetAttn(Dataset):
             except Exception as e:
                 raise IndexError(f"Error reading image {abs_path}: {e}") from e
 
+            img, label = self._apply_text_mosaic(img, label)
+
             if self.transform:
                 augmented = self.transform(image=img)
                 tensor = augmented["image"]
@@ -115,6 +124,8 @@ class OCRDatasetAttn(Dataset):
                 attempts -= 1
                 continue
 
+            img, label = self._apply_text_mosaic(img, label)
+
             if self.transform:
                 augmented = self.transform(image=img)
                 tensor = augmented["image"]
@@ -123,6 +134,46 @@ class OCRDatasetAttn(Dataset):
             return tensor, label
 
         raise RuntimeError("Failed to fetch a valid sample after lazy validation retries.")
+
+    def _apply_text_mosaic(self, img, label: str):
+        """Склеить текущее слово с N-1 случайными словами из датасета горизонтально.
+
+        Возвращает (img_mosaic, label_concat) или исходные (img, label), если
+        мозаика не применяется (вероятность не выпала или датасет слишком мал).
+        """
+        import numpy as np
+
+        if self._text_mosaic_prob <= 0.0 or not self.samples:
+            return img, label
+        if random.random() > self._text_mosaic_prob:
+            return img, label
+        if len(self.samples) < 2:
+            return img, label
+
+        images = [img]
+        labels = [label]
+
+        for _ in range(self._text_mosaic_n_words - 1):
+            other_idx = random.randrange(len(self.samples))
+            other_path, other_label = self.samples[other_idx]
+            try:
+                other_img = read_image(other_path)
+            except Exception:
+                continue
+            # Проверяем, что объединённая метка не превысит max_len
+            combined = label + " " + " ".join(labels[1:] + [other_label]) if len(labels) > 1 \
+                else label + " " + other_label
+            if self._max_len is not None and len(combined) > self._max_len:
+                continue
+            images.append(other_img)
+            labels.append(other_label)
+
+        if len(images) < 2:
+            return img, label
+
+        mosaic_img = make_text_mosaic(images, gap_ratio=self._text_mosaic_gap_ratio)
+        mosaic_label = " ".join(labels)
+        return mosaic_img, mosaic_label
 
     def _mark_sample_invalid(self, idx: int, abs_path: str, error: Exception):
         self._invalid_mask[idx] = True

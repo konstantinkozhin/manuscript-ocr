@@ -617,6 +617,11 @@ def run_training(cfg: Config, device: str = "cuda"):
     max_len = getattr(cfg, "max_len", 25)
     hidden_size = getattr(cfg, "hidden_size", 256)
 
+    # text mosaic
+    text_mosaic_prob = float(getattr(cfg, "text_mosaic_prob", 0.0))
+    text_mosaic_n_words = int(getattr(cfg, "text_mosaic_n_words", 2))
+    text_mosaic_gap_ratio = float(getattr(cfg, "text_mosaic_gap_ratio", 0.15))
+
     # оптимизация
     batch_size = getattr(cfg, "batch_size", 32)
     epochs = getattr(cfg, "epochs", 20)
@@ -965,6 +970,9 @@ def run_training(cfg: Config, device: str = "cuda"):
                     encoding=encoding,
                     max_len=max_len,
                     strict_max_len=True,
+                    text_mosaic_prob=text_mosaic_prob,
+                    text_mosaic_n_words=text_mosaic_n_words,
+                    text_mosaic_gap_ratio=text_mosaic_gap_ratio,
                 )
                 val_ds = OCRDatasetAttn(
                     val_csvs[i],
@@ -990,6 +998,9 @@ def run_training(cfg: Config, device: str = "cuda"):
                     encoding=encoding,
                     max_len=max_len,
                     strict_max_len=True,
+                    text_mosaic_prob=text_mosaic_prob,
+                    text_mosaic_n_words=text_mosaic_n_words,
+                    text_mosaic_gap_ratio=text_mosaic_gap_ratio,
                 )
                 n_val = min(3000 if val_size is None else val_size, len(full_ds))
                 n_train = len(full_ds) - n_val
