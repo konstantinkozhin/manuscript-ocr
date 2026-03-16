@@ -307,5 +307,118 @@ Files:
 - src/manuscript/detectors/_east/dataset.py
 - src/manuscript/detectors/_east/__init__.py
 
+22) EAST dataset: NaN guard and augmentation pipeline fixes (local)
+- All non-mixing augmentations (geometric + photometric) now always run after mixing augmentations,
+  so vflip/shear/random_crop/etc. work together with mosaic/cutmix/ricap/resizemix in the same sample.
+- Factored sample-building logic into `_build_sample()` for clarity.
+- Added `__getitem__` retry wrapper (`_MAX_RETRIES=3`):
+  - If NaN or Inf is detected in the image tensor or any target map, the sample is retried with a
+    randomly chosen index (up to 3 times).
+  - If all retries fail, a zero-filled dummy sample is returned instead of crashing the DataLoader.
+  - Each failure emits a `UserWarning` so problems are visible in logs without stopping training.
+- Added `_has_nan()` and `_sample_is_valid()` static helpers for tensor/array NaN detection.
+- Fixed `shrink_poly()` NaN safety:
+  - Threshold for `n_avg` normalization raised from `> 0` to `> 1e-6` to avoid division by near-zero.
+  - If the result contains NaN after shrink, original (unshrunk) polygon is returned as fallback.
+- Fixed `compute_quad_maps()` NaN safety:
+  - Each quad is wrapped in try/except; a single bad quad is skipped with a warning, not crashing.
+  - Explicit NaN/Inf guards around `shrunk`, `coords`, and `dx/dy` geometry offsets.
+  - Final `np.nan_to_num()` applied to both `score_map` and `geo_map` as belt-and-suspenders.
+
+Files:
+- src/manuscript/detectors/_east/dataset.py
+
+23) TRBA recognizer: expanded augmentation pipeline, TensorBoard previews, epoch-0 baseline (local)
+
+Major update to the TRBA word-level OCR training pipeline.
+
+Augmentation pipeline (src/manuscript/recognizers/_trba/data/transforms.py):
+- Replaced 4-step albumentations pipeline with a full 20-step pipeline in the recommended OCR order.
+- All probabilities and strengths are configurable via the same `params` dict passed to
+  `get_train_transform`, with safe defaults in `DEFAULT_AUG_PARAMS`.
+- All augmentations are independent (each fires based on its own probability).
+
+New augmentations added (all are new custom ImageOnlyTransform subclasses):
+
+Detector-noise simulation (important for real-world OCR):
+- `RandomZoomOut` (p=0.25): shrinks text inside the crop box, simulates detector adding padding.
+  `zoom_out_scale_min=0.65`, `zoom_out_scale_max=1.0`
+- `RandomZoomIn` (p=0.2): zooms in — characters near edges may be clipped.
+  `zoom_in_scale_min=1.0`, `zoom_in_scale_max=1.25`
+- `BBoxJitter` (p=0.25): random shift/crop simulating bbox misalignment from detector.
+  `bbox_jitter_offset=0.12`
+
+Geometric:
+- `A.Perspective` (p=0.25): perspective warp via albumentations.
+  `perspective_scale_min=0.02`, `perspective_scale_max=0.05`
+- `TextWarp` (p=0.2): sinusoidal warp — simulates curved pages, banners, signboards.
+  `text_warp_strength=0.03`
+
+Morphology:
+- `StrokeWidthPerturbation` (p=0.1): random erosion or dilation — varies stroke width.
+  `stroke_kernel_min=1`, `stroke_kernel_max=2`
+
+Photometric (expanded):
+- `A.RandomGamma` (p=0.2): gamma correction. `gamma_min=70`, `gamma_max=150`
+- `A.InvertImg` (p=0.08): inversion (was 0.0 before — now active by default)
+- `A.RandomBrightnessContrast` unchanged (p=0.3)
+
+Blur (expanded):
+- `A.GaussianBlur` (p=0.2): gaussian blur.
+- `A.MotionBlur` (p=0.15): directional motion blur.
+
+Noise (expanded):
+- `GaussianNoiseCustom` (p=0.2): gaussian noise, std sampled from `[std_min, std_max] * 255`.
+  `gauss_noise_std_min=0.01`, `gauss_noise_std_max=0.03`
+- `SaltPepperNoise` (p=0.1): salt-and-pepper noise.
+  `salt_pepper_amount_min=0.001`, `salt_pepper_amount_max=0.005`
+
+Compression / resolution:
+- `A.ImageCompression` (JPEG, p=0.15): `jpeg_quality_min=60`, `jpeg_quality_max=95`
+- `DownscaleUpscale` (p=0.2): downscale then upscale — simulates low-resolution text.
+  `downscale_min=0.5`, `downscale_max=0.9`
+
+Occlusion:
+- `RandomErasing` (p=0.1): fill random rectangles with mean color.
+  `erasing_holes=2`, `erasing_size_min=0.05`, `erasing_size_max=0.15`
+
+Text Mosaic (new augmentation concept):
+- `make_text_mosaic(images, gap_ratio=0.2)`: horizontally concatenates 2–3 word crop images
+  with a white gap equal to `gap_ratio` of the average image height (default 20% of height).
+  This can be used in a custom dataset wrapper to create synthetic compound words / phrases
+  from individual word crops.  Listed in `list_augmentations()` as `"text_mosaic"`.
+
+Utilities added:
+- `DEFAULT_AUG_PARAMS` dict: single source of truth for all default values.
+- `list_augmentations()`: returns ordered list of all augmentation names.
+- `preview_augmentation(img, name, params)`: apply a single named augmentation to a numpy image
+  without normalization/tensor conversion — useful for notebook visualization.
+
+TensorBoard preview (src/manuscript/recognizers/_trba/training/train.py):
+- Added `log_augmentation_previews_tensorboard(...)` function: logs a grid of ``num_samples``
+  examples for every augmentation under `Augmentations/<name>` at step 0.
+- Called automatically once at the start of training (epoch=0), only on fresh runs (not resume).
+
+Epoch-0 baseline validation:
+- Before the first weight update, a full validation pass is run on all validation loaders.
+- Metrics (val_loss, accuracy, CER, WER) are written to TensorBoard at step 0, so the baseline
+  is visible on the same plots as training progress.
+- Wrapped in try/except — a failing baseline never blocks training.
+
+Files:
+- src/manuscript/recognizers/_trba/data/transforms.py
+- src/manuscript/recognizers/_trba/training/train.py
+
+Albumentations 2.x compatibility (local):
+- Replaced deprecated `A.ShiftScaleRotate` (removed in albumentations 2.x) with equivalent
+  `A.Affine(translate_percent=..., scale=..., rotate=...)` in both `get_train_transform` and
+  `preview_augmentation`.
+- Replaced deprecated `value=` kwarg of `A.ShiftScaleRotate` / `fill=` of `A.Affine` and
+  `pad_val=` of `A.Perspective` with the new `fill=` keyword.
+- Replaced deprecated `quality_lower` / `quality_upper` kwargs of `A.ImageCompression` with
+  the new `quality_range=(low, high)` tuple argument.
+- All changes are backwards-compatible with albumentations ≥ 1.3 when using the `fill` name
+  but specifically tested against albumentations 2.0.8.
+
 Summary:
 - v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fixes).

@@ -48,11 +48,17 @@ def shrink_poly(poly, shrink_ratio=0.3):
         n2 = sign * np.array([edge2[1], -edge2[0]]) / (len2 + 1e-6)
         n_avg = n1 + n2
         norm_n = np.linalg.norm(n_avg)
-        if norm_n > 0:
+        if norm_n > 1e-6:
             n_avg /= norm_n
+        else:
+            n_avg = np.zeros(2, dtype=np.float32)
         offset = shrink_ratio * min(len1, len2)
         new_poly[i] = p_curr - offset * n_avg
-    return new_poly.astype(np.float32)
+    result = new_poly.astype(np.float32)
+    # Safety: if somehow NaN crept in, return original poly unchanged
+    if not np.all(np.isfinite(result)):
+        return poly.astype(np.float32)
+    return result
 
 
 class EASTDataset(Dataset):
@@ -790,6 +796,29 @@ class EASTDataset(Dataset):
         img, quads = self._apply_vflip(img, quads)
         return img, quads
 
+    # ------------------------------------------------------------------
+    # NaN / sanity guard helpers
+    # ------------------------------------------------------------------
+
+    @staticmethod
+    def _has_nan(tensor) -> bool:
+        """Return True if a torch.Tensor or np.ndarray contains any NaN / Inf."""
+        if isinstance(tensor, np.ndarray):
+            return bool(np.any(~np.isfinite(tensor)))
+        try:
+            return bool((~torch.isfinite(tensor)).any().item())
+        except Exception:
+            return False
+
+    def _sample_is_valid(self, img_tensor, target: dict) -> bool:
+        """Quick sanity-check: no NaN/Inf in image tensor or map targets."""
+        if self._has_nan(img_tensor):
+            return False
+        for v in target.values():
+            if self._has_nan(v):
+                return False
+        return True
+
     def _apply_gaussian_blur(self, img, force: bool = False):
         if not self._should_apply(self.blur_prob, force):
             return img
@@ -1147,29 +1176,77 @@ class EASTDataset(Dataset):
         return len(self.image_ids)
 
     def __getitem__(self, idx):
-        # Mixing augmentations: try each in order; the first one that fires wins.
-        # Only one mixing augmentation is applied per sample (mutual exclusion via
-        # sequential early-exit).
-        mixing_result = None
+        # NaN-safe wrapper: if any augmentation produces NaN/Inf, fall back to a
+        # clean sample (load raw image, no augmentations) up to _MAX_RETRIES times.
+        # If all retries fail, return a zero-filled dummy sample rather than crashing.
+        _MAX_RETRIES = 3
+        for _attempt in range(_MAX_RETRIES + 1):
+            try:
+                img_tensor, target = self._build_sample(idx)
+                if self._sample_is_valid(img_tensor, target):
+                    return img_tensor, target
+                # NaN detected — fall through to retry with a different index or clean load
+                warnings.warn(
+                    f"EASTDataset[{idx}]: NaN/Inf detected in sample "
+                    f"(attempt {_attempt + 1}/{_MAX_RETRIES}), retrying with fallback.",
+                    UserWarning,
+                )
+                # On subsequent retries pick a random other index
+                if _attempt < _MAX_RETRIES:
+                    idx = np.random.randint(0, len(self.image_ids))
+            except Exception as e:  # noqa: BLE001
+                warnings.warn(
+                    f"EASTDataset[{idx}]: exception during augmentation "
+                    f"(attempt {_attempt + 1}/{_MAX_RETRIES}): {e}",
+                    UserWarning,
+                )
+                if _attempt < _MAX_RETRIES:
+                    idx = np.random.randint(0, len(self.image_ids))
+
+        # All retries exhausted — return a zero dummy to keep the DataLoader alive
+        warnings.warn(
+            f"EASTDataset: all {_MAX_RETRIES} retries failed, returning dummy sample.",
+            UserWarning,
+        )
+        ts = self.target_size
+        out_hw = int(ts * self.score_geo_scale)
+        dummy_img = torch.zeros(3, ts, ts, dtype=torch.float32)
+        dummy_target = {
+            "score_map": torch.zeros(1, out_hw, out_hw, dtype=torch.float32),
+            "geo_map": torch.zeros(8, out_hw, out_hw, dtype=torch.float32),
+            "quads": torch.zeros(0, 8, dtype=torch.float32),
+        }
+        return dummy_img, dummy_target
+
+    def _build_sample(self, idx):
+        """Core sample-building logic (without NaN retry wrapper)."""
+        # ── Mixing augmentations ──────────────────────────────────────────────
+        # Each mixing aug is independent: all enabled ones can fire in the same
+        # sample.  Apply them in order: mosaic → cutmix → ricap → resizemix.
+        # The first one that fires determines the base image+quads; subsequent
+        # ones are applied on top (they too may or may not fire based on their
+        # probabilities).
+        img_resized, quads = self._load_image_and_quads(idx)
+
         for _apply_mixing in (
             self._apply_mosaic,
             self._apply_cutmix,
             self._apply_ricap,
             self._apply_resizemix,
         ):
-            mixing_result = _apply_mixing(idx)
-            if mixing_result is not None:
-                break
+            result = _apply_mixing(idx)
+            if result is not None:
+                img_resized, quads = result
+                break  # one mixing per sample is enough — avoids compounding distortions
 
-        if mixing_result is not None:
-            img_resized, quads = mixing_result
-        else:
-            img_resized, quads = self._load_image_and_quads(idx)
-
+        # ── Geometric augmentations (all applied independently) ───────────────
         img_resized, quads = self._apply_geometric_augments(img_resized, quads)
-        img_resized = self._apply_photometric_augments(img_resized)
 
-        # Convert quads to the format expected by visualization (N, 8)
+        # ── Photometric augmentations (all applied independently) ─────────────
+        img_resized = self._apply_photometric_augments(img_resized)
+        img_resized = self._ensure_uint8(img_resized)
+
+        # Convert quads to (N, 8) array
         if quads:
             quads_array = np.stack(
                 [q.flatten() for q in quads], axis=0
@@ -1192,17 +1269,41 @@ class EASTDataset(Dataset):
         score_map = np.zeros((out_h, out_w), dtype=np.float32)
         geo_map = np.zeros((8, out_h, out_w), dtype=np.float32)
         for quad in quads:
-            quad = order_vertices_clockwise(quad)
-            shrunk = shrink_poly(quad, shrink_ratio=self.shrink_ratio)
-            coords = shrunk * self.score_geo_scale
-            rr, cc = skimage.draw.polygon(
-                coords[:, 1], coords[:, 0], shape=(out_h, out_w)
-            )
-            if len(rr) == 0:
-                continue
-            score_map[rr, cc] = 1
+            try:
+                quad = order_vertices_clockwise(quad)
+                shrunk = shrink_poly(quad, shrink_ratio=self.shrink_ratio)
 
-            for i, (vx, vy) in enumerate(coords):
-                geo_map[2 * i, rr, cc] = vx - cc
-                geo_map[2 * i + 1, rr, cc] = vy - rr
+                # Guard: skip quad if shrink produced NaN/Inf
+                if not np.all(np.isfinite(shrunk)):
+                    continue
+
+                coords = shrunk * self.score_geo_scale
+
+                # Guard: skip degenerate quads (all points identical / zero area)
+                if not np.all(np.isfinite(coords)):
+                    continue
+
+                rr, cc = skimage.draw.polygon(
+                    coords[:, 1], coords[:, 0], shape=(out_h, out_w)
+                )
+                if len(rr) == 0:
+                    continue
+                score_map[rr, cc] = 1
+
+                for i, (vx, vy) in enumerate(coords):
+                    dx = vx - cc
+                    dy = vy - rr
+                    # Guard: skip NaN geometry offsets
+                    if not (np.all(np.isfinite(dx)) and np.all(np.isfinite(dy))):
+                        continue
+                    geo_map[2 * i, rr, cc] = dx
+                    geo_map[2 * i + 1, rr, cc] = dy
+            except Exception as e:  # noqa: BLE001
+                # Single bad quad should never kill the whole sample
+                warnings.warn(f"compute_quad_maps: skipping quad due to error: {e}", UserWarning)
+                continue
+
+        # Final NaN clamp — belt-and-suspenders
+        np.nan_to_num(score_map, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
+        np.nan_to_num(geo_map, copy=False, nan=0.0, posinf=0.0, neginf=0.0)
         return score_map, geo_map

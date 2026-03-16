@@ -26,6 +26,10 @@ from ..data.transforms import (
     get_train_transform,
     get_val_transform,
     load_charset,
+    list_augmentations,
+    preview_augmentation,
+    make_text_mosaic,
+    DEFAULT_AUG_PARAMS,
 )
 from .metrics import compute_cer, compute_wer, compute_accuracy
 from ..model.model import TRBAModel
@@ -464,6 +468,115 @@ def visualize_predictions_tensorboard(
     tag = f"Predictions/{mode}"
     if epoch is not None:
         writer.add_image(tag, grid, epoch)
+
+
+def log_augmentation_previews_tensorboard(
+    val_loader: DataLoader,
+    writer: SummaryWriter,
+    aug_params: dict,
+    img_h: int,
+    img_w: int,
+    num_samples: int = 4,
+    epoch: int = 0,
+    logger=None,
+) -> None:
+    """Log a grid of augmentation previews to TensorBoard.
+
+    For each augmentation in ``list_augmentations()``, takes ``num_samples``
+    raw images from ``val_loader`` (before any transform), applies the
+    augmentation + ResizeAndPadA, and writes a grid image to TensorBoard
+    under ``Augmentations/<name>``.
+
+    Parameters
+    ----------
+    val_loader : DataLoader
+        DataLoader; raw images are extracted from first few batches.
+    writer : SummaryWriter
+        TensorBoard writer.
+    aug_params : dict
+        Augmentation parameters (same keys as DEFAULT_AUG_PARAMS).
+    img_h, img_w : int
+        Target image size for ResizeAndPadA.
+    num_samples : int
+        Number of example images per augmentation.
+    epoch : int
+        Step tag written to TensorBoard.
+    logger : optional Logger
+    """
+    import numpy as np
+    import torchvision
+
+    try:
+        from ..data.transforms import (
+            ResizeAndPadA,
+            preview_augmentation,
+            list_augmentations,
+        )
+    except Exception as e:
+        if logger:
+            logger.warning(f"log_augmentation_previews_tensorboard: import failed: {e}")
+        return
+
+    if ResizeAndPadA is None:
+        return
+
+    resize_pad = ResizeAndPadA(img_h=img_h, img_w=img_w)
+
+    # Collect raw numpy images from the loader (images before transform)
+    raw_images = []
+    for batch in val_loader:
+        imgs_t = batch[0]  # (B, C, H, W) tensors already transformed
+        # Denormalize back to uint8 for preview
+        imgs_np = imgs_t.cpu().numpy()  # (B, C, H, W) float in [-1, 1]
+        imgs_np = (imgs_np * 0.5 + 0.5)  # → [0, 1]
+        imgs_np = np.clip(imgs_np * 255, 0, 255).astype(np.uint8)
+        imgs_np = imgs_np.transpose(0, 2, 3, 1)  # → (B, H, W, C)
+        for img in imgs_np:
+            raw_images.append(img)
+            if len(raw_images) >= num_samples:
+                break
+        if len(raw_images) >= num_samples:
+            break
+
+    if not raw_images:
+        return
+
+    aug_names = list_augmentations()
+    logged = 0
+    for aug_name in aug_names:
+        try:
+            aug_imgs = []
+            for img in raw_images[:num_samples]:
+                try:
+                    aug_img = preview_augmentation(img, aug_name, aug_params)
+                    # Resize/pad for uniform grid size
+                    aug_img = resize_pad.apply(aug_img)
+                except Exception:
+                    aug_img = resize_pad.apply(img.copy())
+                # To tensor CHW float [0, 1]
+                t = np.ascontiguousarray(aug_img).transpose(2, 0, 1).astype(np.float32) / 255.0
+                aug_imgs.append(t)
+
+            if not aug_imgs:
+                continue
+
+            import torch as _torch
+            grid_tensors = [_torch.from_numpy(t) for t in aug_imgs]
+            grid = torchvision.utils.make_grid(
+                grid_tensors,
+                nrow=len(grid_tensors),
+                padding=4,
+                normalize=False,
+                pad_value=1.0,
+            )
+            writer.add_image(f"Augmentations/{aug_name}", grid, epoch)
+            logged += 1
+        except Exception as ex:
+            if logger:
+                logger.warning(f"log_augmentation_previews: '{aug_name}' failed: {ex}")
+
+    if logger:
+        logger.info(f"Logged augmentation previews to TensorBoard: {logged} augmentations")
 
 
 def run_training(cfg: Config, device: str = "cuda"):
@@ -1051,6 +1164,73 @@ def run_training(cfg: Config, device: str = "cuda"):
         logger.info(
             f"Resumed from: {resume_from} (epoch={start_epoch-1}, step={global_step})"
         )
+
+    # ── Augmentation previews (logged once before training) ──────────────────
+    if start_epoch == 1 and val_loaders_individual:
+        try:
+            logger.info("Logging augmentation previews to TensorBoard...")
+            log_augmentation_previews_tensorboard(
+                val_loader=val_loaders_individual[0],
+                writer=writer,
+                aug_params=cfg.__dict__,
+                img_h=img_h,
+                img_w=img_w,
+                num_samples=4,
+                epoch=0,
+                logger=logger,
+            )
+        except Exception as _aug_prev_err:
+            logger.warning(f"Augmentation preview logging failed: {_aug_prev_err}")
+
+    # ── Epoch-0 baseline validation (before any weight updates) ─────────────
+    if start_epoch == 1 and val_loaders_individual:
+        logger.info("Running epoch-0 baseline validation (before training)...")
+        try:
+            model.eval()
+            torch.cuda.empty_cache()
+            _ctc_w0 = get_ctc_weight_for_epoch(
+                0, ctc_weight_initial, ctc_weight_decay_epochs, ctc_weight_min
+            )
+            _total_loss0 = 0.0
+            _total_samples0 = 0
+            _all_refs0, _all_hyps0 = [], []
+            with torch.no_grad():
+                for _vl in val_loaders_individual:
+                    for _imgs, _text_in, _target_y, _lengths in _vl:
+                        _imgs = _imgs.to(device, non_blocking=pin_memory)
+                        _text_in = _text_in.to(device, non_blocking=pin_memory)
+                        _target_y = _target_y.to(device, non_blocking=pin_memory)
+                        with amp.autocast():
+                            _res = model(_imgs, text=_text_in, is_train=True, batch_max_length=max_len)
+                            _al = criterion(_res["attention_logits"].reshape(-1, _res["attention_logits"].size(-1)), _target_y.reshape(-1))
+                            _cl = model.compute_ctc_loss(_res["ctc_logits"], _target_y, _lengths)
+                            _loss = (1 - _ctc_w0) * _al + _ctc_w0 * _cl
+                        _total_loss0 += float(_loss.item())
+                        _total_samples0 += 1
+                        # decode
+                        _res2 = model(_imgs, is_train=False, batch_max_length=max_len)
+                        for _ti, _pi in zip(_target_y.cpu(), _res2["attention_preds"].cpu()):
+                            _all_refs0.append(decode_tokens(_ti, itos, PAD, EOS, BLANK))
+                            _all_hyps0.append(decode_tokens(_pi, itos, PAD, EOS, BLANK))
+                        del _imgs, _text_in, _target_y
+
+            _avg_loss0 = _total_loss0 / max(1, _total_samples0)
+            _acc0 = sum(r == h for r, h in zip(_all_refs0, _all_hyps0)) / max(1, len(_all_refs0))
+            _cer0 = compute_cer(_all_refs0, _all_hyps0) if _all_refs0 else 0.0
+            _wer0 = compute_wer(_all_refs0, _all_hyps0) if _all_refs0 else 0.0
+
+            writer.add_scalar("Loss/val_epoch", _avg_loss0, 0)
+            writer.add_scalar("Accuracy/val_attention", _acc0, 0)
+            writer.add_scalar("CER/val_attention", _cer0, 0)
+            writer.add_scalar("WER/val_attention", _wer0, 0)
+
+            logger.info(
+                f"Epoch 000 baseline | val_loss={_avg_loss0:.4f} | "
+                f"acc={_acc0:.4f} | CER={_cer0:.4f} | WER={_wer0:.4f}"
+            )
+            torch.cuda.empty_cache()
+        except Exception as _e0:
+            logger.warning(f"Epoch-0 baseline validation failed: {_e0}")
 
     # --- training loop ---
     for epoch in range(start_epoch, epochs + 1):
