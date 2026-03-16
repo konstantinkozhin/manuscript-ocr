@@ -663,7 +663,7 @@ def list_augmentations():
 # Text Mosaic: horizontal word concatenation
 # ──────────────────────────────────────────────────────────────────
 
-def make_text_mosaic(images, gap_ratio=0.2):
+def make_text_mosaic(images, gap_ratio=None):
     """Concatenate 2–3 word-crop images horizontally with a white gap.
 
     Parameters
@@ -671,9 +671,10 @@ def make_text_mosaic(images, gap_ratio=0.2):
     images : list of np.ndarray
         List of RGB uint8 word images (can have different sizes).
         Typically 2 or 3 items.
-    gap_ratio : float
-        Gap width as a fraction of the average image height.
-        Default 0.2 (20% of height).
+    gap_ratio : float or None
+        Gap width as a fraction of the image height.
+        If None (default), a random value in [0.03, 0.05] is sampled each call,
+        simulating natural inter-word spacing variation.
 
     Returns
     -------
@@ -695,6 +696,9 @@ def make_text_mosaic(images, gap_ratio=0.2):
             img = cv2.resize(img, (new_w, max_h), interpolation=cv2.INTER_LINEAR)
         resized.append(img)
 
+    # Рандомный пробел между словами: от 3% до 5% высоты (имитирует реальный межсловный интервал)
+    if gap_ratio is None:
+        gap_ratio = np.random.uniform(0.03, 0.05)
     gap_w = max(1, int(max_h * gap_ratio))
     gap = np.full((max_h, gap_w, 3), 255, dtype=np.uint8)
 

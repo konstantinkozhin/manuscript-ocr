@@ -617,10 +617,13 @@ def run_training(cfg: Config, device: str = "cuda"):
     max_len = getattr(cfg, "max_len", 25)
     hidden_size = getattr(cfg, "hidden_size", 256)
 
-    # text mosaic
-    text_mosaic_prob = float(getattr(cfg, "text_mosaic_prob", 0.0))
+    # text mosaic (включён по умолчанию: 3% сэмплов получают мозаику из 2 слов)
+    text_mosaic_prob = float(getattr(cfg, "text_mosaic_prob", 0.03))
     text_mosaic_n_words = int(getattr(cfg, "text_mosaic_n_words", 2))
-    text_mosaic_gap_ratio = float(getattr(cfg, "text_mosaic_gap_ratio", 0.15))
+    # gap_ratio=None → make_text_mosaic сам рандомит 3–5% на каждый вызов
+    text_mosaic_gap_ratio = getattr(cfg, "text_mosaic_gap_ratio", None)
+    if text_mosaic_gap_ratio is not None:
+        text_mosaic_gap_ratio = float(text_mosaic_gap_ratio)
 
     # оптимизация
     batch_size = getattr(cfg, "batch_size", 32)
@@ -1202,33 +1205,66 @@ def run_training(cfg: Config, device: str = "cuda"):
             _ctc_w0 = get_ctc_weight_for_epoch(
                 0, ctc_weight_initial, ctc_weight_decay_epochs, ctc_weight_min
             )
+
             _total_loss0 = 0.0
             _total_samples0 = 0
-            _all_refs0, _all_hyps0 = [], []
-            with torch.no_grad():
-                for _vl in val_loaders_individual:
+            _agg_refs0: List[str] = []
+            _agg_hyps0: List[str] = []
+
+            for _i0, _vl in enumerate(val_loaders_individual):
+                _loss_set = 0.0
+                _refs_set: List[str] = []
+                _hyps_set: List[str] = []
+
+                with torch.no_grad():
                     for _imgs, _text_in, _target_y, _lengths in _vl:
                         _imgs = _imgs.to(device, non_blocking=pin_memory)
                         _text_in = _text_in.to(device, non_blocking=pin_memory)
                         _target_y = _target_y.to(device, non_blocking=pin_memory)
                         with amp.autocast():
                             _res = model(_imgs, text=_text_in, is_train=True, batch_max_length=max_len)
-                            _al = criterion(_res["attention_logits"].reshape(-1, _res["attention_logits"].size(-1)), _target_y.reshape(-1))
+                            _al = criterion(
+                                _res["attention_logits"].reshape(-1, _res["attention_logits"].size(-1)),
+                                _target_y.reshape(-1),
+                            )
                             _cl = model.compute_ctc_loss(_res["ctc_logits"], _target_y, _lengths)
                             _loss = (1 - _ctc_w0) * _al + _ctc_w0 * _cl
-                        _total_loss0 += float(_loss.item())
-                        _total_samples0 += 1
+                        _loss_set += float(_loss.item())
                         # decode
                         _res2 = model(_imgs, is_train=False, batch_max_length=max_len)
                         for _ti, _pi in zip(_target_y.cpu(), _res2["attention_preds"].cpu()):
-                            _all_refs0.append(decode_tokens(_ti, itos, PAD, EOS, BLANK))
-                            _all_hyps0.append(decode_tokens(_pi, itos, PAD, EOS, BLANK))
+                            _r = decode_tokens(_ti, itos, PAD, EOS, BLANK)
+                            _h = decode_tokens(_pi, itos, PAD, EOS, BLANK)
+                            _refs_set.append(_r)
+                            _hyps_set.append(_h)
                         del _imgs, _text_in, _target_y
 
+                _avg_loss_set = _loss_set / max(1, len(_vl))
+                _acc_set = sum(r == h for r, h in zip(_refs_set, _hyps_set)) / max(1, len(_refs_set))
+                _cer_set = compute_cer(_refs_set, _hyps_set) if _refs_set else 0.0
+                _wer_set = compute_wer(_refs_set, _hyps_set) if _refs_set else 0.0
+
+                writer.add_scalar(f"Loss/val_set_{_i0}", _avg_loss_set, 0)
+                writer.add_scalar(f"Accuracy/val_set_{_i0}", _acc_set, 0)
+                writer.add_scalar(f"CER/val_set_{_i0}", _cer_set, 0)
+                writer.add_scalar(f"WER/val_set_{_i0}", _wer_set, 0)
+
+                logger.info(
+                    f"Epoch 000 baseline | set_{_i0} | loss={_avg_loss_set:.4f} | "
+                    f"acc={_acc_set:.4f} | CER={_cer_set:.4f} | WER={_wer_set:.4f}"
+                )
+
+                _total_loss0 += _loss_set
+                _total_samples0 += len(_vl)
+                _agg_refs0.extend(_refs_set)
+                _agg_hyps0.extend(_hyps_set)
+                torch.cuda.empty_cache()
+
+            # Агрегированные метрики по всем датасетам
             _avg_loss0 = _total_loss0 / max(1, _total_samples0)
-            _acc0 = sum(r == h for r, h in zip(_all_refs0, _all_hyps0)) / max(1, len(_all_refs0))
-            _cer0 = compute_cer(_all_refs0, _all_hyps0) if _all_refs0 else 0.0
-            _wer0 = compute_wer(_all_refs0, _all_hyps0) if _all_refs0 else 0.0
+            _acc0 = sum(r == h for r, h in zip(_agg_refs0, _agg_hyps0)) / max(1, len(_agg_refs0))
+            _cer0 = compute_cer(_agg_refs0, _agg_hyps0) if _agg_refs0 else 0.0
+            _wer0 = compute_wer(_agg_refs0, _agg_hyps0) if _agg_refs0 else 0.0
 
             writer.add_scalar("Loss/val_epoch", _avg_loss0, 0)
             writer.add_scalar("Accuracy/val_attention", _acc0, 0)
@@ -1236,7 +1272,7 @@ def run_training(cfg: Config, device: str = "cuda"):
             writer.add_scalar("WER/val_attention", _wer0, 0)
 
             logger.info(
-                f"Epoch 000 baseline | val_loss={_avg_loss0:.4f} | "
+                f"Epoch 000 baseline | TOTAL | val_loss={_avg_loss0:.4f} | "
                 f"acc={_acc0:.4f} | CER={_cer0:.4f} | WER={_wer0:.4f}"
             )
             torch.cuda.empty_cache()

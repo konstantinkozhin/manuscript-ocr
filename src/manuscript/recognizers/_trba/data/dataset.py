@@ -36,7 +36,7 @@ class OCRDatasetAttn(Dataset):
         strict_max_len: bool = True,
         text_mosaic_prob: float = 0.0,
         text_mosaic_n_words: int = 2,
-        text_mosaic_gap_ratio: float = 0.15,
+        text_mosaic_gap_ratio: Optional[float] = None,
     ):
         self.images_dir = images_dir
         self.img_h = img_height
@@ -54,7 +54,8 @@ class OCRDatasetAttn(Dataset):
         self._strict_max_len = strict_max_len
         self._text_mosaic_prob = float(text_mosaic_prob)
         self._text_mosaic_n_words = max(2, int(text_mosaic_n_words))
-        self._text_mosaic_gap_ratio = float(text_mosaic_gap_ratio)
+        # None → make_text_mosaic рандомит gap 3–5% на каждый вызов
+        self._text_mosaic_gap_ratio = float(text_mosaic_gap_ratio) if text_mosaic_gap_ratio is not None else None
 
         self._reasons = {
             "bad_row": 0, "empty_fname": 0, "empty_label": 0,
