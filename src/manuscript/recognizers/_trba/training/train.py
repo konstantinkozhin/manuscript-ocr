@@ -37,7 +37,7 @@ from ..data.transforms import (
     make_text_mosaic,
     DEFAULT_AUG_PARAMS,
 )
-from .metrics import compute_cer, compute_wer, compute_accuracy
+from .metrics import compute_cer, compute_wer
 from ..model.model import TRBAModel
 from .utils import (
     load_checkpoint,
@@ -476,6 +476,131 @@ def visualize_predictions_tensorboard(
         writer.add_image(tag, grid, epoch)
 
 
+def run_validation(
+    model: nn.Module,
+    val_loaders: List[DataLoader],
+    criterion: nn.Module,
+    itos: List[str],
+    stoi: dict,
+    device: torch.device,
+    pin_memory: bool,
+    max_len: int,
+    ctc_weight: float,
+    epoch: int,
+    writer: SummaryWriter,
+    logger: logging.Logger,
+    label: str = "val",
+) -> dict:
+    """Run validation over all per-dataset loaders and return aggregated metrics.
+
+    This is the single canonical validation routine used both at epoch-0 (baseline)
+    and in the regular training loop.  It logs per-dataset and aggregate metrics to
+    TensorBoard and prints a summary table to the logger.
+
+    Returns
+    -------
+    dict with keys: avg_loss, acc, cer, wer
+    """
+    PAD = stoi["<PAD>"]
+    EOS = stoi["<EOS>"]
+    BLANK = stoi.get("<BLANK>", None)
+
+    model.eval()
+    torch.cuda.empty_cache()
+
+    total_loss = 0.0
+    total_batches = 0
+    agg_refs: List[str] = []
+    agg_hyps: List[str] = []
+
+    # ── header ────────────────────────────────────────────────────────────────
+    header = (
+        f"{'set':>5}  {'n':>6}  {'loss':>8}  {'acc':>8}  {'CER':>8}  {'WER':>8}"
+    )
+    logger.info(f"{'─' * len(header)}")
+    logger.info(header)
+    logger.info(f"{'─' * len(header)}")
+
+    for i, loader in enumerate(val_loaders):
+        set_loss = 0.0
+        refs: List[str] = []
+        hyps: List[str] = []
+
+        with torch.no_grad():
+            for imgs, text_in, target_y, lengths in loader:
+                imgs = imgs.to(device, non_blocking=pin_memory)
+                text_in = text_in.to(device, non_blocking=pin_memory)
+                target_y = target_y.to(device, non_blocking=pin_memory)
+                lengths = lengths.to(device, non_blocking=pin_memory)
+
+                with _autocast():
+                    result = model(imgs, text=text_in, is_train=True, batch_max_length=max_len)
+                    attn_loss = criterion(
+                        result["attention_logits"].reshape(-1, result["attention_logits"].size(-1)),
+                        target_y.reshape(-1),
+                    )
+                    ctc_loss = model.compute_ctc_loss(result["ctc_logits"], target_y, lengths)
+                    batch_loss = (1.0 - ctc_weight) * attn_loss + ctc_weight * ctc_loss
+
+                set_loss += float(batch_loss.item())
+
+                # Decode predictions (attention decoder only)
+                result_inf = model(imgs, is_train=False, batch_max_length=max_len)
+                pred_ids = result_inf["attention_preds"].cpu()
+                tgt_ids = target_y.cpu()
+
+                for t_row, p_row in zip(tgt_ids, pred_ids):
+                    refs.append(decode_tokens(t_row, itos, PAD, EOS, BLANK))
+                    hyps.append(decode_tokens(p_row, itos, PAD, EOS, BLANK))
+
+                del imgs, text_in, target_y
+
+        n_samples = len(refs)
+        avg_loss = set_loss / max(1, len(loader))
+        acc = sum(r == h for r, h in zip(refs, hyps)) / max(1, n_samples)
+        cer = compute_cer(refs, hyps) if refs else 0.0
+        wer = compute_wer(refs, hyps) if refs else 0.0
+
+        # TensorBoard
+        writer.add_scalar(f"Loss/val_set_{i}", avg_loss, epoch)
+        writer.add_scalar(f"Accuracy/val_set_{i}", acc, epoch)
+        writer.add_scalar(f"CER/val_set_{i}", cer, epoch)
+        writer.add_scalar(f"WER/val_set_{i}", wer, epoch)
+
+        # Table row
+        logger.info(
+            f"{i:>5}  {n_samples:>6}  {avg_loss:>8.4f}  {acc:>8.4f}  {cer:>8.4f}  {wer:>8.4f}"
+        )
+
+        total_loss += set_loss
+        total_batches += len(loader)
+        agg_refs.extend(refs)
+        agg_hyps.extend(hyps)
+
+        torch.cuda.empty_cache()
+
+    # ── aggregate row ─────────────────────────────────────────────────────────
+    n_total = len(agg_refs)
+    avg_loss_total = total_loss / max(1, total_batches)
+    acc_total = sum(r == h for r, h in zip(agg_refs, agg_hyps)) / max(1, n_total)
+    cer_total = compute_cer(agg_refs, agg_hyps) if agg_refs else 0.0
+    wer_total = compute_wer(agg_refs, agg_hyps) if agg_refs else 0.0
+
+    writer.add_scalar("Loss/val_epoch", avg_loss_total, epoch)
+    writer.add_scalar("Accuracy/val_epoch", acc_total, epoch)
+    writer.add_scalar("CER/val_epoch", cer_total, epoch)
+    writer.add_scalar("WER/val_epoch", wer_total, epoch)
+
+    logger.info(f"{'─' * len(header)}")
+    logger.info(
+        f"{'TOTAL':>5}  {n_total:>6}  {avg_loss_total:>8.4f}  {acc_total:>8.4f}  "
+        f"{cer_total:>8.4f}  {wer_total:>8.4f}"
+    )
+    logger.info(f"{'─' * len(header)}")
+
+    return {"avg_loss": avg_loss_total, "acc": acc_total, "cer": cer_total, "wer": wer_total}
+
+
 def log_augmentation_previews_tensorboard(
     val_loader: DataLoader,
     writer: SummaryWriter,
@@ -599,6 +724,13 @@ def run_training(cfg: Config, device: str = "cuda"):
     logger.info("Start training")
     logger.info(f"Experiment dir: {exp_dir}")
     logger.info(f"Seed: {seed}")
+
+    # Заполняем в cfg все aug-параметры значениями по умолчанию, если они не заданы.
+    # Это гарантирует, что сохранённый config.json содержит полный эффективный конфиг
+    # и эксперимент можно воспроизвести дословно.
+    for _aug_key, _aug_default in DEFAULT_AUG_PARAMS.items():
+        if not hasattr(cfg, _aug_key):
+            setattr(cfg, _aug_key, _aug_default)
 
     try:
         cfg.save()
@@ -1094,8 +1226,24 @@ def run_training(cfg: Config, device: str = "cuda"):
     n_train_samples = _total_len(train_sets)
     n_val_samples = _total_len(val_sets)
 
+    # ── Dataset sizes table ───────────────────────────────────────────────────
+    ds_header = f"{'set':>4}  {'train_csv':<40}  {'train':>8}  {'val':>8}"
+    logger.info("Dataset sizes:")
+    logger.info(f"{'─' * len(ds_header)}")
+    logger.info(ds_header)
+    logger.info(f"{'─' * len(ds_header)}")
+    for _i, (_tcsv, _tset, _vset) in enumerate(zip(train_csvs, train_sets, val_sets)):
+        _tn = len(_tset) if hasattr(_tset, "__len__") else "?"
+        _vn = len(_vset) if hasattr(_vset, "__len__") else "?"
+        _name = Path(_tcsv).stem[:40]
+        logger.info(f"{_i:>4}  {_name:<40}  {_tn:>8}  {_vn:>8}")
+    logger.info(f"{'─' * len(ds_header)}")
+    logger.info(
+        f"{'TOTAL':>4}  {'':40}  {n_train_samples:>8}  {n_val_samples:>8}"
+    )
+    logger.info(f"{'─' * len(ds_header)}")
+
     # Логгирование информации о валидационной стратегии
-    logger.info(f"Validation strategy:")
     for i, (train_csv, train_root) in enumerate(zip(train_csvs, train_roots)):
         has_separate_val = (
             val_csvs
@@ -1105,29 +1253,14 @@ def run_training(cfg: Config, device: str = "cuda"):
             and val_csvs[i] is not None
             and val_roots[i] is not None
         )
-        if has_separate_val:
-            logger.info(
-                f"  Dataset {i}: using separate validation set from {val_roots[i]}"
-            )
-        else:
-            logger.info(
-                f"  Dataset {i}: using split from training set (val_size={val_size})"
-            )
+        src = f"separate val set: {val_roots[i]}" if has_separate_val else f"split from train (val_size={val_size})"
+        logger.info(f"  set_{i}: {src}")
 
-    msg_ds = (
-        f"Datasets: train={n_train_samples} samples across {len(train_sets)} set(s); "
-        f"val={n_val_samples} samples across {len(val_sets)} set(s)"
-    )
     total_val_batches = sum(len(loader) for loader in val_loaders_individual)
-    msg_ld = (
+    logger.info(
         f"Loaders: train_batches/epoch={len(train_loader)}; "
         f"val_batches={total_val_batches}; batch_size={batch_size}"
     )
-
-    print(msg_ds)
-    logger.info(msg_ds)
-    print(msg_ld)
-    logger.info(msg_ld)
 
     # --- создаем scheduler после train_loader ---
     if scheduler_name_for_later == "ReduceLROnPlateau":
@@ -1205,83 +1338,25 @@ def run_training(cfg: Config, device: str = "cuda"):
     # ── Epoch-0 baseline validation (before any weight updates) ─────────────
     if start_epoch == 1 and val_loaders_individual:
         logger.info("Running epoch-0 baseline validation (before training)...")
+        ctc_w0 = get_ctc_weight_for_epoch(
+            0, ctc_weight_initial, ctc_weight_decay_epochs, ctc_weight_min
+        )
         try:
-            model.eval()
-            torch.cuda.empty_cache()
-            _ctc_w0 = get_ctc_weight_for_epoch(
-                0, ctc_weight_initial, ctc_weight_decay_epochs, ctc_weight_min
+            run_validation(
+                model=model,
+                val_loaders=val_loaders_individual,
+                criterion=criterion,
+                itos=itos,
+                stoi=stoi,
+                device=device,
+                pin_memory=pin_memory,
+                max_len=max_len,
+                ctc_weight=ctc_w0,
+                epoch=0,
+                writer=writer,
+                logger=logger,
+                label="baseline",
             )
-
-            _total_loss0 = 0.0
-            _total_samples0 = 0
-            _agg_refs0: List[str] = []
-            _agg_hyps0: List[str] = []
-
-            for _i0, _vl in enumerate(val_loaders_individual):
-                _loss_set = 0.0
-                _refs_set: List[str] = []
-                _hyps_set: List[str] = []
-
-                with torch.no_grad():
-                    for _imgs, _text_in, _target_y, _lengths in _vl:
-                        _imgs = _imgs.to(device, non_blocking=pin_memory)
-                        _text_in = _text_in.to(device, non_blocking=pin_memory)
-                        _target_y = _target_y.to(device, non_blocking=pin_memory)
-                        with _autocast():
-                            _res = model(_imgs, text=_text_in, is_train=True, batch_max_length=max_len)
-                            _al = criterion(
-                                _res["attention_logits"].reshape(-1, _res["attention_logits"].size(-1)),
-                                _target_y.reshape(-1),
-                            )
-                            _cl = model.compute_ctc_loss(_res["ctc_logits"], _target_y, _lengths)
-                            _loss = (1 - _ctc_w0) * _al + _ctc_w0 * _cl
-                        _loss_set += float(_loss.item())
-                        # decode
-                        _res2 = model(_imgs, is_train=False, batch_max_length=max_len)
-                        for _ti, _pi in zip(_target_y.cpu(), _res2["attention_preds"].cpu()):
-                            _r = decode_tokens(_ti, itos, PAD, EOS, BLANK)
-                            _h = decode_tokens(_pi, itos, PAD, EOS, BLANK)
-                            _refs_set.append(_r)
-                            _hyps_set.append(_h)
-                        del _imgs, _text_in, _target_y
-
-                _avg_loss_set = _loss_set / max(1, len(_vl))
-                _acc_set = sum(r == h for r, h in zip(_refs_set, _hyps_set)) / max(1, len(_refs_set))
-                _cer_set = compute_cer(_refs_set, _hyps_set) if _refs_set else 0.0
-                _wer_set = compute_wer(_refs_set, _hyps_set) if _refs_set else 0.0
-
-                writer.add_scalar(f"Loss/val_set_{_i0}", _avg_loss_set, 0)
-                writer.add_scalar(f"Accuracy/val_set_{_i0}", _acc_set, 0)
-                writer.add_scalar(f"CER/val_set_{_i0}", _cer_set, 0)
-                writer.add_scalar(f"WER/val_set_{_i0}", _wer_set, 0)
-
-                logger.info(
-                    f"Epoch 000 baseline | set_{_i0} | loss={_avg_loss_set:.4f} | "
-                    f"acc={_acc_set:.4f} | CER={_cer_set:.4f} | WER={_wer_set:.4f}"
-                )
-
-                _total_loss0 += _loss_set
-                _total_samples0 += len(_vl)
-                _agg_refs0.extend(_refs_set)
-                _agg_hyps0.extend(_hyps_set)
-                torch.cuda.empty_cache()
-
-            # Агрегированные метрики по всем датасетам
-            _avg_loss0 = _total_loss0 / max(1, _total_samples0)
-            _acc0 = sum(r == h for r, h in zip(_agg_refs0, _agg_hyps0)) / max(1, len(_agg_refs0))
-            _cer0 = compute_cer(_agg_refs0, _agg_hyps0) if _agg_refs0 else 0.0
-            _wer0 = compute_wer(_agg_refs0, _agg_hyps0) if _agg_refs0 else 0.0
-
-            writer.add_scalar("Loss/val_epoch", _avg_loss0, 0)
-            writer.add_scalar("Accuracy/val_attention", _acc0, 0)
-            writer.add_scalar("CER/val_attention", _cer0, 0)
-            writer.add_scalar("WER/val_attention", _wer0, 0)
-
-            logger.info(
-                f"Epoch 000 baseline | TOTAL | val_loss={_avg_loss0:.4f} | "
-                f"acc={_acc0:.4f} | CER={_cer0:.4f} | WER={_wer0:.4f}"
-            )
-            torch.cuda.empty_cache()
         except Exception as _e0:
             logger.warning(f"Epoch-0 baseline validation failed: {_e0}")
 
@@ -1386,164 +1461,28 @@ def run_training(cfg: Config, device: str = "cuda"):
         writer.add_scalar("Loss/train_ctc_epoch", avg_ctc_loss, epoch)
 
         if should_eval:
-            model.eval()
-            torch.cuda.empty_cache()
-
-            total_val_loss = 0.0
-            total_samples = 0
-
-            # Валидация только с attention decoder (CTC используется только при обучении)
-            eval_modes = {"attention": {"mode": "attention", "decoder": "attention"}}
-
-            aggregate_mode_stats = {
-                mode_name: {
-                    "total_correct": 0,
-                    "total_predictions": 0,
-                    "all_refs": [],
-                    "all_hyps": [],
-                }
-                for mode_name in eval_modes
-            }
-
-            for i, val_loader_single in enumerate(val_loaders_individual):
-                total_val_loss_single = 0.0
-                refs_single: List[str] = []
-                hyps_single = {mode_name: [] for mode_name in eval_modes}
-
-                pbar_val = tqdm(
-                    val_loader_single,
-                    desc=f"Valid Set {i} {epoch}/{epochs}",
-                    leave=False,
-                )
-                with torch.no_grad():
-                    for imgs, text_in, target_y, lengths in pbar_val:
-                        imgs = imgs.to(device, non_blocking=pin_memory)
-                        text_in = text_in.to(device, non_blocking=pin_memory)
-                        target_y = target_y.to(device, non_blocking=pin_memory)
-
-                        with _autocast():
-                            result = model(
-                                imgs,
-                                text=text_in,
-                                is_train=True,
-                                batch_max_length=max_len,
-                            )
-                            attn_logits = result["attention_logits"]
-                            ctc_logits = result["ctc_logits"]
-
-                            attn_loss_val = criterion(
-                                attn_logits.reshape(-1, attn_logits.size(-1)),
-                                target_y.reshape(-1),
-                            )
-                            ctc_loss_val = model.compute_ctc_loss(
-                                ctc_logits, target_y, lengths
-                            )
-                            val_loss = (
-                                attn_loss_val * (1 - ctc_weight)
-                                + ctc_loss_val * ctc_weight
-                            )
-
-                        total_val_loss_single += float(val_loss.item())
-
-                        preds_batch = {}
-                        for mode_name, mode_cfg in eval_modes.items():
-                            result = model(
-                                imgs,
-                                is_train=False,
-                                batch_max_length=max_len,
-                            )
-                            decoder_type = mode_cfg["decoder"]
-                            if decoder_type == "attention":
-                                pred_ids = result["attention_preds"]
-                            else:
-                                ctc_logits = result["ctc_logits"]
-                                pred_ids = ctc_greedy_decode(ctc_logits, blank_id=BLANK)
-                            preds_batch[mode_name] = pred_ids.cpu()
-
-                        tgt_ids = target_y.cpu()
-                        refs_batch = []
-                        for t_row in tgt_ids:
-                            ref = decode_tokens(
-                                t_row, itos, pad_id=PAD, eos_id=EOS, blank_id=BLANK
-                            )
-                            refs_batch.append(ref)
-                            refs_single.append(ref)
-
-                        for mode_name, pred_tensor in preds_batch.items():
-                            for p_row, ref in zip(pred_tensor, refs_batch):
-                                hyp = decode_tokens(
-                                    p_row, itos, pad_id=PAD, eos_id=EOS, blank_id=BLANK
-                                )
-                                hyps_single[mode_name].append(hyp)
-
-                        pbar_val.set_postfix(val_loss=f"{float(val_loss.item()):.4f}")
-                        del imgs, text_in, target_y, preds_batch, tgt_ids
-
-                avg_val_loss_single = total_val_loss_single / max(
-                    1, len(val_loader_single)
-                )
-
-                writer.add_scalar(f"Loss/val_set_{i}", avg_val_loss_single, epoch)
-
-                for mode_name, hyps in hyps_single.items():
-                    val_acc_single = compute_accuracy(refs_single, hyps)
-                    val_cer_single = compute_cer(refs_single, hyps)
-                    val_wer_single = compute_wer(refs_single, hyps)
-
-                    metric_suffix = (
-                        f"/val_set_{i}"
-                        if mode_name == "greedy"
-                        else f"/val_set_{i}_{mode_name}"
-                    )
-                    writer.add_scalar(f"Accuracy{metric_suffix}", val_acc_single, epoch)
-                    writer.add_scalar(f"CER{metric_suffix}", val_cer_single, epoch)
-                    writer.add_scalar(f"WER{metric_suffix}", val_wer_single, epoch)
-
-                    stats = aggregate_mode_stats[mode_name]
-                    correct_single = sum(1 for r, h in zip(refs_single, hyps) if r == h)
-                    stats["total_correct"] += correct_single
-                    stats["total_predictions"] += len(refs_single)
-                    
-                    # Accumulate for aggregate metrics
-                    stats["all_refs"].extend(refs_single)
-                    stats["all_hyps"].extend(hyps)
-
-                total_val_loss += total_val_loss_single
-                total_samples += len(val_loader_single)
-
-                del refs_single, hyps_single
-                torch.cuda.empty_cache()
-
-            avg_val_loss = total_val_loss / max(1, total_samples)
-
-            def _finalize(mode_name: str):
-                stats = aggregate_mode_stats[mode_name]
-                total_pred = max(1, stats["total_predictions"])
-                acc = stats["total_correct"] / total_pred
-                
-                # Compute CER and WER on all accumulated predictions
-                all_refs = stats["all_refs"]
-                all_hyps = stats["all_hyps"]
-                cer = compute_cer(all_refs, all_hyps) if all_refs else 0.0
-                wer = compute_wer(all_refs, all_hyps) if all_refs else 0.0
-                
-                return acc, cer, wer
-
-            # Метрики только для attention decoder
-            primary_mode_name = "attention"
-            val_acc, val_cer, val_wer = _finalize(primary_mode_name)
-
-            writer.add_scalar("Loss/val_epoch", avg_val_loss, epoch)
-            writer.add_scalar("Accuracy/val_attention", val_acc, epoch)
-            writer.add_scalar("CER/val_attention", val_cer, epoch)
-            writer.add_scalar("WER/val_attention", val_wer, epoch)
+            val_metrics = run_validation(
+                model=model,
+                val_loaders=val_loaders_individual,
+                criterion=criterion,
+                itos=itos,
+                stoi=stoi,
+                device=device,
+                pin_memory=pin_memory,
+                max_len=max_len,
+                ctc_weight=ctc_weight,
+                epoch=epoch,
+                writer=writer,
+                logger=logger,
+            )
+            avg_val_loss = val_metrics["avg_loss"]
+            val_acc = val_metrics["acc"]
+            val_cer = val_metrics["cer"]
+            val_wer = val_metrics["wer"]
 
             # Визуализация случайных примеров в TensorBoard
             if val_loaders_individual:
-                # Выбираем случайный датасет для визуализации
                 random_val_loader = random.choice(val_loaders_individual)
-
-                # Визуализация только attention decoder
                 visualize_predictions_tensorboard(
                     model=model,
                     val_loader=random_val_loader,
