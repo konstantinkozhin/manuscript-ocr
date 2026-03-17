@@ -46,7 +46,8 @@ class OCRDatasetAttn(Dataset):
         self.samples: List[Tuple[str, str]] = []
         self._file_index = build_file_index(images_dir)
         self._encoding = encoding
-        self._delimiter = delimiter if delimiter is not None else ("\t" if csv_path.lower().endswith(".tsv") else ",")
+        # Keep the caller-supplied hint (or None); actual delimiter resolved in _read_rows via sniffing.
+        self._delimiter = delimiter  # may be None → auto-detect
         self._has_header = has_header
         self._strict_charset = strict_charset
         self._validate_image = validate_image
@@ -203,9 +204,34 @@ class OCRDatasetAttn(Dataset):
             return imgs, text_in, target_y, lengths
         return collate
 
+    @staticmethod
+    def _sniff_delimiter(csv_path: str, encoding: str, hint_delimiter: Optional[str]) -> str:
+        """Return the delimiter to use for *csv_path*.
+
+        Priority:
+        1. If the caller supplied an explicit *hint_delimiter*, use it.
+        2. If the file extension is ``.tsv``, assume tab.
+        3. Try ``csv.Sniffer`` on the first 4 KiB of the file.
+        4. Fall back to comma.
+        """
+        if hint_delimiter is not None:
+            return hint_delimiter
+        if csv_path.lower().endswith(".tsv"):
+            return "\t"
+        try:
+            with open(csv_path, newline="", encoding=encoding) as fh:
+                sample = fh.read(4096)
+            dialect = csv.Sniffer().sniff(sample, delimiters=",\t;|")
+            return dialect.delimiter
+        except csv.Error:
+            return ","
+
     def _read_rows(self, csv_path: str):
+        delimiter = self._sniff_delimiter(csv_path, self._encoding, self._delimiter)
+        # Store the detected delimiter so callers can inspect it if needed.
+        self._delimiter = delimiter
         with open(csv_path, newline="", encoding=self._encoding) as f:
-            reader = csv.reader(f, delimiter=self._delimiter)
+            reader = csv.reader(f, delimiter=delimiter)
             rows = list(reader)
         return rows
 
