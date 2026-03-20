@@ -15,6 +15,23 @@ from torch.amp import autocast as _amp_autocast
 def _autocast():
     """Совместимый autocast: использует torch.amp.autocast для подавления FutureWarning."""
     return _amp_autocast("cuda")
+
+
+def _make_grad_scaler():
+    return amp.GradScaler(enabled=torch.cuda.is_available())
+
+
+def _load_rollback_checkpoint(path, model, optimizer, scheduler):
+    """Reload a rollback checkpoint into a fresh GradScaler instance."""
+    scaler = _make_grad_scaler()
+    ckpt = load_checkpoint(
+        path,
+        model,
+        optimizer=optimizer,
+        scheduler=scheduler,
+        scaler=scaler,
+    )
+    return ckpt, scaler
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
@@ -1093,7 +1110,7 @@ def run_training(cfg: Config, device: str = "cuda"):
     scheduler = None
     scheduler_name_for_later = scheduler_name
 
-    scaler = amp.GradScaler()
+    scaler = _make_grad_scaler()
 
     # --- трансформации ---
     train_transform = get_train_transform(cfg.__dict__, img_h=img_h, img_w=img_w)
@@ -1569,12 +1586,11 @@ def run_training(cfg: Config, device: str = "cuda"):
                 )
 
             rollback_retries += 1
-            ckpt = load_checkpoint(
+            ckpt, scaler = _load_rollback_checkpoint(
                 rollback_path,
                 model,
                 optimizer=optimizer,
                 scheduler=scheduler,
-                scaler=scaler,
             )
             global_step = int(ckpt.get("global_step", global_step))
             best_val_loss = float(ckpt.get("best_val_loss", best_val_loss))

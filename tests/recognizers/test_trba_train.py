@@ -1,4 +1,7 @@
+import importlib
+import sys
 from types import SimpleNamespace
+from types import ModuleType
 
 import pytest
 import torch
@@ -68,6 +71,53 @@ def test_is_loss_explosion_detects_large_jump_and_nonfinite():
     assert not is_loss_explosion(current_loss=2.0, reference_loss=1.5, factor=10.0)
     assert is_loss_explosion(current_loss=25.0, reference_loss=2.0, factor=10.0)
     assert is_loss_explosion(current_loss=float("inf"), reference_loss=2.0, factor=10.0)
+
+
+def test_rollback_checkpoint_uses_fresh_grad_scaler(monkeypatch):
+    fake_tensorboard = ModuleType("torch.utils.tensorboard")
+    fake_tensorboard.SummaryWriter = object
+    monkeypatch.setitem(sys.modules, "torch.utils.tensorboard", fake_tensorboard)
+    sys.modules.pop("manuscript.recognizers._trba.training.train", None)
+    train_module = importlib.import_module("manuscript.recognizers._trba.training.train")
+
+    fresh_scaler = object()
+    captured = {}
+
+    monkeypatch.setattr(train_module, "_make_grad_scaler", lambda: fresh_scaler)
+
+    def fake_load_checkpoint(
+        path,
+        model=None,
+        optimizer=None,
+        scheduler=None,
+        scaler=None,
+        **_kwargs,
+    ):
+        captured["path"] = path
+        captured["model"] = model
+        captured["optimizer"] = optimizer
+        captured["scheduler"] = scheduler
+        captured["scaler"] = scaler
+        return {"global_step": 123}
+
+    monkeypatch.setattr(train_module, "load_checkpoint", fake_load_checkpoint)
+
+    ckpt, scaler = train_module._load_rollback_checkpoint(
+        "rollback_ckpt.pth",
+        model="model",
+        optimizer="optimizer",
+        scheduler="scheduler",
+    )
+
+    assert ckpt == {"global_step": 123}
+    assert scaler is fresh_scaler
+    assert captured == {
+        "path": "rollback_ckpt.pth",
+        "model": "model",
+        "optimizer": "optimizer",
+        "scheduler": "scheduler",
+        "scaler": fresh_scaler,
+    }
 
 
 def test_trba_train_passes_new_stability_parameters(monkeypatch):
