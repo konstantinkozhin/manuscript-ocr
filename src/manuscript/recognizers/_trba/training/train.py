@@ -109,6 +109,20 @@ def ctc_greedy_decode(logits: torch.Tensor, blank_id: int = 0) -> torch.Tensor:
     return torch.tensor(padded, dtype=torch.long, device=logits.device)
 
 
+def _compute_joint_loss(result, criterion, target_y, lengths, model, ctc_weight):
+    """Compute attention + CTC loss in fp32 for numerical stability."""
+    attn_logits = result["attention_logits"].float()
+    ctc_logits = result["ctc_logits"].float()
+
+    attn_loss = criterion(
+        attn_logits.reshape(-1, attn_logits.size(-1)),
+        target_y.reshape(-1),
+    )
+    ctc_loss = model.compute_ctc_loss(ctc_logits, target_y, lengths)
+    total_loss = (1.0 - ctc_weight) * attn_loss + ctc_weight * ctc_loss
+    return total_loss, attn_loss, ctc_loss
+
+
 def get_ctc_weight_for_epoch(
     epoch: int,
     initial_weight: float = 0.3,
@@ -553,12 +567,14 @@ def run_validation(
 
                 with _autocast():
                     result = model(imgs, text=text_in, is_train=True, batch_max_length=max_len)
-                    attn_loss = criterion(
-                        result["attention_logits"].reshape(-1, result["attention_logits"].size(-1)),
-                        target_y.reshape(-1),
-                    )
-                    ctc_loss = model.compute_ctc_loss(result["ctc_logits"], target_y, lengths)
-                    batch_loss = (1.0 - ctc_weight) * attn_loss + ctc_weight * ctc_loss
+                batch_loss, attn_loss, ctc_loss = _compute_joint_loss(
+                    result=result,
+                    criterion=criterion,
+                    target_y=target_y,
+                    lengths=lengths,
+                    model=model,
+                    ctc_weight=ctc_weight,
+                )
 
                 set_loss += float(batch_loss.item())
 
@@ -1497,15 +1513,14 @@ def run_training(cfg: Config, device: str = "cuda"):
                     is_train=True,
                     batch_max_length=max_len,
                 )
-
-                attn_logits = result["attention_logits"]
-                ctc_logits = result["ctc_logits"]
-                attn_loss_val = criterion(
-                    attn_logits.reshape(-1, attn_logits.size(-1)),
-                    target_y.reshape(-1),
-                )
-                ctc_loss_val = model.compute_ctc_loss(ctc_logits, target_y, lengths)
-                loss = (1.0 - ctc_weight) * attn_loss_val + ctc_weight * ctc_loss_val
+            loss, attn_loss_val, ctc_loss_val = _compute_joint_loss(
+                result=result,
+                criterion=criterion,
+                target_y=target_y,
+                lengths=lengths,
+                model=model,
+                ctc_weight=ctc_weight,
+            )
 
             if not torch.isfinite(loss):
                 epoch_failed = True

@@ -14,6 +14,14 @@ from manuscript.recognizers._trba.training.utils import is_loss_explosion
 pytestmark = pytest.mark.requires_torch
 
 
+def _import_train_module(monkeypatch):
+    fake_tensorboard = ModuleType("torch.utils.tensorboard")
+    fake_tensorboard.SummaryWriter = object
+    monkeypatch.setitem(sys.modules, "torch.utils.tensorboard", fake_tensorboard)
+    sys.modules.pop("manuscript.recognizers._trba.training.train", None)
+    return importlib.import_module("manuscript.recognizers._trba.training.train")
+
+
 def test_sample_batch_input_size_respects_minimums(monkeypatch):
     monkeypatch.setattr(
         "manuscript.recognizers._trba.data.dataset.random.uniform",
@@ -73,12 +81,50 @@ def test_is_loss_explosion_detects_large_jump_and_nonfinite():
     assert is_loss_explosion(current_loss=float("inf"), reference_loss=2.0, factor=10.0)
 
 
+def test_joint_loss_is_computed_in_float32(monkeypatch):
+    train_module = _import_train_module(monkeypatch)
+    captured = {}
+
+    class FakeModel:
+        def compute_ctc_loss(self, ctc_logits, targets, target_lengths):
+            captured["dtype"] = ctc_logits.dtype
+            captured["targets_shape"] = tuple(targets.shape)
+            captured["lengths"] = target_lengths.tolist()
+            return ctc_logits.mean()
+
+    result = {
+        "attention_logits": torch.tensor(
+            [[[0.0, 3.0, -1.0], [0.0, -1.0, 3.0], [3.0, 0.0, -1.0]]],
+            dtype=torch.float16,
+        ),
+        "ctc_logits": torch.randn(1, 4, 3, dtype=torch.float16),
+    }
+    criterion = torch.nn.CrossEntropyLoss(ignore_index=0)
+    target_y = torch.tensor([[1, 2, 0]], dtype=torch.long)
+    lengths = torch.tensor([2], dtype=torch.long)
+
+    total_loss, attn_loss, ctc_loss = train_module._compute_joint_loss(
+        result=result,
+        criterion=criterion,
+        target_y=target_y,
+        lengths=lengths,
+        model=FakeModel(),
+        ctc_weight=0.3,
+    )
+
+    assert captured == {
+        "dtype": torch.float32,
+        "targets_shape": (1, 3),
+        "lengths": [2],
+    }
+    assert total_loss.dtype == torch.float32
+    assert attn_loss.dtype == torch.float32
+    assert ctc_loss.dtype == torch.float32
+    assert torch.isfinite(total_loss)
+
+
 def test_rollback_checkpoint_uses_fresh_grad_scaler(monkeypatch):
-    fake_tensorboard = ModuleType("torch.utils.tensorboard")
-    fake_tensorboard.SummaryWriter = object
-    monkeypatch.setitem(sys.modules, "torch.utils.tensorboard", fake_tensorboard)
-    sys.modules.pop("manuscript.recognizers._trba.training.train", None)
-    train_module = importlib.import_module("manuscript.recognizers._trba.training.train")
+    train_module = _import_train_module(monkeypatch)
 
     fresh_scaler = object()
     captured = {}
