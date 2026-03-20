@@ -3,6 +3,7 @@ import sys
 from types import SimpleNamespace
 from types import ModuleType
 
+import numpy as np
 import pytest
 import torch
 
@@ -46,6 +47,18 @@ def test_make_collate_attn_applies_batch_resolution_jitter(monkeypatch):
         lambda _a, _b: 0.9,
     )
 
+    def fake_get_train_transform(_params, img_h, img_w, **_kwargs):
+        def _transform(*, image):
+            assert image.ndim == 3
+            return {"image": torch.zeros(3, img_h, img_w)}
+
+        return _transform
+
+    monkeypatch.setattr(
+        "manuscript.recognizers._trba.data.dataset.get_train_transform",
+        fake_get_train_transform,
+    )
+
     stoi = {
         "<PAD>": 0,
         "<SOS>": 1,
@@ -61,11 +74,13 @@ def test_make_collate_attn_applies_batch_resolution_jitter(monkeypatch):
         resolution_jitter=0.15,
         min_img_height=24,
         min_img_width=132,
+        image_transform_params={},
+        is_train=True,
     )
 
     batch = [
-        (torch.zeros(3, 64, 256), "ab"),
-        (torch.ones(3, 64, 256), "a"),
+        (np.zeros((32, 80, 3), dtype=np.uint8), "ab"),
+        (np.ones((28, 72, 3), dtype=np.uint8) * 255, "a"),
     ]
     imgs, text_in, target_y, lengths = collate(batch)
 
@@ -202,3 +217,69 @@ def test_trba_train_passes_new_stability_parameters(monkeypatch):
     assert captured["cfg"].batch_resolution_jitter == 0.15
     assert captured["cfg"].batch_resolution_min_h == 30
     assert captured["cfg"].batch_resolution_min_w == 140
+
+
+def test_make_collate_attn_keeps_fixed_validation_size(monkeypatch):
+    def fake_get_val_transform(img_h, img_w):
+        def _transform(*, image):
+            assert image.ndim == 3
+            return {"image": torch.ones(3, img_h, img_w)}
+
+        return _transform
+
+    monkeypatch.setattr(
+        "manuscript.recognizers._trba.data.dataset.get_val_transform",
+        fake_get_val_transform,
+    )
+
+    stoi = {
+        "<PAD>": 0,
+        "<SOS>": 1,
+        "<EOS>": 2,
+        "a": 3,
+    }
+    collate = OCRDatasetAttn.make_collate_attn(
+        stoi=stoi,
+        max_len=4,
+        drop_blank=True,
+        batch_img_size=(64, 256),
+        is_train=False,
+    )
+
+    batch = [
+        (np.zeros((20, 90, 3), dtype=np.uint8), "a"),
+        (np.ones((25, 60, 3), dtype=np.uint8) * 255, "a"),
+    ]
+    imgs, text_in, target_y, lengths = collate(batch)
+
+    assert imgs.shape == (2, 3, 64, 256)
+    assert text_in.shape == (2, 5)
+    assert target_y.shape == (2, 5)
+    assert lengths.tolist() == [2, 2]
+
+
+def test_trba_train_defaults_batch_resolution_jitter_to_enabled(monkeypatch):
+    captured = {}
+
+    def fake_run_training(cfg, device="cuda"):
+        captured["cfg"] = cfg
+        captured["device"] = device
+        return {"status": "ok"}
+
+    monkeypatch.setattr(trba_module, "_TRAINING_AVAILABLE", True)
+    monkeypatch.setattr(
+        trba_module,
+        "Config",
+        lambda payload: SimpleNamespace(**payload),
+    )
+    monkeypatch.setattr(trba_module, "run_training", fake_run_training)
+
+    trba_module.TRBA.train(
+        train_csvs="train.csv",
+        train_roots="train_images",
+        device="cpu",
+    )
+
+    assert captured["device"] == "cpu"
+    assert captured["cfg"].auto_rollback_on_loss_explosion is True
+    assert captured["cfg"].batch_resolution_jitter == 0.12

@@ -961,8 +961,9 @@ class TRBA(BaseModel):
         batch_resolution_jitter : float, optional
             Relative batch-wise input resolution jitter applied only during
             training. A value of ``0.12`` means each batch is resized together
-            within roughly +/-12% of ``img_h`` and ``img_w``. Set to ``0`` to
-            disable. Default is ``0.12``.
+            within roughly +/-12% of ``img_h`` and ``img_w``. Validation keeps
+            the fixed configured size. Set to ``0`` to disable. Default is
+            ``0.12``.
         batch_resolution_min_h : int, optional
             Lower bound for jittered training batch height. Default is ``24``.
         batch_resolution_min_w : int, optional

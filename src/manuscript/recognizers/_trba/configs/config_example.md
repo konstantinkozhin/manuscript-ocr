@@ -148,7 +148,8 @@ Notes on the new training safeguards:
 
 * `auto_rollback_on_loss_explosion=true` keeps a pre-epoch rollback checkpoint and retries the same epoch automatically.
 * Loss explosion is detected when train loss becomes `NaN`/`Inf` or grows by at least `loss_explosion_factor` times versus the previous stable epoch.
-* `batch_resolution_jitter=0.12` means each training batch is resized together within about +/-12% of `img_h` and `img_w`, while never going below `24 x 132`.
+* `batch_resolution_jitter=0.12` enables batch-wise training resolution jitter within about +/-12% of `img_h` and `img_w`, while never going below `24 x 132`.
+* Validation still uses the fixed configured `img_h x img_w` size, without jitter.
 
 ## Example of a charset.txt file
 

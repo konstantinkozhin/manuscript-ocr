@@ -35,7 +35,7 @@ def _load_rollback_checkpoint(path, model, optimizer, scheduler):
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-from torch.utils.data import ConcatDataset, DataLoader, random_split
+from torch.utils.data import ConcatDataset, DataLoader, Subset, random_split
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
@@ -46,8 +46,6 @@ from ..data.dataset import (
 )
 from ..data.transforms import (
     decode_tokens,
-    get_train_transform,
-    get_val_transform,
     load_charset,
     list_augmentations,
     preview_augmentation,
@@ -284,14 +282,17 @@ def split_train_val(
     stoi,
     img_h,
     img_w,
-    train_transform,
-    val_transform,
     encoding="utf-8",
     val_size=3000,
+    max_len=None,
+    strict_max_len=True,
+    text_mosaic_prob=0.0,
+    text_mosaic_n_words=2,
+    text_mosaic_gap_ratio=None,
 ):
     train_sets, val_sets = [], []
     for c, r in zip(csvs, roots):
-        full_ds = OCRDatasetAttn(
+        split_ds = OCRDatasetAttn(
             c,
             r,
             stoi,
@@ -299,18 +300,55 @@ def split_train_val(
             img_max_width=img_w,
             transform=None,
             encoding=encoding,
+            max_len=max_len,
+            strict_max_len=strict_max_len,
+            text_mosaic_prob=0.0,
+            text_mosaic_n_words=text_mosaic_n_words,
+            text_mosaic_gap_ratio=text_mosaic_gap_ratio,
+            return_raw_image=True,
         )
-        n_val = min(val_size, len(full_ds))
-        n_train = len(full_ds) - n_val
+        n_val = min(val_size, len(split_ds))
+        n_train = len(split_ds) - n_val
         if n_train <= 0:
             raise ValueError(
-                f"В датасете {c} всего {len(full_ds)} примеров, меньше чем {val_size}"
+                f"В датасете {c} всего {len(split_ds)} примеров, меньше чем {val_size}"
             )
 
-        train_ds, val_ds = random_split(full_ds, [n_train, n_val])
+        train_split, val_split = random_split(split_ds, [n_train, n_val])
 
-        train_ds.dataset.transform = train_transform
-        val_ds.dataset.transform = val_transform
+        train_base = OCRDatasetAttn(
+            c,
+            r,
+            stoi,
+            img_height=img_h,
+            img_max_width=img_w,
+            transform=None,
+            encoding=encoding,
+            max_len=max_len,
+            strict_max_len=strict_max_len,
+            text_mosaic_prob=text_mosaic_prob,
+            text_mosaic_n_words=text_mosaic_n_words,
+            text_mosaic_gap_ratio=text_mosaic_gap_ratio,
+            return_raw_image=True,
+        )
+        val_base = OCRDatasetAttn(
+            c,
+            r,
+            stoi,
+            img_height=img_h,
+            img_max_width=img_w,
+            transform=None,
+            encoding=encoding,
+            max_len=max_len,
+            strict_max_len=strict_max_len,
+            text_mosaic_prob=0.0,
+            text_mosaic_n_words=text_mosaic_n_words,
+            text_mosaic_gap_ratio=text_mosaic_gap_ratio,
+            return_raw_image=True,
+        )
+
+        train_ds = Subset(train_base, train_split.indices)
+        val_ds = Subset(val_base, val_split.indices)
 
         train_sets.append(train_ds)
         val_sets.append(val_ds)
@@ -1129,8 +1167,6 @@ def run_training(cfg: Config, device: str = "cuda"):
     scaler = _make_grad_scaler()
 
     # --- трансформации ---
-    train_transform = get_train_transform(cfg.__dict__, img_h=img_h, img_w=img_w)
-    val_transform = get_val_transform(img_h, img_w)
 
     # --- датасеты и лоадеры ---
     train_sets = []
@@ -1152,34 +1188,6 @@ def run_training(cfg: Config, device: str = "cuda"):
                     stoi,
                     img_height=img_h,
                     img_max_width=img_w,
-                    transform=train_transform,
-                    encoding=encoding,
-                    max_len=max_len,
-                    strict_max_len=True,
-                    text_mosaic_prob=text_mosaic_prob,
-                    text_mosaic_n_words=text_mosaic_n_words,
-                    text_mosaic_gap_ratio=text_mosaic_gap_ratio,
-                )
-                val_ds = OCRDatasetAttn(
-                    val_csvs[i],
-                    val_roots[i],
-                    stoi,
-                    img_height=img_h,
-                    img_max_width=img_w,
-                    transform=val_transform,
-                    encoding=encoding,
-                    max_len=max_len,
-                    strict_max_len=True,
-                )
-                train_sets.append(train_ds)
-                val_sets.append(val_ds)
-            else:
-                full_ds = OCRDatasetAttn(
-                    train_csv,
-                    train_root,
-                    stoi,
-                    img_height=img_h,
-                    img_max_width=img_w,
                     transform=None,
                     encoding=encoding,
                     max_len=max_len,
@@ -1187,20 +1195,39 @@ def run_training(cfg: Config, device: str = "cuda"):
                     text_mosaic_prob=text_mosaic_prob,
                     text_mosaic_n_words=text_mosaic_n_words,
                     text_mosaic_gap_ratio=text_mosaic_gap_ratio,
+                    return_raw_image=True,
                 )
-                n_val = min(3000 if val_size is None else val_size, len(full_ds))
-                n_train = len(full_ds) - n_val
-                if n_train <= 0:
-                    raise ValueError(
-                        f"В датасете {train_csv} всего {len(full_ds)} примеров, меньше чем {n_val}"
-                    )
-
-                train_ds, val_ds = random_split(full_ds, [n_train, n_val])
-                train_ds.dataset.transform = train_transform
-                val_ds.dataset.transform = val_transform
-
+                val_ds = OCRDatasetAttn(
+                    val_csvs[i],
+                    val_roots[i],
+                    stoi,
+                    img_height=img_h,
+                    img_max_width=img_w,
+                    transform=None,
+                    encoding=encoding,
+                    max_len=max_len,
+                    strict_max_len=True,
+                    return_raw_image=True,
+                )
                 train_sets.append(train_ds)
                 val_sets.append(val_ds)
+            else:
+                split_train_sets, split_val_sets = split_train_val(
+                    [train_csv],
+                    [train_root],
+                    stoi,
+                    img_h,
+                    img_w,
+                    encoding=encoding,
+                    val_size=3000 if val_size is None else val_size,
+                    max_len=max_len,
+                    strict_max_len=True,
+                    text_mosaic_prob=text_mosaic_prob,
+                    text_mosaic_n_words=text_mosaic_n_words,
+                    text_mosaic_gap_ratio=text_mosaic_gap_ratio,
+                )
+                train_sets.extend(split_train_sets)
+                val_sets.extend(split_val_sets)
     else:
         train_sets, val_sets = split_train_val(
             train_csvs,
@@ -1208,10 +1235,13 @@ def run_training(cfg: Config, device: str = "cuda"):
             stoi,
             img_h,
             img_w,
-            train_transform,
-            val_transform,
             encoding=encoding,
             val_size=val_size,
+            max_len=max_len,
+            strict_max_len=True,
+            text_mosaic_prob=text_mosaic_prob,
+            text_mosaic_n_words=text_mosaic_n_words,
+            text_mosaic_gap_ratio=text_mosaic_gap_ratio,
         )
 
     collate_train = OCRDatasetAttn.make_collate_attn(
@@ -1222,9 +1252,15 @@ def run_training(cfg: Config, device: str = "cuda"):
         resolution_jitter=batch_resolution_jitter,
         min_img_height=batch_resolution_min_h,
         min_img_width=batch_resolution_min_w,
+        image_transform_params=cfg.__dict__,
+        is_train=True,
     )
     collate_val = OCRDatasetAttn.make_collate_attn(
-        stoi, max_len=max_len, drop_blank=True
+        stoi,
+        max_len=max_len,
+        drop_blank=True,
+        batch_img_size=(img_h, img_w),
+        is_train=False,
     )
 
     if train_proportions is not None:
