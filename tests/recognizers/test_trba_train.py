@@ -138,6 +138,22 @@ def test_joint_loss_is_computed_in_float32(monkeypatch):
     assert torch.isfinite(total_loss)
 
 
+def test_nonfinite_grad_norm_is_not_fatal_with_amp(monkeypatch):
+    train_module = _import_train_module(monkeypatch)
+
+    class FakeScaler:
+        def is_enabled(self):
+            return True
+
+    class FakeDisabledScaler:
+        def is_enabled(self):
+            return False
+
+    assert train_module._should_fail_on_nonfinite_grad_norm(FakeScaler()) is False
+    assert train_module._should_fail_on_nonfinite_grad_norm(FakeDisabledScaler()) is True
+    assert train_module._should_fail_on_nonfinite_grad_norm(None) is True
+
+
 def test_rollback_checkpoint_uses_fresh_grad_scaler(monkeypatch):
     train_module = _import_train_module(monkeypatch)
 

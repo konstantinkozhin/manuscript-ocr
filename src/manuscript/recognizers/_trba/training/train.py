@@ -21,6 +21,11 @@ def _make_grad_scaler():
     return amp.GradScaler(enabled=torch.cuda.is_available())
 
 
+def _should_fail_on_nonfinite_grad_norm(scaler) -> bool:
+    """AMP overflows are handled by GradScaler and should not abort the epoch."""
+    return scaler is None or not scaler.is_enabled()
+
+
 def _load_rollback_checkpoint(path, model, optimizer, scheduler):
     """Reload a rollback checkpoint into a fresh GradScaler instance."""
     scaler = _make_grad_scaler()
@@ -1569,7 +1574,10 @@ def run_training(cfg: Config, device: str = "cuda"):
             scaler.unscale_(optimizer)
             grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
             grad_norm_value = float(grad_norm.item() if torch.is_tensor(grad_norm) else grad_norm)
-            if not torch.isfinite(torch.as_tensor(grad_norm_value)):
+            if (
+                _should_fail_on_nonfinite_grad_norm(scaler)
+                and not torch.isfinite(torch.as_tensor(grad_norm_value))
+            ):
                 epoch_failed = True
                 failure_reason = f"non-finite gradient norm at batch {batch_idx}"
                 optimizer.zero_grad(set_to_none=True)
