@@ -273,7 +273,9 @@ def _run_training(
 
     start_epoch = 1
     best_val_loss = float("inf")
-    patience = 0
+    best_val_dice = -float("inf")
+    patience_loss = 0
+    patience_dice = 0
 
     if val_interval < 1:
         raise ValueError("val_interval must be >= 1")
@@ -408,7 +410,9 @@ def _run_training(
             if scaler_state is not None:
                 scaler.load_state_dict(scaler_state)
             best_val_loss = checkpoint.get("best_val_loss", best_val_loss)
-            patience = checkpoint.get("patience", patience)
+            best_val_dice = checkpoint.get("best_val_dice", best_val_dice)
+            patience_loss = checkpoint.get("patience_loss", checkpoint.get("patience", patience_loss))
+            patience_dice = checkpoint.get("patience_dice", patience_dice)
             start_epoch = checkpoint.get("epoch", 0) + 1
         else:
             state_dict = _extract_model_state(checkpoint)
@@ -700,16 +704,32 @@ def _run_training(
 
             if avg_val < best_val_loss:
                 best_val_loss = avg_val
-                patience = 0
+                patience_loss = 0
                 torch.save(
                     (ema_model if use_ema else model).state_dict(),
-                    os.path.join(ckpt_dir, "best.pth"),
+                    os.path.join(ckpt_dir, "best_loss.pth"),
                 )
+                print(f"  [checkpoint] Saved best_loss.pth  (val_loss={avg_val:.4f})")
             else:
-                patience += 1
-                if patience >= early_stop:
-                    print(f"Early stopping at epoch {epoch}")
-                    should_stop = True
+                patience_loss += 1
+
+            if overall_dice > best_val_dice:
+                best_val_dice = overall_dice
+                patience_dice = 0
+                torch.save(
+                    (ema_model if use_ema else model).state_dict(),
+                    os.path.join(ckpt_dir, "best_dice.pth"),
+                )
+                print(f"  [checkpoint] Saved best_dice.pth  (val_dice={overall_dice:.4f})")
+            else:
+                patience_dice += 1
+
+            if patience_loss >= early_stop and patience_dice >= early_stop:
+                print(
+                    f"Early stopping at epoch {epoch} "
+                    f"(patience_loss={patience_loss}, patience_dice={patience_dice})"
+                )
+                should_stop = True
 
             try:
                 make_collage("Predictions", epoch)
@@ -732,7 +752,9 @@ def _run_training(
             "scheduler_state": scheduler.state_dict() if scheduler is not None else None,
             "scaler_state": scaler.state_dict(),
             "best_val_loss": best_val_loss,
-            "patience": patience,
+            "best_val_dice": best_val_dice,
+            "patience_loss": patience_loss,
+            "patience_dice": patience_dice,
         }
         torch.save(state_payload, os.path.join(ckpt_dir, "last_state.pt"))
         if should_stop:
@@ -745,7 +767,9 @@ def _run_training(
         from manuscript.detectors import EAST
         
         onnx_path = os.path.join(ckpt_dir, "best_model.onnx")
-        best_weights_path = os.path.join(ckpt_dir, "best.pth")
+        best_weights_path = os.path.join(ckpt_dir, "best_loss.pth")
+        if not os.path.isfile(best_weights_path):
+            best_weights_path = os.path.join(ckpt_dir, "best_dice.pth")
         
         export_size = target_size if target_size is not None else 1280
         

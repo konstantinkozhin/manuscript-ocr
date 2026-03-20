@@ -224,5 +224,201 @@ Files:
 - src/manuscript/detectors/_east/train_utils.py
 - src/manuscript/detectors/_east/__init__.py
 
+19) EAST training: dual best-model checkpoints and combined early stopping (local)
+- Best model is now saved to two separate files: `best_loss.pth` (lowest val loss) and `best_dice.pth` (highest val Dice).
+- Early stopping now triggers only when BOTH patience counters (`patience_loss` and `patience_dice`) reach `early_stop` epochs without improvement.
+- Resume (`last_state.pt`) now stores and restores `best_val_dice`, `patience_loss`, and `patience_dice` instead of single `patience`.
+- ONNX export at end of training uses `best_loss.pth` with fallback to `best_dice.pth`.
+- A console message is printed each time a new best checkpoint is saved, showing the metric value.
+
+File:
+- src/manuscript/detectors/_east/train_utils.py
+
+20) EAST augmentation expansion: 8 new augmentations (local)
+- Added 8 new augmentation methods to `EASTDataset`, all configurable via `augmentation_config` in `EAST.train`.
+
+Geometric (with quad coordinate transformation):
+- `vflip` — vertical flip (`vflip_prob=0.0` by default, off for documents).
+- `shear` — affine shear along X/Y axes (`shear_prob=0.15`, `shear_deg=5.0`).
+- `random_crop` — random crop + resize back to target_size (`random_crop_prob=0.2`, `random_crop_scale=(0.7,1.0)`).
+- `mosaic` — 4-image 2×2 mosaic with random center split (`mosaic_prob=0.0` by default, enable for scene/license-plate datasets).
+
+Photometric (no coordinate change):
+- `motion_blur` — directional motion blur at random angle (`motion_blur_prob=0.1`, `motion_blur_ksize_range=(3,9)`).
+- `hsv` — independent hue/saturation/value shift (`hsv_prob=0.15`, `hsv_h=0.015`, `hsv_s=0.3`, `hsv_v=0.2`).
+- `cutout` — random rectangular fill with mean color (`cutout_prob=0.15`, `cutout_num_holes=2`, `cutout_hole_size_range=(0.05,0.15)`).
+- `elastic` — elastic grid distortion via Gaussian-smoothed displacement fields (`elastic_prob=0.1`, `elastic_alpha=20.0`, `elastic_sigma=4.0`).
+- `fog` — directional fog gradient blending image with white mist (`fog_prob=0.1`, `fog_strength_range=(0.1,0.4)`, `fog_direction="random"`).
+  Directions: `top`, `bottom`, `left`, `right`, `random`. Simulates glare, mist, and uneven lighting typical in outdoor/mobile photography.
+
+All new augmentations are added to `list_augmentations()` and `preview_augmentation()`.
+Default probabilities are conservative — new augmentations do not degrade document/manuscript training out of the box.
+Mosaic is off (`0.0`) by default and should be enabled explicitly for mixed-scene or license-plate datasets.
+
+Files:
+- src/manuscript/detectors/_east/dataset.py
+- src/manuscript/detectors/_east/__init__.py
+
+21) EAST augmentation expansion: CutMix, RICAP, ResizeMix (local)
+- Added 3 mixing augmentations to `EASTDataset`, all off by default (`prob=0.0`) and configurable via
+  `augmentation_config` in `EAST.train`.
+- All three augmentations are **mutually exclusive per sample** — the first one that fires (by probability)
+  is applied; the rest are skipped. This preserves the expected sample distribution.
+
+CutMix (`cutmix_prob`, `cutmix_alpha`):
+- Cuts a rectangular patch from a randomly sampled second image and pastes it over the base image.
+- Patch size is proportional to √(1 − λ) where λ ~ Beta(alpha, alpha).
+- Label logic for quads:
+  - Base-image quads whose bounding box **overlaps** the cut region are discarded (conservative; avoids
+    partial-text labels).
+  - Second-image quads that fall **entirely inside** the cut region are added to the label set.
+- Default: `cutmix_prob=0.0`, `cutmix_alpha=1.0`.
+- Enable for scene/license-plate/mixed datasets where detecting partially occluded text is important.
+
+RICAP (`ricap_prob`, `ricap_beta`):
+- Randomly crops regions from 4 different images and assembles them into a single 2×2 grid at a
+  randomly sampled center split (Beta-distributed around 0.5).
+- Crop origin for each tile is randomly chosen inside the source image.
+- Label logic for quads:
+  - Each tile's quads are translated by (crop_origin → tile_canvas_offset).
+  - Only quads fully contained within their tile's canvas region are kept.
+- Default: `ricap_prob=0.0`, `ricap_beta=0.3`.
+- More aggressive spatial mixing than Mosaic; best for highly varied scene datasets.
+
+ResizeMix (`resizemix_prob`, `resizemix_scale_range`):
+- Downscales a second image to a small thumbnail (scale sampled uniformly from `resizemix_scale_range`)
+  and pastes it at a random location on the base image.
+- Preserves the entire source image context at a small scale (unlike CutMix which only copies a crop).
+- Label logic for quads:
+  - Base-image quads that do **not** overlap the paste region are kept.
+  - Second-image quads are scaled (by the resize factor) and offset into the paste location; only those
+    fully contained within the paste region are added.
+- Default: `resizemix_prob=0.0`, `resizemix_scale_range=(0.1, 0.8)`.
+- Useful for improving small-text detection generalization; the pasted thumbnail teaches scale invariance.
+
+Implementation notes:
+- All three methods return `None` (skip) when dataset has fewer than 2 images.
+- `list_augmentations()` now includes `"cutmix"`, `"ricap"`, `"resizemix"`.
+- `preview_augmentation(idx, name)` supports all three new names.
+- Mutual-exclusion ordering in `__getitem__`: mosaic → cutmix → ricap → resizemix (first hit wins).
+- No torchvision/external mixing libraries used — custom implementation for direct quad-label compatibility.
+
+Files:
+- src/manuscript/detectors/_east/dataset.py
+- src/manuscript/detectors/_east/__init__.py
+
+22) EAST dataset: NaN guard and augmentation pipeline fixes (local)
+- All non-mixing augmentations (geometric + photometric) now always run after mixing augmentations,
+  so vflip/shear/random_crop/etc. work together with mosaic/cutmix/ricap/resizemix in the same sample.
+- Factored sample-building logic into `_build_sample()` for clarity.
+- Added `__getitem__` retry wrapper (`_MAX_RETRIES=3`):
+  - If NaN or Inf is detected in the image tensor or any target map, the sample is retried with a
+    randomly chosen index (up to 3 times).
+  - If all retries fail, a zero-filled dummy sample is returned instead of crashing the DataLoader.
+  - Each failure emits a `UserWarning` so problems are visible in logs without stopping training.
+- Added `_has_nan()` and `_sample_is_valid()` static helpers for tensor/array NaN detection.
+- Fixed `shrink_poly()` NaN safety:
+  - Threshold for `n_avg` normalization raised from `> 0` to `> 1e-6` to avoid division by near-zero.
+  - If the result contains NaN after shrink, original (unshrunk) polygon is returned as fallback.
+- Fixed `compute_quad_maps()` NaN safety:
+  - Each quad is wrapped in try/except; a single bad quad is skipped with a warning, not crashing.
+  - Explicit NaN/Inf guards around `shrunk`, `coords`, and `dx/dy` geometry offsets.
+  - Final `np.nan_to_num()` applied to both `score_map` and `geo_map` as belt-and-suspenders.
+
+Files:
+- src/manuscript/detectors/_east/dataset.py
+
+23) TRBA recognizer: expanded augmentation pipeline, TensorBoard previews, epoch-0 baseline (local)
+
+Major update to the TRBA word-level OCR training pipeline.
+
+Augmentation pipeline (src/manuscript/recognizers/_trba/data/transforms.py):
+- Replaced 4-step albumentations pipeline with a full 20-step pipeline in the recommended OCR order.
+- All probabilities and strengths are configurable via the same `params` dict passed to
+  `get_train_transform`, with safe defaults in `DEFAULT_AUG_PARAMS`.
+- All augmentations are independent (each fires based on its own probability).
+
+New augmentations added (all are new custom ImageOnlyTransform subclasses):
+
+Detector-noise simulation (important for real-world OCR):
+- `RandomZoomOut` (p=0.25): shrinks text inside the crop box, simulates detector adding padding.
+  `zoom_out_scale_min=0.65`, `zoom_out_scale_max=1.0`
+- `RandomZoomIn` (p=0.2): zooms in — characters near edges may be clipped.
+  `zoom_in_scale_min=1.0`, `zoom_in_scale_max=1.25`
+- `BBoxJitter` (p=0.25): random shift/crop simulating bbox misalignment from detector.
+  `bbox_jitter_offset=0.12`
+
+Geometric:
+- `A.Perspective` (p=0.25): perspective warp via albumentations.
+  `perspective_scale_min=0.02`, `perspective_scale_max=0.05`
+- `TextWarp` (p=0.2): sinusoidal warp — simulates curved pages, banners, signboards.
+  `text_warp_strength=0.03`
+
+Morphology:
+- `StrokeWidthPerturbation` (p=0.1): random erosion or dilation — varies stroke width.
+  `stroke_kernel_min=1`, `stroke_kernel_max=2`
+
+Photometric (expanded):
+- `A.RandomGamma` (p=0.2): gamma correction. `gamma_min=70`, `gamma_max=150`
+- `A.InvertImg` (p=0.08): inversion (was 0.0 before — now active by default)
+- `A.RandomBrightnessContrast` unchanged (p=0.3)
+
+Blur (expanded):
+- `A.GaussianBlur` (p=0.2): gaussian blur.
+- `A.MotionBlur` (p=0.15): directional motion blur.
+
+Noise (expanded):
+- `GaussianNoiseCustom` (p=0.2): gaussian noise, std sampled from `[std_min, std_max] * 255`.
+  `gauss_noise_std_min=0.01`, `gauss_noise_std_max=0.03`
+- `SaltPepperNoise` (p=0.1): salt-and-pepper noise.
+  `salt_pepper_amount_min=0.001`, `salt_pepper_amount_max=0.005`
+
+Compression / resolution:
+- `A.ImageCompression` (JPEG, p=0.15): `jpeg_quality_min=60`, `jpeg_quality_max=95`
+- `DownscaleUpscale` (p=0.2): downscale then upscale — simulates low-resolution text.
+  `downscale_min=0.5`, `downscale_max=0.9`
+
+Occlusion:
+- `RandomErasing` (p=0.1): fill random rectangles with mean color.
+  `erasing_holes=2`, `erasing_size_min=0.05`, `erasing_size_max=0.15`
+
+Text Mosaic (new augmentation concept):
+- `make_text_mosaic(images, gap_ratio=0.2)`: horizontally concatenates 2–3 word crop images
+  with a white gap equal to `gap_ratio` of the average image height (default 20% of height).
+  This can be used in a custom dataset wrapper to create synthetic compound words / phrases
+  from individual word crops.  Listed in `list_augmentations()` as `"text_mosaic"`.
+
+Utilities added:
+- `DEFAULT_AUG_PARAMS` dict: single source of truth for all default values.
+- `list_augmentations()`: returns ordered list of all augmentation names.
+- `preview_augmentation(img, name, params)`: apply a single named augmentation to a numpy image
+  without normalization/tensor conversion — useful for notebook visualization.
+
+TensorBoard preview (src/manuscript/recognizers/_trba/training/train.py):
+- Added `log_augmentation_previews_tensorboard(...)` function: logs a grid of ``num_samples``
+  examples for every augmentation under `Augmentations/<name>` at step 0.
+- Called automatically once at the start of training (epoch=0), only on fresh runs (not resume).
+
+Epoch-0 baseline validation:
+- Before the first weight update, a full validation pass is run on all validation loaders.
+- Metrics (val_loss, accuracy, CER, WER) are written to TensorBoard at step 0, so the baseline
+  is visible on the same plots as training progress.
+- Wrapped in try/except — a failing baseline never blocks training.
+
+Files:
+- src/manuscript/recognizers/_trba/data/transforms.py
+- src/manuscript/recognizers/_trba/training/train.py
+
+Albumentations 2.x compatibility (local):
+- Replaced deprecated `A.ShiftScaleRotate` (removed in albumentations 2.x) with equivalent
+  `A.Affine(translate_percent=..., scale=..., rotate=...)` in both `get_train_transform` and
+  `preview_augmentation`.
+- Replaced deprecated `value=` kwarg of `A.ShiftScaleRotate` / `fill=` of `A.Affine` and
+  `pad_val=` of `A.Perspective` with the new `fill=` keyword.
+- Replaced deprecated `quality_lower` / `quality_upper` kwargs of `A.ImageCompression` with
+  the new `quality_range=(low, high)` tuple argument.
+- All changes are backwards-compatible with albumentations ≥ 1.3 when using the `fill` name
+  but specifically tested against albumentations 2.0.8.
+
 Summary:
 - v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fixes).
