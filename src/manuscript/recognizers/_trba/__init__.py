@@ -865,6 +865,12 @@ class TRBA(BaseModel):
         ctc_weight_decay_epochs: int = 50,
         ctc_weight_min: float = 0.0,
         max_grad_norm: float = 5.0,
+        auto_rollback_on_loss_explosion: bool = True,
+        loss_explosion_factor: float = 10.0,
+        loss_explosion_max_retries: int = 2,
+        batch_resolution_jitter: float = 0.12,
+        batch_resolution_min_h: int = 24,
+        batch_resolution_min_w: int = 132,
         batch_size: int = 32,
         epochs: int = 20,
         lr: float = 1e-3,
@@ -940,6 +946,27 @@ class TRBA(BaseModel):
         max_grad_norm : float, optional
             Maximum gradient norm for clipping (prevents gradient explosion/NaN).
             Default is 5.0.
+        auto_rollback_on_loss_explosion : bool, optional
+            If ``True``, training automatically restores the last stable state
+            and retries the same epoch when train loss becomes non-finite or
+            jumps by ``loss_explosion_factor`` times relative to the previous
+            stable epoch. Default is ``True``.
+        loss_explosion_factor : float, optional
+            Multiplicative threshold used to detect loss explosion between
+            stable epochs. Default is ``10.0``.
+        loss_explosion_max_retries : int, optional
+            Maximum number of automatic rollback retries for the same epoch
+            before training stops early from the last stable checkpoint.
+            Default is ``2``.
+        batch_resolution_jitter : float, optional
+            Relative batch-wise input resolution jitter applied only during
+            training. A value of ``0.12`` means each batch is resized together
+            within roughly +/-12% of ``img_h`` and ``img_w``. Set to ``0`` to
+            disable. Default is ``0.12``.
+        batch_resolution_min_h : int, optional
+            Lower bound for jittered training batch height. Default is ``24``.
+        batch_resolution_min_w : int, optional
+            Lower bound for jittered training batch width. Default is ``132``.
         batch_size : int, optional
             Training batch size. Default is 32.
         epochs : int, optional
@@ -1166,6 +1193,12 @@ class TRBA(BaseModel):
             "ctc_weight_decay_epochs": ctc_weight_decay_epochs,
             "ctc_weight_min": ctc_weight_min,
             "max_grad_norm": max_grad_norm,
+            "auto_rollback_on_loss_explosion": auto_rollback_on_loss_explosion,
+            "loss_explosion_factor": loss_explosion_factor,
+            "loss_explosion_max_retries": loss_explosion_max_retries,
+            "batch_resolution_jitter": batch_resolution_jitter,
+            "batch_resolution_min_h": batch_resolution_min_h,
+            "batch_resolution_min_w": batch_resolution_min_w,
             "batch_size": batch_size,
             "epochs": epochs,
             "lr": lr,

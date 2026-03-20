@@ -6,6 +6,7 @@ from concurrent.futures import ThreadPoolExecutor, as_completed
 from typing import List, Optional, Tuple, Union
 
 import torch
+import torch.nn.functional as F
 from torch.utils.data import Dataset
 from tqdm import tqdm
 
@@ -141,10 +142,50 @@ class OCRDatasetAttn(Dataset):
         raise RuntimeError("No valid samples remain after filtering unreadable images.")
 
     @staticmethod
-    def make_collate_attn(stoi, max_len: int, drop_blank: bool = True):
+    def sample_batch_input_size(
+        img_height: int,
+        img_width: int,
+        resolution_jitter: float = 0.0,
+        min_img_height: int = 24,
+        min_img_width: int = 132,
+    ) -> Tuple[int, int]:
+        """Sample a shared train-time input size for the whole batch."""
+        if resolution_jitter <= 0:
+            return int(img_height), int(img_width)
+
+        scale = random.uniform(1.0 - resolution_jitter, 1.0 + resolution_jitter)
+        target_h = max(int(min_img_height), int(round(img_height * scale)))
+        target_w = max(int(min_img_width), int(round(img_width * scale)))
+        return target_h, target_w
+
+    @staticmethod
+    def make_collate_attn(
+        stoi,
+        max_len: int,
+        drop_blank: bool = True,
+        batch_img_size: Optional[Tuple[int, int]] = None,
+        resolution_jitter: float = 0.0,
+        min_img_height: int = 24,
+        min_img_width: int = 132,
+    ):
         def collate(batch):
             imgs, labels_text = zip(*batch)
             imgs = torch.stack(imgs)
+            if batch_img_size is not None:
+                target_h, target_w = OCRDatasetAttn.sample_batch_input_size(
+                    img_height=batch_img_size[0],
+                    img_width=batch_img_size[1],
+                    resolution_jitter=resolution_jitter,
+                    min_img_height=min_img_height,
+                    min_img_width=min_img_width,
+                )
+                if imgs.shape[-2:] != (target_h, target_w):
+                    imgs = F.interpolate(
+                        imgs,
+                        size=(target_h, target_w),
+                        mode="bilinear",
+                        align_corners=False,
+                    )
             text_in, target_y, lengths = pack_attention_targets(
                 labels_text, stoi=stoi, max_len=max_len, drop_blank=drop_blank
             )

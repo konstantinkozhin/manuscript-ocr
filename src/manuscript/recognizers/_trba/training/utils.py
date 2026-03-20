@@ -1,4 +1,5 @@
 import random
+import math
 from typing import Dict, Any, Tuple, Optional
 
 import torch
@@ -18,6 +19,7 @@ def save_checkpoint(
     stoi,
     config,
     log_dir,
+    extra_state: Optional[Dict[str, Any]] = None,
 ):
     ckpt = {
         "epoch": epoch,
@@ -33,6 +35,8 @@ def save_checkpoint(
         "config": config,
         "log_dir": log_dir,
     }
+    if extra_state:
+        ckpt.update(extra_state)
     torch.save(ckpt, path)
 
 
@@ -121,6 +125,23 @@ def set_seed(seed: int = 42):
     torch.backends.cudnn.benchmark = True
     torch.backends.cuda.matmul.allow_tf32 = True
     torch.backends.cudnn.allow_tf32 = True
+
+
+def is_loss_explosion(
+    current_loss: Optional[float],
+    reference_loss: Optional[float],
+    factor: float = 10.0,
+) -> bool:
+    """Return True when the current loss clearly diverged from a stable baseline."""
+    if current_loss is None or not math.isfinite(float(current_loss)):
+        return True
+
+    if reference_loss is None or not math.isfinite(float(reference_loss)):
+        return False
+
+    factor = max(float(factor), 1.0)
+    baseline = max(float(reference_loss), 1e-12)
+    return float(current_loss) >= baseline * factor
 
 
 # -------------------------
