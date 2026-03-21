@@ -138,6 +138,15 @@ def test_joint_loss_is_computed_in_float32(monkeypatch):
     assert torch.isfinite(total_loss)
 
 
+def test_get_ctc_weight_for_epoch_reaches_min_without_rebound(monkeypatch):
+    train_module = _import_train_module(monkeypatch)
+
+    assert train_module.get_ctc_weight_for_epoch(0, 0.3, 50, 0.0) == pytest.approx(0.3)
+    assert train_module.get_ctc_weight_for_epoch(1, 0.3, 50, 0.0) == pytest.approx(0.3)
+    assert train_module.get_ctc_weight_for_epoch(50, 0.3, 50, 0.0) == pytest.approx(0.0)
+    assert train_module.get_ctc_weight_for_epoch(51, 0.3, 50, 0.0) == pytest.approx(0.0)
+
+
 def test_nonfinite_grad_norm_is_not_fatal_with_amp(monkeypatch):
     train_module = _import_train_module(monkeypatch)
 
@@ -152,6 +161,38 @@ def test_nonfinite_grad_norm_is_not_fatal_with_amp(monkeypatch):
     assert train_module._should_fail_on_nonfinite_grad_norm(FakeScaler()) is False
     assert train_module._should_fail_on_nonfinite_grad_norm(FakeDisabledScaler()) is True
     assert train_module._should_fail_on_nonfinite_grad_norm(None) is True
+
+
+def test_select_explosion_rollback_path_prefers_best_loss(monkeypatch):
+    train_module = _import_train_module(monkeypatch)
+
+    monkeypatch.setattr(
+        train_module.os.path,
+        "isfile",
+        lambda path: path in {"best_loss_ckpt.pth", "last_ckpt.pth"},
+    )
+
+    assert (
+        train_module._select_explosion_rollback_path(
+            "best_loss_ckpt.pth",
+            "last_ckpt.pth",
+        )
+        == "best_loss_ckpt.pth"
+    )
+    assert (
+        train_module._select_explosion_rollback_path(
+            "missing_best.pth",
+            "last_ckpt.pth",
+        )
+        == "last_ckpt.pth"
+    )
+    assert (
+        train_module._select_explosion_rollback_path(
+            "missing_best.pth",
+            "missing_last.pth",
+        )
+        is None
+    )
 
 
 def test_rollback_checkpoint_uses_fresh_grad_scaler(monkeypatch):

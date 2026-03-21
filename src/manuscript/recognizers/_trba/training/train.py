@@ -9,7 +9,13 @@ from typing import Union, Optional, Dict, Any, List
 
 import torch
 import torch.cuda.amp as amp  # noqa: F401 (scaler still uses cuda.amp.GradScaler)
+import torch.nn as nn
+import torch.optim as optim
 from torch.amp import autocast as _amp_autocast
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.utils.data import ConcatDataset, DataLoader, Subset, random_split
+from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm
 
 
 def _autocast():
@@ -26,6 +32,15 @@ def _should_fail_on_nonfinite_grad_norm(scaler) -> bool:
     return scaler is None or not scaler.is_enabled()
 
 
+def _select_explosion_rollback_path(best_loss_path: str, last_path: str) -> Optional[str]:
+    """Prefer the best-loss checkpoint; fall back to the last full checkpoint."""
+    if os.path.isfile(best_loss_path):
+        return best_loss_path
+    if os.path.isfile(last_path):
+        return last_path
+    return None
+
+
 def _load_rollback_checkpoint(path, model, optimizer, scheduler):
     """Reload a rollback checkpoint into a fresh GradScaler instance."""
     scaler = _make_grad_scaler()
@@ -37,12 +52,6 @@ def _load_rollback_checkpoint(path, model, optimizer, scheduler):
         scaler=scaler,
     )
     return ckpt, scaler
-import torch.nn as nn
-import torch.optim as optim
-from torch.optim.lr_scheduler import ReduceLROnPlateau
-from torch.utils.data import ConcatDataset, DataLoader, Subset, random_split
-from torch.utils.tensorboard import SummaryWriter
-from tqdm import tqdm
 
 from ..data.dataset import (
     OCRDatasetAttn,
@@ -51,6 +60,8 @@ from ..data.dataset import (
 )
 from ..data.transforms import (
     decode_tokens,
+    get_train_transform,
+    get_val_transform,
     load_charset,
     list_augmentations,
     preview_augmentation,
@@ -156,8 +167,10 @@ def get_ctc_weight_for_epoch(
         return initial_weight
 
     # Линейное затухание
-    progress = min(1.0, (epoch - 1) / decay_epochs)
-    current_weight = initial_weight * (1 - progress) + min_weight * progress
+    effective_epoch = max(float(epoch) - 1.0, 0.0)
+    decay_span = max(float(decay_epochs) - 1.0, 1.0)
+    progress = min(1.0, effective_epoch / decay_span)
+    current_weight = initial_weight * (1.0 - progress) + min_weight * progress
 
     return max(min_weight, current_weight)
 
@@ -294,6 +307,10 @@ def split_train_val(
     text_mosaic_prob=0.0,
     text_mosaic_n_words=2,
     text_mosaic_gap_ratio=None,
+    train_transform=None,
+    val_transform=None,
+    train_return_raw_image=False,
+    val_return_raw_image=False,
 ):
     train_sets, val_sets = [], []
     for c, r in zip(csvs, roots):
@@ -327,14 +344,14 @@ def split_train_val(
             stoi,
             img_height=img_h,
             img_max_width=img_w,
-            transform=None,
+            transform=train_transform,
             encoding=encoding,
             max_len=max_len,
             strict_max_len=strict_max_len,
             text_mosaic_prob=text_mosaic_prob,
             text_mosaic_n_words=text_mosaic_n_words,
             text_mosaic_gap_ratio=text_mosaic_gap_ratio,
-            return_raw_image=True,
+            return_raw_image=train_return_raw_image,
         )
         val_base = OCRDatasetAttn(
             c,
@@ -342,14 +359,14 @@ def split_train_val(
             stoi,
             img_height=img_h,
             img_max_width=img_w,
-            transform=None,
+            transform=val_transform,
             encoding=encoding,
             max_len=max_len,
             strict_max_len=strict_max_len,
             text_mosaic_prob=0.0,
             text_mosaic_n_words=text_mosaic_n_words,
             text_mosaic_gap_ratio=text_mosaic_gap_ratio,
-            return_raw_image=True,
+            return_raw_image=val_return_raw_image,
         )
 
         train_ds = Subset(train_base, train_split.indices)
@@ -832,8 +849,8 @@ def run_training(cfg: Config, device: str = "cuda"):
     max_len = getattr(cfg, "max_len", 25)
     hidden_size = getattr(cfg, "hidden_size", 256)
 
-    # text mosaic (включён по умолчанию: 3% сэмплов получают мозаику из 2 слов)
-    text_mosaic_prob = float(getattr(cfg, "text_mosaic_prob", 0.03))
+    # text mosaic is opt-in; default stays off to keep the baseline stable.
+    text_mosaic_prob = float(getattr(cfg, "text_mosaic_prob", 0.0))
     text_mosaic_n_words = int(getattr(cfg, "text_mosaic_n_words", 2))
     # gap_ratio=None → make_text_mosaic сам рандомит 3–5% на каждый вызов
     text_mosaic_gap_ratio = getattr(cfg, "text_mosaic_gap_ratio", None)
@@ -888,11 +905,11 @@ def run_training(cfg: Config, device: str = "cuda"):
     # CTC loss weight для стабилизации начального обучения
     ctc_weight_initial = getattr(cfg, "ctc_weight", 0.3)
     ctc_weight_decay_epochs = getattr(
-        cfg, "ctc_weight_decay_epochs", 15
-    )  # Затухание за 15 эпох
+        cfg, "ctc_weight_decay_epochs", 50
+    )  # Match the public API default.
     ctc_weight_min = getattr(
-        cfg, "ctc_weight_min", 0.03
-    )  # Полное затухание после decay_epochs
+        cfg, "ctc_weight_min", 0.0
+    )  # Match the public API default.
 
     # Gradient clipping для защиты от взрыва градиентов
     max_grad_norm = getattr(cfg, "max_grad_norm", 5.0)
@@ -936,7 +953,6 @@ def run_training(cfg: Config, device: str = "cuda"):
     best_loss_path = os.path.join(exp_dir, "best_loss_ckpt.pth")
     best_acc_path = os.path.join(exp_dir, "best_acc_ckpt.pth")
     last_path = os.path.join(exp_dir, "last_ckpt.pth")
-    rollback_path = os.path.join(exp_dir, "rollback_ckpt.pth")
     best_loss_weights_path = os.path.join(exp_dir, "best_loss_weights.pth")
     best_acc_weights_path = os.path.join(exp_dir, "best_acc_weights.pth")
     last_weights_path = os.path.join(exp_dir, "last_weights.pth")
@@ -1172,6 +1188,11 @@ def run_training(cfg: Config, device: str = "cuda"):
     scaler = _make_grad_scaler()
 
     # --- трансформации ---
+    use_dynamic_train_batch_resize = batch_resolution_jitter > 0.0
+    train_transform = None
+    if not use_dynamic_train_batch_resize:
+        train_transform = get_train_transform(cfg.__dict__, img_h=img_h, img_w=img_w)
+    val_transform = get_val_transform(img_h, img_w)
 
     # --- датасеты и лоадеры ---
     train_sets = []
@@ -1193,14 +1214,14 @@ def run_training(cfg: Config, device: str = "cuda"):
                     stoi,
                     img_height=img_h,
                     img_max_width=img_w,
-                    transform=None,
+                    transform=train_transform,
                     encoding=encoding,
                     max_len=max_len,
                     strict_max_len=True,
                     text_mosaic_prob=text_mosaic_prob,
                     text_mosaic_n_words=text_mosaic_n_words,
                     text_mosaic_gap_ratio=text_mosaic_gap_ratio,
-                    return_raw_image=True,
+                    return_raw_image=use_dynamic_train_batch_resize,
                 )
                 val_ds = OCRDatasetAttn(
                     val_csvs[i],
@@ -1208,11 +1229,11 @@ def run_training(cfg: Config, device: str = "cuda"):
                     stoi,
                     img_height=img_h,
                     img_max_width=img_w,
-                    transform=None,
+                    transform=val_transform,
                     encoding=encoding,
                     max_len=max_len,
                     strict_max_len=True,
-                    return_raw_image=True,
+                    return_raw_image=False,
                 )
                 train_sets.append(train_ds)
                 val_sets.append(val_ds)
@@ -1230,6 +1251,10 @@ def run_training(cfg: Config, device: str = "cuda"):
                     text_mosaic_prob=text_mosaic_prob,
                     text_mosaic_n_words=text_mosaic_n_words,
                     text_mosaic_gap_ratio=text_mosaic_gap_ratio,
+                    train_transform=train_transform,
+                    val_transform=val_transform,
+                    train_return_raw_image=use_dynamic_train_batch_resize,
+                    val_return_raw_image=False,
                 )
                 train_sets.extend(split_train_sets)
                 val_sets.extend(split_val_sets)
@@ -1247,25 +1272,34 @@ def run_training(cfg: Config, device: str = "cuda"):
             text_mosaic_prob=text_mosaic_prob,
             text_mosaic_n_words=text_mosaic_n_words,
             text_mosaic_gap_ratio=text_mosaic_gap_ratio,
+            train_transform=train_transform,
+            val_transform=val_transform,
+            train_return_raw_image=use_dynamic_train_batch_resize,
+            val_return_raw_image=False,
         )
 
-    collate_train = OCRDatasetAttn.make_collate_attn(
-        stoi,
-        max_len=max_len,
-        drop_blank=True,
-        batch_img_size=(img_h, img_w),
-        resolution_jitter=batch_resolution_jitter,
-        min_img_height=batch_resolution_min_h,
-        min_img_width=batch_resolution_min_w,
-        image_transform_params=cfg.__dict__,
-        is_train=True,
-    )
+    if use_dynamic_train_batch_resize:
+        collate_train = OCRDatasetAttn.make_collate_attn(
+            stoi,
+            max_len=max_len,
+            drop_blank=True,
+            batch_img_size=(img_h, img_w),
+            resolution_jitter=batch_resolution_jitter,
+            min_img_height=batch_resolution_min_h,
+            min_img_width=batch_resolution_min_w,
+            image_transform_params=cfg.__dict__,
+            is_train=True,
+        )
+    else:
+        collate_train = OCRDatasetAttn.make_collate_attn(
+            stoi,
+            max_len=max_len,
+            drop_blank=True,
+        )
     collate_val = OCRDatasetAttn.make_collate_attn(
         stoi,
         max_len=max_len,
         drop_blank=True,
-        batch_img_size=(img_h, img_w),
-        is_train=False,
     )
 
     if train_proportions is not None:
@@ -1503,33 +1537,12 @@ def run_training(cfg: Config, device: str = "cuda"):
     epoch = start_epoch
     rollback_retries = 0
     while epoch <= epochs:
-        if epoch < ctc_weight_decay_epochs:
-            ctc_weight = get_ctc_weight_for_epoch(
-                epoch,
-                initial_weight=ctc_weight_initial,
-                decay_epochs=ctc_weight_decay_epochs,
-                min_weight=ctc_weight_min,
-            )
-        else:
-            ctc_weight = ctc_weight_initial
-
-        if auto_rollback_on_loss_explosion:
-            save_checkpoint(
-                rollback_path,
-                model,
-                optimizer,
-                scheduler,
-                scaler,
-                epoch - 1,
-                global_step,
-                best_val_loss,
-                best_val_acc,
-                itos,
-                stoi,
-                training_state_config,
-                log_dir,
-                extra_state={"last_stable_train_loss": last_stable_train_loss},
-            )
+        ctc_weight = get_ctc_weight_for_epoch(
+            epoch,
+            initial_weight=ctc_weight_initial,
+            decay_epochs=ctc_weight_decay_epochs,
+            min_weight=ctc_weight_min,
+        )
 
         model.train()
         total_train_loss = 0.0
@@ -1547,7 +1560,6 @@ def run_training(cfg: Config, device: str = "cuda"):
 
             optimizer.zero_grad(set_to_none=True)
             with _autocast():
-                # New unified API
                 result = model(
                     imgs,
                     text=text_in,
@@ -1639,26 +1651,32 @@ def run_training(cfg: Config, device: str = "cuda"):
             )
 
         if epoch_failed:
-            if not auto_rollback_on_loss_explosion or not os.path.isfile(rollback_path):
+            rollback_resume_path = _select_explosion_rollback_path(
+                best_loss_path=best_loss_path,
+                last_path=last_path,
+            )
+            if not auto_rollback_on_loss_explosion or rollback_resume_path is None:
                 raise RuntimeError(
                     f"Training failed at epoch {epoch}: {failure_reason}"
                 )
 
             rollback_retries += 1
             ckpt, scaler = _load_rollback_checkpoint(
-                rollback_path,
+                rollback_resume_path,
                 model,
                 optimizer=optimizer,
                 scheduler=scheduler,
             )
+            epoch = int(ckpt.get("epoch", epoch - 1)) + 1
             global_step = int(ckpt.get("global_step", global_step))
             best_val_loss = float(ckpt.get("best_val_loss", best_val_loss))
             best_val_acc = float(ckpt.get("best_val_acc", best_val_acc))
             last_stable_train_loss = ckpt.get("last_stable_train_loss")
 
             rollback_msg = (
-                f"Epoch {epoch:03d}: rollback after detected explosion "
-                f"({failure_reason}). Retry {rollback_retries}/{loss_explosion_max_retries}."
+                f"Epoch {epoch:03d}: resume from {os.path.basename(rollback_resume_path)} "
+                f"after detected explosion ({failure_reason}). "
+                f"Retry {rollback_retries}/{loss_explosion_max_retries}."
             )
             print(rollback_msg)
             logger.warning(rollback_msg)

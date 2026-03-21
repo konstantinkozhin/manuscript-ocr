@@ -44,7 +44,7 @@
 
 **`max_grad_norm`** – Gradient clipping threshold
 
-**`auto_rollback_on_loss_explosion`** – Automatically rollback to the last stable checkpoint when train loss becomes non-finite or jumps too much between epochs
+**`auto_rollback_on_loss_explosion`** – Automatically resume from the best-loss checkpoint (fallback: last checkpoint) when train loss becomes non-finite or jumps too much between epochs
 
 **`loss_explosion_factor`** – Multiplicative threshold for detecting a loss explosion relative to the previous stable epoch
 
@@ -146,9 +146,10 @@
 
 Notes on the new training safeguards:
 
-* `auto_rollback_on_loss_explosion=true` keeps a pre-epoch rollback checkpoint and retries the same epoch automatically.
+* `auto_rollback_on_loss_explosion=true` resumes from `best_loss_ckpt.pth` after an explosion; if it does not exist yet, it falls back to `last_ckpt.pth`.
 * Loss explosion is detected when train loss becomes `NaN`/`Inf` or grows by at least `loss_explosion_factor` times versus the previous stable epoch.
 * `batch_resolution_jitter=0.12` enables batch-wise training resolution jitter within about +/-12% of `img_h` and `img_w`, while never going below `24 x 132`.
+* `batch_resolution_jitter=0.0` restores the classic fixed-size preprocessing path used before dynamic batch resizing was added.
 * Validation still uses the fixed configured `img_h x img_w` size, without jitter.
 
 ## Example of a charset.txt file

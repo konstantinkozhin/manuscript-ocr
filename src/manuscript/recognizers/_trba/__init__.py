@@ -947,23 +947,23 @@ class TRBA(BaseModel):
             Maximum gradient norm for clipping (prevents gradient explosion/NaN).
             Default is 5.0.
         auto_rollback_on_loss_explosion : bool, optional
-            If ``True``, training automatically restores the last stable state
-            and retries the same epoch when train loss becomes non-finite or
-            jumps by ``loss_explosion_factor`` times relative to the previous
-            stable epoch. Default is ``True``.
+            If ``True``, training automatically resumes from the best-loss
+            checkpoint (or falls back to the last checkpoint) when train loss
+            becomes non-finite or jumps by ``loss_explosion_factor`` times
+            relative to the previous stable epoch. Default is ``True``.
         loss_explosion_factor : float, optional
             Multiplicative threshold used to detect loss explosion between
             stable epochs. Default is ``10.0``.
         loss_explosion_max_retries : int, optional
             Maximum number of automatic rollback retries for the same epoch
-            before training stops early from the last stable checkpoint.
+            before training stops early from the selected resume checkpoint.
             Default is ``2``.
         batch_resolution_jitter : float, optional
             Relative batch-wise input resolution jitter applied only during
             training. A value of ``0.12`` means each batch is resized together
             within roughly +/-12% of ``img_h`` and ``img_w``. Validation keeps
-            the fixed configured size. Set to ``0`` to disable. Default is
-            ``0.12``.
+            the fixed configured size. Set to ``0`` to restore the classic
+            fixed-size dataset-level preprocessing path. Default is ``0.12``.
         batch_resolution_min_h : int, optional
             Lower bound for jittered training batch height. Default is ``24``.
         batch_resolution_min_w : int, optional
