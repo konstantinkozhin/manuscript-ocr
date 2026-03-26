@@ -12,8 +12,6 @@ from tqdm import tqdm
 from ....utils import read_image
 from .transforms import (
     build_file_index,
-    get_train_transform,
-    get_val_transform,
     make_text_mosaic,
     pack_attention_targets,
 )
@@ -39,7 +37,6 @@ class OCRDatasetAttn(Dataset):
         text_mosaic_prob: float = 0.0,
         text_mosaic_n_words: int = 2,
         text_mosaic_gap_ratio: Optional[float] = None,
-        return_raw_image: bool = False,
     ):
         self.images_dir = images_dir
         self.img_h = img_height
@@ -58,7 +55,6 @@ class OCRDatasetAttn(Dataset):
         self._strict_max_len = strict_max_len
         self._text_mosaic_prob = float(text_mosaic_prob)
         self._text_mosaic_n_words = max(2, int(text_mosaic_n_words))
-        self._return_raw_image = bool(return_raw_image)
         # None → make_text_mosaic рандомит gap 3–5% на каждый вызов
         self._text_mosaic_gap_ratio = float(text_mosaic_gap_ratio) if text_mosaic_gap_ratio is not None else None
 
@@ -106,17 +102,9 @@ class OCRDatasetAttn(Dataset):
 
             if self.transform:
                 augmented = self.transform(image=img)
-                image_or_tensor = augmented["image"]
+                tensor = augmented["image"]
             else:
-                image_or_tensor = img
-
-            if self._return_raw_image:
-                return image_or_tensor, label
-
-            if torch.is_tensor(image_or_tensor):
-                return image_or_tensor, label
-
-            tensor = torch.from_numpy(image_or_tensor).permute(2, 0, 1).float() / 255.0
+                tensor = torch.from_numpy(img).permute(2, 0, 1).float() / 255.0
             return tensor, label
 
         attempts = self._max_getitem_retries
@@ -142,17 +130,9 @@ class OCRDatasetAttn(Dataset):
 
             if self.transform:
                 augmented = self.transform(image=img)
-                image_or_tensor = augmented["image"]
+                tensor = augmented["image"]
             else:
-                image_or_tensor = img
-
-            if self._return_raw_image:
-                return image_or_tensor, label
-
-            if torch.is_tensor(image_or_tensor):
-                return image_or_tensor, label
-
-            tensor = torch.from_numpy(image_or_tensor).permute(2, 0, 1).float() / 255.0
+                tensor = torch.from_numpy(img).permute(2, 0, 1).float() / 255.0
             return tensor, label
 
         raise RuntimeError("Failed to fetch a valid sample after lazy validation retries.")
@@ -214,63 +194,10 @@ class OCRDatasetAttn(Dataset):
         raise RuntimeError("No valid samples remain after filtering unreadable images.")
 
     @staticmethod
-    def sample_batch_input_size(
-        img_height: int,
-        img_width: int,
-        resolution_jitter: float = 0.0,
-        min_img_height: int = 24,
-        min_img_width: int = 132,
-    ) -> Tuple[int, int]:
-        """Sample a shared train-time input size for the whole batch."""
-        if resolution_jitter <= 0:
-            return int(img_height), int(img_width)
-
-        scale = random.uniform(1.0 - resolution_jitter, 1.0 + resolution_jitter)
-        target_h = max(int(min_img_height), int(round(img_height * scale)))
-        target_w = max(int(min_img_width), int(round(img_width * scale)))
-        return target_h, target_w
-
-    @staticmethod
-    def make_collate_attn(
-        stoi,
-        max_len: int,
-        drop_blank: bool = True,
-        batch_img_size: Optional[Tuple[int, int]] = None,
-        resolution_jitter: float = 0.0,
-        min_img_height: int = 24,
-        min_img_width: int = 132,
-        image_transform_params: Optional[dict] = None,
-        is_train: bool = False,
-    ):
+    def make_collate_attn(stoi, max_len: int, drop_blank: bool = True):
         def collate(batch):
             imgs, labels_text = zip(*batch)
-            first_img = imgs[0]
-            if torch.is_tensor(first_img):
-                imgs = torch.stack(imgs)
-            else:
-                if batch_img_size is None:
-                    raise ValueError("batch_img_size is required when collating raw images.")
-
-                target_h, target_w = int(batch_img_size[0]), int(batch_img_size[1])
-                if is_train:
-                    target_h, target_w = OCRDatasetAttn.sample_batch_input_size(
-                        img_height=batch_img_size[0],
-                        img_width=batch_img_size[1],
-                        resolution_jitter=resolution_jitter,
-                        min_img_height=min_img_height,
-                        min_img_width=min_img_width,
-                    )
-                    image_transform = get_train_transform(
-                        image_transform_params or {},
-                        img_h=target_h,
-                        img_w=target_w,
-                    )
-                else:
-                    image_transform = get_val_transform(target_h, target_w)
-
-                imgs = torch.stack(
-                    [image_transform(image=img)["image"] for img in imgs]
-                )
+            imgs = torch.stack(imgs)
             text_in, target_y, lengths = pack_attention_targets(
                 labels_text, stoi=stoi, max_len=max_len, drop_blank=drop_blank
             )

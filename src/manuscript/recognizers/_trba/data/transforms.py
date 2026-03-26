@@ -457,14 +457,7 @@ def pack_attention_targets(texts, stoi, max_len, drop_blank=True):
     return text_in, target_y, lengths
 
 
-def get_train_transform(
-    params,
-    img_h,
-    img_w,
-    include_resize_pad: bool = True,
-    include_normalize: bool = True,
-    include_to_tensor: bool = True,
-):
+def get_train_transform(params, img_h, img_w):
     """Get training transforms (requires albumentations and torch).
 
     All augmentation probabilities and strengths are configurable via ``params``
@@ -503,13 +496,12 @@ def get_train_transform(
     def _v(key):
         return params.get(key, DEFAULT_AUG_PARAMS[key])
 
-    transforms = []
-
-    if include_resize_pad:
-        transforms.append(ResizeAndPadA(img_h=img_h, img_w=img_w))
-
-    transforms.extend(
+    return A.Compose(
         [
+            # 1. Resize + pad (always)
+            ResizeAndPadA(img_h=img_h, img_w=img_w),
+
+            # 2-4. Detector-noise simulation
             RandomZoomOut(
                 scale_min=float(_v("zoom_out_scale_min")),
                 scale_max=float(_v("zoom_out_scale_max")),
@@ -620,15 +612,11 @@ def get_train_transform(
                 p=_p("p_RandomErasing"),
             ),
 
+            # 19-20. Normalization (always)
+            A.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)),
+            ToTensorV2(),
         ]
     )
-
-    if include_normalize:
-        transforms.append(A.Normalize(mean=(0.5, 0.5, 0.5), std=(0.5, 0.5, 0.5)))
-    if include_to_tensor:
-        transforms.append(ToTensorV2())
-
-    return A.Compose(transforms)
 
 
 def get_val_transform(img_h, img_w):

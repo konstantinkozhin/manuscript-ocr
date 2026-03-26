@@ -9,49 +9,18 @@ from typing import Union, Optional, Dict, Any, List
 
 import torch
 import torch.cuda.amp as amp  # noqa: F401 (scaler still uses cuda.amp.GradScaler)
-import torch.nn as nn
-import torch.optim as optim
 from torch.amp import autocast as _amp_autocast
-from torch.optim.lr_scheduler import ReduceLROnPlateau
-from torch.utils.data import ConcatDataset, DataLoader, Subset, random_split
-from torch.utils.tensorboard import SummaryWriter
-from tqdm import tqdm
 
 
 def _autocast():
     """Совместимый autocast: использует torch.amp.autocast для подавления FutureWarning."""
     return _amp_autocast("cuda")
-
-
-def _make_grad_scaler():
-    return amp.GradScaler(enabled=torch.cuda.is_available())
-
-
-def _should_fail_on_nonfinite_grad_norm(scaler) -> bool:
-    """AMP overflows are handled by GradScaler and should not abort the epoch."""
-    return scaler is None or not scaler.is_enabled()
-
-
-def _select_explosion_rollback_path(best_loss_path: str, last_path: str) -> Optional[str]:
-    """Prefer the best-loss checkpoint; fall back to the last full checkpoint."""
-    if os.path.isfile(best_loss_path):
-        return best_loss_path
-    if os.path.isfile(last_path):
-        return last_path
-    return None
-
-
-def _load_rollback_checkpoint(path, model, optimizer, scheduler):
-    """Reload a rollback checkpoint into a fresh GradScaler instance."""
-    scaler = _make_grad_scaler()
-    ckpt = load_checkpoint(
-        path,
-        model,
-        optimizer=optimizer,
-        scheduler=scheduler,
-        scaler=scaler,
-    )
-    return ckpt, scaler
+import torch.nn as nn
+import torch.optim as optim
+from torch.optim.lr_scheduler import ReduceLROnPlateau
+from torch.utils.data import ConcatDataset, DataLoader, random_split
+from torch.utils.tensorboard import SummaryWriter
+from tqdm import tqdm
 
 from ..data.dataset import (
     OCRDatasetAttn,
@@ -71,7 +40,6 @@ from ..data.transforms import (
 from .metrics import compute_cer, compute_wer
 from ..model.model import TRBAModel
 from .utils import (
-    is_loss_explosion,
     load_checkpoint,
     save_checkpoint,
     save_weights,
@@ -123,20 +91,6 @@ def ctc_greedy_decode(logits: torch.Tensor, blank_id: int = 0) -> torch.Tensor:
     return torch.tensor(padded, dtype=torch.long, device=logits.device)
 
 
-def _compute_joint_loss(result, criterion, target_y, lengths, model, ctc_weight):
-    """Compute attention + CTC loss in fp32 for numerical stability."""
-    attn_logits = result["attention_logits"].float()
-    ctc_logits = result["ctc_logits"].float()
-
-    attn_loss = criterion(
-        attn_logits.reshape(-1, attn_logits.size(-1)),
-        target_y.reshape(-1),
-    )
-    ctc_loss = model.compute_ctc_loss(ctc_logits, target_y, lengths)
-    total_loss = (1.0 - ctc_weight) * attn_loss + ctc_weight * ctc_loss
-    return total_loss, attn_loss, ctc_loss
-
-
 def get_ctc_weight_for_epoch(
     epoch: int,
     initial_weight: float = 0.3,
@@ -167,10 +121,8 @@ def get_ctc_weight_for_epoch(
         return initial_weight
 
     # Линейное затухание
-    effective_epoch = max(float(epoch) - 1.0, 0.0)
-    decay_span = max(float(decay_epochs) - 1.0, 1.0)
-    progress = min(1.0, effective_epoch / decay_span)
-    current_weight = initial_weight * (1.0 - progress) + min_weight * progress
+    progress = min(1.0, (epoch - 1) / decay_epochs)
+    current_weight = initial_weight * (1 - progress) + min_weight * progress
 
     return max(min_weight, current_weight)
 
@@ -300,21 +252,14 @@ def split_train_val(
     stoi,
     img_h,
     img_w,
+    train_transform,
+    val_transform,
     encoding="utf-8",
     val_size=3000,
-    max_len=None,
-    strict_max_len=True,
-    text_mosaic_prob=0.0,
-    text_mosaic_n_words=2,
-    text_mosaic_gap_ratio=None,
-    train_transform=None,
-    val_transform=None,
-    train_return_raw_image=False,
-    val_return_raw_image=False,
 ):
     train_sets, val_sets = [], []
     for c, r in zip(csvs, roots):
-        split_ds = OCRDatasetAttn(
+        full_ds = OCRDatasetAttn(
             c,
             r,
             stoi,
@@ -322,55 +267,18 @@ def split_train_val(
             img_max_width=img_w,
             transform=None,
             encoding=encoding,
-            max_len=max_len,
-            strict_max_len=strict_max_len,
-            text_mosaic_prob=0.0,
-            text_mosaic_n_words=text_mosaic_n_words,
-            text_mosaic_gap_ratio=text_mosaic_gap_ratio,
-            return_raw_image=True,
         )
-        n_val = min(val_size, len(split_ds))
-        n_train = len(split_ds) - n_val
+        n_val = min(val_size, len(full_ds))
+        n_train = len(full_ds) - n_val
         if n_train <= 0:
             raise ValueError(
-                f"В датасете {c} всего {len(split_ds)} примеров, меньше чем {val_size}"
+                f"В датасете {c} всего {len(full_ds)} примеров, меньше чем {val_size}"
             )
 
-        train_split, val_split = random_split(split_ds, [n_train, n_val])
+        train_ds, val_ds = random_split(full_ds, [n_train, n_val])
 
-        train_base = OCRDatasetAttn(
-            c,
-            r,
-            stoi,
-            img_height=img_h,
-            img_max_width=img_w,
-            transform=train_transform,
-            encoding=encoding,
-            max_len=max_len,
-            strict_max_len=strict_max_len,
-            text_mosaic_prob=text_mosaic_prob,
-            text_mosaic_n_words=text_mosaic_n_words,
-            text_mosaic_gap_ratio=text_mosaic_gap_ratio,
-            return_raw_image=train_return_raw_image,
-        )
-        val_base = OCRDatasetAttn(
-            c,
-            r,
-            stoi,
-            img_height=img_h,
-            img_max_width=img_w,
-            transform=val_transform,
-            encoding=encoding,
-            max_len=max_len,
-            strict_max_len=strict_max_len,
-            text_mosaic_prob=0.0,
-            text_mosaic_n_words=text_mosaic_n_words,
-            text_mosaic_gap_ratio=text_mosaic_gap_ratio,
-            return_raw_image=val_return_raw_image,
-        )
-
-        train_ds = Subset(train_base, train_split.indices)
-        val_ds = Subset(val_base, val_split.indices)
+        train_ds.dataset.transform = train_transform
+        val_ds.dataset.transform = val_transform
 
         train_sets.append(train_ds)
         val_sets.append(val_ds)
@@ -627,14 +535,12 @@ def run_validation(
 
                 with _autocast():
                     result = model(imgs, text=text_in, is_train=True, batch_max_length=max_len)
-                batch_loss, attn_loss, ctc_loss = _compute_joint_loss(
-                    result=result,
-                    criterion=criterion,
-                    target_y=target_y,
-                    lengths=lengths,
-                    model=model,
-                    ctc_weight=ctc_weight,
-                )
+                    attn_loss = criterion(
+                        result["attention_logits"].reshape(-1, result["attention_logits"].size(-1)),
+                        target_y.reshape(-1),
+                    )
+                    ctc_loss = model.compute_ctc_loss(result["ctc_logits"], target_y, lengths)
+                    batch_loss = (1.0 - ctc_weight) * attn_loss + ctc_weight * ctc_loss
 
                 set_loss += float(batch_loss.item())
 
@@ -849,8 +755,8 @@ def run_training(cfg: Config, device: str = "cuda"):
     max_len = getattr(cfg, "max_len", 25)
     hidden_size = getattr(cfg, "hidden_size", 256)
 
-    # text mosaic is opt-in; default stays off to keep the baseline stable.
-    text_mosaic_prob = float(getattr(cfg, "text_mosaic_prob", 0.0))
+    # text mosaic (включён по умолчанию: 3% сэмплов получают мозаику из 2 слов)
+    text_mosaic_prob = float(getattr(cfg, "text_mosaic_prob", 0.03))
     text_mosaic_n_words = int(getattr(cfg, "text_mosaic_n_words", 2))
     # gap_ratio=None → make_text_mosaic сам рандомит 3–5% на каждый вызов
     text_mosaic_gap_ratio = getattr(cfg, "text_mosaic_gap_ratio", None)
@@ -905,24 +811,14 @@ def run_training(cfg: Config, device: str = "cuda"):
     # CTC loss weight для стабилизации начального обучения
     ctc_weight_initial = getattr(cfg, "ctc_weight", 0.3)
     ctc_weight_decay_epochs = getattr(
-        cfg, "ctc_weight_decay_epochs", 50
-    )  # Match the public API default.
+        cfg, "ctc_weight_decay_epochs", 15
+    )  # Затухание за 15 эпох
     ctc_weight_min = getattr(
-        cfg, "ctc_weight_min", 0.0
-    )  # Match the public API default.
+        cfg, "ctc_weight_min", 0.03
+    )  # Полное затухание после decay_epochs
 
     # Gradient clipping для защиты от взрыва градиентов
     max_grad_norm = getattr(cfg, "max_grad_norm", 5.0)
-    auto_rollback_on_loss_explosion = bool(
-        getattr(cfg, "auto_rollback_on_loss_explosion", True)
-    )
-    loss_explosion_factor = float(getattr(cfg, "loss_explosion_factor", 10.0))
-    loss_explosion_max_retries = int(
-        getattr(cfg, "loss_explosion_max_retries", 2)
-    )
-    batch_resolution_jitter = float(getattr(cfg, "batch_resolution_jitter", 0.12))
-    batch_resolution_min_h = int(getattr(cfg, "batch_resolution_min_h", 24))
-    batch_resolution_min_w = int(getattr(cfg, "batch_resolution_min_w", 132))
 
     # --- директории и TensorBoard ---
     if resume_from:
@@ -1185,13 +1081,10 @@ def run_training(cfg: Config, device: str = "cuda"):
     scheduler = None
     scheduler_name_for_later = scheduler_name
 
-    scaler = _make_grad_scaler()
+    scaler = amp.GradScaler()
 
     # --- трансформации ---
-    use_dynamic_train_batch_resize = batch_resolution_jitter > 0.0
-    train_transform = None
-    if not use_dynamic_train_batch_resize:
-        train_transform = get_train_transform(cfg.__dict__, img_h=img_h, img_w=img_w)
+    train_transform = get_train_transform(cfg.__dict__, img_h=img_h, img_w=img_w)
     val_transform = get_val_transform(img_h, img_w)
 
     # --- датасеты и лоадеры ---
@@ -1221,7 +1114,6 @@ def run_training(cfg: Config, device: str = "cuda"):
                     text_mosaic_prob=text_mosaic_prob,
                     text_mosaic_n_words=text_mosaic_n_words,
                     text_mosaic_gap_ratio=text_mosaic_gap_ratio,
-                    return_raw_image=use_dynamic_train_batch_resize,
                 )
                 val_ds = OCRDatasetAttn(
                     val_csvs[i],
@@ -1233,31 +1125,37 @@ def run_training(cfg: Config, device: str = "cuda"):
                     encoding=encoding,
                     max_len=max_len,
                     strict_max_len=True,
-                    return_raw_image=False,
                 )
                 train_sets.append(train_ds)
                 val_sets.append(val_ds)
             else:
-                split_train_sets, split_val_sets = split_train_val(
-                    [train_csv],
-                    [train_root],
+                full_ds = OCRDatasetAttn(
+                    train_csv,
+                    train_root,
                     stoi,
-                    img_h,
-                    img_w,
+                    img_height=img_h,
+                    img_max_width=img_w,
+                    transform=None,
                     encoding=encoding,
-                    val_size=3000 if val_size is None else val_size,
                     max_len=max_len,
                     strict_max_len=True,
                     text_mosaic_prob=text_mosaic_prob,
                     text_mosaic_n_words=text_mosaic_n_words,
                     text_mosaic_gap_ratio=text_mosaic_gap_ratio,
-                    train_transform=train_transform,
-                    val_transform=val_transform,
-                    train_return_raw_image=use_dynamic_train_batch_resize,
-                    val_return_raw_image=False,
                 )
-                train_sets.extend(split_train_sets)
-                val_sets.extend(split_val_sets)
+                n_val = min(3000 if val_size is None else val_size, len(full_ds))
+                n_train = len(full_ds) - n_val
+                if n_train <= 0:
+                    raise ValueError(
+                        f"В датасете {train_csv} всего {len(full_ds)} примеров, меньше чем {n_val}"
+                    )
+
+                train_ds, val_ds = random_split(full_ds, [n_train, n_val])
+                train_ds.dataset.transform = train_transform
+                val_ds.dataset.transform = val_transform
+
+                train_sets.append(train_ds)
+                val_sets.append(val_ds)
     else:
         train_sets, val_sets = split_train_val(
             train_csvs,
@@ -1265,41 +1163,17 @@ def run_training(cfg: Config, device: str = "cuda"):
             stoi,
             img_h,
             img_w,
+            train_transform,
+            val_transform,
             encoding=encoding,
             val_size=val_size,
-            max_len=max_len,
-            strict_max_len=True,
-            text_mosaic_prob=text_mosaic_prob,
-            text_mosaic_n_words=text_mosaic_n_words,
-            text_mosaic_gap_ratio=text_mosaic_gap_ratio,
-            train_transform=train_transform,
-            val_transform=val_transform,
-            train_return_raw_image=use_dynamic_train_batch_resize,
-            val_return_raw_image=False,
         )
 
-    if use_dynamic_train_batch_resize:
-        collate_train = OCRDatasetAttn.make_collate_attn(
-            stoi,
-            max_len=max_len,
-            drop_blank=True,
-            batch_img_size=(img_h, img_w),
-            resolution_jitter=batch_resolution_jitter,
-            min_img_height=batch_resolution_min_h,
-            min_img_width=batch_resolution_min_w,
-            image_transform_params=cfg.__dict__,
-            is_train=True,
-        )
-    else:
-        collate_train = OCRDatasetAttn.make_collate_attn(
-            stoi,
-            max_len=max_len,
-            drop_blank=True,
-        )
+    collate_train = OCRDatasetAttn.make_collate_attn(
+        stoi, max_len=max_len, drop_blank=True
+    )
     collate_val = OCRDatasetAttn.make_collate_attn(
-        stoi,
-        max_len=max_len,
-        drop_blank=True,
+        stoi, max_len=max_len, drop_blank=True
     )
 
     if train_proportions is not None:
@@ -1418,7 +1292,6 @@ def run_training(cfg: Config, device: str = "cuda"):
     start_epoch = 1
     global_step = 0
     best_val_loss, best_val_acc = float("inf"), -1.0
-    last_stable_train_loss = None
 
     if resume_from and os.path.isfile(resume_from):
         try:
@@ -1441,56 +1314,10 @@ def run_training(cfg: Config, device: str = "cuda"):
         global_step = int(ckpt.get("global_step", 0))
         best_val_loss = float(ckpt.get("best_val_loss", best_val_loss))
         best_val_acc = float(ckpt.get("best_val_acc", best_val_acc))
-        last_stable_train_loss = ckpt.get("last_stable_train_loss")
         logger.info(
             f"Resumed from: {resume_from} (epoch={start_epoch-1}, step={global_step})"
         )
 
-    training_state_config = {
-        "batch_size": batch_size,
-        "epochs": epochs,
-        "lr": lr,
-        "optimizer": optimizer_name,
-        "scheduler": scheduler_name,
-        "weight_decay": weight_decay,
-        "momentum": momentum,
-        "img_h": img_h,
-        "img_w": img_w,
-        "encoding": encoding,
-        "max_len": max_len,
-        "hidden_size": hidden_size,
-        "num_encoder_layers": num_encoder_layers,
-        "cnn_in_channels": cnn_in_channels,
-        "cnn_out_channels": cnn_out_channels,
-        "cnn_backbone": cnn_backbone,
-        "ctc_weight": ctc_weight_initial,
-        "ctc_weight_decay_epochs": ctc_weight_decay_epochs,
-        "ctc_weight_min": ctc_weight_min,
-        "max_grad_norm": max_grad_norm,
-        "auto_rollback_on_loss_explosion": auto_rollback_on_loss_explosion,
-        "loss_explosion_factor": loss_explosion_factor,
-        "loss_explosion_max_retries": loss_explosion_max_retries,
-        "batch_resolution_jitter": batch_resolution_jitter,
-        "batch_resolution_min_h": batch_resolution_min_h,
-        "batch_resolution_min_w": batch_resolution_min_w,
-        "charset_path": charset_path,
-        "train_csvs": train_csvs,
-        "train_roots": train_roots,
-        "val_csvs": val_csvs,
-        "val_roots": val_roots,
-    }
-
-    logger.info(
-        "Train-time resolution jitter: "
-        f"jitter={batch_resolution_jitter:.3f}, "
-        f"min_size=({batch_resolution_min_h}, {batch_resolution_min_w})"
-    )
-    logger.info(
-        "Loss explosion rollback: "
-        f"enabled={auto_rollback_on_loss_explosion}, "
-        f"factor={loss_explosion_factor:.2f}, "
-        f"max_retries={loss_explosion_max_retries}"
-    )
     # ── Augmentation previews (logged once before training) ──────────────────
     if start_epoch == 1 and val_loaders_individual:
         try:
@@ -1534,25 +1361,25 @@ def run_training(cfg: Config, device: str = "cuda"):
             logger.warning(f"Epoch-0 baseline validation failed: {_e0}")
 
     # --- training loop ---
-    epoch = start_epoch
-    rollback_retries = 0
-    while epoch <= epochs:
-        ctc_weight = get_ctc_weight_for_epoch(
-            epoch,
-            initial_weight=ctc_weight_initial,
-            decay_epochs=ctc_weight_decay_epochs,
-            min_weight=ctc_weight_min,
-        )
+    for epoch in range(start_epoch, epochs + 1):
+        # Вычисляем текущий CTC weight с затуханием
+        if epoch < ctc_weight_decay_epochs:
+            ctc_weight = get_ctc_weight_for_epoch(
+                epoch,
+                initial_weight=ctc_weight_initial,
+                decay_epochs=ctc_weight_decay_epochs,
+                min_weight=ctc_weight_min,
+            )
+        else:
+            ctc_weight = ctc_weight_initial  # Не используется, но для совместимости
 
+        # train
         model.train()
         total_train_loss = 0.0
         total_attn_loss = 0.0
         total_ctc_loss = 0.0
-        processed_train_batches = 0
-        epoch_failed = False
-        failure_reason = ""
         pbar = tqdm(train_loader, desc=f"Train {epoch}/{epochs}", leave=False)
-        for batch_idx, (imgs, text_in, target_y, lengths) in enumerate(pbar, 1):
+        for imgs, text_in, target_y, lengths in pbar:
             imgs = imgs.to(device, non_blocking=pin_memory)
             text_in = text_in.to(device, non_blocking=pin_memory)
             target_y = target_y.to(device, non_blocking=pin_memory)
@@ -1560,40 +1387,36 @@ def run_training(cfg: Config, device: str = "cuda"):
 
             optimizer.zero_grad(set_to_none=True)
             with _autocast():
+                # New unified API
                 result = model(
                     imgs,
                     text=text_in,
                     is_train=True,
                     batch_max_length=max_len,
                 )
-            loss, attn_loss_val, ctc_loss_val = _compute_joint_loss(
-                result=result,
-                criterion=criterion,
-                target_y=target_y,
-                lengths=lengths,
-                model=model,
-                ctc_weight=ctc_weight,
-            )
 
-            if not torch.isfinite(loss):
-                epoch_failed = True
-                failure_reason = f"non-finite loss at batch {batch_idx}"
-                optimizer.zero_grad(set_to_none=True)
-                break
+                # Compute dual loss (attention + CTC)
+                loss = torch.tensor(0.0, device=device)
+                attn_loss_val = torch.tensor(0.0, device=device)
+                ctc_loss_val = torch.tensor(0.0, device=device)
+
+                attn_logits = result["attention_logits"]
+                ctc_logits = result["ctc_logits"]
+
+                attn_loss_val = criterion(
+                    attn_logits.reshape(-1, attn_logits.size(-1)),
+                    target_y.reshape(-1),
+                )
+                ctc_loss_val = model.compute_ctc_loss(ctc_logits, target_y, lengths)
+
+                # Weighted combination
+                loss = (1.0 - ctc_weight) * attn_loss_val + ctc_weight * ctc_loss_val
 
             scaler.scale(loss).backward()
 
+            # Gradient clipping для защиты от взрыва градиентов (NaN)
             scaler.unscale_(optimizer)
-            grad_norm = torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
-            grad_norm_value = float(grad_norm.item() if torch.is_tensor(grad_norm) else grad_norm)
-            if (
-                _should_fail_on_nonfinite_grad_norm(scaler)
-                and not torch.isfinite(torch.as_tensor(grad_norm_value))
-            ):
-                epoch_failed = True
-                failure_reason = f"non-finite gradient norm at batch {batch_idx}"
-                optimizer.zero_grad(set_to_none=True)
-                break
+            torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
 
             scaler.step(optimizer)
             scaler.update()
@@ -1605,7 +1428,6 @@ def run_training(cfg: Config, device: str = "cuda"):
             total_train_loss += loss_val
             total_attn_loss += attn_loss_scalar
             total_ctc_loss += ctc_loss_scalar
-            processed_train_batches += 1
 
             writer.add_scalar("Loss/train_step", loss_val, global_step)
             writer.add_scalar("Loss/train_attn_step", attn_loss_scalar, global_step)
@@ -1623,76 +1445,9 @@ def run_training(cfg: Config, device: str = "cuda"):
             ):
                 scheduler.step()
 
-        pbar.close()
-
-        if not epoch_failed and processed_train_batches > 0:
-            avg_train_loss = total_train_loss / processed_train_batches
-            avg_attn_loss = total_attn_loss / processed_train_batches
-            avg_ctc_loss = total_ctc_loss / processed_train_batches
-        else:
-            avg_train_loss = None
-            avg_attn_loss = None
-            avg_ctc_loss = None
-
-        if (
-            not epoch_failed
-            and auto_rollback_on_loss_explosion
-            and is_loss_explosion(
-                current_loss=avg_train_loss,
-                reference_loss=last_stable_train_loss,
-                factor=loss_explosion_factor,
-            )
-        ):
-            epoch_failed = True
-            failure_reason = (
-                "train_loss exploded: "
-                f"stable={last_stable_train_loss:.4f}, current={avg_train_loss:.4f}, "
-                f"threshold={loss_explosion_factor:.2f}x"
-            )
-
-        if epoch_failed:
-            rollback_resume_path = _select_explosion_rollback_path(
-                best_loss_path=best_loss_path,
-                last_path=last_path,
-            )
-            if not auto_rollback_on_loss_explosion or rollback_resume_path is None:
-                raise RuntimeError(
-                    f"Training failed at epoch {epoch}: {failure_reason}"
-                )
-
-            rollback_retries += 1
-            ckpt, scaler = _load_rollback_checkpoint(
-                rollback_resume_path,
-                model,
-                optimizer=optimizer,
-                scheduler=scheduler,
-            )
-            epoch = int(ckpt.get("epoch", epoch - 1)) + 1
-            global_step = int(ckpt.get("global_step", global_step))
-            best_val_loss = float(ckpt.get("best_val_loss", best_val_loss))
-            best_val_acc = float(ckpt.get("best_val_acc", best_val_acc))
-            last_stable_train_loss = ckpt.get("last_stable_train_loss")
-
-            rollback_msg = (
-                f"Epoch {epoch:03d}: resume from {os.path.basename(rollback_resume_path)} "
-                f"after detected explosion ({failure_reason}). "
-                f"Retry {rollback_retries}/{loss_explosion_max_retries}."
-            )
-            print(rollback_msg)
-            logger.warning(rollback_msg)
-
-            if rollback_retries > loss_explosion_max_retries:
-                stop_msg = (
-                    f"Stopping early at epoch {epoch:03d}: exceeded rollback retry budget "
-                    f"({loss_explosion_max_retries})."
-                )
-                print(stop_msg)
-                logger.error(stop_msg)
-                break
-            continue
-
-        rollback_retries = 0
-        last_stable_train_loss = avg_train_loss
+        avg_train_loss = total_train_loss / max(1, len(train_loader))
+        avg_attn_loss = total_attn_loss / max(1, len(train_loader))
+        avg_ctc_loss = total_ctc_loss / max(1, len(train_loader))
 
         should_eval = ((epoch - start_epoch) % val_interval == 0) or (epoch == epochs)
 
@@ -1758,8 +1513,9 @@ def run_training(cfg: Config, device: str = "cuda"):
                     f"{val_acc:.6f}",
                     f"{val_cer:.6f}",
                     f"{val_wer:.6f}",
-                    f"{optimizer.param_groups[0]['lr']:.6e}",
                 ]
+                row.append(f"{optimizer.param_groups[0]['lr']:.6e}")
+                w.writerow(row)
             else:
                 row = [
                     epoch,
@@ -1768,9 +1524,9 @@ def run_training(cfg: Config, device: str = "cuda"):
                     "skipped",
                     "skipped",
                     "skipped",
-                    f"{optimizer.param_groups[0]['lr']:.6e}",
                 ]
-            w.writerow(row)
+                row.append(f"{optimizer.param_groups[0]['lr']:.6e}")
+                w.writerow(row)
 
         msg_parts = [
             f"Epoch {epoch:03d}/{epochs}",
@@ -1792,15 +1548,47 @@ def run_training(cfg: Config, device: str = "cuda"):
         print(msg)
         logger.info(msg)
 
-        checkpoint_extra_state = {
-            "last_stable_train_loss": last_stable_train_loss,
-            "last_val_loss": avg_val_loss,
-            "last_val_acc": val_acc,
-            "last_val_cer": val_cer,
-            "last_val_wer": val_wer,
-        }
-
         if should_eval:
+            save_checkpoint(
+                last_path,
+                model,
+                optimizer,
+                scheduler,
+                scaler,
+                epoch,
+                global_step,
+                avg_val_loss,
+                val_acc,
+                itos,
+                stoi,
+                {
+                    "batch_size": batch_size,
+                    "epochs": epochs,
+                    "lr": lr,
+                    "optimizer": optimizer_name,
+                    "scheduler": scheduler_name,
+                    "weight_decay": weight_decay,
+                    "momentum": momentum,
+                    "img_h": img_h,
+                    "img_w": img_w,
+                    "encoding": encoding,
+                    "max_len": max_len,
+                    "hidden_size": hidden_size,
+                    "num_encoder_layers": num_encoder_layers,
+                    "cnn_in_channels": cnn_in_channels,
+                    "cnn_out_channels": cnn_out_channels,
+                    "cnn_backbone": cnn_backbone,
+                    "ctc_weight": ctc_weight,
+                    "charset_path": charset_path,
+                    "train_csvs": train_csvs,
+                    "train_roots": train_roots,
+                    "val_csvs": val_csvs,
+                    "val_roots": val_roots,
+                },
+                log_dir,
+            )
+            save_weights(last_weights_path, model)
+
             if avg_val_loss < best_val_loss:
                 best_val_loss = avg_val_loss
                 save_checkpoint(
@@ -1812,12 +1600,34 @@ def run_training(cfg: Config, device: str = "cuda"):
                     epoch,
                     global_step,
                     best_val_loss,
-                    best_val_acc,
+                    val_acc,
                     itos,
                     stoi,
-                    training_state_config,
+                    {
+                        "batch_size": batch_size,
+                        "epochs": epochs,
+                        "lr": lr,
+                        "optimizer": optimizer_name,
+                        "scheduler": scheduler_name,
+                        "weight_decay": weight_decay,
+                        "momentum": momentum,
+                        "img_h": img_h,
+                        "img_w": img_w,
+                        "encoding": encoding,
+                        "max_len": max_len,
+                        "hidden_size": hidden_size,
+                        "num_encoder_layers": num_encoder_layers,
+                        "cnn_in_channels": cnn_in_channels,
+                        "cnn_out_channels": cnn_out_channels,
+                        "cnn_backbone": cnn_backbone,
+                        "ctc_weight": ctc_weight,
+                        "charset_path": charset_path,
+                        "train_csvs": train_csvs,
+                        "train_roots": train_roots,
+                        "val_csvs": val_csvs,
+                        "val_roots": val_roots,
+                    },
                     log_dir,
-                    extra_state=checkpoint_extra_state,
                 )
                 save_weights(best_loss_weights_path, model)
                 logger.info(f"New best val_loss: {best_val_loss:.4f} (epoch {epoch})")
@@ -1836,30 +1646,34 @@ def run_training(cfg: Config, device: str = "cuda"):
                     best_val_acc,
                     itos,
                     stoi,
-                    training_state_config,
+                    {
+                        "batch_size": batch_size,
+                        "epochs": epochs,
+                        "lr": lr,
+                        "optimizer": optimizer_name,
+                        "scheduler": scheduler_name,
+                        "weight_decay": weight_decay,
+                        "momentum": momentum,
+                        "img_h": img_h,
+                        "img_w": img_w,
+                        "encoding": encoding,
+                        "max_len": max_len,
+                        "hidden_size": hidden_size,
+                        "num_encoder_layers": num_encoder_layers,
+                        "cnn_in_channels": cnn_in_channels,
+                        "cnn_out_channels": cnn_out_channels,
+                        "cnn_backbone": cnn_backbone,
+                        "ctc_weight": ctc_weight,
+                        "charset_path": charset_path,
+                        "train_csvs": train_csvs,
+                        "train_roots": train_roots,
+                        "val_csvs": val_csvs,
+                        "val_roots": val_roots,
+                    },
                     log_dir,
-                    extra_state=checkpoint_extra_state,
                 )
                 save_weights(best_acc_weights_path, model)
                 logger.info(f"New best acc: {best_val_acc:.4f} (epoch {epoch})")
-
-            save_checkpoint(
-                last_path,
-                model,
-                optimizer,
-                scheduler,
-                scaler,
-                epoch,
-                global_step,
-                best_val_loss,
-                best_val_acc,
-                itos,
-                stoi,
-                training_state_config,
-                log_dir,
-                extra_state=checkpoint_extra_state,
-            )
-            save_weights(last_weights_path, model)
 
         if scheduler is not None:
             # OneCycleLR вызывается после каждого батча, не здесь
@@ -1870,8 +1684,6 @@ def run_training(cfg: Config, device: str = "cuda"):
                     scheduler.step(avg_val_loss)
             else:
                 scheduler.step()
-
-        epoch += 1
 
     writer.close()
     logger.info("Training finished.")
