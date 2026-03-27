@@ -211,8 +211,8 @@ msgid "Built-in preparer presets:"
 msgstr "Встроенные пресеты preparer:"
 
 #: ../../pipeline_usage.rst:113
-msgid "``\"bbox\"``: legacy axis-aligned crop behavior"
-msgstr "``\"bbox\"``: прежнее поведение с осеориентированными кропами"
+msgid "``\"bbox\"``: axis-aligned crop"
+msgstr "``\"bbox\"``: осеориентированный кроп"
 
 #: ../../pipeline_usage.rst:114
 msgid ""

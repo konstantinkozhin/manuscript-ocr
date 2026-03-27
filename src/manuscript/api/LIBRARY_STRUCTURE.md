@@ -21,10 +21,10 @@ graph LR
     data --> Page["Page"]
     data --> Block["Block"]
     data --> Line["Line"]
-    data --> Word["Word"]
+    data --> TextSpan["TextSpan"]
 
     detectors --> EAST["EAST"]
-    EAST --> east_predict["predict(image, return_maps=False) -> Dict[str, Any]"]
+    EAST --> east_predict["predict(image) -> Page"]
 
     layouts --> SimpleSorting["SimpleSorting"]
     SimpleSorting --> layout_predict["predict(page, image=None) -> Page"]
@@ -37,5 +37,9 @@ graph LR
 
     utils --> organize_page["organize_page() -> Page (compat wrapper)"]
 
-    api --> BaseModel["BaseModel"]
+    api --> BaseArtifactModel["BaseArtifactModel"]
+    api --> BaseDetector["BaseDetector"]
+    api --> BaseRecognizer["BaseRecognizer"]
+    api --> BaseLayout["BaseLayout"]
+    api --> BaseCorrector["BaseCorrector"]
 ```

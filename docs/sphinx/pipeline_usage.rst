@@ -135,10 +135,9 @@ Built-in Components
 TRBA Region Preparation
 -----------------------
 
-``TRBA`` keeps the current default crop behavior, but now allows crop
-preparation customization when needed.
+``TRBA`` supports configurable crop preparation before recognition.
 
-Default behavior is unchanged:
+Default settings:
 
 - ``region_preparer="bbox"`` extracts axis-aligned bounding boxes
 - ``rotate_threshold=1.5`` auto-rotates tall crops before recognition
@@ -146,7 +145,7 @@ Default behavior is unchanged:
 
 Built-in preparer presets:
 
-- ``"bbox"``: legacy axis-aligned crop behavior
+- ``"bbox"``: axis-aligned crop
 - ``"polygon_mask"``: tight crop with pixels outside the polygon masked to white
 - ``"quad_warp"``: perspective rectification for 4-point polygons, with bbox fallback
 
