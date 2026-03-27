@@ -10,8 +10,14 @@ except ImportError:
     TORCH_AVAILABLE = False
     torch = None
 
+from manuscript.api.detector import BaseDetector
 from manuscript.detectors import EAST
 from manuscript.data import Page
+
+
+def test_east_inherits_base_detector():
+    assert issubclass(EAST, BaseDetector)
+
 
 @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 class TestEASTInitialization:
@@ -313,9 +319,7 @@ class TestEASTPredict:
         
         result = detector.predict(test_image_path)
         
-        assert isinstance(result, dict)
-        assert "page" in result
-        assert isinstance(result["page"], Page)
+        assert isinstance(result, Page)
     
     @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
     def test_predict_with_numpy_array(self, test_image):
@@ -324,9 +328,7 @@ class TestEASTPredict:
         
         result = detector.predict(test_image)
         
-        assert isinstance(result, dict)
-        assert "page" in result
-        assert isinstance(result["page"], Page)
+        assert isinstance(result, Page)
     
     @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
     def test_predict_returns_page_structure(self, test_image):
@@ -334,15 +336,17 @@ class TestEASTPredict:
         detector = EAST()
         
         result = detector.predict(test_image)
-        page = result["page"]
+        page = result
         
         assert hasattr(page, "blocks")
         assert isinstance(page.blocks, list)
         
         if len(page.blocks) > 0:
             block = page.blocks[0]
-            assert hasattr(block, "words")
-            assert isinstance(block.words, list)
+            assert hasattr(block, "lines")
+            assert isinstance(block.lines, list)
+            if len(block.lines) > 0:
+                assert isinstance(block.lines[0].text_spans, list)
 
     @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
     def test_predict_different_thresholds(self, test_image):
@@ -354,8 +358,8 @@ class TestEASTPredict:
         result_high = detector_high.predict(test_image)
         
         # Both should work without errors
-        assert isinstance(result_low["page"], Page)
-        assert isinstance(result_high["page"], Page)
+        assert isinstance(result_low, Page)
+        assert isinstance(result_high, Page)
     
     @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
     def test_predict_axis_aligned_vs_original(self, test_image):
@@ -367,8 +371,8 @@ class TestEASTPredict:
         result_original = detector_original.predict(test_image)
         
         # Both should return results
-        assert isinstance(result_aligned["page"], Page)
-        assert isinstance(result_original["page"], Page)
+        assert isinstance(result_aligned, Page)
+        assert isinstance(result_original, Page)
 
 
 @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
@@ -418,7 +422,7 @@ class TestEASTEdgeCases:
         result = detector.predict(small_img)
         
         # Should not raise errors
-        assert isinstance(result["page"], Page)
+        assert isinstance(result, Page)
     
     @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
     def test_predict_very_large_image(self):
@@ -431,7 +435,7 @@ class TestEASTEdgeCases:
         result = detector.predict(large_img)
         
         # Should not raise errors
-        assert isinstance(result["page"], Page)
+        assert isinstance(result, Page)
     
     @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
     def test_predict_grayscale_image(self):
@@ -445,7 +449,7 @@ class TestEASTEdgeCases:
         try:
             result = detector.predict(gray_img)
             # If it worked, check the result
-            assert isinstance(result["page"], Page)
+            assert isinstance(result, Page)
         except (ValueError, AttributeError):
             # Expected error for grayscale
             pass
@@ -457,8 +461,7 @@ class TestEASTEdgeCases:
         
         black_img = np.zeros((480, 640, 3), dtype=np.uint8)
         
-        result = detector.predict(black_img)
-        page = result["page"]
+        page = detector.predict(black_img)
         
         # Most likely there will be no detections, but there should be no errors
         assert isinstance(page, Page)
@@ -470,8 +473,7 @@ class TestEASTEdgeCases:
         
         white_img = np.ones((480, 640, 3), dtype=np.uint8) * 255
         
-        result = detector.predict(white_img)
-        page = result["page"]
+        page = detector.predict(white_img)
         
         assert isinstance(page, Page)
         
@@ -485,7 +487,7 @@ class TestEASTEdgeCases:
         result = detector.predict(test_img)
         
         # Should not raise errors even with zero expansion
-        assert isinstance(result["page"], Page)
+        assert isinstance(result, Page)
 
 @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 class TestEASTIntegration:
@@ -512,7 +514,7 @@ class TestEASTIntegration:
             result = detector.predict(example_image_path)
             
             # All should run without errors
-            assert isinstance(result["page"], Page)
+            assert isinstance(result, Page)
 
     @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
     def test_consistency_across_runs(self):
@@ -528,8 +530,8 @@ class TestEASTIntegration:
         result2 = detector.predict(img)
         
         # The number of detections should be the same
-        words1 = sum(len(b.words) for b in result1["page"].blocks)
-        words2 = sum(len(b.words) for b in result2["page"].blocks)
+        words1 = sum(len(line.text_spans) for b in result1.blocks for line in b.lines)
+        words2 = sum(len(line.text_spans) for b in result2.blocks for line in b.lines)
         
         assert words1 == words2
 
@@ -633,8 +635,7 @@ class TestEASTTTA:
         
         result = detector.predict(img)
         
-        assert "page" in result
-        assert isinstance(result["page"], Page)
+        assert isinstance(result, Page)
 
     def test_tta_consistency(self):
         """Test that TTA produces consistent results."""
@@ -646,8 +647,8 @@ class TestEASTTTA:
         result1 = detector.predict(img)
         result2 = detector.predict(img)
         
-        words1 = sum(len(line.words) for block in result1["page"].blocks for line in block.lines)
-        words2 = sum(len(line.words) for block in result2["page"].blocks for line in block.lines)
+        words1 = sum(len(line.text_spans) for block in result1.blocks for line in block.lines)
+        words2 = sum(len(line.text_spans) for block in result2.blocks for line in block.lines)
         
         assert words1 == words2
 
@@ -665,8 +666,8 @@ class TestEASTTTA:
         result_no_tta = detector_no_tta.predict(img)
         
         # Both should return valid Page objects
-        assert isinstance(result_tta["page"], Page)
-        assert isinstance(result_no_tta["page"], Page)
+        assert isinstance(result_tta, Page)
+        assert isinstance(result_no_tta, Page)
 
     def test_tta_with_axis_aligned_false(self):
         """Test that TTA works correctly with axis_aligned_output=False."""
@@ -678,18 +679,17 @@ class TestEASTTTA:
         
         result = detector.predict(img)
         
-        assert "page" in result
-        assert isinstance(result["page"], Page)
+        assert isinstance(result, Page)
         
         # Check that polygons are preserved (not converted to axis-aligned rectangles)
         # With axis_aligned_output=False, we should get the original 4-point polygons
-        for block in result["page"].blocks:
+        for block in result.blocks:
             for line in block.lines:
-                for word in line.words:
+                for text_span in line.text_spans:
                     # Each polygon should have 4 points
-                    assert len(word.polygon) == 4
+                    assert len(text_span.polygon) == 4
                     # Each point should have 2 coordinates
-                    for point in word.polygon:
+                    for point in text_span.polygon:
                         assert len(point) == 2
 
     def test_tta_axis_aligned_true_vs_false(self):
@@ -705,15 +705,15 @@ class TestEASTTTA:
         result_not_aligned = detector_not_aligned.predict(img)
         
         # Both should return valid results
-        assert isinstance(result_aligned["page"], Page)
-        assert isinstance(result_not_aligned["page"], Page)
+        assert isinstance(result_aligned, Page)
+        assert isinstance(result_not_aligned, Page)
         
         # Get all words from both results
         def get_all_words(page):
-            return [word for block in page.blocks for line in block.lines for word in line.words]
+            return [text_span for block in page.blocks for line in block.lines for text_span in line.text_spans]
         
-        words_aligned = get_all_words(result_aligned["page"])
-        words_not_aligned = get_all_words(result_not_aligned["page"])
+        words_aligned = get_all_words(result_aligned)
+        words_not_aligned = get_all_words(result_not_aligned)
         
         # Should have the same number of words
         assert len(words_aligned) == len(words_not_aligned)

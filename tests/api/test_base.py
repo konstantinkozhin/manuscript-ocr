@@ -1,4 +1,4 @@
-"""Tests for BaseModel class."""
+"""Tests for BaseArtifactModel class."""
 
 import pytest
 import tempfile
@@ -7,14 +7,14 @@ from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
 import onnxruntime as ort
 
-from manuscript.api.base import BaseModel
+from manuscript.api.base import BaseArtifactModel
 
 
 # ============================================================================
 # Mock implementations for testing abstract class
 # ============================================================================
-class ConcreteModel(BaseModel):
-    """Concrete implementation of BaseModel for testing."""
+class ConcreteModel(BaseArtifactModel):
+    """Concrete implementation of BaseArtifactModel for testing."""
     
     default_weights_name = "default_model.onnx"
     pretrained_registry = {
@@ -35,7 +35,7 @@ class ConcreteModel(BaseModel):
         return {"result": x * 2}
 
 
-class MinimalModel(BaseModel):
+class MinimalModel(BaseArtifactModel):
     """Minimal model without default weights or registry."""
     
     def _initialize_session(self):
@@ -292,20 +292,22 @@ class TestWeightResolution:
         expected_url = "https://github.com/owner/repo/releases/download/v2.0/models/subdir/model.onnx"
         mock_download_http.assert_called_once_with(expected_url)
     
-    @patch('gdown.download')
-    def test_gdrive_url_resolution(self, mock_gdown_download, tmp_path):
+    def test_gdrive_url_resolution(self, tmp_path):
         """Test Google Drive URL resolution with gdown."""
         gdrive_spec = "gdrive:1234567890abcdef"
         
         mock_file = tmp_path / "model.onnx"
         mock_file.write_text("mock")
-        mock_gdown_download.return_value = str(mock_file)
         
-        model = ConcreteModel(weights=gdrive_spec)
+        with patch.dict("sys.modules", {"gdown": MagicMock()}):
+            import gdown
+
+            gdown.download.return_value = str(mock_file)
+            model = ConcreteModel(weights=gdrive_spec)
         
         # Verify gdown.download was called with correct file_id
-        mock_gdown_download.assert_called_once()
-        call_kwargs = mock_gdown_download.call_args.kwargs
+        gdown.download.assert_called_once()
+        call_kwargs = gdown.download.call_args.kwargs
         assert call_kwargs['id'] == '1234567890abcdef'
         assert call_kwargs['quiet'] == False
 
@@ -421,28 +423,30 @@ class TestExtraArtifactResolution:
         expected_url = "https://github.com/user/repo/releases/download/v1.0/artifact.txt"
         mock_download.assert_called_once_with(expected_url)
     
-    @patch('gdown.download')
-    def test_resolve_artifact_from_gdrive(self, mock_gdown_download, tmp_path):
+    def test_resolve_artifact_from_gdrive(self, tmp_path):
         """Test downloading artifact from Google Drive with gdown."""
         weights_file = tmp_path / "model.onnx"
         weights_file.write_text("mock")
         
         mock_file = tmp_path / "artifact.txt"
         mock_file.write_text("downloaded")
-        mock_gdown_download.return_value = str(mock_file)
         
-        model = ConcreteModel(weights=str(weights_file))
+        with patch.dict("sys.modules", {"gdown": MagicMock()}):
+            import gdown
+
+            gdown.download.return_value = str(mock_file)
+            model = ConcreteModel(weights=str(weights_file))
         
-        result = model._resolve_extra_artifact(
-            "gdrive:ABCDEFG123",
-            default_name=None,
-            registry={},
-            description="artifact"
-        )
+            result = model._resolve_extra_artifact(
+                "gdrive:ABCDEFG123",
+                default_name=None,
+                registry={},
+                description="artifact"
+            )
         
         # Verify gdown.download was called with correct file_id
-        mock_gdown_download.assert_called_once()
-        call_kwargs = mock_gdown_download.call_args.kwargs
+        gdown.download.assert_called_once()
+        call_kwargs = gdown.download.call_args.kwargs
         assert call_kwargs['id'] == 'ABCDEFG123'
     
     def test_artifact_no_default_raises_error(self, tmp_path):
@@ -577,24 +581,26 @@ class TestDownloadHelpers:
             expected = "https://github.com/owner/repo/releases/download/v1.0.0/weights.onnx"
             mock_download.assert_called_once_with(expected)
     
-    @patch('gdown.download')
-    def test_download_gdrive_url_construction(self, mock_gdown_download, tmp_path):
+    def test_download_gdrive_url_construction(self, tmp_path):
         """Test Google Drive download with gdown."""
         weights_file = tmp_path / "model.onnx"
         weights_file.write_text("mock")
         
         downloaded_file = tmp_path / "downloaded.onnx"
         downloaded_file.write_text("mock_downloaded")
-        mock_gdown_download.return_value = str(downloaded_file)
         
-        model = ConcreteModel(weights=str(weights_file))
+        with patch.dict("sys.modules", {"gdown": MagicMock()}):
+            import gdown
+
+            gdown.download.return_value = str(downloaded_file)
+            model = ConcreteModel(weights=str(weights_file))
         
-        spec = "gdrive:1Ab2Cd3Ef4Gh5"
-        result = model._download_gdrive(spec)
+            spec = "gdrive:1Ab2Cd3Ef4Gh5"
+            result = model._download_gdrive(spec)
         
         # Verify gdown.download was called with correct file_id
-        mock_gdown_download.assert_called_once()
-        call_kwargs = mock_gdown_download.call_args.kwargs
+        gdown.download.assert_called_once()
+        call_kwargs = gdown.download.call_args.kwargs
         assert call_kwargs['id'] == '1Ab2Cd3Ef4Gh5'
         assert call_kwargs['quiet'] == False
         assert result == str(downloaded_file)
@@ -686,7 +692,7 @@ class TestModelInitialization:
         weights_file = tmp_path / "model.onnx"
         weights_file.write_text("mock")
         
-        # Train is a static method in BaseModel
+        # Train is a static method in BaseArtifactModel
         with pytest.raises(NotImplementedError, match="does not support training"):
             ConcreteModel.train()
     
@@ -695,7 +701,7 @@ class TestModelInitialization:
         weights_file = tmp_path / "model.onnx"
         weights_file.write_text("mock")
         
-        # Export is a static method in BaseModel
+        # Export is a static method in BaseArtifactModel
         with pytest.raises(NotImplementedError, match="does not support export"):
             ConcreteModel.export()
 

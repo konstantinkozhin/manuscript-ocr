@@ -1,15 +1,20 @@
-from manuscript.data import Block, Line, Page, Word
+from manuscript.api.layout import BaseLayout
+from manuscript.data import Block, Line, Page, TextSpan
 from manuscript.layouts import SimpleSorting
 from manuscript.utils import organize_page
 
 
-def _collect_words(page: Page):
+def _collect_text_spans(page: Page):
     return [
-        word
+        text_span
         for block in page.blocks
         for line in block.lines
-        for word in line.words
+        for text_span in line.text_spans
     ]
+
+
+def test_simplesorting_inherits_base_layout():
+    assert issubclass(SimpleSorting, BaseLayout)
 
 
 def test_simplesorting_empty_page():
@@ -17,44 +22,75 @@ def test_simplesorting_empty_page():
     result = layout.predict(Page(blocks=[]))
     assert len(result.blocks) == 1
     assert len(result.blocks[0].lines) == 1
-    assert len(result.blocks[0].lines[0].words) == 0
+    assert len(result.blocks[0].lines[0].text_spans) == 0
 
 
-def test_simplesorting_single_word():
-    word = Word(
+def test_simplesorting_single_text_span():
+    text_span = TextSpan(
         polygon=[(10, 20), (100, 20), (100, 40), (10, 40)],
         detection_confidence=0.95,
     )
-    page = Page(blocks=[Block(lines=[Line(words=[word], order=0)], order=0)])
+    page = Page(
+        blocks=[Block(lines=[Line(text_spans=[text_span], order=0)], order=0)]
+    )
     result = SimpleSorting(use_columns=False).predict(page)
 
-    words = _collect_words(result)
-    assert len(words) == 1
-    assert words[0].order == 0
+    text_spans = _collect_text_spans(result)
+    assert len(text_spans) == 1
+    assert text_spans[0].order == 0
 
 
-def test_simplesorting_multiple_words_in_line():
-    words = [
-        Word(polygon=[(120, 20), (180, 20), (180, 40), (120, 40)], detection_confidence=0.93),
-        Word(polygon=[(10, 20), (50, 20), (50, 40), (10, 40)], detection_confidence=0.95),
-        Word(polygon=[(60, 20), (110, 20), (110, 40), (60, 40)], detection_confidence=0.97),
+def test_simplesorting_multiple_text_spans_in_line():
+    text_spans = [
+        TextSpan(
+            polygon=[(120, 20), (180, 20), (180, 40), (120, 40)],
+            detection_confidence=0.93,
+        ),
+        TextSpan(
+            polygon=[(10, 20), (50, 20), (50, 40), (10, 40)],
+            detection_confidence=0.95,
+        ),
+        TextSpan(
+            polygon=[(60, 20), (110, 20), (110, 40), (60, 40)],
+            detection_confidence=0.97,
+        ),
     ]
-    page = Page(blocks=[Block(lines=[Line(words=words, order=0)], order=0)])
+    page = Page(
+        blocks=[Block(lines=[Line(text_spans=text_spans, order=0)], order=0)]
+    )
     result = SimpleSorting(use_columns=False).predict(page)
 
-    ordered = result.blocks[0].lines[0].words
-    assert [word.order for word in ordered] == [0, 1, 2]
-    assert [word.detection_confidence for word in ordered] == [0.95, 0.97, 0.93]
+    ordered = result.blocks[0].lines[0].text_spans
+    assert [text_span.order for text_span in ordered] == [0, 1, 2]
+    assert [text_span.detection_confidence for text_span in ordered] == [
+        0.95,
+        0.97,
+        0.93,
+    ]
 
 
 def test_simplesorting_multiple_lines():
-    words = [
-        Word(polygon=[(10, 20), (50, 20), (50, 40), (10, 40)], detection_confidence=0.95),
-        Word(polygon=[(60, 20), (110, 20), (110, 40), (60, 40)], detection_confidence=0.97),
-        Word(polygon=[(10, 50), (50, 50), (50, 70), (10, 70)], detection_confidence=0.93),
-        Word(polygon=[(60, 50), (110, 50), (110, 70), (60, 70)], detection_confidence=0.91),
+    text_spans = [
+        TextSpan(
+            polygon=[(10, 20), (50, 20), (50, 40), (10, 40)],
+            detection_confidence=0.95,
+        ),
+        TextSpan(
+            polygon=[(60, 20), (110, 20), (110, 40), (60, 40)],
+            detection_confidence=0.97,
+        ),
+        TextSpan(
+            polygon=[(10, 50), (50, 50), (50, 70), (10, 70)],
+            detection_confidence=0.93,
+        ),
+        TextSpan(
+            polygon=[(60, 50), (110, 50), (110, 70), (60, 70)],
+            detection_confidence=0.91,
+        ),
     ]
-    page = Page(blocks=[Block(lines=[Line(words=words, order=0)], order=0)])
+    page = Page(
+        blocks=[Block(lines=[Line(text_spans=text_spans, order=0)], order=0)]
+    )
     result = SimpleSorting(use_columns=False).predict(page)
 
     assert len(result.blocks) == 1
@@ -64,55 +100,88 @@ def test_simplesorting_multiple_lines():
 
 
 def test_simplesorting_columns():
-    words = [
-        Word(polygon=[(10, 20), (50, 20), (50, 40), (10, 40)], detection_confidence=0.95),
-        Word(polygon=[(10, 50), (50, 50), (50, 70), (10, 70)], detection_confidence=0.93),
-        Word(polygon=[(200, 20), (250, 20), (250, 40), (200, 40)], detection_confidence=0.97),
-        Word(polygon=[(200, 50), (250, 50), (250, 70), (200, 70)], detection_confidence=0.91),
+    text_spans = [
+        TextSpan(
+            polygon=[(10, 20), (50, 20), (50, 40), (10, 40)],
+            detection_confidence=0.95,
+        ),
+        TextSpan(
+            polygon=[(10, 50), (50, 50), (50, 70), (10, 70)],
+            detection_confidence=0.93,
+        ),
+        TextSpan(
+            polygon=[(200, 20), (250, 20), (250, 40), (200, 40)],
+            detection_confidence=0.97,
+        ),
+        TextSpan(
+            polygon=[(200, 50), (250, 50), (250, 70), (200, 70)],
+            detection_confidence=0.91,
+        ),
     ]
-    page = Page(blocks=[Block(lines=[Line(words=words, order=0)], order=0)])
+    page = Page(
+        blocks=[Block(lines=[Line(text_spans=text_spans, order=0)], order=0)]
+    )
     result = SimpleSorting(use_columns=True, max_splits=10).predict(page)
 
     assert len(result.blocks) >= 1
     for block in result.blocks:
         assert len(block.lines) > 0
         for line in block.lines:
-            assert len(line.words) > 0
+            assert len(line.text_spans) > 0
 
 
-def test_simplesorting_preserves_word_attributes():
-    word = Word(
+def test_simplesorting_preserves_text_span_attributes():
+    text_span = TextSpan(
         polygon=[(10, 20), (100, 20), (100, 40), (10, 40)],
         detection_confidence=0.95,
         text="Hello",
         recognition_confidence=0.98,
     )
-    page = Page(blocks=[Block(lines=[Line(words=[word], order=0)], order=0)])
+    page = Page(
+        blocks=[Block(lines=[Line(text_spans=[text_span], order=0)], order=0)]
+    )
     result = SimpleSorting(use_columns=False).predict(page)
 
-    result_word = result.blocks[0].lines[0].words[0]
-    assert result_word.polygon == word.polygon
-    assert result_word.detection_confidence == word.detection_confidence
-    assert result_word.text == word.text
-    assert result_word.recognition_confidence == word.recognition_confidence
+    result_text_span = result.blocks[0].lines[0].text_spans[0]
+    assert result_text_span.polygon == text_span.polygon
+    assert result_text_span.detection_confidence == text_span.detection_confidence
+    assert result_text_span.text == text_span.text
+    assert (
+        result_text_span.recognition_confidence
+        == text_span.recognition_confidence
+    )
 
 
 def test_organize_page_wrapper_matches_simplesorting():
-    words = [
-        Word(polygon=[(120, 20), (180, 20), (180, 40), (120, 40)], detection_confidence=0.93),
-        Word(polygon=[(10, 20), (50, 20), (50, 40), (10, 40)], detection_confidence=0.95),
-        Word(polygon=[(60, 20), (110, 20), (110, 40), (60, 40)], detection_confidence=0.97),
-        Word(polygon=[(10, 50), (50, 50), (50, 70), (10, 70)], detection_confidence=0.91),
+    text_spans = [
+        TextSpan(
+            polygon=[(120, 20), (180, 20), (180, 40), (120, 40)],
+            detection_confidence=0.93,
+        ),
+        TextSpan(
+            polygon=[(10, 20), (50, 20), (50, 40), (10, 40)],
+            detection_confidence=0.95,
+        ),
+        TextSpan(
+            polygon=[(60, 20), (110, 20), (110, 40), (60, 40)],
+            detection_confidence=0.97,
+        ),
+        TextSpan(
+            polygon=[(10, 50), (50, 50), (50, 70), (10, 70)],
+            detection_confidence=0.91,
+        ),
     ]
-    page = Page(blocks=[Block(lines=[Line(words=words, order=0)], order=0)])
+    page = Page(
+        blocks=[Block(lines=[Line(text_spans=text_spans, order=0)], order=0)]
+    )
 
     from_wrapper = organize_page(page, max_splits=10, use_columns=True)
     from_layout = SimpleSorting(max_splits=10, use_columns=True).predict(page)
 
-    wrapper_words = _collect_words(from_wrapper)
-    layout_words = _collect_words(from_layout)
+    wrapper_text_spans = _collect_text_spans(from_wrapper)
+    layout_text_spans = _collect_text_spans(from_layout)
 
-    assert len(wrapper_words) == len(layout_words)
-    for left, right in zip(wrapper_words, layout_words):
+    assert len(wrapper_text_spans) == len(layout_text_spans)
+    for left, right in zip(wrapper_text_spans, layout_text_spans):
         assert left.polygon == right.polygon
         assert left.order == right.order

@@ -21,6 +21,13 @@ except ImportError:
     EASTDataset = None
 
 
+def _quad(x0, y0, x1, y1):
+    return np.array(
+        [[x0, y0], [x1, y0], [x1, y1], [x0, y1]],
+        dtype=np.float32,
+    )
+
+
 # ============================================================================
 # Tests for geometric functions
 # ============================================================================
@@ -262,7 +269,7 @@ class TestEASTDataset:
         assert len(dataset) == 1
 
     def test_east_dataset_missing_image(self, tmp_path):
-        """Test error when image file is missing"""
+        """Missing images should trigger warnings and return a dummy sample."""
         annotations = {
             "images": [
                 {"id": 1, "file_name": "missing.jpg", "width": 640, "height": 480}
@@ -285,8 +292,15 @@ class TestEASTDataset:
 
         dataset = EASTDataset(str(img_dir), str(ann_file))
 
-        with pytest.raises(FileNotFoundError, match="Image not found"):
-            _ = dataset[0]
+        with pytest.warns(UserWarning, match="returning dummy sample"):
+            img_tensor, target = dataset[0]
+
+        assert isinstance(img_tensor, torch.Tensor)
+        assert img_tensor.shape == (3, 512, 512)
+        assert torch.count_nonzero(img_tensor) == 0
+        assert target["score_map"].shape == (1, 128, 128)
+        assert target["geo_map"].shape == (8, 128, 128)
+        assert target["quads"].shape == (0, 8)
 
     def test_east_dataset_multiple_quads(self, tmp_path):
         """Test with multiple quads on a single image"""
@@ -716,3 +730,216 @@ class TestEASTDatasetEdgeCases:
         cv2.imwrite(str(img_dir / "test.jpg"), img)
 
         return str(img_dir), str(ann_file)
+
+
+@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
+class TestEASTDatasetAugmentations:
+    @pytest.fixture
+    def simple_dataset(self, tmp_path):
+        annotations = {
+            "images": [{"id": 1, "file_name": "test.jpg", "width": 128, "height": 128}],
+            "annotations": [
+                {
+                    "id": 1,
+                    "image_id": 1,
+                    "segmentation": [[16, 16, 48, 16, 48, 48, 16, 48]],
+                }
+            ],
+        }
+
+        ann_file = tmp_path / "annotations.json"
+        ann_file.write_text(json.dumps(annotations), encoding="utf-8")
+
+        img_dir = tmp_path / "images"
+        img_dir.mkdir()
+        img = np.full((128, 128, 3), 100, dtype=np.uint8)
+        cv2.imwrite(str(img_dir / "test.jpg"), img)
+
+        return str(img_dir), str(ann_file)
+
+    def _make_aug_dataset(self, simple_dataset):
+        img_dir, ann_file = simple_dataset
+        dataset = EASTDataset(img_dir, ann_file, target_size=64, score_geo_scale=0.25)
+        dataset.image_ids = [0, 1, 2, 3]
+        return dataset
+
+    def test_apply_mosaic_keeps_quads_in_bounds(self, simple_dataset, monkeypatch):
+        dataset = self._make_aug_dataset(simple_dataset)
+        dataset.mosaic_prob = 1.0
+
+        monkeypatch.setattr(
+            dataset,
+            "_load_image_and_quads",
+            lambda idx: (
+                np.full((64, 64, 3), 40 + idx * 40, dtype=np.uint8),
+                [_quad(8, 8, 24, 24)],
+            ),
+        )
+        monkeypatch.setattr(np.random, "uniform", lambda *args, **kwargs: 0.5)
+        randint_values = iter([1, 2, 3])
+        monkeypatch.setattr(
+            np.random, "randint", lambda *args, **kwargs: next(randint_values)
+        )
+
+        img, quads = dataset._apply_mosaic(0, force=True)
+
+        pts = np.stack(quads, axis=0)
+        assert img.shape == (64, 64, 3)
+        assert img.dtype == np.uint8
+        assert len(quads) == 4
+        assert np.all(np.isfinite(pts))
+        assert pts.min() >= 0
+        assert pts.max() <= 63
+
+    def test_apply_cutmix_merges_expected_regions(self, simple_dataset, monkeypatch):
+        dataset = self._make_aug_dataset(simple_dataset)
+        dataset.cutmix_prob = 1.0
+        dataset.cutmix_alpha = 1.0
+
+        def fake_load(idx):
+            if idx == 0:
+                return (
+                    np.full((64, 64, 3), 10, dtype=np.uint8),
+                    [_quad(40, 40, 56, 56), _quad(20, 20, 40, 40)],
+                )
+            return (
+                np.full((64, 64, 3), 200, dtype=np.uint8),
+                [_quad(4, 4, 12, 12), _quad(40, 40, 52, 52)],
+            )
+
+        monkeypatch.setattr(dataset, "_load_image_and_quads", fake_load)
+        monkeypatch.setattr(np.random, "beta", lambda *args, **kwargs: 0.75)
+        randint_values = iter([0, 0, 1])
+        monkeypatch.setattr(
+            np.random, "randint", lambda *args, **kwargs: next(randint_values)
+        )
+
+        img, quads = dataset._apply_cutmix(0, force=True)
+
+        assert img.shape == (64, 64, 3)
+        assert img.dtype == np.uint8
+        assert tuple(img[0, 0]) == (200, 200, 200)
+        assert tuple(img[50, 50]) == (10, 10, 10)
+        assert len(quads) == 2
+        assert any(np.allclose(q, _quad(40, 40, 56, 56)) for q in quads)
+        assert any(np.allclose(q, _quad(4, 4, 12, 12)) for q in quads)
+
+    def test_apply_ricap_returns_finite_quads(self, simple_dataset, monkeypatch):
+        dataset = self._make_aug_dataset(simple_dataset)
+        dataset.ricap_prob = 1.0
+        dataset.ricap_beta = 0.3
+
+        monkeypatch.setattr(
+            dataset,
+            "_load_image_and_quads",
+            lambda idx: (
+                np.full((64, 64, 3), 30 + idx * 30, dtype=np.uint8),
+                [_quad(4, 4, 16, 16)],
+            ),
+        )
+        beta_values = iter([0.5, 0.5])
+        monkeypatch.setattr(np.random, "beta", lambda *args, **kwargs: next(beta_values))
+        randint_values = iter([1, 2, 3, 0, 0, 0, 0, 0, 0, 0, 0])
+        monkeypatch.setattr(
+            np.random, "randint", lambda *args, **kwargs: next(randint_values)
+        )
+
+        img, quads = dataset._apply_ricap(0, force=True)
+
+        pts = np.stack(quads, axis=0)
+        assert img.shape == (64, 64, 3)
+        assert img.dtype == np.uint8
+        assert len(quads) == 4
+        assert np.all(np.isfinite(pts))
+        assert pts.min() >= 0
+        assert pts.max() <= 63
+
+    def test_apply_resizemix_keeps_shape_and_expected_quads(
+        self, simple_dataset, monkeypatch
+    ):
+        dataset = self._make_aug_dataset(simple_dataset)
+        dataset.resizemix_prob = 1.0
+        dataset.resizemix_scale_range = (0.5, 0.5)
+
+        def fake_load(idx):
+            if idx == 0:
+                return (
+                    np.full((64, 64, 3), 10, dtype=np.uint8),
+                    [_quad(40, 40, 56, 56), _quad(12, 12, 28, 28)],
+                )
+            return (
+                np.full((64, 64, 3), 220, dtype=np.uint8),
+                [_quad(4, 4, 12, 12)],
+            )
+
+        monkeypatch.setattr(dataset, "_load_image_and_quads", fake_load)
+        monkeypatch.setattr(np.random, "uniform", lambda *args, **kwargs: 0.5)
+        randint_values = iter([0, 0, 1])
+        monkeypatch.setattr(
+            np.random, "randint", lambda *args, **kwargs: next(randint_values)
+        )
+
+        img, quads = dataset._apply_resizemix(0, force=True)
+
+        assert img.shape == (64, 64, 3)
+        assert img.dtype == np.uint8
+        assert tuple(img[0, 0]) == (220, 220, 220)
+        assert tuple(img[50, 50]) == (10, 10, 10)
+        assert len(quads) == 2
+        assert any(np.allclose(q, _quad(40, 40, 56, 56)) for q in quads)
+        assert any(np.allclose(q, _quad(2, 2, 6, 6)) for q in quads)
+
+    def test_photometric_helpers_preserve_shape_dtype_and_finiteness(
+        self, simple_dataset, monkeypatch
+    ):
+        dataset = self._make_aug_dataset(simple_dataset)
+
+        img = np.zeros((16, 16, 3), dtype=np.uint8)
+        img[:, 8:] = 200
+
+        dataset.cutout_prob = 1.0
+        dataset.cutout_num_holes = 1
+        dataset.cutout_hole_size_range = (0.25, 0.25)
+        monkeypatch.setattr(np.random, "uniform", lambda *args, **kwargs: 0.25)
+        randint_values = iter([0, 0])
+        monkeypatch.setattr(
+            np.random, "randint", lambda *args, **kwargs: next(randint_values)
+        )
+        cutout = dataset._apply_cutout(img, force=True)
+        expected_fill = img.mean(axis=(0, 1)).astype(np.uint8)
+        assert cutout.shape == img.shape
+        assert cutout.dtype == np.uint8
+        assert np.all(cutout[:4, :4] == expected_fill)
+
+        dataset.elastic_prob = 1.0
+        monkeypatch.setattr(
+            np.random, "rand", lambda *shape: np.full(shape, 0.5, dtype=np.float32)
+        )
+        elastic = dataset._apply_elastic(img, force=True)
+        assert elastic.shape == img.shape
+        assert elastic.dtype == np.uint8
+        assert np.array_equal(elastic, img)
+
+        dataset.fog_prob = 1.0
+        dataset.fog_direction = "random"
+        monkeypatch.setattr(np.random, "uniform", lambda *args, **kwargs: 0.25)
+        monkeypatch.setattr(np.random, "choice", lambda choices: "left")
+        fog = dataset._apply_fog(img, force=True)
+        assert fog.shape == img.shape
+        assert fog.dtype == np.uint8
+        assert np.all(np.isfinite(fog))
+        assert fog[:, 0].mean() > img[:, 0].mean()
+
+    def test_preview_augmentation_and_list(self, simple_dataset):
+        img_dir, ann_file = simple_dataset
+        dataset = EASTDataset(img_dir, ann_file, target_size=64)
+
+        names = dataset.list_augmentations()
+        assert "mosaic" in names
+        assert "fog" in names
+        assert "negative" in names
+
+        preview = dataset.preview_augmentation(0, "negative")
+        assert preview.shape == (64, 64, 3)
+        assert preview.dtype == np.uint8
+        assert dataset.preview_augmentation(0, "unknown") is None

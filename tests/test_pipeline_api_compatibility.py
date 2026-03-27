@@ -1,4 +1,4 @@
-from typing import Any, Dict, List, Union
+from typing import Any, List, Union
 
 import numpy as np
 import pytest
@@ -6,29 +6,29 @@ from PIL import Image
 
 import manuscript._pipeline as pipeline_module
 from manuscript import Pipeline
-from manuscript.data import Block, Line, Page, Word
+from manuscript.data import Block, Line, Page, TextSpan
 
 
 def _make_test_page() -> Page:
     # Intentionally shuffled order by x to verify layout stage behavior.
     words = [
-        Word(
+        TextSpan(
             polygon=[(210.0, 10.0), (300.0, 10.0), (300.0, 50.0), (210.0, 50.0)],
             detection_confidence=0.88,
             order=2,
         ),
-        Word(
+        TextSpan(
             polygon=[(10.0, 10.0), (100.0, 10.0), (100.0, 50.0), (10.0, 50.0)],
             detection_confidence=0.95,
             order=0,
         ),
-        Word(
+        TextSpan(
             polygon=[(110.0, 10.0), (200.0, 10.0), (200.0, 50.0), (110.0, 50.0)],
             detection_confidence=0.92,
             order=1,
         ),
     ]
-    return Page(blocks=[Block(lines=[Line(words=words, order=0)], order=0)])
+    return Page(blocks=[Block(lines=[Line(text_spans=words, order=0)], order=0)])
 
 
 class DummyDetector:
@@ -38,16 +38,10 @@ class DummyDetector:
     def predict(
         self,
         img_or_path: Union[str, np.ndarray, Image.Image],
-        return_maps: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> Page:
         if self.events is not None:
             self.events.append("detector")
-        page = _make_test_page()
-        return {
-            "page": page,
-            "score_map": None if not return_maps else np.zeros((10, 10)),
-            "geo_map": None if not return_maps else np.zeros((10, 10, 5)),
-        }
+        return _make_test_page()
 
 
 class DummyLayout:
@@ -65,9 +59,9 @@ class DummyLayout:
         result = page.model_copy(deep=True)
         for block in result.blocks:
             for line in block.lines:
-                line.words.sort(key=lambda w: min(p[0] for p in w.polygon))
-                for idx, word in enumerate(line.words):
-                    word.order = idx
+                line.text_spans.sort(key=lambda w: min(p[0] for p in w.polygon))
+                for idx, text_span in enumerate(line.text_spans):
+                    text_span.order = idx
         return result
 
 
@@ -78,6 +72,7 @@ class DummyRecognizer:
         self.last_image = None
         self.last_min_text_size = None
         self.last_orders = None
+        self.last_debug_save_dir = None
         self.min_text_size = min_text_size
 
     def predict(
@@ -85,26 +80,28 @@ class DummyRecognizer:
         page: Page,
         image: np.ndarray = None,
         batch_size: int = 32,
+        debug_save_dir: Any = None,
     ) -> Page:
         if self.events is not None:
             self.events.append("recognizer")
         self.call_count += 1
         self.last_image = image
+        self.last_debug_save_dir = debug_save_dir
         self.last_min_text_size = self.min_text_size
 
         result = page.model_copy(deep=True)
         self.last_orders = [
-            word.order
+            text_span.order
             for block in result.blocks
             for line in block.lines
-            for word in line.words
+            for text_span in line.text_spans
         ]
 
         recognized_idx = 0
         for block in result.blocks:
             for line in block.lines:
-                for word in line.words:
-                    poly = np.array(word.polygon, dtype=np.float32)
+                for text_span in line.text_spans:
+                    poly = np.array(text_span.polygon, dtype=np.float32)
                     x_min, y_min = np.min(poly, axis=0)
                     x_max, y_max = np.max(poly, axis=0)
                     width = x_max - x_min
@@ -114,8 +111,8 @@ class DummyRecognizer:
                         continue
 
                     recognized_idx += 1
-                    word.text = f"word{recognized_idx}"
-                    word.recognition_confidence = 0.9 - (recognized_idx - 1) * 0.05
+                    text_span.text = f"word{recognized_idx}"
+                    text_span.recognition_confidence = 0.9 - (recognized_idx - 1) * 0.05
 
         return result
 
@@ -131,9 +128,9 @@ class DummyRecognizerNoExtraArgs:
         result = page.model_copy(deep=True)
         for block in result.blocks:
             for line in block.lines:
-                for idx, word in enumerate(line.words, start=1):
-                    word.text = f"r{idx}"
-                    word.recognition_confidence = 0.8
+                for idx, text_span in enumerate(line.text_spans, start=1):
+                    text_span.text = f"r{idx}"
+                    text_span.recognition_confidence = 0.8
         return result
 
 
@@ -152,9 +149,9 @@ class DummyCorrector:
         result = page.model_copy(deep=True)
         for block in result.blocks:
             for line in block.lines:
-                for word in line.words:
-                    if word.text:
-                        word.text = f"{word.text}_corr"
+                for text_span in line.text_spans:
+                    if text_span.text:
+                        text_span.text = f"{text_span.text}_corr"
         return result
 
 
@@ -173,7 +170,7 @@ class TestPipelineAPICompatibility:
         page = result["page"]
         assert isinstance(page, Page)
 
-        words = page.blocks[0].lines[0].words
+        words = page.blocks[0].lines[0].text_spans
         assert [w.text for w in words] == ["word1", "word2", "word3"]
         assert [w.order for w in words] == [0, 1, 2]
         assert recognizer.last_orders == [0, 1, 2]
@@ -198,10 +195,10 @@ class TestPipelineAPICompatibility:
 
         result = pipeline.predict(np.zeros((100, 400, 3), dtype=np.uint8))
         page = result["page"]
-        words = page.blocks[0].lines[0].words
+        words = page.blocks[0].lines[0].text_spans
 
         assert layout.call_count == 1
-        assert all(word.text is None for word in words)
+        assert all(text_span.text is None for text_span in words)
         assert pipeline.last_recognition_page is None
         assert pipeline.last_layout_page is not None
 
@@ -214,7 +211,7 @@ class TestPipelineAPICompatibility:
         )
 
         result = pipeline.predict(np.zeros((100, 400, 3), dtype=np.uint8))
-        words = result["page"].blocks[0].lines[0].words
+        words = result["page"].blocks[0].lines[0].text_spans
         assert recognizer.call_count == 1
         assert [w.text for w in words] == ["word1", "word2", "word3"]
         assert pipeline.last_layout_page is None
@@ -229,7 +226,7 @@ class TestPipelineAPICompatibility:
         )
 
         result = pipeline.predict(np.zeros((100, 400, 3), dtype=np.uint8))
-        words = result["page"].blocks[0].lines[0].words
+        words = result["page"].blocks[0].lines[0].text_spans
         assert [w.text for w in words] == ["word1_corr", "word2_corr", "word3_corr"]
         assert corrector.call_count == 1
         assert pipeline.last_correction_page is not None
@@ -277,16 +274,16 @@ class TestPipelineAPICompatibility:
 
     def test_pipeline_min_text_size_filtering(self):
         class SmallBoxDetector(DummyDetector):
-            def predict(self, img_or_path, return_maps=False):
+            def predict(self, img_or_path):
                 words = [
-                    Word(
+                    TextSpan(
                         polygon=[(10.0, 10.0), (12.0, 10.0), (12.0, 12.0), (10.0, 12.0)],
                         detection_confidence=0.95,
                         order=0,
                     )
                 ]
-                page = Page(blocks=[Block(lines=[Line(words=words, order=0)], order=0)])
-                return {"page": page}
+                page = Page(blocks=[Block(lines=[Line(text_spans=words, order=0)], order=0)])
+                return page
 
         recognizer = DummyRecognizer(min_text_size=5)
         pipeline = Pipeline(
@@ -297,7 +294,7 @@ class TestPipelineAPICompatibility:
 
         result = pipeline.predict(np.zeros((100, 400, 3), dtype=np.uint8))
         assert recognizer.call_count == 1
-        assert result["page"].blocks[0].lines[0].words[0].text is None
+        assert result["page"].blocks[0].lines[0].text_spans[0].text is None
         assert recognizer.last_min_text_size == 5
 
     def test_pipeline_stage_image_forwarding(self):
@@ -318,6 +315,22 @@ class TestPipelineAPICompatibility:
         assert isinstance(recognizer.last_image, np.ndarray)
         assert isinstance(corrector.last_image, np.ndarray)
 
+    def test_pipeline_forwards_recognizer_debug_dir(self, tmp_path):
+        recognizer = DummyRecognizer()
+        pipeline = Pipeline(
+            detector=DummyDetector(),
+            layout=DummyLayout(),
+            recognizer=recognizer,
+        )
+
+        debug_dir = tmp_path / "recognizer_crops"
+        _ = pipeline.predict(
+            np.zeros((40, 120, 3), dtype=np.uint8),
+            recognizer_debug_dir=debug_dir,
+        )
+
+        assert recognizer.last_debug_save_dir == debug_dir
+
     def test_pipeline_recognizer_without_batch_min_text_signature(self):
         recognizer = DummyRecognizerNoExtraArgs()
         pipeline = Pipeline(
@@ -326,7 +339,7 @@ class TestPipelineAPICompatibility:
             recognizer=recognizer,
         )
         result = pipeline.predict(np.zeros((60, 200, 3), dtype=np.uint8))
-        words = result["page"].blocks[0].lines[0].words
+        words = result["page"].blocks[0].lines[0].text_spans
         assert recognizer.call_count == 1
         assert [w.text for w in words] == ["r1", "r2", "r3"]
 
@@ -422,8 +435,8 @@ class TestPipelineInitialization:
 
     def test_pipeline_default_initialization(self, monkeypatch):
         class FakeEAST:
-            def predict(self, image, return_maps=False):
-                return {"page": _make_test_page()}
+            def predict(self, image):
+                return _make_test_page()
 
         class FakeLayout:
             def predict(self, page, image=None):
@@ -446,8 +459,8 @@ class TestPipelineInitialization:
 
     def test_pipeline_partial_initialization(self, monkeypatch):
         class FakeEAST:
-            def predict(self, image, return_maps=False):
-                return {"page": _make_test_page()}
+            def predict(self, image):
+                return _make_test_page()
 
         class FakeLayout:
             def predict(self, page, image=None):

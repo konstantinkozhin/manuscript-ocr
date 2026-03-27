@@ -1,3 +1,4 @@
+import copy
 import json
 import os
 import random
@@ -381,7 +382,7 @@ def _run_training(
     )
 
 
-    ema_model = model if not use_ema else torch.deepcopy(model)
+    ema_model = model if not use_ema else copy.deepcopy(model)
     ema_decay = 0.9999
     if use_ema:
         for p in ema_model.parameters():

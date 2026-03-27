@@ -2,9 +2,9 @@ import pytest
 import numpy as np
 from copy import deepcopy
 
-from manuscript.data import Word, Line, Block, Page
+from manuscript.api.corrector import BaseCorrector
+from manuscript.data import TextSpan, Line, Block, Page
 from manuscript.correctors import CharLM
-from manuscript.api.base import BaseModel as BaseCorrector
 
 
 # ============================================================================
@@ -14,19 +14,19 @@ from manuscript.api.base import BaseModel as BaseCorrector
 
 def create_sample_page() -> Page:
     """Create a sample Page for testing."""
-    word1 = Word(
+    word1 = TextSpan(
         polygon=[(10.0, 20.0), (100.0, 20.0), (100.0, 40.0), (10.0, 40.0)],
         detection_confidence=0.95,
         text="Hello",
         recognition_confidence=0.98,
     )
-    word2 = Word(
+    word2 = TextSpan(
         polygon=[(110.0, 20.0), (200.0, 20.0), (200.0, 40.0), (110.0, 40.0)],
         detection_confidence=0.92,
         text="World",
         recognition_confidence=0.96,
     )
-    line = Line(words=[word1, word2])
+    line = Line(text_spans=[word1, word2])
     block = Block(lines=[line])
     return Page(blocks=[block])
 
@@ -42,10 +42,10 @@ def create_empty_page() -> Page:
 
 
 class TestBaseCorrector:
-    """Tests asserting BaseModel usage as corrector base class."""
+    """Tests asserting BaseCorrector usage."""
 
     def test_base_model_is_abstract(self):
-        """BaseModel (used as corrector base) is abstract and cannot be instantiated."""
+        """BaseCorrector is abstract and cannot be instantiated."""
         with pytest.raises(TypeError):
             BaseCorrector()
 
@@ -118,7 +118,7 @@ class TestCharLM:
         assert hasattr(corrector, "weights")
 
     def test_charlm_inherits_base(self):
-        """CharLM inherits from BaseModel (used as corrector base)."""
+        """CharLM inherits from BaseCorrector."""
         corrector = CharLM(weights=None)
         assert isinstance(corrector, BaseCorrector)
 
@@ -157,9 +157,9 @@ class TestCharLM:
 
         result = corrector.predict(page)
 
-        page.blocks[0].lines[0].words[0].text = "Modified"
+        page.blocks[0].lines[0].text_spans[0].text = "Modified"
 
-        assert result.blocks[0].lines[0].words[0].text == "Hello"
+        assert result.blocks[0].lines[0].text_spans[0].text == "Hello"
 
     def test_charlm_preserves_text_without_weights(self):
         """CharLM without weights preserves all text content."""
@@ -168,8 +168,8 @@ class TestCharLM:
 
         result = corrector.predict(page)
 
-        assert result.blocks[0].lines[0].words[0].text == "Hello"
-        assert result.blocks[0].lines[0].words[1].text == "World"
+        assert result.blocks[0].lines[0].text_spans[0].text == "Hello"
+        assert result.blocks[0].lines[0].text_spans[1].text == "World"
 
     def test_charlm_preserves_structure(self):
         """CharLM preserves page structure."""
@@ -180,7 +180,7 @@ class TestCharLM:
 
         assert len(result.blocks) == len(page.blocks)
         assert len(result.blocks[0].lines) == len(page.blocks[0].lines)
-        assert len(result.blocks[0].lines[0].words) == len(page.blocks[0].lines[0].words)
+        assert len(result.blocks[0].lines[0].text_spans) == len(page.blocks[0].lines[0].text_spans)
 
     def test_charlm_preserves_coordinates(self):
         """CharLM preserves polygon coordinates."""
@@ -189,8 +189,8 @@ class TestCharLM:
 
         result = corrector.predict(page)
 
-        original_polygon = page.blocks[0].lines[0].words[0].polygon
-        result_polygon = result.blocks[0].lines[0].words[0].polygon
+        original_polygon = page.blocks[0].lines[0].text_spans[0].polygon
+        result_polygon = result.blocks[0].lines[0].text_spans[0].polygon
         assert result_polygon == original_polygon
 
     def test_charlm_preserves_confidence(self):
@@ -200,8 +200,8 @@ class TestCharLM:
 
         result = corrector.predict(page)
 
-        orig_word = page.blocks[0].lines[0].words[0]
-        result_word = result.blocks[0].lines[0].words[0]
+        orig_word = page.blocks[0].lines[0].text_spans[0]
+        result_word = result.blocks[0].lines[0].text_spans[0]
         assert result_word.detection_confidence == orig_word.detection_confidence
         assert result_word.recognition_confidence == orig_word.recognition_confidence
 
@@ -223,20 +223,20 @@ class TestCharLM:
         result = corrector(page)
 
         assert isinstance(result, Page)
-        assert result.blocks[0].lines[0].words[0].text == "Hello"
+        assert result.blocks[0].lines[0].text_spans[0].text == "Hello"
 
     def test_charlm_multiple_calls(self):
         """CharLM can be called multiple times."""
         corrector = CharLM(weights=None)
         page1 = create_sample_page()
         page2 = create_sample_page()
-        page2.blocks[0].lines[0].words[0].text = "Different"
+        page2.blocks[0].lines[0].text_spans[0].text = "Different"
 
         result1 = corrector.predict(page1)
         result2 = corrector.predict(page2)
 
-        assert result1.blocks[0].lines[0].words[0].text == "Hello"
-        assert result2.blocks[0].lines[0].words[0].text == "Different"
+        assert result1.blocks[0].lines[0].text_spans[0].text == "Hello"
+        assert result2.blocks[0].lines[0].text_spans[0].text == "Different"
 
     def test_charlm_default_parameters(self):
         """CharLM has sensible default parameters."""
@@ -299,7 +299,7 @@ class TestCustomCorrector:
     """Tests for implementing custom correctors."""
 
     def test_custom_corrector_modifies_text(self):
-        """Custom corrector can modify word text."""
+        """Custom corrector can modify TextSpan text."""
 
         class UppercaseCorrector(BaseCorrector):
             default_weights_name = None
@@ -317,9 +317,9 @@ class TestCustomCorrector:
                 result = page.model_copy(deep=True)
                 for block in result.blocks:
                     for line in block.lines:
-                        for word in line.words:
-                            if word.text:
-                                word.text = word.text.upper()
+                        for text_span in line.text_spans:
+                            if text_span.text:
+                                text_span.text = text_span.text.upper()
                 return result
 
         corrector = UppercaseCorrector()
@@ -327,12 +327,12 @@ class TestCustomCorrector:
 
         result = corrector.predict(page)
 
-        assert result.blocks[0].lines[0].words[0].text == "HELLO"
-        assert result.blocks[0].lines[0].words[1].text == "WORLD"
-        assert page.blocks[0].lines[0].words[0].text == "Hello"
+        assert result.blocks[0].lines[0].text_spans[0].text == "HELLO"
+        assert result.blocks[0].lines[0].text_spans[1].text == "WORLD"
+        assert page.blocks[0].lines[0].text_spans[0].text == "Hello"
 
     def test_custom_corrector_uses_context(self):
-        """Custom corrector can use word context."""
+        """Custom corrector can use TextSpan context."""
 
         class ContextAwareCorrector(BaseCorrector):
             default_weights_name = None
@@ -350,9 +350,9 @@ class TestCustomCorrector:
                 result = page.model_copy(deep=True)
                 for block in result.blocks:
                     for line in block.lines:
-                        texts = [w.text for w in line.words if w.text]
-                        if line.words and line.words[0].text:
-                            line.words[0].text = f"[{len(texts)} words] {line.words[0].text}"
+                        texts = [w.text for w in line.text_spans if w.text]
+                        if line.text_spans and line.text_spans[0].text:
+                            line.text_spans[0].text = f"[{len(texts)} words] {line.text_spans[0].text}"
                 return result
 
         corrector = ContextAwareCorrector()
@@ -360,7 +360,7 @@ class TestCustomCorrector:
 
         result = corrector.predict(page)
 
-        assert result.blocks[0].lines[0].words[0].text == "[2 words] Hello"
+        assert result.blocks[0].lines[0].text_spans[0].text == "[2 words] Hello"
 
     def test_custom_corrector_with_kwargs(self):
         """Custom corrector can accept additional kwargs."""
@@ -382,9 +382,9 @@ class TestCustomCorrector:
                 result = page.model_copy(deep=True)
                 for block in result.blocks:
                     for line in block.lines:
-                        for word in line.words:
-                            if word.text:
-                                word.text = self.prefix + word.text
+                        for text_span in line.text_spans:
+                            if text_span.text:
+                                text_span.text = self.prefix + text_span.text
                 return result
 
         corrector = ConfigurableCorrector(prefix=">>")
@@ -392,7 +392,7 @@ class TestCustomCorrector:
 
         result = corrector.predict(page)
 
-        assert result.blocks[0].lines[0].words[0].text == ">>Hello"
+        assert result.blocks[0].lines[0].text_spans[0].text == ">>Hello"
 
 
 # ============================================================================
@@ -434,7 +434,7 @@ class TestCharLMAdvanced:
         result = corrector.predict(page)
 
         assert result is not page
-        assert result.blocks[0].lines[0].words[0].text == page.blocks[0].lines[0].words[0].text
+        assert result.blocks[0].lines[0].text_spans[0].text == page.blocks[0].lines[0].text_spans[0].text
 
     def test_charlm_accepts_lexicon_as_set(self):
         """CharLM accepts lexicon as a set."""
@@ -455,20 +455,20 @@ class TestCharLMAdvanced:
         """CharLM handles pages with multiple blocks."""
         corrector = CharLM(weights=None)
         
-        word1 = Word(
+        word1 = TextSpan(
             polygon=[(10.0, 20.0), (100.0, 20.0), (100.0, 40.0), (10.0, 40.0)],
             detection_confidence=0.95,
             text="Block1",
             recognition_confidence=0.98,
         )
-        word2 = Word(
+        word2 = TextSpan(
             polygon=[(10.0, 60.0), (100.0, 60.0), (100.0, 80.0), (10.0, 80.0)],
             detection_confidence=0.92,
             text="Block2",
             recognition_confidence=0.96,
         )
-        line1 = Line(words=[word1])
-        line2 = Line(words=[word2])
+        line1 = Line(text_spans=[word1])
+        line2 = Line(text_spans=[word2])
         block1 = Block(lines=[line1])
         block2 = Block(lines=[line2])
         page = Page(blocks=[block1, block2])
@@ -476,71 +476,71 @@ class TestCharLMAdvanced:
         result = corrector.predict(page)
 
         assert len(result.blocks) == 2
-        assert result.blocks[0].lines[0].words[0].text == "Block1"
-        assert result.blocks[1].lines[0].words[0].text == "Block2"
+        assert result.blocks[0].lines[0].text_spans[0].text == "Block1"
+        assert result.blocks[1].lines[0].text_spans[0].text == "Block2"
 
     def test_charlm_handles_multiple_lines(self):
         """CharLM handles blocks with multiple lines."""
         corrector = CharLM(weights=None)
         
-        word1 = Word(
+        word1 = TextSpan(
             polygon=[(10.0, 20.0), (100.0, 20.0), (100.0, 40.0), (10.0, 40.0)],
             detection_confidence=0.95,
             text="Line1",
             recognition_confidence=0.98,
         )
-        word2 = Word(
+        word2 = TextSpan(
             polygon=[(10.0, 50.0), (100.0, 50.0), (100.0, 70.0), (10.0, 70.0)],
             detection_confidence=0.92,
             text="Line2",
             recognition_confidence=0.96,
         )
-        line1 = Line(words=[word1])
-        line2 = Line(words=[word2])
+        line1 = Line(text_spans=[word1])
+        line2 = Line(text_spans=[word2])
         block = Block(lines=[line1, line2])
         page = Page(blocks=[block])
 
         result = corrector.predict(page)
 
         assert len(result.blocks[0].lines) == 2
-        assert result.blocks[0].lines[0].words[0].text == "Line1"
-        assert result.blocks[0].lines[1].words[0].text == "Line2"
+        assert result.blocks[0].lines[0].text_spans[0].text == "Line1"
+        assert result.blocks[0].lines[1].text_spans[0].text == "Line2"
 
     def test_charlm_handles_words_without_text(self):
         """CharLM handles words with None text."""
         corrector = CharLM(weights=None)
         
-        word = Word(
+        text_span = TextSpan(
             polygon=[(10.0, 20.0), (100.0, 20.0), (100.0, 40.0), (10.0, 40.0)],
             detection_confidence=0.95,
             text=None,
             recognition_confidence=None,
         )
-        line = Line(words=[word])
+        line = Line(text_spans=[text_span])
         block = Block(lines=[line])
         page = Page(blocks=[block])
 
         result = corrector.predict(page)
 
-        assert result.blocks[0].lines[0].words[0].text is None
+        assert result.blocks[0].lines[0].text_spans[0].text is None
 
     def test_charlm_handles_empty_text(self):
         """CharLM handles words with empty text."""
         corrector = CharLM(weights=None)
         
-        word = Word(
+        text_span = TextSpan(
             polygon=[(10.0, 20.0), (100.0, 20.0), (100.0, 40.0), (10.0, 40.0)],
             detection_confidence=0.95,
             text="",
             recognition_confidence=0.98,
         )
-        line = Line(words=[word])
+        line = Line(text_spans=[text_span])
         block = Block(lines=[line])
         page = Page(blocks=[block])
 
         result = corrector.predict(page)
 
-        assert result.blocks[0].lines[0].words[0].text == ""
+        assert result.blocks[0].lines[0].text_spans[0].text == ""
 
     def test_charlm_has_train_method(self):
         """CharLM has static train method."""
@@ -575,9 +575,9 @@ class TestCreatePageFromText:
         assert isinstance(page, Page)
         assert len(page.blocks) == 1
         assert len(page.blocks[0].lines) == 1
-        assert len(page.blocks[0].lines[0].words) == 2
-        assert page.blocks[0].lines[0].words[0].text == "Hello"
-        assert page.blocks[0].lines[0].words[1].text == "world"
+        assert len(page.blocks[0].lines[0].text_spans) == 2
+        assert page.blocks[0].lines[0].text_spans[0].text == "Hello"
+        assert page.blocks[0].lines[0].text_spans[1].text == "world"
 
     def test_create_page_from_text_multiple_lines(self):
         """Creates page from multiple lines."""
@@ -586,9 +586,9 @@ class TestCreatePageFromText:
         page = create_page_from_text(["Line one", "Line two", "Line three"])
         
         assert len(page.blocks[0].lines) == 3
-        assert page.blocks[0].lines[0].words[0].text == "Line"
-        assert page.blocks[0].lines[1].words[0].text == "Line"
-        assert page.blocks[0].lines[2].words[0].text == "Line"
+        assert page.blocks[0].lines[0].text_spans[0].text == "Line"
+        assert page.blocks[0].lines[1].text_spans[0].text == "Line"
+        assert page.blocks[0].lines[2].text_spans[0].text == "Line"
 
     def test_create_page_from_text_empty_lines(self):
         """Handles empty lines correctly."""
@@ -605,9 +605,9 @@ class TestCreatePageFromText:
         
         page = create_page_from_text(["Test"])
         
-        word = page.blocks[0].lines[0].words[0]
-        assert word.detection_confidence == 1.0
-        assert word.recognition_confidence == 1.0
+        text_span = page.blocks[0].lines[0].text_spans[0]
+        assert text_span.detection_confidence == 1.0
+        assert text_span.recognition_confidence == 1.0
 
     def test_create_page_from_text_custom_confidence(self):
         """Accepts custom confidence parameter."""
@@ -615,9 +615,9 @@ class TestCreatePageFromText:
         
         page = create_page_from_text(["Test"], confidence=0.5)
         
-        word = page.blocks[0].lines[0].words[0]
-        assert word.detection_confidence == 0.5
-        assert word.recognition_confidence == 0.5
+        text_span = page.blocks[0].lines[0].text_spans[0]
+        assert text_span.detection_confidence == 0.5
+        assert text_span.recognition_confidence == 0.5
 
     def test_create_page_from_text_has_valid_polygons(self):
         """Words have valid polygon coordinates."""
@@ -625,9 +625,9 @@ class TestCreatePageFromText:
         
         page = create_page_from_text(["Test"])
         
-        word = page.blocks[0].lines[0].words[0]
-        assert len(word.polygon) == 4
-        for x, y in word.polygon:
+        text_span = page.blocks[0].lines[0].text_spans[0]
+        assert len(text_span.polygon) == 4
+        for x, y in text_span.polygon:
             assert isinstance(x, float)
             assert isinstance(y, float)
 
@@ -645,8 +645,8 @@ class TestCreatePageFromText:
         
         page = create_page_from_text(["Привет мир"])
         
-        assert page.blocks[0].lines[0].words[0].text == "Привет"
-        assert page.blocks[0].lines[0].words[1].text == "мир"
+        assert page.blocks[0].lines[0].text_spans[0].text == "Привет"
+        assert page.blocks[0].lines[0].text_spans[1].text == "мир"
 
     def test_create_page_from_text_with_charlm(self):
         """Integration test: create_page_from_text works with CharLM."""
@@ -658,5 +658,5 @@ class TestCreatePageFromText:
         result = corrector.predict(page)
         
         assert isinstance(result, Page)
-        assert result.blocks[0].lines[0].words[0].text == "Hello"
-        assert result.blocks[0].lines[0].words[1].text == "world"
+        assert result.blocks[0].lines[0].text_spans[0].text == "Hello"
+        assert result.blocks[0].lines[0].text_spans[1].text == "world"

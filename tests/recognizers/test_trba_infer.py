@@ -1,10 +1,12 @@
+import json
 from pathlib import Path
 from unittest.mock import patch
 import numpy as np
 from PIL import Image
 
+from manuscript.api.recognizer import BaseRecognizer
 from manuscript.recognizers import TRBA
-from manuscript.data import Word, Line, Block, Page
+from manuscript.data import TextSpan, Line, Block, Page
 
 
 class TestTRBAInitialization:
@@ -17,8 +19,9 @@ class TestTRBAInitialization:
         assert hasattr(TRBA, 'train')
         assert hasattr(TRBA, 'export')
 
-    def test_trba_has_basemodel_attributes(self):
-        """Test that TRBA inherits from BaseModel"""
+    def test_trba_has_base_attributes(self):
+        """Test that TRBA inherits from BaseRecognizer/BaseArtifactModel."""
+        assert issubclass(TRBA, BaseRecognizer)
         assert hasattr(TRBA, 'default_weights_name')
         assert hasattr(TRBA, 'pretrained_registry')
         assert hasattr(TRBA, 'config_registry')
@@ -28,7 +31,7 @@ class TestTRBAInitialization:
         """Test default preset"""
         assert TRBA.default_weights_name == "trba_lite_g1"
 
-    @patch('manuscript.api.base.BaseModel._download_http')
+    @patch('manuscript.api.base.BaseArtifactModel._download_http')
     def test_trba_initialization_with_local_file(self, mock_download, tmp_path):
         """Test initialization with local files"""
         # Create mock files
@@ -320,7 +323,7 @@ class TestTRBAAPI:
             device="cpu"
         )
         
-        # Should be callable via BaseModel.__call__
+        # Should be callable via BaseArtifactModel.__call__
         assert callable(recognizer)
 
     def test_static_methods_exist(self):
@@ -355,21 +358,21 @@ class TestTRBAPredictPageInterface:
     @staticmethod
     def _create_page() -> Page:
         words = [
-            Word(
+            TextSpan(
                 polygon=[(10.0, 10.0), (80.0, 10.0), (80.0, 40.0), (10.0, 40.0)],
                 detection_confidence=0.95,
             ),
-            Word(
+            TextSpan(
                 polygon=[(90.0, 10.0), (160.0, 10.0), (160.0, 40.0), (90.0, 40.0)],
                 detection_confidence=0.92,
             ),
         ]
-        return Page(blocks=[Block(lines=[Line(words=words)])])
+        return Page(blocks=[Block(lines=[Line(text_spans=words)])])
 
-    def test_predict_accepts_page_and_returns_page(self, tmp_path):
+    def test_predict_accepts_page_and_returns_page(self, tmp_path, monkeypatch):
         calls = {}
 
-        def region_predictor(regions, batch_size=32, recognizer=None):
+        def fake_predict_text_images(regions, batch_size=32):
             calls["count"] = len(regions)
             calls["batch_size"] = batch_size
             return [
@@ -377,10 +380,8 @@ class TestTRBAPredictPageInterface:
                 {"text": "word2", "confidence": 0.85},
             ]
 
-        recognizer = self._create_recognizer(
-            tmp_path,
-            region_predictor=region_predictor,
-        )
+        recognizer = self._create_recognizer(tmp_path)
+        monkeypatch.setattr(recognizer, "_predict_text_images", fake_predict_text_images)
         page = self._create_page()
         image = np.zeros((64, 180, 3), dtype=np.uint8)
 
@@ -388,10 +389,10 @@ class TestTRBAPredictPageInterface:
 
         assert isinstance(result, Page)
         assert result is not page
-        assert result.blocks[0].lines[0].words[0].text == "word1"
-        assert result.blocks[0].lines[0].words[1].text == "word2"
-        assert result.blocks[0].lines[0].words[0].recognition_confidence == 0.9
-        assert result.blocks[0].lines[0].words[1].recognition_confidence == 0.85
+        assert result.blocks[0].lines[0].text_spans[0].text == "word1"
+        assert result.blocks[0].lines[0].text_spans[1].text == "word2"
+        assert result.blocks[0].lines[0].text_spans[0].recognition_confidence == 0.9
+        assert result.blocks[0].lines[0].text_spans[1].recognition_confidence == 0.85
         assert calls == {"count": 2, "batch_size": 32}
 
     def test_predict_without_image_returns_copy(self, tmp_path):
@@ -402,32 +403,28 @@ class TestTRBAPredictPageInterface:
 
         assert isinstance(result, Page)
         assert result is not page
-        assert result.blocks[0].lines[0].words[0].text is None
-        assert result.blocks[0].lines[0].words[1].text is None
+        assert result.blocks[0].lines[0].text_spans[0].text is None
+        assert result.blocks[0].lines[0].text_spans[1].text is None
 
-    def test_predict_respects_min_text_size(self, tmp_path):
+    def test_predict_respects_min_text_size(self, tmp_path, monkeypatch):
         calls = {}
 
-        def region_predictor(regions, batch_size=32, recognizer=None):
+        def fake_predict_text_images(regions, batch_size=32):
             calls["count"] = len(regions)
             return [{"text": "big", "confidence": 0.88}]
 
-        recognizer = self._create_recognizer(
-            tmp_path,
-            min_text_size=5,
-            region_predictor=region_predictor,
-        )
+        recognizer = self._create_recognizer(tmp_path, min_text_size=5)
+        monkeypatch.setattr(recognizer, "_predict_text_images", fake_predict_text_images)
         page = Page(
             blocks=[
                 Block(
                     lines=[
-                        Line(
-                            words=[
-                                Word(
+                        Line(text_spans=[
+                                TextSpan(
                                     polygon=[(10.0, 10.0), (12.0, 10.0), (12.0, 12.0), (10.0, 12.0)],
                                     detection_confidence=0.9,
                                 ),
-                                Word(
+                                TextSpan(
                                     polygon=[(20.0, 10.0), (100.0, 10.0), (100.0, 40.0), (20.0, 40.0)],
                                     detection_confidence=0.9,
                                 ),
@@ -441,30 +438,26 @@ class TestTRBAPredictPageInterface:
 
         result = recognizer.predict(page, image=image)
 
-        assert result.blocks[0].lines[0].words[0].text is None
-        assert result.blocks[0].lines[0].words[1].text == "big"
+        assert result.blocks[0].lines[0].text_spans[0].text is None
+        assert result.blocks[0].lines[0].text_spans[1].text == "big"
         assert calls == {"count": 1}
 
-    def test_default_bbox_preparer_rotates_before_prediction(self, tmp_path):
+    def test_default_bbox_preparer_rotates_before_prediction(self, tmp_path, monkeypatch):
         captured = {}
 
-        def region_predictor(regions, batch_size=32, recognizer=None):
+        def fake_predict_text_images(regions, batch_size=32):
             captured["shape"] = regions[0].image.shape
             captured["pixel"] = regions[0].image[0, 99].tolist()
             return [{"text": "rot", "confidence": 0.91}]
 
-        recognizer = self._create_recognizer(
-            tmp_path,
-            region_predictor=region_predictor,
-            rotate_threshold=1.5,
-        )
+        recognizer = self._create_recognizer(tmp_path, rotate_threshold=1.5)
+        monkeypatch.setattr(recognizer, "_predict_text_images", fake_predict_text_images)
         page = Page(
             blocks=[
                 Block(
                     lines=[
-                        Line(
-                            words=[
-                                Word(
+                        Line(text_spans=[
+                                TextSpan(
                                     polygon=[
                                         (10.0, 10.0),
                                         (60.0, 10.0),
@@ -486,27 +479,26 @@ class TestTRBAPredictPageInterface:
 
         assert captured["shape"] == (50, 100, 3)
         assert captured["pixel"] == [255, 0, 0]
-        assert result.blocks[0].lines[0].words[0].text == "rot"
+        assert result.blocks[0].lines[0].text_spans[0].text == "rot"
 
-    def test_polygon_mask_preset_masks_background(self, tmp_path):
+    def test_polygon_mask_preset_masks_background(self, tmp_path, monkeypatch):
         captured = {}
 
-        def region_predictor(regions, batch_size=32, recognizer=None):
+        def fake_predict_text_images(regions, batch_size=32):
             captured["image"] = regions[0].image.copy()
             return [{"text": "mask", "confidence": 0.9}]
 
         recognizer = self._create_recognizer(
             tmp_path,
             region_preparer="polygon_mask",
-            region_predictor=region_predictor,
         )
+        monkeypatch.setattr(recognizer, "_predict_text_images", fake_predict_text_images)
         page = Page(
             blocks=[
                 Block(
                     lines=[
-                        Line(
-                            words=[
-                                Word(
+                        Line(text_spans=[
+                                TextSpan(
                                     polygon=[
                                         (20.0, 10.0),
                                         (50.0, 10.0),
@@ -528,18 +520,18 @@ class TestTRBAPredictPageInterface:
         assert captured["image"][0, 0].tolist() == [255, 255, 255]
         assert captured["image"][15, 15].tolist() == [10, 20, 30]
 
-    def test_quad_warp_preset_uses_natural_rectified_size(self, tmp_path):
+    def test_quad_warp_preset_uses_natural_rectified_size(self, tmp_path, monkeypatch):
         captured = {}
 
-        def region_predictor(regions, batch_size=32, recognizer=None):
+        def fake_predict_text_images(regions, batch_size=32):
             captured["shape"] = regions[0].image.shape
             return [{"text": "warp", "confidence": 0.9}]
 
         recognizer = self._create_recognizer(
             tmp_path,
             region_preparer="quad_warp",
-            region_predictor=region_predictor,
         )
+        monkeypatch.setattr(recognizer, "_predict_text_images", fake_predict_text_images)
         polygon = [
             (10.0, 10.0),
             (70.0, 20.0),
@@ -550,9 +542,8 @@ class TestTRBAPredictPageInterface:
             blocks=[
                 Block(
                     lines=[
-                        Line(
-                            words=[
-                                Word(
+                        Line(text_spans=[
+                                TextSpan(
                                     polygon=polygon,
                                     detection_confidence=0.9,
                                 )
@@ -568,26 +559,72 @@ class TestTRBAPredictPageInterface:
 
         assert captured["shape"][:2] == (32, 61)
 
-    def test_custom_region_preparer_and_predictor_hooks(self, tmp_path):
+    def test_quad_warp_preset_falls_back_to_bbox_for_non_quad_polygon(
+        self, tmp_path, monkeypatch
+    ):
+        captured = {}
+
+        def fake_predict_text_images(regions, batch_size=32):
+            captured["shape"] = regions[0].image.shape
+            captured["meta"] = dict(regions[0].meta)
+            return [{"text": "fallback", "confidence": 0.9}]
+
+        recognizer = self._create_recognizer(
+            tmp_path,
+            region_preparer="quad_warp",
+        )
+        monkeypatch.setattr(recognizer, "_predict_text_images", fake_predict_text_images)
+        polygon = [
+            (10.0, 10.0),
+            (40.0, 10.0),
+            (70.0, 20.0),
+            (60.0, 50.0),
+            (20.0, 55.0),
+        ]
+        page = Page(
+            blocks=[
+                Block(
+                    lines=[
+                        Line(text_spans=[
+                                TextSpan(
+                                    polygon=polygon,
+                                    detection_confidence=0.9,
+                                )
+                            ]
+                        )
+                    ]
+                )
+            ]
+        )
+        image = np.full((80, 96, 3), 200, dtype=np.uint8)
+
+        result = recognizer.predict(page, image=image)
+
+        assert captured["shape"][:2] == (45, 60)
+        assert captured["meta"]["region_preparer"] == "quad_warp"
+        assert captured["meta"]["fallback_to_bbox"] is True
+        assert result.blocks[0].lines[0].text_spans[0].text == "fallback"
+
+    def test_custom_region_preparer_hook(self, tmp_path, monkeypatch):
         captured = {}
 
         def region_preparer(page, image, recognizer=None, options=None):
-            words = page.blocks[0].lines[0].words
+            words = page.blocks[0].lines[0].text_spans
             return [
                 {
-                    "word": words[0],
+                    "text_span": words[0],
                     "image": image[10:40, 10:80],
                     "polygon": np.array(words[0].polygon, dtype=np.float32),
                     "meta": {"source": "custom"},
                 },
                 {
-                    "word": words[1],
+                    "text_span": words[1],
                     "image": image[10:40, 90:160],
                     "polygon": np.array(words[1].polygon, dtype=np.float32),
                 },
             ]
 
-        def region_predictor(regions, batch_size=32, recognizer=None, page=None, image=None):
+        def fake_predict_text_images(regions, batch_size=32):
             captured["metas"] = [region.meta for region in regions]
             captured["batch_size"] = batch_size
             return [
@@ -598,8 +635,8 @@ class TestTRBAPredictPageInterface:
         recognizer = self._create_recognizer(
             tmp_path,
             region_preparer=region_preparer,
-            region_predictor=region_predictor,
         )
+        monkeypatch.setattr(recognizer, "_predict_text_images", fake_predict_text_images)
         page = self._create_page()
         image = np.zeros((64, 180, 3), dtype=np.uint8)
 
@@ -607,11 +644,60 @@ class TestTRBAPredictPageInterface:
 
         assert captured["batch_size"] == 32
         assert captured["metas"][0]["source"] == "custom"
-        assert result.blocks[0].lines[0].words[0].text == "custom1"
-        assert result.blocks[0].lines[0].words[1].text == "custom2"
+        assert result.blocks[0].lines[0].text_spans[0].text == "custom1"
+        assert result.blocks[0].lines[0].text_spans[1].text == "custom2"
+
+    def test_predict_can_save_debug_regions(self, tmp_path, monkeypatch):
+        def fake_predict_text_images(regions, batch_size=32):
+            return [
+                {"text": "word1", "confidence": 0.9},
+                {"text": "word2", "confidence": 0.85},
+            ]
+
+        recognizer = self._create_recognizer(tmp_path)
+        monkeypatch.setattr(recognizer, "_predict_text_images", fake_predict_text_images)
+        page = self._create_page()
+        image = np.zeros((64, 180, 3), dtype=np.uint8)
+        image[10:40, 10:80] = [10, 20, 30]
+        image[10:40, 90:160] = [40, 50, 60]
+        debug_dir = tmp_path / "recognizer_crops"
+
+        recognizer.predict(page, image=image, debug_save_dir=debug_dir)
+
+        crop_files = sorted(debug_dir.glob("*.png"))
+        assert [path.name for path in crop_files] == ["0000.png", "0001.png"]
+        assert (debug_dir / "index.json").exists()
+
+        index_data = json.loads((debug_dir / "index.json").read_text(encoding="utf-8"))
+        assert len(index_data) == 2
+        assert index_data[0]["region_preparer"] == "bbox"
+        assert index_data[0]["prediction"]["text"] == "word1"
+        assert index_data[1]["prediction"]["confidence"] == 0.85
+
+    def test_predict_uses_default_debug_dir_from_constructor(self, tmp_path, monkeypatch):
+        def fake_predict_text_images(regions, batch_size=32):
+            return [
+                {"text": "word1", "confidence": 0.9},
+                {"text": "word2", "confidence": 0.85},
+            ]
+
+        debug_dir = tmp_path / "recognizer_crops"
+        recognizer = self._create_recognizer(
+            tmp_path,
+            recognizer_debug_dir=debug_dir,
+        )
+        monkeypatch.setattr(recognizer, "_predict_text_images", fake_predict_text_images)
+        page = self._create_page()
+        image = np.zeros((64, 180, 3), dtype=np.uint8)
+
+        recognizer.predict(page, image=image)
+
+        assert (debug_dir / "0000.png").exists()
+        assert (debug_dir / "0001.png").exists()
+        assert (debug_dir / "index.json").exists()
 
     def test_invalid_region_preparer_preset_raises(self, tmp_path):
-        with patch('manuscript.api.base.BaseModel._download_http'):
+        with patch('manuscript.api.base.BaseArtifactModel._download_http'):
             weights_file = tmp_path / "model.onnx"
             config_file = tmp_path / "model.json"
             charset_file = tmp_path / "model.txt"
@@ -631,3 +717,25 @@ class TestTRBAPredictPageInterface:
                 assert False, "Expected ValueError for invalid region_preparer"
             except ValueError as exc:
                 assert "region_preparer" in str(exc)
+
+    def test_removed_region_predictor_argument_raises(self, tmp_path):
+        with patch('manuscript.api.base.BaseArtifactModel._download_http'):
+            weights_file = tmp_path / "model.onnx"
+            config_file = tmp_path / "model.json"
+            charset_file = tmp_path / "model.txt"
+
+            weights_file.write_text("mock_onnx")
+            config_file.write_text('{"max_len": 25, "hidden_size": 256, "img_h": 64, "img_w": 256}')
+            charset_file.write_text("<PAD>\n<SOS>\n<EOS>\na\nb\nc")
+
+            try:
+                TRBA(
+                    weights=str(weights_file),
+                    config=str(config_file),
+                    charset=str(charset_file),
+                    device="cpu",
+                    region_predictor=lambda *_args, **_kwargs: [],
+                )
+                assert False, "Expected TypeError for removed region_predictor"
+            except TypeError as exc:
+                assert "region_predictor has been removed" in str(exc)

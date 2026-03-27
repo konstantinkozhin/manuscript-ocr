@@ -18,7 +18,7 @@ def _autocast():
 import torch.nn as nn
 import torch.optim as optim
 from torch.optim.lr_scheduler import ReduceLROnPlateau
-from torch.utils.data import ConcatDataset, DataLoader, random_split
+from torch.utils.data import ConcatDataset, DataLoader, Subset, random_split
 from torch.utils.tensorboard import SummaryWriter
 from tqdm import tqdm
 
@@ -275,10 +275,29 @@ def split_train_val(
                 f"В датасете {c} всего {len(full_ds)} примеров, меньше чем {val_size}"
             )
 
-        train_ds, val_ds = random_split(full_ds, [n_train, n_val])
+        train_split, val_split = random_split(full_ds, [n_train, n_val])
 
-        train_ds.dataset.transform = train_transform
-        val_ds.dataset.transform = val_transform
+        train_base = OCRDatasetAttn(
+            c,
+            r,
+            stoi,
+            img_height=img_h,
+            img_max_width=img_w,
+            transform=train_transform,
+            encoding=encoding,
+        )
+        val_base = OCRDatasetAttn(
+            c,
+            r,
+            stoi,
+            img_height=img_h,
+            img_max_width=img_w,
+            transform=val_transform,
+            encoding=encoding,
+        )
+
+        train_ds = Subset(train_base, train_split.indices)
+        val_ds = Subset(val_base, val_split.indices)
 
         train_sets.append(train_ds)
         val_sets.append(val_ds)
@@ -1150,9 +1169,35 @@ def run_training(cfg: Config, device: str = "cuda"):
                         f"В датасете {train_csv} всего {len(full_ds)} примеров, меньше чем {n_val}"
                     )
 
-                train_ds, val_ds = random_split(full_ds, [n_train, n_val])
-                train_ds.dataset.transform = train_transform
-                val_ds.dataset.transform = val_transform
+                train_split, val_split = random_split(full_ds, [n_train, n_val])
+                train_base = OCRDatasetAttn(
+                    train_csv,
+                    train_root,
+                    stoi,
+                    img_height=img_h,
+                    img_max_width=img_w,
+                    transform=train_transform,
+                    encoding=encoding,
+                    max_len=max_len,
+                    strict_max_len=True,
+                    text_mosaic_prob=text_mosaic_prob,
+                    text_mosaic_n_words=text_mosaic_n_words,
+                    text_mosaic_gap_ratio=text_mosaic_gap_ratio,
+                )
+                val_base = OCRDatasetAttn(
+                    train_csv,
+                    train_root,
+                    stoi,
+                    img_height=img_h,
+                    img_max_width=img_w,
+                    transform=val_transform,
+                    encoding=encoding,
+                    max_len=max_len,
+                    strict_max_len=True,
+                )
+
+                train_ds = Subset(train_base, train_split.indices)
+                val_ds = Subset(val_base, val_split.indices)
 
                 train_sets.append(train_ds)
                 val_sets.append(val_ds)
