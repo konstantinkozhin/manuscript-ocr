@@ -1,11 +1,12 @@
 from abc import ABC, abstractmethod
 from pathlib import Path
-from typing import Optional, Dict
+from typing import Dict, Optional
 import shutil
+import tempfile
 import time
 import urllib.error
 import urllib.request
-import tempfile
+
 import onnxruntime as ort
 
 try:
@@ -14,13 +15,17 @@ except ImportError:
     tqdm = None
 
 
-class BaseModel(ABC):
+class BaseArtifactModel(ABC):
     """
-    Base class for models with unified interface:
-        - artifact loading (local, URL, GitHub, GDrive, preset)
-        - device selection
-        - backend session initialization
-        - inference / training / export
+    Shared infrastructure for artifact-backed OCR stages.
+
+    The class provides the common mechanics used by detectors, recognizers,
+    layouts, and correctors:
+
+    - artifact loading from local files, URLs, GitHub releases, Google Drive,
+      and preset registries
+    - device selection and ONNX Runtime provider resolution
+    - unified ``predict`` / ``train`` / ``export`` surface
     """
 
     default_weights_name: Optional[str] = None
@@ -349,3 +354,6 @@ class BaseModel(ABC):
     @staticmethod
     def export(*args, **kwargs):
         raise NotImplementedError("This model does not support export.")
+
+
+__all__ = ["BaseArtifactModel"]

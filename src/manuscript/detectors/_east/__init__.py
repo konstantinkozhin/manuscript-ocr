@@ -6,9 +6,9 @@ import cv2
 import numpy as np
 import onnxruntime as ort
 
-from manuscript.api.base import BaseModel
+from manuscript.api.detector import BaseDetector
 
-from ...data import Block, Line, Page, Word
+from ...data import Block, Line, Page, TextSpan
 from ...utils import read_image
 from .lanms import locality_aware_nms
 from .utils import (
@@ -34,7 +34,7 @@ except ImportError:
     _TORCH_AVAILABLE = False
 
 
-class EAST(BaseModel):
+class EAST(BaseDetector):
     """
     Initialize EAST text detector with ONNX Runtime.
 
@@ -411,33 +411,21 @@ class EAST(BaseModel):
     def predict(
         self,
         img_or_path: Union[str, Path, np.ndarray],
-        return_maps: bool = False,
-    ) -> Dict[str, Any]:
+    ) -> Page:
         """
-        Run EAST inference and return detection results.
+        Run EAST inference and return detected page structure.
 
         Parameters
         ----------
         img_or_path : str or pathlib.Path or numpy.ndarray
             Path to an image file or an RGB image provided as a NumPy array
             with shape ``(H, W, 3)`` in ``uint8`` format.
-        return_maps : bool, optional
-            If True, returns raw model score and geometry maps under keys
-            ``"score_map"`` and ``"geo_map"``. Default is False.
-
         Returns
         -------
-        dict
-            Dictionary with the following keys:
-
-            - ``"page"`` : Page
-                Parsed detection result as a Page object containing a single
-                Block with a single Line of Word objects. Each Word has polygon
-                coordinates, confidence score, and sequential ``order`` index.
-            - ``"score_map"`` : numpy.ndarray or None
-                Raw score map produced by the network if ``return_maps=True``.
-            - ``"geo_map"`` : numpy.ndarray or None
-                Raw geometry map if ``return_maps=True``.
+        Page
+            Parsed detection result as a Page object containing a single
+            Block with a single Line of TextSpan objects. Each TextSpan has polygon
+            coordinates, confidence score, and sequential ``order`` index.
 
         Notes
         -----
@@ -457,8 +445,8 @@ class EAST(BaseModel):
         For visualization, use the external ``visualize_page`` utility:
 
         >>> from manuscript.utils import visualize_page
-        >>> result = model.predict(img_path)
-        >>> vis_img = visualize_page(img, result["page"])
+        >>> page = model.predict(img_path)
+        >>> vis_img = visualize_page(img, page)
 
         Examples
         --------
@@ -467,18 +455,17 @@ class EAST(BaseModel):
         >>> from manuscript.detectors import EAST
         >>> model = EAST()
         >>> img_path = r"example/ocr_example_image.jpg"
-        >>> result = model.predict(img_path)
-        >>> page = result["page"]
-        >>> # Access first line's first word
-        >>> first_word = page.blocks[0].lines[0].words[0]
-        >>> print(f"Confidence: {first_word.detection_confidence}")
+        >>> page = model.predict(img_path)
+        >>> # Access first line's first text span
+        >>> first_text_span = page.blocks[0].lines[0].text_spans[0]
+        >>> print(f"Confidence: {first_text_span.detection_confidence}")
 
         Visualize results separately:
 
         >>> from manuscript.utils import visualize_page, read_image
-        >>> result = model.predict(img_path)
+        >>> page = model.predict(img_path)
         >>> img = read_image(img_path)
-        >>> vis_img = visualize_page(img, result["page"])
+        >>> vis_img = visualize_page(img, page)
         >>> vis_img.show()
 
         """
@@ -490,7 +477,7 @@ class EAST(BaseModel):
         orig_h, orig_w = img.shape[:2]
 
         # Run inference on original image
-        final_quads_nms, score_map, geo_map = self._run_inference_on_image(img)
+        final_quads_nms, _, _ = self._run_inference_on_image(img)
 
         # TTA: Run on horizontally flipped image and merge results
         if self.use_tta:
@@ -573,22 +560,20 @@ class EAST(BaseModel):
             else processed_quads
         )
 
-        words: List[Word] = []
+        text_spans: List[TextSpan] = []
         for quad in output_quads:
             pts = quad[:8].reshape(4, 2)
             score = float(np.clip(quad[8], 0.0, 1.0))
-            words.append(Word(polygon=pts.tolist(), detection_confidence=score))
+            text_spans.append(TextSpan(polygon=pts.tolist(), detection_confidence=score))
 
-        for idx, w in enumerate(words):
-            w.order = idx
+        for idx, text_span in enumerate(text_spans):
+            text_span.order = idx
 
-        page = Page(blocks=[Block(lines=[Line(words=words, order=0)], order=0)])
+        page = Page(
+            blocks=[Block(lines=[Line(text_spans=text_spans, order=0)], order=0)]
+        )
 
-        return {
-            "page": page,
-            "score_map": score_map if return_maps else None,
-            "geo_map": geo_map if return_maps else None,
-        }
+        return page
 
     @staticmethod
     def train(

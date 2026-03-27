@@ -7,11 +7,11 @@ from typing import Optional, Union
 import numpy as np
 import onnxruntime as ort
 
-from manuscript.api.base import BaseModel
+from manuscript.api.corrector import BaseCorrector
 from manuscript.data import Page
 
 
-class CharLM(BaseModel):
+class CharLM(BaseCorrector):
     """
     Character-level language model corrector using ONNX Runtime.
 
@@ -100,7 +100,6 @@ class CharLM(BaseModel):
         if weights is None and self.default_weights_name is not None:
             weights = self.default_weights_name
 
-        # Remember original weights name for lexicon resolution
         self._weights_preset = weights if weights in self.pretrained_registry else None
 
         if weights is None:
@@ -238,9 +237,9 @@ class CharLM(BaseModel):
         Returns
         -------
         Page
-            Corrected Page object with updated word texts.
+            Corrected Page object with updated text-span texts.
         """
-        _ = image  # Intentionally unused in CharLM.
+        _ = image
 
         if self.weights is None or not self.c2i:
             return page.model_copy(deep=True)
@@ -252,10 +251,10 @@ class CharLM(BaseModel):
 
         for block in result.blocks:
             for line in block.lines:
-                for word in line.words:
-                    if word.text:
-                        corrected = self._correct_word(word.text)
-                        word.text = corrected
+                for text_span in line.text_spans:
+                    if text_span.text:
+                        corrected = self._correct_word(text_span.text)
+                        text_span.text = corrected
 
         return result
 

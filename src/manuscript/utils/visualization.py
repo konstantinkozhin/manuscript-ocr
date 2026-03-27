@@ -102,9 +102,9 @@ def visualize_page(
     max_size=4096,
 ) -> Image.Image:
     """
-    Visualize a Page object with detected words/blocks.
+    Visualize a Page object with detected text spans/blocks.
 
-    This function draws all words from the Page structure on the image,
+    This function draws all text spans from the Page structure on the image,
     optionally showing reading order with numbered markers and connecting lines.
     When show_order=True, it also visualizes blocks with semi-transparent
     bounding boxes, each block having a distinct color.
@@ -117,22 +117,22 @@ def visualize_page(
         - RGB numpy array with shape (H, W, 3)
         - PIL Image object
     page : Page
-        Page object from manuscript.data containing detected blocks/words.
+        Page object from manuscript.data containing detected blocks/text spans.
     color : tuple of int, default=(0, 255, 0)
-        RGB color for word boundaries.
+        RGB color for text span boundaries.
     thickness : int, default=2
-        Line thickness for word boundaries.
+        Line thickness for text span boundaries.
     show_order : bool, default=True
         If True, colors different text lines with different colors and shows
         semi-transparent block boundaries with different colors per block.
     show_lines : bool, default=False
         If True and show_order=True, draw connecting lines between consecutive
-        words showing the reading sequence.
+        text spans showing the reading sequence.
     show_numbers : bool, default=False
-        If True and show_order=True, display numbered markers on each word
+        If True and show_order=True, display numbered markers on each text span
         showing the reading order.
     line_color : tuple of int, default=(255, 165, 0)
-        RGB color for connecting lines between words.
+        RGB color for connecting lines between text spans.
     number_bg : tuple of int, default=(255, 255, 255)
         Background color for order number boxes.
     number_color : tuple of int, default=(0, 0, 0)
@@ -173,7 +173,7 @@ def visualize_page(
     ...     thickness=3
     ... )
 
-    Show connecting lines and numbers between words:
+    Show connecting lines and numbers between text spans:
 
     >>> vis = visualize_page(
     ...     "document.jpg",
@@ -219,26 +219,26 @@ def visualize_page(
         block_quads = []
         if block.lines:
             for line in block.lines:
-                quads, words = [], []
-                for w in line.words:
-                    poly = np.array(w.polygon) * scale
+                quads, text_spans = [], []
+                for text_span in line.text_spans:
+                    poly = np.array(text_span.polygon) * scale
                     quad = poly.reshape(-1)
                     quads.append(quad)
-                    words.append(w)
+                    text_spans.append(text_span)
                     block_quads.append(quad)
                 if quads:
-                    lines.append((quads, words, line_index))
+                    lines.append((quads, text_spans, line_index))
                     line_index += 1
-        elif block.words:
-            quads, words = [], []
-            for w in block.words:
-                poly = np.array(w.polygon) * scale
+        elif block.text_spans:
+            quads, text_spans = [], []
+            for text_span in block.text_spans:
+                poly = np.array(text_span.polygon) * scale
                 quad = poly.reshape(-1)
                 quads.append(quad)
-                words.append(w)
+                text_spans.append(text_span)
                 block_quads.append(quad)
             if quads:
-                lines.append((quads, words, line_index))
+                lines.append((quads, text_spans, line_index))
                 line_index += 1
         if block_quads:
             blocks.append((block_quads, block_idx))
@@ -260,17 +260,17 @@ def visualize_page(
             block_layer, (int(x1), int(y1)), (int(x2), int(y2)), (*color_b, 75), -1
         )  # alpha=75
     
-    # ----- WORD MASK (cut out words from block layers) -----
-    word_mask = np.zeros((h, w), dtype=np.uint8)
+    # ----- TEXT-SPAN MASK (cut out text spans from block layers) -----
+    text_span_mask = np.zeros((h, w), dtype=np.uint8)
     for quads, _, _ in lines:
         for quad in quads:
             coords = quad.reshape(4, 2).astype(np.int32)
-            cv2.fillPoly(word_mask, [coords], 255)
+            cv2.fillPoly(text_span_mask, [coords], 255)
 
-    inv_word_mask = cv2.bitwise_not(word_mask)
+    inv_text_span_mask = cv2.bitwise_not(text_span_mask)
 
-     # cut out words → blocks DO NOT cover words
-    block_layer[:, :, 3] = cv2.bitwise_and(block_layer[:, :, 3], inv_word_mask)
+     # cut out text spans -> blocks do not cover text spans
+    block_layer[:, :, 3] = cv2.bitwise_and(block_layer[:, :, 3], inv_text_span_mask)
 
     # final image
     base = Image.fromarray(img).convert("RGBA")
@@ -279,7 +279,7 @@ def visualize_page(
 
     draw = ImageDraw.Draw(out)
 
-    # ----- WORD BOXES -----
+    # ----- TEXT-SPAN BOXES -----
     for quads, _, idx in lines:
         col = get_line_color(idx) if show_order else color
         for quad in quads:
@@ -289,11 +289,11 @@ def visualize_page(
 
     # ----- ORDER LINES & NUMBERS -----
     if show_order:
-        words = [w for _, ws, _ in lines for w in ws]
+        text_spans = [span for _, spans, _ in lines for span in spans]
         centers = []
-        for w in words:
-            xs = [p[0] * scale for p in w.polygon]
-            ys = [p[1] * scale for p in w.polygon]
+        for text_span in text_spans:
+            xs = [p[0] * scale for p in text_span.polygon]
+            ys = [p[1] * scale for p in text_span.polygon]
             centers.append((sum(xs) / 4, sum(ys) / 4))
 
         # Draw connecting lines only if show_lines is True

@@ -5,6 +5,6 @@ This package contains the core data structures used to represent OCR results
 throughout the manuscript-ocr library.
 """
 
-from .structures import Word, Line, Block, Page
+from .structures import TextSpan, Line, Block, Page
 
-__all__ = ["Word", "Line", "Block", "Page"]
+__all__ = ["TextSpan", "Line", "Block", "Page"]

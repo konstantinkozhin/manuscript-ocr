@@ -1,19 +1,26 @@
-import inspect
 import time
 from pathlib import Path
-from typing import Any, Dict, Optional, TYPE_CHECKING, Union
+from typing import Any, Dict, Optional, Union
 
 import numpy as np
 from PIL import Image
 
+from .api._page_helpers import (
+    accepts_predict_kwarg,
+    call_page_stage,
+    filter_predict_kwargs,
+)
+from .api.protocols import (
+    CorrectorProtocol,
+    DetectorProtocol,
+    LayoutProtocol,
+    RecognizerProtocol,
+)
 from .data import Page
 from .detectors import EAST
 from .layouts import SimpleSorting
 from .recognizers import TRBA
 from .utils import read_image, visualize_page
-
-if TYPE_CHECKING:
-    from .api.base import BaseModel as BaseCorrector
 
 _DEFAULT = object()
 _VALID_LAYOUT_AFTER = {"detector", "recognizer", "corrector"}
@@ -30,10 +37,10 @@ class Pipeline:
 
     def __init__(
         self,
-        detector: Any = _DEFAULT,
-        layout: Any = _DEFAULT,
-        recognizer: Any = _DEFAULT,
-        corrector: Optional["BaseCorrector"] = None,
+        detector: DetectorProtocol = _DEFAULT,
+        layout: Optional[LayoutProtocol] = _DEFAULT,
+        recognizer: Optional[RecognizerProtocol] = _DEFAULT,
+        corrector: Optional[CorrectorProtocol] = None,
         layout_after: str = "detector",
     ):
         """
@@ -42,7 +49,7 @@ class Pipeline:
         Parameters
         ----------
         detector : object, optional
-            Detector instance with ``predict(image) -> {"page": Page}``.
+            Detector instance with ``predict(image) -> Page``.
             If omitted, default ``EAST()`` is used.
             Detector cannot be disabled.
         layout : object or None, optional
@@ -89,28 +96,12 @@ class Pipeline:
         self._last_recognition_page: Optional[Page] = None
         self._last_correction_page: Optional[Page] = None
 
-    @staticmethod
-    def _filter_predict_kwargs(model: Any, kwargs: Dict[str, Any]) -> Dict[str, Any]:
-        try:
-            params = inspect.signature(model.predict).parameters
-        except (TypeError, ValueError):
-            return {}
-
-        if any(p.kind == inspect.Parameter.VAR_KEYWORD for p in params.values()):
-            return kwargs
-
-        return {k: v for k, v in kwargs.items() if k in params}
-
-    @staticmethod
-    def _call_predict(model: Any, page: Page, kwargs: Dict[str, Any]) -> Page:
-        filtered_kwargs = Pipeline._filter_predict_kwargs(model, kwargs)
-        return model.predict(page, **filtered_kwargs)
-
     def predict(
         self,
         image: Union[str, Path, np.ndarray, Image.Image],
         vis: bool = False,
         profile: bool = False,
+        recognizer_debug_dir: Optional[Union[str, Path]] = None,
     ) -> Union[Dict[str, Page], tuple]:
         """
         Run pipeline on a single image.
@@ -123,6 +114,9 @@ class Pipeline:
             If True, returns visualization image together with result.
         profile : bool, optional
             If True, prints timing per stage.
+        recognizer_debug_dir : str or Path, optional
+            If provided and the recognizer supports ``debug_save_dir``,
+            saves the prepared recognition crops into this directory.
         """
         start_time = time.time()
 
@@ -148,9 +142,9 @@ class Pipeline:
 
             t0 = time.time()
             layout_kwargs: Dict[str, Any] = {}
-            if "image" in self._filter_predict_kwargs(self.layout, {"image": None}):
+            if accepts_predict_kwarg(self.layout, "image"):
                 layout_kwargs["image"] = get_image_array()
-            page = self._call_predict(self.layout, page, layout_kwargs)
+            page = call_page_stage(self.layout, page, **layout_kwargs)
             self._last_layout_page = page.model_copy(deep=True)
             if profile:
                 print(f"Layout ({anchor}): {time.time() - t0:.3f}s")
@@ -158,11 +152,7 @@ class Pipeline:
 
         # Detection
         t0 = time.time()
-        detection_kwargs = self._filter_predict_kwargs(
-            self.detector, {"return_maps": False}
-        )
-        detection_result = self.detector.predict(image, **detection_kwargs)
-        page: Page = detection_result["page"]
+        page = self.detector.predict(image)
         self._last_detection_page = page.model_copy(deep=True)
         if profile:
             print(f"Detection: {time.time() - t0:.3f}s")
@@ -173,15 +163,16 @@ class Pipeline:
         # Recognition slot
         if self.recognizer is not None:
             t0 = time.time()
-            recognizer_kwargs = self._filter_predict_kwargs(
+            recognizer_kwargs = filter_predict_kwargs(
                 self.recognizer,
                 {
                     "batch_size": 32,
+                    "debug_save_dir": recognizer_debug_dir,
                 },
             )
-            if "image" in self._filter_predict_kwargs(self.recognizer, {"image": None}):
+            if accepts_predict_kwarg(self.recognizer, "image"):
                 recognizer_kwargs["image"] = get_image_array()
-            page = self._call_predict(self.recognizer, page, recognizer_kwargs)
+            page = call_page_stage(self.recognizer, page, **recognizer_kwargs)
             self._last_recognition_page = page.model_copy(deep=True)
             if profile:
                 print(f"Recognition: {time.time() - t0:.3f}s")
@@ -193,9 +184,9 @@ class Pipeline:
         if self.corrector is not None:
             t0 = time.time()
             corrector_kwargs: Dict[str, Any] = {}
-            if "image" in self._filter_predict_kwargs(self.corrector, {"image": None}):
+            if accepts_predict_kwarg(self.corrector, "image"):
                 corrector_kwargs["image"] = get_image_array()
-            page = self._call_predict(self.corrector, page, corrector_kwargs)
+            page = call_page_stage(self.corrector, page, **corrector_kwargs)
             self._last_correction_page = page.model_copy(deep=True)
             if profile:
                 print(f"Correction: {time.time() - t0:.3f}s")
@@ -223,7 +214,7 @@ class Pipeline:
         lines = []
         for block in page.blocks:
             for line in block.lines:
-                texts = [w.text for w in line.words if w.text]
+                texts = [span.text for span in line.text_spans if span.text]
                 if texts:
                     lines.append(" ".join(texts))
         return "\n".join(lines)

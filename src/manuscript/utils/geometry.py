@@ -40,7 +40,8 @@ def polygon_to_bbox(
     pad: float = 0.0,
 ) -> Optional[Tuple[int, int, int, int]]:
     """
-    Convert polygon to a clipped axis-aligned bounding box.
+    Convert a polygon with any number of vertices to a clipped axis-aligned
+    bounding box.
 
     Parameters
     ----------
@@ -115,6 +116,8 @@ def crop_polygon_mask(
 ) -> Optional[np.ndarray]:
     """
     Crop the polygon bounding box and mask pixels outside the polygon.
+
+    Works with arbitrary polygons of shape ``(N, 2)``.
     """
     pts = np.asarray(polygon, dtype=np.float32)
     bbox = polygon_to_bbox(pts, image_shape=image.shape, pad=pad)
@@ -145,7 +148,8 @@ def order_quad_points(
     points: Union[np.ndarray, Tuple[Tuple[float, float], ...]]
 ) -> np.ndarray:
     """
-    Order 4 polygon points as top-left, top-right, bottom-right, bottom-left.
+    Order exactly 4 polygon points as top-left, top-right, bottom-right,
+    bottom-left.
     """
     pts = np.asarray(points, dtype=np.float32)
     if pts.shape != (4, 2):
@@ -170,6 +174,9 @@ def warp_quad(
 ) -> Optional[np.ndarray]:
     """
     Perspective-warp a quadrilateral polygon into a rectified crop.
+
+    This helper is intentionally quad-specific. For non-quad polygons it
+    returns ``None`` so callers may choose a fallback strategy.
     """
     pts = np.asarray(polygon, dtype=np.float32)
     if pts.shape != (4, 2):

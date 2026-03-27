@@ -70,6 +70,7 @@ dev = [
     # ONNX export tools
     "onnx>=1.12",
     "onnxsim>=0.4",
+    "ultralytics>=8.4.30",
     
     # Training utilities
     "torch-optimizer>=0.1",

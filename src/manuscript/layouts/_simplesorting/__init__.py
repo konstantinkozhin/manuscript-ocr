@@ -2,12 +2,14 @@ from typing import List, Optional, Tuple
 
 import numpy as np
 
-from ...data import Block, Line, Page, Word
+from manuscript.api.layout import BaseLayout
+
+from ...data import Block, Line, Page, TextSpan
 
 
-class SimpleSorting:
+class SimpleSorting(BaseLayout):
     """
-    Layout model that groups detected words into columns and lines.
+    Layout model that groups detected text spans into columns and lines.
 
     Parameters
     ----------
@@ -20,6 +22,10 @@ class SimpleSorting:
     def __init__(self, max_splits: int = 10, use_columns: bool = True):
         self.max_splits = max_splits
         self.use_columns = use_columns
+
+    def _initialize_session(self):
+        """Layout stage has no backend session."""
+        return None
 
     @staticmethod
     def _resolve_intersections(
@@ -230,12 +236,12 @@ class SimpleSorting:
 
     def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
         """
-        Organize words in a page into blocks/lines and assign reading order.
+        Organize text spans in a page into blocks/lines and assign reading order.
 
         Parameters
         ----------
         page : Page
-            Input page with detected words.
+            Input page with detected text spans.
         image : numpy.ndarray, optional
             Optional source image (unused by this layout model).
 
@@ -246,23 +252,23 @@ class SimpleSorting:
         """
         _ = image
 
-        all_words: List[Word] = []
+        all_text_spans: List[TextSpan] = []
         for block in page.blocks:
             for line in block.lines:
-                all_words.extend(line.words)
+                all_text_spans.extend(line.text_spans)
 
-        if not all_words:
-            return Page(blocks=[Block(lines=[Line(words=[], order=0)], order=0)])
+        if not all_text_spans:
+            return Page(blocks=[Block(lines=[Line(text_spans=[], order=0)], order=0)])
 
-        word_to_box = {}
+        text_span_to_box = {}
         boxes = []
-        for word in all_words:
-            poly = np.array(word.polygon, dtype=np.int32)
+        for text_span in all_text_spans:
+            poly = np.array(text_span.polygon, dtype=np.int32)
             x_min, y_min = np.min(poly, axis=0)
             x_max, y_max = np.max(poly, axis=0)
             box = (int(x_min), int(y_min), int(x_max), int(y_max))
             boxes.append(box)
-            word_to_box[box] = word
+            text_span_to_box[box] = text_span
 
         if self.use_columns:
             columns = self._segment_columns(boxes)
@@ -275,13 +281,13 @@ class SimpleSorting:
 
             lines: List[Line] = []
             for line_idx, line_boxes in enumerate(lines_in_column):
-                line_words = []
-                for word_idx, box in enumerate(line_boxes):
-                    word = word_to_box[box]
-                    word.order = word_idx
-                    line_words.append(word)
+                line_text_spans = []
+                for text_span_idx, box in enumerate(line_boxes):
+                    text_span = text_span_to_box[box]
+                    text_span.order = text_span_idx
+                    line_text_spans.append(text_span)
 
-                line = Line(words=line_words, order=line_idx)
+                line = Line(text_spans=line_text_spans, order=line_idx)
                 lines.append(line)
 
             block = Block(lines=lines, order=block_idx)

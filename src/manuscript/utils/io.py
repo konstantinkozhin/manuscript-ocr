@@ -5,7 +5,7 @@ import cv2
 import numpy as np
 from PIL import Image
 
-from manuscript.data import Word, Line, Block, Page
+from manuscript.data import TextSpan, Line, Block, Page
 
 
 def read_image(img_or_path: Union[str, Path, bytes, np.ndarray, Image.Image]) -> np.ndarray:
@@ -199,16 +199,16 @@ def create_page_from_text(
     useful for testing correctors or other text processing components
     without requiring actual OCR detection/recognition.
 
-    Each line becomes a Line object with words split by whitespace.
-    Words are assigned dummy polygon coordinates for compatibility
+    Each line becomes a Line object with text spans split by whitespace.
+    Text spans are assigned dummy polygon coordinates for compatibility
     with the data structures.
 
     Parameters
     ----------
     lines : List[str]
-        List of text lines. Each line will be split into words.
+        List of text lines. Each line will be split into text spans.
     confidence : float, optional
-        Confidence score to assign to all words (default 1.0).
+        Confidence score to assign to all text spans (default 1.0).
 
     Returns
     -------
@@ -219,7 +219,7 @@ def create_page_from_text(
     --------
     >>> from manuscript.utils import create_page_from_text
     >>> page = create_page_from_text(["Hello world", "This is a test"])
-    >>> page.blocks[0].lines[0].words[0].text
+    >>> page.blocks[0].lines[0].text_spans[0].text
     'Hello'
     >>> len(page.blocks[0].lines)
     2
@@ -238,7 +238,7 @@ def create_page_from_text(
     >>> 
     >>> # Get corrected text
     >>> for line in corrected.blocks[0].lines:
-    ...     print(" ".join(w.text for w in line.words))
+    ...     print(" ".join(span.text for span in line.text_spans))
     """
     result_lines = []
     y_offset = 0
@@ -250,7 +250,7 @@ def create_page_from_text(
             y_offset += line_height
             continue
             
-        words = []
+        text_spans = []
         x_offset = 0
         
         for word_text in words_text:
@@ -261,16 +261,16 @@ def create_page_from_text(
                 (float(x_offset + word_width), float(y_offset + line_height)),
                 (float(x_offset), float(y_offset + line_height)),
             ]
-            word = Word(
+            text_span = TextSpan(
                 polygon=polygon,
                 detection_confidence=confidence,
                 text=word_text,
                 recognition_confidence=confidence,
             )
-            words.append(word)
+            text_spans.append(text_span)
             x_offset += word_width + 10
         
-        result_lines.append(Line(words=words))
+        result_lines.append(Line(text_spans=text_spans))
         y_offset += line_height + 5
     
     block = Block(lines=result_lines)

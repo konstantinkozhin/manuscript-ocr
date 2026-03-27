@@ -13,7 +13,7 @@ def organize_page(
     Parameters
     ----------
     page : Page
-        Input page with detected words.
+        Input page with detected text spans.
     max_splits : int, optional
         Maximum number of column split attempts. Default is 10.
     use_columns : bool, optional
