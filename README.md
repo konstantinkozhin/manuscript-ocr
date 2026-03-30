@@ -122,7 +122,7 @@ pipeline = Pipeline()
 result = pipeline.predict("document.jpg")
 
 # Извлечение текста
-text = pipeline.get_text(result)
+text = pipeline.get_text(result["page"])
 print(text)
 ```
 

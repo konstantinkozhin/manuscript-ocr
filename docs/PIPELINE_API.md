@@ -16,8 +16,8 @@ Default `Pipeline()`:
 ### Detector
 
 ```python
-def predict(self, image) -> Dict[str, Any]:
-    return {"page": page}
+def predict(self, image) -> Page:
+    ...
 ```
 
 ### Layout
@@ -134,20 +134,21 @@ For advanced cases, you can inject hooks into `TRBA` instead of writing a full
 custom recognizer:
 
 ```python
-from functools import partial
 import numpy as np
 
 def my_preparer(page, image, recognizer=None, options=None):
     regions = []
     for block in page.blocks:
         for line in block.lines:
-            for word in line.words:
-                poly = np.asarray(word.polygon, dtype=np.float32)
+            for text_span in line.text_spans:
+                poly = np.asarray(text_span.polygon, dtype=np.float32)
                 crop = image[10:40, 10:80]
-                regions.append({"word": word, "image": crop, "polygon": poly})
+                regions.append(
+                    {"text_span": text_span, "image": crop, "polygon": poly}
+                )
     return regions
 
-recognizer = TRBA(region_preparer=partial(my_preparer))
+recognizer = TRBA(region_preparer=my_preparer)
 ```
 
 If you want complete control over recognition logic, the simplest route is
