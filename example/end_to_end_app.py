@@ -9,7 +9,7 @@ from manuscript.recognizers import TRBA
 
 
 CORRECTOR_MODELS = ["prereform_charlm_g1", "modern_charlm_g1"]
-RECOGNIZER_MODELS = ["trba_lite_g1", "trba_base_g1"]
+RECOGNIZER_MODELS = ["trba_lite_g1", "trba_lite_g2", "trba_base_g1"]
 
 last_recognition_page = None
 last_correction_page = None

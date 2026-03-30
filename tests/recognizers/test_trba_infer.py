@@ -31,6 +31,12 @@ class TestTRBAInitialization:
         """Test default preset"""
         assert TRBA.default_weights_name == "trba_lite_g1"
 
+    def test_trba_lite_g2_preset_registered(self):
+        """TRBA exposes trba_lite_g2 across all preset registries."""
+        assert "trba_lite_g2" in TRBA.pretrained_registry
+        assert "trba_lite_g2" in TRBA.config_registry
+        assert "trba_lite_g2" in TRBA.charset_registry
+
     @patch('manuscript.api.base.BaseArtifactModel._download_http')
     def test_trba_initialization_with_local_file(self, mock_download, tmp_path):
         """Test initialization with local files"""

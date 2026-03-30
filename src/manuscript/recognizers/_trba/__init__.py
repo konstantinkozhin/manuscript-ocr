@@ -149,16 +149,19 @@ class TRBA(BaseRecognizer):
 
     pretrained_registry = {
         "trba_lite_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_lite_g1.onnx",
+        "trba_lite_g2": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_lite_g2.onnx",
         "trba_base_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_base_g1.onnx",
     }
 
     config_registry = {
         "trba_lite_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_lite_g1.json",
+        "trba_lite_g2": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_lite_g2.json",
         "trba_base_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_base_g1.json",
     }
 
     charset_registry = {
         "trba_lite_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_lite_g1.txt",
+        "trba_lite_g2": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_lite_g2.txt",
         "trba_base_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_base_g1.txt",
     }
 
