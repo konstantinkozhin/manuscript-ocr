@@ -1,4 +1,6 @@
+import sys
 from dataclasses import dataclass, field
+from functools import partial
 from typing import Any, Dict, List, Optional, Sequence
 
 import numpy as np
@@ -8,8 +10,13 @@ from manuscript.utils import read_image
 
 REGION_PREPARER_PRESETS = frozenset({"bbox", "polygon_mask", "quad_warp"})
 
+if sys.version_info >= (3, 10):
+    _dataclass_compat = partial(dataclass, slots=True)
+else:
+    _dataclass_compat = dataclass
 
-@dataclass(slots=True)
+
+@_dataclass_compat
 class PreparedRegion:
     """Prepared text crop associated with a specific ``TextSpan`` object."""
 
@@ -19,7 +26,7 @@ class PreparedRegion:
     meta: Dict[str, Any] = field(default_factory=dict)
 
 
-@dataclass(slots=True)
+@_dataclass_compat
 class RecognitionPrediction:
     """Recognition result for a single prepared text crop."""
 
