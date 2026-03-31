@@ -70,8 +70,8 @@ class YOLO(BaseDetector):
 
     Available presets:
 
-    - ``"yolo26s_obb_text"`` - manuscript-ocr YOLO26-S OBB text detector
-    - ``"yolo26x_obb_text"`` - manuscript-ocr YOLO26-X OBB text detector
+    - ``"yolo26s_obb_text"`` - YOLO26-S OBB text detector
+    - ``"yolo26x_obb_text"`` - YOLO26-X OBB text detector
     """
 
     default_weights_name = "yolo26s_obb_text"
