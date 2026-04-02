@@ -109,11 +109,41 @@ def test_yolo_uses_default_preset_when_weights_missing(monkeypatch, tmp_path):
     assert Path(detector.weights) == model_path
 
 
-def test_yolo_defaults_to_1280_target_size():
-    detector = YOLO.__new__(YOLO)
-    detector.target_size = 1280
+def test_yolo_default_preset_uses_1280_target_size(monkeypatch, tmp_path):
+    model_path = tmp_path / "preset.onnx"
+    model_path.write_bytes(b"fake")
+
+    monkeypatch.setattr(
+        "manuscript.api.base.BaseArtifactModel._download_http",
+        lambda self, url: str(model_path),
+    )
+
+    detector = YOLO(weights=None)
 
     assert detector.target_size == 1280
+
+
+def test_yolo_defaults_to_01_score_thresh(tmp_path):
+    model_path = tmp_path / "model.onnx"
+    model_path.write_bytes(b"fake")
+
+    detector = YOLO(weights=str(model_path))
+
+    assert detector.score_thresh == 0.1
+
+
+def test_yolo26x_preset_uses_1024_target_size(monkeypatch, tmp_path):
+    model_path = tmp_path / "preset.onnx"
+    model_path.write_bytes(b"fake")
+
+    monkeypatch.setattr(
+        "manuscript.api.base.BaseArtifactModel._download_http",
+        lambda self, url: str(model_path),
+    )
+
+    detector = YOLO(weights="yolo26x_obb_text")
+
+    assert detector.target_size == 1024
 
 
 def test_yolo_suppresses_mostly_contained_boxes_by_default():

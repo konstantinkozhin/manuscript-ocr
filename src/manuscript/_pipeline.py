@@ -101,7 +101,6 @@ class Pipeline:
         image: Union[str, Path, np.ndarray, Image.Image],
         vis: bool = False,
         profile: bool = False,
-        recognizer_debug_dir: Optional[Union[str, Path]] = None,
     ) -> Union[Dict[str, Page], tuple]:
         """
         Run pipeline on a single image.
@@ -114,9 +113,6 @@ class Pipeline:
             If True, returns visualization image together with result.
         profile : bool, optional
             If True, prints timing per stage.
-        recognizer_debug_dir : str or Path, optional
-            If provided and the recognizer supports ``debug_save_dir``,
-            saves the prepared recognition crops into this directory.
         """
         start_time = time.time()
 
@@ -167,7 +163,6 @@ class Pipeline:
                 self.recognizer,
                 {
                     "batch_size": 32,
-                    "debug_save_dir": recognizer_debug_dir,
                 },
             )
             if accepts_predict_kwarg(self.recognizer, "image"):

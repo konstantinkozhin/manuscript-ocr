@@ -42,14 +42,16 @@ class YOLO(BaseDetector):
         Default is ``None`` (CPU).
     score_thresh : float, optional
         Confidence threshold applied to model outputs after ONNX inference and
-        before the additional containment cleanup pass. Default is ``0.25``.
+        before the additional containment cleanup pass. Default is ``0.1``.
     class_ids : sequence of int or None, optional
         Optional whitelist of class IDs to keep. If ``None``, all classes are
         kept. Default is ``None``.
-    target_size : int, optional
+    target_size : int or None, optional
         Square inference size used for letterbox preprocessing. Images are
         resized into ``(target_size, target_size)`` before ONNX inference.
-        Default is ``1280``.
+        If ``None``, preset defaults are used: ``1280`` for
+        ``"yolo26s_obb_text"``, ``1024`` for ``"yolo26x_obb_text"``.
+        Unknown/custom weights fall back to ``1280``.
     axis_aligned_output : bool, optional
         If ``True`` (default), OBB detections are converted to standard
         axis-aligned rectangles. If ``False``, OBB detections are returned as
@@ -75,6 +77,11 @@ class YOLO(BaseDetector):
     """
 
     default_weights_name = "yolo26s_obb_text"
+    default_target_size = 1280
+    default_target_size_registry: Dict[str, int] = {
+        "yolo26s_obb_text": 1280,
+        "yolo26x_obb_text": 1024,
+    }
     pretrained_registry: Dict[str, str] = {
         "yolo26s_obb_text": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text.raw.onnx",
         "yolo26x_obb_text": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text.raw.onnx",
@@ -85,9 +92,9 @@ class YOLO(BaseDetector):
         weights: Optional[Union[str, Path]] = None,
         device: Optional[str] = None,
         *,
-        score_thresh: float = 0.25,
+        score_thresh: float = 0.1,
         class_ids: Optional[Sequence[int]] = None,
-        target_size: int = 1280,
+        target_size: Optional[int] = None,
         axis_aligned_output: bool = True,
         containment_threshold: Optional[float] = 0.9,
         **kwargs,
@@ -97,7 +104,11 @@ class YOLO(BaseDetector):
         self.onnx_session = None
         self.score_thresh = float(score_thresh)
         self.class_ids = None if class_ids is None else {int(v) for v in class_ids}
-        self.target_size = int(target_size)
+        self.target_size = int(
+            self._resolve_default_target_size(weights)
+            if target_size is None
+            else target_size
+        )
         self.axis_aligned_output = bool(axis_aligned_output)
         self.containment_threshold = (
             None
@@ -105,6 +116,44 @@ class YOLO(BaseDetector):
             else float(containment_threshold)
         )
         self._output_layout = "detect"
+
+    @classmethod
+    def _candidate_weight_names(cls, value: Optional[Union[str, Path]]) -> List[str]:
+        if value is None:
+            return []
+
+        raw = str(value).strip()
+        if not raw:
+            return []
+
+        tail = raw.replace("\\", "/").rstrip("/").rsplit("/", 1)[-1]
+        candidates = [raw, tail]
+        for item in list(candidates):
+            without_onnx = item.removesuffix(".onnx")
+            candidates.append(without_onnx)
+            candidates.append(without_onnx.removesuffix(".raw"))
+
+        seen = set()
+        unique: List[str] = []
+        for item in candidates:
+            if item and item not in seen:
+                unique.append(item)
+                seen.add(item)
+        return unique
+
+    def _resolve_default_target_size(self, weights: Optional[Union[str, Path]]) -> int:
+        candidates: List[str] = []
+        if weights is None and self.default_weights_name:
+            candidates.append(self.default_weights_name)
+
+        for value in (weights, self.weights):
+            candidates.extend(self._candidate_weight_names(value))
+
+        for candidate in candidates:
+            if candidate in self.default_target_size_registry:
+                return self.default_target_size_registry[candidate]
+
+        return self.default_target_size
 
     def _initialize_session(self):
         if self.onnx_session is not None:

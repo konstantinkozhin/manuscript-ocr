@@ -315,21 +315,18 @@ class TestPipelineAPICompatibility:
         assert isinstance(recognizer.last_image, np.ndarray)
         assert isinstance(corrector.last_image, np.ndarray)
 
-    def test_pipeline_forwards_recognizer_debug_dir(self, tmp_path):
-        recognizer = DummyRecognizer()
+    def test_pipeline_rejects_removed_recognizer_debug_dir(self):
         pipeline = Pipeline(
             detector=DummyDetector(),
             layout=DummyLayout(),
-            recognizer=recognizer,
+            recognizer=DummyRecognizer(),
         )
 
-        debug_dir = tmp_path / "recognizer_crops"
-        _ = pipeline.predict(
-            np.zeros((40, 120, 3), dtype=np.uint8),
-            recognizer_debug_dir=debug_dir,
-        )
-
-        assert recognizer.last_debug_save_dir == debug_dir
+        with pytest.raises(TypeError, match="recognizer_debug_dir"):
+            pipeline.predict(
+                np.zeros((40, 120, 3), dtype=np.uint8),
+                recognizer_debug_dir="recognizer_crops",
+            )
 
     def test_pipeline_recognizer_without_batch_min_text_signature(self):
         recognizer = DummyRecognizerNoExtraArgs()

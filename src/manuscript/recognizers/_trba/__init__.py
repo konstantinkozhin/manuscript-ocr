@@ -182,11 +182,13 @@ class TRBA(BaseRecognizer):
                 "region_predictor has been removed from TRBA. "
                 "Pass a custom recognizer to Pipeline instead."
             )
+        if "recognizer_debug_dir" in kwargs:
+            raise TypeError(
+                "recognizer_debug_dir has been removed from TRBA. "
+                "Use debug_save_dir instead."
+            )
 
         default_debug_save_dir = kwargs.pop("debug_save_dir", None)
-        recognizer_debug_dir = kwargs.pop("recognizer_debug_dir", None)
-        if default_debug_save_dir is None:
-            default_debug_save_dir = recognizer_debug_dir
 
         # Initialize artifact-backed recognizer infrastructure.
         super().__init__(weights=weights, device=device, **kwargs)
