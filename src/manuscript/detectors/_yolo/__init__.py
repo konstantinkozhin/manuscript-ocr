@@ -129,9 +129,11 @@ class YOLO(BaseDetector):
         tail = raw.replace("\\", "/").rstrip("/").rsplit("/", 1)[-1]
         candidates = [raw, tail]
         for item in list(candidates):
-            without_onnx = item.removesuffix(".onnx")
+            without_onnx = item[:-5] if item.endswith(".onnx") else item
             candidates.append(without_onnx)
-            candidates.append(without_onnx.removesuffix(".raw"))
+            candidates.append(
+                without_onnx[:-4] if without_onnx.endswith(".raw") else without_onnx
+            )
 
         seen = set()
         unique: List[str] = []
