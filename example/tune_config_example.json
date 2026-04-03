@@ -1,0 +1,84 @@
+{
+    "_comment": "Пример конфига с Ray Tune. Скопируйте, измените пути и запустите.",
+    "_usage": [
+        "ASHA:  python run_tune.py tune_config_example.json",
+        "PBT:   python run_tune.py tune_config_example.json --mode pbt",
+        "Auto:  python run_tune.py tune_config_example.json --auto"
+    ],
+
+    "train_csvs": ["path/to/train.csv"],
+    "train_roots": ["path/to/images/"],
+    "val_csvs": ["path/to/val.csv"],
+    "val_roots": ["path/to/val_images/"],
+    "charset_path": "path/to/charset.txt",
+
+    "img_h": 64,
+    "img_w": 256,
+    "max_len": 25,
+    "hidden_size": 256,
+    "num_encoder_layers": 2,
+    "cnn_backbone": "seresnet31",
+    "encoding": "utf-8",
+
+    "epochs": 20,
+    "batch_size": 32,
+    "lr": 1e-3,
+    "optimizer": "AdamW",
+    "scheduler": "CosineAnnealingLR",
+    "weight_decay": 1e-4,
+    "ctc_weight": 0.3,
+    "ctc_weight_decay_epochs": 15,
+    "ctc_weight_min": 0.03,
+    "max_grad_norm": 5.0,
+
+    "_comment_pretrain": "Стартовые веса: 'default' (GitHub release), путь к .pth, или null",
+    "pretrain_weights": "default",
+
+    "_comment_freeze": "Заморозка слоёв: 'none', 'full', 'partial'",
+    "freeze_cnn": "none",
+    "freeze_enc_rnn": "none",
+    "freeze_attention": "none",
+
+    "_comment_tune": "=== Ray Tune настройки (тумблер) ===",
+
+    "use_ray_tune": true,
+    "tune_mode": "asha",
+    "tune_num_samples": 8,
+    "tune_max_epochs": 20,
+    "tune_gpus_per_trial": 0.5,
+    "tune_cpus_per_trial": 2,
+
+    "_comment_modes": [
+        "asha  — быстрый поиск, рано останавливает плохие trial-ы.",
+        "         Хорош для начального поиска lr, batch_size, weight_decay.",
+        "         Каждый trial стартует с pretrain_weights и обучается независимо.",
+        "",
+        "pbt   — Population Based Training, мутирует гиперпараметры на лету.",
+        "         Лучше для fine-tuning: берёт веса лучших trial-ов и",
+        "         продолжает обучение с мутированными гиперпараметрами.",
+        "         По сути: дообучение на уже обученных весах с подбором lr.",
+        "",
+        "Чтобы ВЫКЛЮЧИТЬ tune и обучать обычно:",
+        "  use_ray_tune: false"
+    ],
+
+    "_comment_workflow": [
+        "Рекомендуемый workflow:",
+        "1. Сначала ASHA с num_samples=8-16, epochs=10-15",
+        "   → находит лучший диапазон lr, batch_size, ctc_weight",
+        "2. Потом PBT с num_samples=4, epochs=30-50",
+        "   pretrain_weights = путь к лучшим весам из шага 1",
+        "   → доводит качество подбором lr/ctc_weight на лету",
+        "3. extract_best → config.json + weights.pth",
+        "4. Финальное обучение с use_ray_tune=false на найденных параметрах"
+    ],
+
+    "_comment_search_space": [
+        "По умолчанию тюнятся: lr, batch_size, weight_decay, ctc_weight,",
+        "ctc_weight_decay_epochs, optimizer, max_grad_norm.",
+        "Можно задать кастомное пространство через tune_search_space.",
+        "",
+        "Пример tune_search_space (передаётся как dict, но значения —",
+        "строковые описания, раскрываются в run_tune):"
+    ]
+}

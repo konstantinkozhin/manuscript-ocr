@@ -61,6 +61,11 @@ gpu = []
 # User installs manually: pip install onnxruntime-silicon
 silicon = []
 
+# Ray Tune for hyperparameter search (optional)
+tune = [
+    "ray[tune]>=2.9",
+]
+
 # Full development dependencies (includes PyTorch for training)
 dev = [
     # PyTorch dependencies for training
