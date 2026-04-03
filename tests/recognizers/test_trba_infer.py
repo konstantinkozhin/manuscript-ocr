@@ -2,6 +2,7 @@ import json
 from pathlib import Path
 from unittest.mock import patch
 import numpy as np
+import pytest
 from PIL import Image
 
 from manuscript.api.recognizer import BaseRecognizer
@@ -690,7 +691,7 @@ class TestTRBAPredictPageInterface:
         debug_dir = tmp_path / "recognizer_crops"
         recognizer = self._create_recognizer(
             tmp_path,
-            recognizer_debug_dir=debug_dir,
+            debug_save_dir=debug_dir,
         )
         monkeypatch.setattr(recognizer, "_predict_text_images", fake_predict_text_images)
         page = self._create_page()
@@ -701,6 +702,13 @@ class TestTRBAPredictPageInterface:
         assert (debug_dir / "0000.png").exists()
         assert (debug_dir / "0001.png").exists()
         assert (debug_dir / "index.json").exists()
+
+    def test_removed_recognizer_debug_dir_argument_raises(self, tmp_path):
+        with pytest.raises(TypeError, match="recognizer_debug_dir"):
+            self._create_recognizer(
+                tmp_path,
+                recognizer_debug_dir=tmp_path / "recognizer_crops",
+            )
 
     def test_invalid_region_preparer_preset_raises(self, tmp_path):
         with patch('manuscript.api.base.BaseArtifactModel._download_http'):
