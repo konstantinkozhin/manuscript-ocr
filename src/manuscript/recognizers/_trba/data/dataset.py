@@ -17,6 +17,23 @@ from .transforms import (
 )
 
 
+class _CollateAttn:
+    """Picklable collate for attention-based OCR (replaces closure for Windows multiprocessing)."""
+
+    def __init__(self, stoi: dict, max_len: int, drop_blank: bool = True):
+        self.stoi = stoi
+        self.max_len = max_len
+        self.drop_blank = drop_blank
+
+    def __call__(self, batch):
+        imgs, labels_text = zip(*batch)
+        imgs = torch.stack(imgs)
+        text_in, target_y, lengths = pack_attention_targets(
+            labels_text, stoi=self.stoi, max_len=self.max_len, drop_blank=self.drop_blank
+        )
+        return imgs, text_in, target_y, lengths
+
+
 class OCRDatasetAttn(Dataset):
     def __init__(
         self,
@@ -195,14 +212,7 @@ class OCRDatasetAttn(Dataset):
 
     @staticmethod
     def make_collate_attn(stoi, max_len: int, drop_blank: bool = True):
-        def collate(batch):
-            imgs, labels_text = zip(*batch)
-            imgs = torch.stack(imgs)
-            text_in, target_y, lengths = pack_attention_targets(
-                labels_text, stoi=stoi, max_len=max_len, drop_blank=drop_blank
-            )
-            return imgs, text_in, target_y, lengths
-        return collate
+        return _CollateAttn(stoi, max_len, drop_blank)
 
     @staticmethod
     def _sniff_delimiter(csv_path: str, encoding: str, hint_delimiter: Optional[str]) -> str:
