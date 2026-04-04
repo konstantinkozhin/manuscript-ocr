@@ -222,22 +222,20 @@ def visualize_page(
             for line in block.lines:
                 quads, text_spans = [], []
                 for text_span in line.text_spans:
-                    poly = np.array(text_span.polygon) * scale
-                    quad = poly.reshape(-1)
-                    quads.append(quad)
+                    poly = np.asarray(text_span.polygon, dtype=np.float32) * scale
+                    quads.append(poly)
                     text_spans.append(text_span)
-                    block_quads.append(quad)
+                    block_quads.append(poly)
                 if quads:
                     lines.append((quads, text_spans, line_index))
                     line_index += 1
         elif block.text_spans:
             quads, text_spans = [], []
             for text_span in block.text_spans:
-                poly = np.array(text_span.polygon) * scale
-                quad = poly.reshape(-1)
-                quads.append(quad)
+                poly = np.asarray(text_span.polygon, dtype=np.float32) * scale
+                quads.append(poly)
                 text_spans.append(text_span)
-                block_quads.append(quad)
+                block_quads.append(poly)
             if quads:
                 lines.append((quads, text_spans, line_index))
                 line_index += 1
@@ -253,7 +251,7 @@ def visualize_page(
     block_layer = np.zeros((h, w, 4), dtype=np.uint8)
 
     for block_quads, block_idx in blocks:
-        pts = np.vstack([q.reshape(4, 2) for q in block_quads])
+        pts = np.vstack(block_quads)
         x1, y1 = pts[:, 0].min(), pts[:, 1].min()
         x2, y2 = pts[:, 0].max(), pts[:, 1].max()
         color_b = get_block_color(block_idx)
@@ -265,7 +263,7 @@ def visualize_page(
     text_span_mask = np.zeros((h, w), dtype=np.uint8)
     for quads, _, _ in lines:
         for quad in quads:
-            coords = quad.reshape(4, 2).astype(np.int32)
+            coords = np.asarray(quad, dtype=np.int32)
             cv2.fillPoly(text_span_mask, [coords], 255)
 
     inv_text_span_mask = cv2.bitwise_not(text_span_mask)
@@ -284,7 +282,7 @@ def visualize_page(
     for quads, _, idx in lines:
         col = get_line_color(idx) if show_order else color
         for quad in quads:
-            pts = quad.reshape(4, 2)
+            pts = np.asarray(quad, dtype=np.float32)
             pts_py = [(int(x), int(y)) for x, y in pts]
             draw.line(pts_py + [pts_py[0]], fill=tuple(col), width=thickness)
 
@@ -295,7 +293,7 @@ def visualize_page(
         for text_span in text_spans:
             xs = [p[0] * scale for p in text_span.polygon]
             ys = [p[1] * scale for p in text_span.polygon]
-            centers.append((sum(xs) / 4, sum(ys) / 4))
+            centers.append((sum(xs) / len(xs), sum(ys) / len(ys)))
 
         # Draw connecting lines only if show_lines is True
         if show_lines:

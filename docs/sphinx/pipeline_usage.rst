@@ -7,9 +7,9 @@ The pipeline is stage-based and passes one ``Page`` object through the stages:
 
 By default, ``Pipeline()`` creates:
 
-- detector: ``EAST()``
+- detector: ``YOLO(weights="yolo26x_obb_text_g1")``
 - layout: ``SimpleSorting()``
-- recognizer: ``TRBA()``
+- recognizer: ``TRBA(weights="trba_lite_g2")``
 - corrector: ``None``
 
 Stage Contracts
@@ -189,6 +189,39 @@ full custom recognizer:
 
 If you need complete control over recognition logic, the simplest route is
 still to provide your own recognizer class with ``predict(page, image) -> Page``.
+
+Collapsing Text Spans
+---------------------
+
+Some recognizers work on whole lines or blocks rather than on individual
+text-span crops. Use ``collapse_page_text_spans`` to convert a narrow page
+structure into a wider one before recognition.
+
+.. code-block:: python
+
+    from manuscript.utils import collapse_page_text_spans
+
+    line_level_page = collapse_page_text_spans(
+        page,
+        level="line",
+        method="bbox",
+    )
+
+    block_level_page = collapse_page_text_spans(
+        page,
+        level="block",
+        method="convex_hull",
+    )
+
+``"line"`` keeps the same blocks and lines, but replaces each line with one
+merged ``TextSpan``. ``"block"`` replaces each block with one line
+containing one merged ``TextSpan``.
+
+Lower-level helpers are also available:
+
+- ``merge_text_spans(text_spans, method="bbox")``
+- ``collapse_line_text_spans(line, method="bbox")``
+- ``collapse_block_text_spans(block, method="bbox")``
 
 Visualization and Profiling
 ---------------------------

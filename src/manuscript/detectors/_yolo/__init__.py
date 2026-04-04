@@ -27,12 +27,16 @@ class YOLO(BaseDetector):
         - GitHub release: ``"github://owner/repo/tag/file.onnx"``
         - Google Drive: ``"gdrive:FILE_ID"``
         - Preset name: ``"yolo26s_obb_text_g1"`` or ``"yolo26x_obb_text_g1"``
-        - ``None``: auto-downloads default preset (``yolo26s_obb_text_g1``)
+        - ``None``: auto-downloads default preset (``yolo26x_obb_text_g1``)
 
         The ONNX model may return either standard detections in
         ``xyxy, score, class_id`` format with shape ``[N, 6]`` / ``[1, N, 6]``
         or oriented detections in ``cx, cy, w, h, score, class_id, angle``
         format with shape ``[N, 7]`` / ``[1, N, 7]``.
+    config : str or Path, optional
+        Path or identifier for model configuration YAML. Same URL schemes
+        as ``weights``. If ``None``, attempts to infer a YAML file next to
+        the weights or uses the preset config from ``config_registry``.
     device : str, optional
         Compute device: ``"cuda"``, ``"coreml"``, or ``"cpu"``. If None,
         automatically selects CPU. For GPU/CoreML acceleration:
@@ -77,7 +81,7 @@ class YOLO(BaseDetector):
     - ``"yolo26x_obb_text_g1"`` - YOLO26-X OBB text detector
     """
 
-    default_weights_name = "yolo26s_obb_text_g1"
+    default_weights_name = "yolo26x_obb_text_g1"
     default_target_size = 1280
     pretrained_registry: Dict[str, str] = {
         "yolo26s_obb_text_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx",
@@ -91,6 +95,7 @@ class YOLO(BaseDetector):
     def __init__(
         self,
         weights: Optional[Union[str, Path]] = None,
+        config: Optional[Union[str, Path]] = None,
         device: Optional[str] = None,
         *,
         score_thresh: float = 0.1,
@@ -105,8 +110,9 @@ class YOLO(BaseDetector):
         self.onnx_session = None
         self.score_thresh = float(score_thresh)
         self.class_ids = None if class_ids is None else {int(v) for v in class_ids}
+        self.config_path = self._resolve_model_config(weights=weights, config=config)
         self.target_size = int(
-            self._resolve_default_target_size(weights)
+            self._resolve_default_target_size()
             if target_size is None
             else target_size
         )
@@ -144,16 +150,24 @@ class YOLO(BaseDetector):
                 seen.add(item)
         return unique
 
-    def _resolve_default_target_size(self, weights: Optional[Union[str, Path]]) -> int:
-        config_path = self._resolve_model_config(weights)
-        if config_path is not None:
-            return self._load_target_size_from_config(config_path)
+    def _resolve_default_target_size(self) -> int:
+        if self.config_path is not None:
+            return self._load_target_size_from_config(self.config_path)
         return self.default_target_size
 
     def _resolve_model_config(
         self,
         weights: Optional[Union[str, Path]],
+        config: Optional[Union[str, Path]] = None,
     ) -> Optional[str]:
+        if config is not None:
+            return self._resolve_extra_artifact(
+                str(config),
+                default_name=None,
+                registry=self.config_registry,
+                description="model config",
+            )
+
         weights_path = Path(self.weights)
         config_candidate = weights_path.with_suffix(".yaml")
         if config_candidate.exists():
@@ -681,7 +695,7 @@ class YOLO(BaseDetector):
         Run inference and get structured output:
 
         >>> from manuscript.detectors import YOLO
-        >>> model = YOLO(weights="yolo26s_obb_text_g1")
+        >>> model = YOLO(weights="yolo26x_obb_text_g1")
         >>> page = model.predict("page.jpg")
         >>> first_text_span = page.blocks[0].lines[0].text_spans[0]
         >>> print(first_text_span.detection_confidence)

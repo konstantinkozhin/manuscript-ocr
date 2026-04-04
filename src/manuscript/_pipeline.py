@@ -17,7 +17,7 @@ from .api.protocols import (
     RecognizerProtocol,
 )
 from .data import Page
-from .detectors import EAST
+from .detectors import YOLO
 from .layouts import SimpleSorting
 from .recognizers import TRBA
 from .utils import read_image, visualize_page
@@ -50,7 +50,7 @@ class Pipeline:
         ----------
         detector : object, optional
             Detector instance with ``predict(image) -> Page``.
-            If omitted, default ``EAST()`` is used.
+            If omitted, default ``YOLO(weights="yolo26x_obb_text_g1")`` is used.
             Detector cannot be disabled.
         layout : object or None, optional
             Layout model instance with ``predict(page, image=None) -> Page``.
@@ -58,7 +58,7 @@ class Pipeline:
             Pass ``None`` to disable layout stage.
         recognizer : object or None, optional
             Recognizer instance with ``predict(page, image=None, ...) -> Page``.
-            If omitted, default ``TRBA()`` is used.
+            If omitted, default ``TRBA(weights="trba_lite_g2")`` is used.
             Pass ``None`` to disable recognition stage.
         corrector : object or None, optional
             Corrector instance with ``predict(page, image=None) -> Page``.
@@ -67,7 +67,7 @@ class Pipeline:
             Slot where layout stage is executed. Default is ``"detector"``.
         """
         if detector is _DEFAULT:
-            self.detector = EAST()
+            self.detector = YOLO(weights="yolo26x_obb_text_g1")
         elif detector is None:
             raise ValueError("detector cannot be None")
         else:
@@ -79,7 +79,7 @@ class Pipeline:
             self.layout = layout
 
         if recognizer is _DEFAULT:
-            self.recognizer = TRBA()
+            self.recognizer = TRBA(weights="trba_lite_g2")
         else:
             self.recognizer = recognizer
 

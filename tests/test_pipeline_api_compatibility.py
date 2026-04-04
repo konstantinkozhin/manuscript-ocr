@@ -431,7 +431,10 @@ class TestPipelineInitialization:
             Pipeline(detector=None)
 
     def test_pipeline_default_initialization(self, monkeypatch):
-        class FakeEAST:
+        class FakeYOLO:
+            def __init__(self, weights=None):
+                self.weights = weights
+
             def predict(self, image):
                 return _make_test_page()
 
@@ -440,22 +443,30 @@ class TestPipelineInitialization:
                 return page
 
         class FakeTRBA:
+            def __init__(self, weights=None):
+                self.weights = weights
+
             def predict(self, page, image=None):
                 return page
 
-        monkeypatch.setattr(pipeline_module, "EAST", FakeEAST)
+        monkeypatch.setattr(pipeline_module, "YOLO", FakeYOLO)
         monkeypatch.setattr(pipeline_module, "SimpleSorting", FakeLayout)
         monkeypatch.setattr(pipeline_module, "TRBA", FakeTRBA)
 
         pipeline = Pipeline()
-        assert isinstance(pipeline.detector, FakeEAST)
+        assert isinstance(pipeline.detector, FakeYOLO)
+        assert pipeline.detector.weights == "yolo26x_obb_text_g1"
         assert isinstance(pipeline.layout, FakeLayout)
         assert isinstance(pipeline.recognizer, FakeTRBA)
+        assert pipeline.recognizer.weights == "trba_lite_g2"
         assert pipeline.corrector is None
         assert pipeline.layout_after == "detector"
 
     def test_pipeline_partial_initialization(self, monkeypatch):
-        class FakeEAST:
+        class FakeYOLO:
+            def __init__(self, weights=None):
+                self.weights = weights
+
             def predict(self, image):
                 return _make_test_page()
 
@@ -464,10 +475,13 @@ class TestPipelineInitialization:
                 return page
 
         class FakeTRBA:
+            def __init__(self, weights=None):
+                self.weights = weights
+
             def predict(self, page, image=None):
                 return page
 
-        monkeypatch.setattr(pipeline_module, "EAST", FakeEAST)
+        monkeypatch.setattr(pipeline_module, "YOLO", FakeYOLO)
         monkeypatch.setattr(pipeline_module, "SimpleSorting", FakeLayout)
         monkeypatch.setattr(pipeline_module, "TRBA", FakeTRBA)
 
@@ -476,9 +490,11 @@ class TestPipelineInitialization:
         assert pipeline1.detector is custom_detector
         assert isinstance(pipeline1.layout, FakeLayout)
         assert isinstance(pipeline1.recognizer, FakeTRBA)
+        assert pipeline1.recognizer.weights == "trba_lite_g2"
 
         custom_recognizer = DummyRecognizer()
         pipeline2 = Pipeline(recognizer=custom_recognizer)
-        assert isinstance(pipeline2.detector, FakeEAST)
+        assert isinstance(pipeline2.detector, FakeYOLO)
+        assert pipeline2.detector.weights == "yolo26x_obb_text_g1"
         assert isinstance(pipeline2.layout, FakeLayout)
         assert pipeline2.recognizer is custom_recognizer

@@ -264,3 +264,44 @@ msgstr ""
 "Если нужен полный контроль над логикой распознавания, самым простым "
 "вариантом остаётся собственный класс recognizer с ``predict(page, image) -> "
 "Page``."
+
+#: ../../pipeline_usage.rst:146
+msgid "Collapsing Text Spans"
+msgstr "Объединение Text Span"
+
+#: ../../pipeline_usage.rst:148
+msgid ""
+"Some recognizers work on whole lines or blocks rather than on individual "
+"text-span crops. Use ``collapse_page_text_spans`` to convert a narrow page "
+"structure into a wider one before recognition."
+msgstr ""
+"Некоторые распознаватели работают не с отдельными crop text span, а с "
+"целыми строками или блоками. Используйте ``collapse_page_text_spans``, "
+"чтобы перед распознаванием преобразовать узкую структуру страницы в более "
+"широкую."
+
+#: ../../pipeline_usage.rst:164
+msgid ""
+"``\"line\"`` keeps the same blocks and lines, but replaces each line with one "
+"merged ``TextSpan``. ``\"block\"`` replaces each block with one line "
+"containing one merged ``TextSpan``."
+msgstr ""
+"``\"line\"`` сохраняет те же блоки и строки, но заменяет каждую строку "
+"одним объединённым ``TextSpan``. ``\"block\"`` заменяет каждый блок одной "
+"строкой, содержащей один объединённый ``TextSpan``."
+
+#: ../../pipeline_usage.rst:167
+msgid "Lower-level helpers are also available:"
+msgstr "Также доступны более низкоуровневые хелперы:"
+
+#: ../../pipeline_usage.rst:169
+msgid "``merge_text_spans(text_spans, method=\"bbox\")``"
+msgstr "``merge_text_spans(text_spans, method=\"bbox\")``"
+
+#: ../../pipeline_usage.rst:170
+msgid "``collapse_line_text_spans(line, method=\"bbox\")``"
+msgstr "``collapse_line_text_spans(line, method=\"bbox\")``"
+
+#: ../../pipeline_usage.rst:171
+msgid "``collapse_block_text_spans(block, method=\"bbox\")``"
+msgstr "``collapse_block_text_spans(block, method=\"bbox\")``"

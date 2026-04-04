@@ -22,10 +22,12 @@ msgid "Utilities"
 msgstr "Утилиты"
 
 #: ../../api/utils.rst:4 df7a37714c9d490384bdebd05d77bc62
-msgid "Utility functions for image processing, visualization, and more."
+msgid ""
+"Utility functions for image processing, visualization, page organization, "
+"text-span collapsing, and more."
 msgstr ""
-"Вспомогательные функции для обработки изображений, визуализации и других "
-"задач."
+"Вспомогательные функции для обработки изображений, визуализации, "
+"организации страницы, объединения text span и других задач."
 
 #: f2eb893694c549f784e24a35a42146d3 manuscript.utils:1 of
 msgid "Common utilities for manuscript-ocr."

@@ -1,8 +1,7 @@
-from typing import Optional, Union, Tuple
+from typing import Optional, Sequence, Tuple, Union
 
 import cv2
 import numpy as np
-from shapely.geometry import Polygon
 
 
 def _box_iou(
@@ -212,3 +211,54 @@ def warp_quad(
     if warped.size == 0:
         return None
     return warped
+
+
+def merge_polygons(
+    polygons: Sequence[Union[np.ndarray, Tuple[Tuple[float, float], ...]]],
+    method: str = "bbox",
+) -> Optional[list[tuple[float, float]]]:
+    """
+    Merge multiple polygons into a single polygon.
+
+    Parameters
+    ----------
+    polygons : sequence of array-like polygons
+        Input polygons with shape ``(N, 2)``.
+    method : {"bbox", "convex_hull"}, optional
+        Merge strategy. ``"bbox"`` returns an axis-aligned rectangle covering
+        all points. ``"convex_hull"`` returns a convex hull over all points.
+
+    Returns
+    -------
+    list of tuple or None
+        Merged polygon, or ``None`` when ``polygons`` is empty.
+    """
+    if not polygons:
+        return None
+
+    normalized = []
+    for polygon in polygons:
+        pts = np.asarray(polygon, dtype=np.float32)
+        if pts.ndim != 2 or pts.shape[1] != 2 or pts.size == 0:
+            raise ValueError("Each polygon must have shape (N, 2)")
+        normalized.append(pts)
+
+    points = np.concatenate(normalized, axis=0)
+
+    if method == "bbox":
+        x_min, y_min = np.min(points, axis=0)
+        x_max, y_max = np.max(points, axis=0)
+        return [
+            (float(x_min), float(y_min)),
+            (float(x_max), float(y_min)),
+            (float(x_max), float(y_max)),
+            (float(x_min), float(y_max)),
+        ]
+
+    if method == "convex_hull":
+        hull = cv2.convexHull(points)
+        if hull is None or hull.size == 0:
+            return None
+        return [(float(x), float(y)) for x, y in hull.reshape(-1, 2)]
+
+    raise ValueError(f"method must be 'bbox' or 'convex_hull', got: {method}")
