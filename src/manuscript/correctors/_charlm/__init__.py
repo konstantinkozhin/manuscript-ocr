@@ -217,6 +217,7 @@ class CharLM(BaseCorrector):
         if self.weights is None:
             raise ValueError("No weights provided for CharLM corrector")
 
+        self._prepare_runtime_dependencies()
         providers = self.runtime_providers()
         self.onnx_session = ort.InferenceSession(str(self.weights), providers=providers)
         self._log_device_info(self.onnx_session)

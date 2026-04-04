@@ -4,6 +4,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 import cv2
 import numpy as np
 import onnxruntime as ort
+import yaml
 from shapely.geometry import Polygon
 
 from manuscript.api.detector import BaseDetector
@@ -25,8 +26,8 @@ class YOLO(BaseDetector):
         - HTTP/HTTPS URL: ``"https://example.com/model.onnx"``
         - GitHub release: ``"github://owner/repo/tag/file.onnx"``
         - Google Drive: ``"gdrive:FILE_ID"``
-        - Preset name: ``"yolo26s_obb_text"`` or ``"yolo26x_obb_text"``
-        - ``None``: auto-downloads default preset (``yolo26s_obb_text``)
+        - Preset name: ``"yolo26s_obb_text_g1"`` or ``"yolo26x_obb_text_g1"``
+        - ``None``: auto-downloads default preset (``yolo26s_obb_text_g1``)
 
         The ONNX model may return either standard detections in
         ``xyxy, score, class_id`` format with shape ``[N, 6]`` / ``[1, N, 6]``
@@ -49,9 +50,9 @@ class YOLO(BaseDetector):
     target_size : int or None, optional
         Square inference size used for letterbox preprocessing. Images are
         resized into ``(target_size, target_size)`` before ONNX inference.
-        If ``None``, preset defaults are used: ``1280`` for
-        ``"yolo26s_obb_text"``, ``1024`` for ``"yolo26x_obb_text"``.
-        Unknown/custom weights fall back to ``1280``.
+        If ``None``, the detector tries to read ``imgsz`` from a YAML config
+        located next to the weights or downloaded from the preset registry.
+        Unknown/custom weights without YAML fall back to ``1280``.
     axis_aligned_output : bool, optional
         If ``True`` (default), OBB detections are converted to standard
         axis-aligned rectangles. If ``False``, OBB detections are returned as
@@ -72,19 +73,19 @@ class YOLO(BaseDetector):
 
     Available presets:
 
-    - ``"yolo26s_obb_text"`` - YOLO26-S OBB text detector
-    - ``"yolo26x_obb_text"`` - YOLO26-X OBB text detector
+    - ``"yolo26s_obb_text_g1"`` - YOLO26-S OBB text detector
+    - ``"yolo26x_obb_text_g1"`` - YOLO26-X OBB text detector
     """
 
-    default_weights_name = "yolo26s_obb_text"
+    default_weights_name = "yolo26s_obb_text_g1"
     default_target_size = 1280
-    default_target_size_registry: Dict[str, int] = {
-        "yolo26s_obb_text": 1280,
-        "yolo26x_obb_text": 1024,
-    }
     pretrained_registry: Dict[str, str] = {
-        "yolo26s_obb_text": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text.raw.onnx",
-        "yolo26x_obb_text": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text.raw.onnx",
+        "yolo26s_obb_text_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx",
+        "yolo26x_obb_text_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.onnx",
+    }
+    config_registry: Dict[str, str] = {
+        "yolo26s_obb_text_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.yaml",
+        "yolo26x_obb_text_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.yaml",
     }
 
     def __init__(
@@ -144,6 +145,20 @@ class YOLO(BaseDetector):
         return unique
 
     def _resolve_default_target_size(self, weights: Optional[Union[str, Path]]) -> int:
+        config_path = self._resolve_model_config(weights)
+        if config_path is not None:
+            return self._load_target_size_from_config(config_path)
+        return self.default_target_size
+
+    def _resolve_model_config(
+        self,
+        weights: Optional[Union[str, Path]],
+    ) -> Optional[str]:
+        weights_path = Path(self.weights)
+        config_candidate = weights_path.with_suffix(".yaml")
+        if config_candidate.exists():
+            return str(config_candidate.absolute())
+
         candidates: List[str] = []
         if weights is None and self.default_weights_name:
             candidates.append(self.default_weights_name)
@@ -152,15 +167,63 @@ class YOLO(BaseDetector):
             candidates.extend(self._candidate_weight_names(value))
 
         for candidate in candidates:
-            if candidate in self.default_target_size_registry:
-                return self.default_target_size_registry[candidate]
+            if candidate in self.config_registry:
+                return self._resolve_extra_artifact(
+                    candidate,
+                    default_name=None,
+                    registry=self.config_registry,
+                    description="model config",
+                )
 
-        return self.default_target_size
+        return None
+
+    @staticmethod
+    def _parse_imgsz(value: Any) -> int:
+        if isinstance(value, bool):
+            raise ValueError("imgsz must be numeric, got bool")
+
+        if isinstance(value, (int, float)):
+            return int(value)
+
+        if isinstance(value, str):
+            stripped = value.strip()
+            if stripped.isdigit():
+                return int(stripped)
+            raise ValueError(f"imgsz must be an integer or square pair, got: {value!r}")
+
+        if isinstance(value, (list, tuple)):
+            if any(isinstance(v, bool) for v in value):
+                raise ValueError("imgsz must be numeric, got bool")
+            values = [int(v) for v in value]
+            if len(values) == 1:
+                return values[0]
+            if len(values) == 2 and values[0] == values[1]:
+                return values[0]
+            raise ValueError(
+                f"imgsz must be a single integer or square pair, got: {value!r}"
+            )
+
+        raise ValueError(f"imgsz must be an integer or square pair, got: {value!r}")
+
+    def _load_target_size_from_config(self, config_path: Union[str, Path]) -> int:
+        with open(config_path, "r", encoding="utf-8") as f:
+            config = yaml.safe_load(f) or {}
+
+        if not isinstance(config, dict):
+            raise ValueError(
+                f"YOLO config must be a mapping, got: {type(config).__name__}"
+            )
+
+        if "imgsz" not in config:
+            raise ValueError(f"YOLO config does not define imgsz: {config_path}")
+
+        return self._parse_imgsz(config["imgsz"])
 
     def _initialize_session(self):
         if self.onnx_session is not None:
             return
 
+        self._prepare_runtime_dependencies()
         self.onnx_session = ort.InferenceSession(
             self.weights,
             providers=self.runtime_providers(),
@@ -618,7 +681,7 @@ class YOLO(BaseDetector):
         Run inference and get structured output:
 
         >>> from manuscript.detectors import YOLO
-        >>> model = YOLO(weights="yolo26s_obb_text")
+        >>> model = YOLO(weights="yolo26s_obb_text_g1")
         >>> page = model.predict("page.jpg")
         >>> first_text_span = page.blocks[0].lines[0].text_spans[0]
         >>> print(first_text_span.detection_confidence)

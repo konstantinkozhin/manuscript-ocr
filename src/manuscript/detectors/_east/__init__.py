@@ -175,6 +175,7 @@ class EAST(BaseDetector):
         if self.onnx_session is not None:
             return
 
+        self._prepare_runtime_dependencies()
         providers = self.runtime_providers()
 
         self.onnx_session = ort.InferenceSession(

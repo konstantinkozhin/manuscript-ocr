@@ -243,6 +243,8 @@ class TRBA(BaseRecognizer):
             if default_debug_save_dir is None
             else Path(default_debug_save_dir).expanduser()
         )
+        self._supports_multi_batch_inference: Optional[bool] = None
+        self._single_batch_warning_emitted = False
 
     def _resolve_config(self, config: Optional[str]) -> str:
         """
@@ -384,6 +386,7 @@ class TRBA(BaseRecognizer):
         if self.onnx_session is not None:
             return
 
+        self._prepare_runtime_dependencies()
         providers = self.runtime_providers()
         self.onnx_session = ort.InferenceSession(str(self.weights), providers=providers)
         self._log_device_info(self.onnx_session)
@@ -516,6 +519,89 @@ class TRBA(BaseRecognizer):
             rotate_region=self._apply_region_rotation,
         )
 
+    def _warn_single_batch_only(self) -> None:
+        if self._single_batch_warning_emitted:
+            return
+        print(
+            "[WARN] ONNX model does not support dynamic batch inference; "
+            "falling back to batch_size=1"
+        )
+        self._single_batch_warning_emitted = True
+
+    def _effective_inference_batch_size(self, batch_size: int) -> int:
+        if self.onnx_session is None:
+            self._initialize_session()
+
+        requested_batch_size = max(1, int(batch_size))
+        if self._supports_multi_batch_inference is False:
+            if requested_batch_size > 1:
+                self._warn_single_batch_only()
+            return 1
+
+        input_shape = self.onnx_session.get_inputs()[0].shape
+        output_shape = self.onnx_session.get_outputs()[0].shape
+        input_batch_dim = input_shape[0] if input_shape else None
+        output_batch_dim = output_shape[0] if output_shape else None
+
+        if (
+            isinstance(input_batch_dim, int)
+            and input_batch_dim == 1
+        ) or (
+            isinstance(output_batch_dim, int)
+            and output_batch_dim == 1
+        ):
+            self._supports_multi_batch_inference = False
+            if requested_batch_size > 1:
+                self._warn_single_batch_only()
+            return 1
+
+        return requested_batch_size
+
+    @staticmethod
+    def _is_batch_shape_error(exc: Exception) -> bool:
+        message = str(exc)
+        return any(
+            marker in message
+            for marker in (
+                "ReshapeHelper",
+                "requested shape",
+                "cannot be reshaped to the requested shape",
+                "running Reshape node",
+            )
+        )
+
+    def _decode_recognition_logits(
+        self,
+        logits: np.ndarray,
+    ) -> List[RecognitionPrediction]:
+        preds = np.argmax(logits, axis=-1)
+        probs = self._softmax(logits, axis=-1)
+
+        results: List[RecognitionPrediction] = []
+        for pred_row, prob_row in zip(preds, probs):
+            decoded_chars = []
+            for token_id in pred_row:
+                if token_id == self.eos_id:
+                    break
+                if token_id not in [self.pad_id, self.sos_id] and token_id < len(self.itos):
+                    decoded_chars.append(self.itos[token_id])
+
+            seq_probs = []
+            for t, token_id in enumerate(pred_row):
+                if token_id == self.eos_id:
+                    break
+                if token_id not in [self.pad_id, self.sos_id]:
+                    seq_probs.append(prob_row[t, token_id])
+
+            results.append(
+                RecognitionPrediction(
+                    text="".join(decoded_chars),
+                    confidence=float(np.mean(seq_probs)) if seq_probs else 0.0,
+                )
+            )
+
+        return results
+
     def _predict_text_images(
         self,
         regions: Sequence[PreparedRegion],
@@ -531,41 +617,34 @@ class TRBA(BaseRecognizer):
             return []
 
         results: List[RecognitionPrediction] = []
+        effective_batch_size = self._effective_inference_batch_size(batch_size)
+        input_name = self.onnx_session.get_inputs()[0].name
+        output_name = self.onnx_session.get_outputs()[0].name
 
-        for i in range(0, len(regions), batch_size):
-            batch_regions = regions[i : i + batch_size]
+        for i in range(0, len(regions), effective_batch_size):
+            batch_regions = regions[i : i + effective_batch_size]
             batch_tensors = [self._preprocess_image(region.image)[0] for region in batch_regions]
             batch_input = np.stack(batch_tensors, axis=0)
+            try:
+                logits = self.onnx_session.run([output_name], {input_name: batch_input})[0]
+            except Exception as exc:
+                if len(batch_regions) > 1 and self._is_batch_shape_error(exc):
+                    self._supports_multi_batch_inference = False
+                    self._warn_single_batch_only()
+                    for batch_tensor in batch_tensors:
+                        single_input = np.expand_dims(batch_tensor, axis=0)
+                        single_logits = self.onnx_session.run(
+                            [output_name],
+                            {input_name: single_input},
+                        )[0]
+                        results.extend(self._decode_recognition_logits(single_logits))
+                    continue
+                raise
 
-            input_name = self.onnx_session.get_inputs()[0].name
-            output_name = self.onnx_session.get_outputs()[0].name
-            logits = self.onnx_session.run([output_name], {input_name: batch_input})[0]
+            if len(batch_regions) > 1 and self._supports_multi_batch_inference is None:
+                self._supports_multi_batch_inference = True
 
-            preds = np.argmax(logits, axis=-1)
-            probs = self._softmax(logits, axis=-1)
-
-            for j in range(len(batch_regions)):
-                pred_row = preds[j]
-                decoded_chars = []
-                for token_id in pred_row:
-                    if token_id == self.eos_id:
-                        break
-                    if token_id not in [self.pad_id, self.sos_id] and token_id < len(self.itos):
-                        decoded_chars.append(self.itos[token_id])
-
-                seq_probs = []
-                for t, token_id in enumerate(pred_row):
-                    if token_id == self.eos_id:
-                        break
-                    if token_id not in [self.pad_id, self.sos_id]:
-                        seq_probs.append(probs[j, t, token_id])
-
-                results.append(
-                    RecognitionPrediction(
-                        text="".join(decoded_chars),
-                        confidence=float(np.mean(seq_probs)) if seq_probs else 0.0,
-                    )
-                )
+            results.extend(self._decode_recognition_logits(logits))
 
         return results
 
@@ -1271,6 +1350,33 @@ class TRBA(BaseRecognizer):
         print(f"Output shape: {output.shape}")
         print(f"Expected: [1, {max_length + 1}, {num_classes}] (max_length + 1 steps)")
 
+        torch_output = output.numpy()
+
+        def _validate_exported_onnx(path: Path, label: str) -> None:
+            session = ort.InferenceSession(str(path), providers=["CPUExecutionProvider"])
+            input_name = session.get_inputs()[0].name
+            ort_outputs = session.run(None, {input_name: dummy_input.numpy()})
+            onnx_output = ort_outputs[0]
+
+            print(f"[OK] {label} inference works!")
+            print(f"  Output shape: {onnx_output.shape}")
+
+            max_diff = abs(torch_output - onnx_output).max()
+            print(f"  Max difference vs PyTorch: {max_diff:.6f}")
+            if max_diff < 1e-4:
+                print("  [OK] Outputs match!")
+            else:
+                print("  [WARNING] Outputs differ slightly")
+
+            batch_probe = np.random.randn(2, 3, img_h, img_w).astype(np.float32)
+            batch_probe_output = session.run(None, {input_name: batch_probe})[0]
+            if batch_probe_output.shape[0] != 2:
+                raise RuntimeError(
+                    "dynamic batch validation failed: "
+                    f"expected batch dimension 2, got {batch_probe_output.shape[0]}"
+                )
+            print("  [OK] Dynamic batch inference works for batch_size=2")
+
         # Export to ONNX
         print(f"\nExporting to ONNX (opset {opset_version})...")
         torch.onnx.export(
@@ -1287,6 +1393,7 @@ class TRBA(BaseRecognizer):
                 "logits": {0: "batch_size"},
             },
             verbose=False,
+            dynamo=False,
         )
 
         print(f"[OK] ONNX model saved to: {output_path}")
@@ -1299,6 +1406,10 @@ class TRBA(BaseRecognizer):
         onnx.checker.check_model(onnx_model_proto)
         print("[OK] ONNX model is valid")
 
+        # Test ONNX inference
+        print(f"\nTesting ONNX inference...")
+        _validate_exported_onnx(output_path, "Exported ONNX model")
+
         # Simplify if requested
         if simplify:
             try:
@@ -1309,6 +1420,15 @@ class TRBA(BaseRecognizer):
                 if check:
                     onnx.save(model_simplified, str(output_path))
                     print("[OK] ONNX model simplified")
+                    try:
+                        print("\nValidating simplified ONNX model...")
+                        _validate_exported_onnx(output_path, "Simplified ONNX model")
+                    except Exception as exc:
+                        onnx.save(onnx_model_proto, str(output_path))
+                        print(
+                            "[WARNING] Simplified ONNX model failed validation, "
+                            f"restored original export: {exc}"
+                        )
                 else:
                     print("[WARNING] Simplification failed, using original model")
             except ImportError:
@@ -1317,35 +1437,9 @@ class TRBA(BaseRecognizer):
                 )
                 print("  Install with: pip install onnx-simplifier")
 
-        # Test ONNX inference
-        try:
-            print(f"\nTesting ONNX inference...")
-            session = ort.InferenceSession(str(output_path))
-
-            ort_inputs = {"input": dummy_input.numpy()}
-            ort_outputs = session.run(None, ort_inputs)
-
-            print(f"[OK] ONNX inference works!")
-            print(f"  Output shape: {ort_outputs[0].shape}")
-
-            # Compare with PyTorch
-            torch_output = output.numpy()
-            onnx_output = ort_outputs[0]
-
-            max_diff = abs(torch_output - onnx_output).max()
-            print(f"  Max difference vs PyTorch: {max_diff:.6f}")
-
-            if max_diff < 1e-4:
-                print(f"  [OK] Outputs match!")
-            else:
-                print(f"  [WARNING] Outputs differ slightly")
-
-        except Exception as e:
-            print(f"[WARNING] ONNX inference test failed: {e}")
-
         # Print summary
         file_size_mb = output_path.stat().st_size / (1024 * 1024)
         print(f"\n[OK] Export complete! Model size: {file_size_mb:.1f} MB")
         print(f"\nInput shape: [batch_size, 3, {img_h}, {img_w}]")
-        print(f"Output shape: [batch_size, {max_length}, {num_classes}]")
+        print(f"Output shape: [batch_size, {max_length + 1}, {num_classes}]")
         print(f"Decoding: Greedy (argmax over last dimension)")

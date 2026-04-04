@@ -1,4 +1,6 @@
 from abc import ABC, abstractmethod
+import contextlib
+import io
 from pathlib import Path
 from typing import Dict, Optional
 import shutil
@@ -38,6 +40,8 @@ class BaseArtifactModel(ABC):
         self.weights = self._resolve_weights(weights)
         self.extra_config = kwargs
         self.session = None
+        self._runtime_deps_preloaded = False
+        self._runtime_preload_message: Optional[str] = None
 
     # -------------------------------------------------------------------------
     # DEVICE
@@ -73,6 +77,33 @@ class BaseArtifactModel(ABC):
             return ["CoreMLExecutionProvider", "CPUExecutionProvider"]
         else:
             return ["CPUExecutionProvider"]
+
+    def _prepare_runtime_dependencies(self) -> None:
+        if self.device != "cuda" or self._runtime_deps_preloaded:
+            return
+
+        self._runtime_deps_preloaded = True
+        if not hasattr(ort, "preload_dlls"):
+            return
+
+        stdout_buffer = io.StringIO()
+        stderr_buffer = io.StringIO()
+        try:
+            with contextlib.redirect_stdout(stdout_buffer), contextlib.redirect_stderr(stderr_buffer):
+                ort.preload_dlls()
+        except Exception as exc:
+            self._runtime_preload_message = f"onnxruntime.preload_dlls failed: {exc}"
+            return
+
+        captured = []
+        stdout_text = stdout_buffer.getvalue().strip()
+        stderr_text = stderr_buffer.getvalue().strip()
+        if stdout_text:
+            captured.append(stdout_text)
+        if stderr_text:
+            captured.append(stderr_text)
+        if captured:
+            self._runtime_preload_message = "\n".join(captured)
     
     def _log_device_info(self, session):
         """
@@ -94,7 +125,21 @@ class BaseArtifactModel(ABC):
         # Check if primary provider is available
         if self.device == "cuda" and "CUDAExecutionProvider" not in actual_providers:
             print(f"  Warning: CUDA requested but not available. Falling back to CPU.")
-            print(f"      Install onnxruntime-gpu for CUDA support: pip install onnxruntime-gpu")
+            available_providers = set()
+            try:
+                available_providers = set(ort.get_available_providers())
+            except Exception:
+                pass
+
+            if "CUDAExecutionProvider" not in available_providers:
+                print(f"      Install onnxruntime-gpu for CUDA support: pip install onnxruntime-gpu")
+            else:
+                print("      CUDAExecutionProvider is installed, but its CUDA/cuDNN DLLs did not initialize.")
+                print("      Install CUDA 12 / cuDNN 9 runtime DLLs or let onnxruntime preload them.")
+                if self._runtime_preload_message:
+                    print("      preload_dlls output:")
+                    for line in self._runtime_preload_message.splitlines():
+                        print(f"        {line}")
         elif self.device == "coreml" and "CoreMLExecutionProvider" not in actual_providers:
             print(f"  Warning: CoreML requested but not available. Falling back to CPU.")
             print(f"      Install onnxruntime-silicon for CoreML support: pip install onnxruntime-silicon")

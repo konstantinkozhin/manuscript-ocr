@@ -8,6 +8,17 @@ from manuscript.data import Page
 from manuscript.detectors import YOLO
 
 
+def _mock_download_http(model_path, yaml_path):
+    def _download_http(self, url):
+        if url.endswith(".onnx"):
+            return str(model_path)
+        if url.endswith(".yaml"):
+            return str(yaml_path)
+        raise AssertionError(f"Unexpected download URL: {url}")
+
+    return _download_http
+
+
 class _FakeIO:
     def __init__(self, name, shape):
         self.name = name
@@ -86,22 +97,24 @@ def test_yolo_inherits_base_detector():
 
 
 def test_yolo_has_default_preset():
-    assert YOLO.default_weights_name == "yolo26s_obb_text"
-    assert YOLO.pretrained_registry["yolo26s_obb_text"] == (
-        "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text.raw.onnx"
+    assert YOLO.default_weights_name == "yolo26s_obb_text_g1"
+    assert YOLO.pretrained_registry["yolo26s_obb_text_g1"] == (
+        "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx"
     )
-    assert YOLO.pretrained_registry["yolo26x_obb_text"] == (
-        "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text.raw.onnx"
+    assert YOLO.pretrained_registry["yolo26x_obb_text_g1"] == (
+        "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.onnx"
     )
 
 
 def test_yolo_uses_default_preset_when_weights_missing(monkeypatch, tmp_path):
     model_path = tmp_path / "preset.onnx"
     model_path.write_bytes(b"fake")
+    yaml_path = tmp_path / "downloaded-default.yaml"
+    yaml_path.write_text("imgsz: 1280\n", encoding="utf-8")
 
     monkeypatch.setattr(
         "manuscript.api.base.BaseArtifactModel._download_http",
-        lambda self, url: str(model_path),
+        _mock_download_http(model_path, yaml_path),
     )
 
     detector = YOLO(weights=None)
@@ -112,10 +125,12 @@ def test_yolo_uses_default_preset_when_weights_missing(monkeypatch, tmp_path):
 def test_yolo_default_preset_uses_1280_target_size(monkeypatch, tmp_path):
     model_path = tmp_path / "preset.onnx"
     model_path.write_bytes(b"fake")
+    yaml_path = tmp_path / "downloaded-default.yaml"
+    yaml_path.write_text("imgsz: 1280\n", encoding="utf-8")
 
     monkeypatch.setattr(
         "manuscript.api.base.BaseArtifactModel._download_http",
-        lambda self, url: str(model_path),
+        _mock_download_http(model_path, yaml_path),
     )
 
     detector = YOLO(weights=None)
@@ -135,15 +150,27 @@ def test_yolo_defaults_to_01_score_thresh(tmp_path):
 def test_yolo26x_preset_uses_1024_target_size(monkeypatch, tmp_path):
     model_path = tmp_path / "preset.onnx"
     model_path.write_bytes(b"fake")
+    yaml_path = tmp_path / "downloaded-x.yaml"
+    yaml_path.write_text("imgsz: 1024\n", encoding="utf-8")
 
     monkeypatch.setattr(
         "manuscript.api.base.BaseArtifactModel._download_http",
-        lambda self, url: str(model_path),
+        _mock_download_http(model_path, yaml_path),
     )
 
-    detector = YOLO(weights="yolo26x_obb_text")
+    detector = YOLO(weights="yolo26x_obb_text_g1")
 
     assert detector.target_size == 1024
+
+
+def test_yolo_reads_local_yaml_imgsz_for_target_size(tmp_path):
+    model_path = tmp_path / "custom.raw.onnx"
+    model_path.write_bytes(b"fake")
+    model_path.with_suffix(".yaml").write_text("imgsz: [960, 960]\n", encoding="utf-8")
+
+    detector = YOLO(weights=str(model_path))
+
+    assert detector.target_size == 960
 
 
 def test_yolo_suppresses_mostly_contained_boxes_by_default():
