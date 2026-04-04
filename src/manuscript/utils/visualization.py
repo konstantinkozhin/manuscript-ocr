@@ -5,6 +5,7 @@ import cv2
 import numpy as np
 from PIL import Image, ImageDraw
 
+from ..data import Page
 from .io import read_image
 
 try:
@@ -90,7 +91,7 @@ def _draw_quads(
 
 def visualize_page(
     image: Union[str, Path, np.ndarray, Image.Image],
-    page: "Page",  # type: ignore  # noqa: F821
+    page: Page,
     color=(0, 255, 0),
     thickness=2,
     show_order=True,
@@ -155,9 +156,9 @@ def visualize_page(
     >>> from manuscript import EAST
     >>> from manuscript.utils import visualize_page
     >>> detector = EAST()
-    >>> result = detector.predict("document.jpg")
+    >>> page = detector.predict("document.jpg")
     >>> # Can pass path directly
-    >>> vis = visualize_page("document.jpg", result["page"])
+    >>> vis = visualize_page("document.jpg", page)
     >>> vis.save("output.jpg")
 
     Visualization with reading order and block boundaries:
@@ -167,7 +168,7 @@ def visualize_page(
     >>> img = read_image("document.jpg")
     >>> vis = visualize_page(
     ...     img,
-    ...     result["page"],
+    ...     page,
     ...     show_order=True,
     ...     color=(255, 0, 0),
     ...     thickness=3
@@ -177,7 +178,7 @@ def visualize_page(
 
     >>> vis = visualize_page(
     ...     "document.jpg",
-    ...     result["page"],
+    ...     page,
     ...     show_order=True,
     ...     show_lines=True,
     ...     show_numbers=True

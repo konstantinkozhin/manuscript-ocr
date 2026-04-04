@@ -86,9 +86,8 @@ msgid ":class:`~manuscript.recognizers.TRBA` - Text recognizer"
 msgstr ":class:`~manuscript.recognizers.TRBA` — модель распознавания текста"
 
 #: ../../getting_started.rst:65 fd06413ae672467ba4f4c2608e8ccaed
-#, fuzzy
 msgid ":class:`~manuscript.correctors.CharLM` - Character-level text corrector"
-msgstr ":class:`~manuscript.detectors.EAST` — детектор текста"
+msgstr ":class:`~manuscript.correctors.CharLM` — посимвольный корректор текста"
 
 #: ../../getting_started.rst:66 688bc42cca7a4cb38017bb8e0cd95255
 msgid ":class:`~manuscript.data.Page` - Page data structure"
@@ -105,4 +104,32 @@ msgstr ":class:`~manuscript.data.Line` — структура данных ст�
 #: ../../getting_started.rst:69 483fab9d2a6343bbb9ece0ad3a7ea5bf
 msgid ":class:`~manuscript.data.Word` - Word data structure"
 msgstr ":class:`~manuscript.data.Word` — структура данных слова"
+
+msgid "Pipeline Defaults"
+msgstr "Настройки Pipeline по умолчанию"
+
+msgid "``Pipeline()`` uses:"
+msgstr "``Pipeline()`` использует:"
+
+msgid "``EAST`` detector"
+msgstr "детектор ``EAST``"
+
+msgid "``SimpleSorting`` layout"
+msgstr "layout-анализ ``SimpleSorting``"
+
+msgid "``TRBA`` recognizer"
+msgstr "распознаватель ``TRBA``"
+
+msgid "no corrector (``None``)"
+msgstr "без корректора (``None``)"
+
+msgid "Model Zoo"
+msgstr "Зоопарк моделей"
+
+msgid ""
+"For the list of built-in presets and release artifacts documented for this "
+"documentation version, see :doc:`model_zoo`."
+msgstr ""
+"Список встроенных пресетов и релизных артефактов, задокументированных для "
+"этой версии документации, см. в :doc:`model_zoo`."
 

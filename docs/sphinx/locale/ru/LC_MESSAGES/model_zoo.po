@@ -1,0 +1,244 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr
+# package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: manuscript-ocr 0.1.11\n"
+"Report-Msgid-Bugs-To: \n"
+"PO-Revision-Date: 2026-04-04 20:45+0700\n"
+"Last-Translator: OpenAI Codex\n"
+"Language: ru\n"
+"Language-Team: ru\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.18.0\n"
+
+msgid "Model Zoo"
+msgstr "Зоопарк моделей"
+
+msgid "This page lists the presets and release artifacts documented for version |release|."
+msgstr "На этой странице перечислены пресеты и релизные артефакты, задокументированные для версии |release|."
+
+msgid "Detection"
+msgstr "Детекция"
+
+msgid "Layout"
+msgstr "Layout-анализ"
+
+msgid "Recognition"
+msgstr "Распознавание"
+
+msgid "Correction"
+msgstr "Посткоррекция"
+
+msgid "Preset"
+msgstr "Пресет"
+
+msgid "Architecture"
+msgstr "Архитектура"
+
+msgid "Params"
+msgstr "Параметров"
+
+msgid "Rotated"
+msgstr "Поворот"
+
+msgid "Artifacts"
+msgstr "Артефакты"
+
+msgid "Origin"
+msgstr "Происхождение"
+
+msgid "License"
+msgstr "Лицензия"
+
+msgid "Supports"
+msgstr "Поддерживает"
+
+msgid "Script"
+msgstr "Письмо"
+
+msgid "Orthography"
+msgstr "Орфография"
+
+msgid "Yes"
+msgstr "Да"
+
+msgid "Manuscript"
+msgstr "Manuscript"
+
+msgid "MIT"
+msgstr "MIT"
+
+msgid "``east_50_g1``"
+msgstr "``east_50_g1``"
+
+msgid "EAST (ResNet-50)"
+msgstr "EAST (ResNet-50)"
+
+msgid "53.86M"
+msgstr "53.86M"
+
+msgid "`east_50_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.onnx>`_"
+msgstr "`east_50_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.onnx>`_"
+
+msgid "`east_50_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.pth>`_"
+msgstr "`east_50_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.pth>`_"
+
+msgid "``yolo26s_obb_text_g1``"
+msgstr "``yolo26s_obb_text_g1``"
+
+msgid "YOLO26-S OBB"
+msgstr "YOLO26-S OBB"
+
+msgid "9.75M"
+msgstr "9.75M"
+
+msgid "`yolo26s_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx>`_"
+msgstr "`yolo26s_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx>`_"
+
+msgid "`yolo26s_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.pt>`_"
+msgstr "`yolo26s_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.pt>`_"
+
+msgid "`yolo26s_obb_text_g1.raw.yaml <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.yaml>`_"
+msgstr "`yolo26s_obb_text_g1.raw.yaml <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.yaml>`_"
+
+msgid "Trained by the authors with Ultralytics YOLO"
+msgstr "Обучено авторами с Ultralytics YOLO"
+
+msgid "`Ultralytics license <https://github.com/ultralytics/ultralytics/blob/main/LICENSE>`_"
+msgstr "`лицензия Ultralytics <https://github.com/ultralytics/ultralytics/blob/main/LICENSE>`_"
+
+msgid "``yolo26x_obb_text_g1``"
+msgstr "``yolo26x_obb_text_g1``"
+
+msgid "YOLO26-X OBB"
+msgstr "YOLO26-X OBB"
+
+msgid "57.61M"
+msgstr "57.61M"
+
+msgid "`yolo26x_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.onnx>`_"
+msgstr "`yolo26x_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.onnx>`_"
+
+msgid "`yolo26x_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.pt>`_"
+msgstr "`yolo26x_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.pt>`_"
+
+msgid "`yolo26x_obb_text_g1.raw.yaml <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.yaml>`_"
+msgstr "`yolo26x_obb_text_g1.raw.yaml <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.yaml>`_"
+
+msgid "``SimpleSorting``"
+msgstr "``SimpleSorting``"
+
+msgid "Algorithmic ordering"
+msgstr "Алгоритмическая сортировка"
+
+msgid "-"
+msgstr "-"
+
+msgid "Left-to-right, multi-column"
+msgstr "Слева направо, многоколоночно"
+
+msgid "TRBA"
+msgstr "TRBA"
+
+msgid "45.10M"
+msgstr "45.10M"
+
+msgid "Modern + pre-reform Russian"
+msgstr "Современный + дореформенный русский"
+
+msgid "`trba_base_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.onnx>`_"
+msgstr "`trba_base_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.onnx>`_"
+
+msgid "`trba_base_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.pth>`_"
+msgstr "`trba_base_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.pth>`_"
+
+msgid "`trba_base_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.json>`_"
+msgstr "`trba_base_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.json>`_"
+
+msgid "`trba_base_g1.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.txt>`_"
+msgstr "`trba_base_g1.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.txt>`_"
+
+msgid "``trba_lite_g1``"
+msgstr "``trba_lite_g1``"
+
+msgid "TRBA-Lite"
+msgstr "TRBA-Lite"
+
+msgid "9.46M"
+msgstr "9.46M"
+
+msgid "`trba_lite_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.onnx>`_"
+msgstr "`trba_lite_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.onnx>`_"
+
+msgid "`trba_lite_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.pth>`_"
+msgstr "`trba_lite_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.pth>`_"
+
+msgid "`trba_lite_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.json>`_"
+msgstr "`trba_lite_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.json>`_"
+
+msgid "`trba_lite_g1.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.txt>`_"
+msgstr "`trba_lite_g1.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.txt>`_"
+
+msgid "``trba_lite_g2``"
+msgstr "``trba_lite_g2``"
+
+msgid "`trba_lite_g2.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.onnx>`_"
+msgstr "`trba_lite_g2.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.onnx>`_"
+
+msgid "`trba_lite_g2.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.pth>`_"
+msgstr "`trba_lite_g2.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.pth>`_"
+
+msgid "`trba_lite_g2.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.json>`_"
+msgstr "`trba_lite_g2.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.json>`_"
+
+msgid "`trba_lite_g2.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.txt>`_"
+msgstr "`trba_lite_g2.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.txt>`_"
+
+msgid "CharLM"
+msgstr "CharLM"
+
+msgid "4.38M"
+msgstr "4.38M"
+
+msgid "Modern Russian"
+msgstr "Современный русский"
+
+msgid "`modern_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.onnx>`_"
+msgstr "`modern_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.onnx>`_"
+
+msgid "`modern_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.pt>`_"
+msgstr "`modern_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.pt>`_"
+
+msgid "`modern_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.json>`_"
+msgstr "`modern_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.json>`_"
+
+msgid "`modern_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_words.txt>`_"
+msgstr "`modern_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_words.txt>`_"
+
+msgid "``prereform_charlm_g1``"
+msgstr "``prereform_charlm_g1``"
+
+msgid "4.39M"
+msgstr "4.39M"
+
+msgid "Pre-reform Russian"
+msgstr "Дореформенный русский"
+
+msgid "`prereform_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.onnx>`_"
+msgstr "`prereform_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.onnx>`_"
+
+msgid "`prereform_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.pt>`_"
+msgstr "`prereform_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.pt>`_"
+
+msgid "`prereform_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.json>`_"
+msgstr "`prereform_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.json>`_"
+
+msgid "`prereform_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt>`_"
+msgstr "`prereform_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt>`_"

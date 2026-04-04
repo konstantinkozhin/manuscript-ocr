@@ -78,3 +78,9 @@ Pipeline Defaults
 - ``SimpleSorting`` layout
 - ``TRBA`` recognizer
 - no corrector (``None``)
+
+Model Zoo
+---------
+
+For the list of built-in presets and release artifacts documented for this
+documentation version, see :doc:`model_zoo`.
