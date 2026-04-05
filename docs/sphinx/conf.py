@@ -34,6 +34,7 @@ exclude_patterns = ["_build", "Thumbs.db", ".DS_Store"]
 # -- Options for HTML output -------------------------------------------------
 html_theme = "sphinx_rtd_theme"
 html_static_path = ["_static"]
+html_favicon = "_static/favicon.ico"
 html_css_files = ["language_switcher.css", "model_zoo.css"]
 html_js_files = ["language_switcher.js", "version_sidebar.js"]
 
