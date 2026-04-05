@@ -5,6 +5,7 @@ import sys
 from pathlib import Path
 from types import ModuleType
 from types import SimpleNamespace
+from typing import Tuple
 from unittest.mock import MagicMock, patch
 
 import pytest
@@ -16,7 +17,7 @@ import manuscript.detectors._east as east_module
 from manuscript.detectors import EAST
 
 
-def _write_coco_dataset(root: Path, stem: str) -> tuple[str, str]:
+def _write_coco_dataset(root: Path, stem: str) -> Tuple[str, str]:
     images_dir = root / stem / "images"
     images_dir.mkdir(parents=True)
     (images_dir / f"{stem}.jpg").write_bytes(b"fake image")

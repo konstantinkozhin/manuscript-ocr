@@ -1,4 +1,4 @@
-from typing import Optional, Sequence, Tuple, Union
+from typing import List, Optional, Sequence, Tuple, Union
 
 import cv2
 import numpy as np
@@ -216,7 +216,7 @@ def warp_quad(
 def merge_polygons(
     polygons: Sequence[Union[np.ndarray, Tuple[Tuple[float, float], ...]]],
     method: str = "bbox",
-) -> Optional[list[tuple[float, float]]]:
+) -> Optional[List[Tuple[float, float]]]:
     """
     Merge multiple polygons into a single polygon.
 
