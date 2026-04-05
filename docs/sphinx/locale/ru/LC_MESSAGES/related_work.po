@@ -1,0 +1,71 @@
+msgid ""
+msgstr ""
+"Project-Id-Version: manuscript-ocr 0.1.11\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-05 19:57+0700\n"
+"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"Last-Translator: OpenAI Codex\n"
+"Language-Team: ru\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/related_work.rst:2
+#: fc9f6670c99b4015b50b0c8f7a102ab2
+msgid "Related Work"
+msgstr "Связанные работы"
+
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/related_work.rst:4
+#: 4141295b808e4a289a16cc91fdb147ef
+msgid ""
+"The following publications are related to the manuscript-ocr project and its "
+"experiments on pre-reform handwritten Russian texts:"
+msgstr ""
+"Следующие публикации связаны с проектом manuscript-ocr и его экспериментами "
+"по распознаванию дореформенных рукописных русских текстов:"
+
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/related_work.rst:7
+#: d6e4f7fd15c64ca286df5338d564b17b
+msgid ""
+"Sherstnev, P.A.; Kozhin, K.D.; Pyataeva, A.V. Analyzing the Influence of "
+"Hyperparameters on the Efficiency of an OCR Model for Pre-Reform Handwritten "
+"Texts. Program Comput Soft 51, 173–180 (2025). https://doi.org/10.1134/"
+"S0361768825700069"
+msgstr ""
+"Sherstnev, P.A.; Kozhin, K.D.; Pyataeva, A.V. Analyzing the Influence of "
+"Hyperparameters on the Efficiency of an OCR Model for Pre-Reform Handwritten "
+"Texts. Program Comput Soft 51, 173–180 (2025). https://doi.org/10.1134/"
+"S0361768825700069"
+
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/related_work.rst:8
+#: 1ae4ac74bae34298adc80ea80ccbfbdc
+msgid ""
+"Шерстнев, П. А.; Кожин, К. Д.; Пятаева, А. В. Анализ влияния "
+"гиперпараметров на эффективность OCR-модели для дореформенных рукописных "
+"текстов // Программирование. – 2025. – № 3. – С. 70-79. – DOI 10.31857/"
+"S0132347425030071. – EDN GRLAPG."
+msgstr ""
+"Шерстнев, П. А.; Кожин, К. Д.; Пятаева, А. В. Анализ влияния "
+"гиперпараметров на эффективность OCR-модели для дореформенных рукописных "
+"текстов // Программирование. – 2025. – № 3. – С. 70-79. – DOI 10.31857/"
+"S0132347425030071. – EDN GRLAPG."
+
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/related_work.rst:9
+#: 98c0ffec5760499a9721524eea1a6e60
+msgid ""
+"Шерстнев, П. А.; Кожин, К. Д.; Пятаева, А. В. Распознавание рукописных "
+"текстов отчетов губернаторов Енисейской губернии 19 века // "
+"GraphiCon 2024 : Материалы 34-й Международной конференции по компьютерной "
+"графике и машинному зрению, Омск, 17–19 сентября 2024 года. – Омск: Омский "
+"государственный технический университет, 2024. – С. 519-524. – DOI "
+"10.25206/978-5-8149-3873-2-2024-519-524. – EDN GBEKEZ."
+msgstr ""
+"Шерстнев, П. А.; Кожин, К. Д.; Пятаева, А. В. Распознавание рукописных "
+"текстов отчетов губернаторов Енисейской губернии 19 века // "
+"GraphiCon 2024 : Материалы 34-й Международной конференции по компьютерной "
+"графике и машинному зрению, Омск, 17–19 сентября 2024 года. – Омск: Омский "
+"государственный технический университет, 2024. – С. 519-524. – DOI "
+"10.25206/978-5-8149-3873-2-2024-519-524. – EDN GBEKEZ."
