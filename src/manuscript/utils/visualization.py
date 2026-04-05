@@ -93,7 +93,7 @@ def visualize_page(
     image: Union[str, Path, np.ndarray, Image.Image],
     page: Page,
     color=(0, 255, 0),
-    thickness=2,
+    thickness=4,
     show_order=True,
     show_lines=False,
     show_numbers=False,
@@ -121,7 +121,7 @@ def visualize_page(
         Page object from manuscript.data containing detected blocks/text spans.
     color : tuple of int, default=(0, 255, 0)
         RGB color for text span boundaries.
-    thickness : int, default=2
+    thickness : int, default=4
         Line thickness for text span boundaries.
     show_order : bool, default=True
         If True, colors different text lines with different colors and shows

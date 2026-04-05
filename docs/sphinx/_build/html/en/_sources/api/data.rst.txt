@@ -16,31 +16,31 @@ The following diagram shows the relationships between data structures:
         Page[Page]
         Block[Block]
         Line[Line]
-        Word[Word]
+        TextSpan[TextSpan]
 
         %% Relations
         Page -->|"blocks: List[Block]"| Block
         Block -->|"lines: List[Line]"| Line
-        Line -->|"words: List[Word]"| Word
+        Line -->|"text_spans: List[TextSpan]"| TextSpan
 
-        %% Word fields
-        Word --> Wpoly["polygon: List[(x, y)]<br>≥ 4 points, clockwise"]
-        Word --> Wdet["detection_confidence: float (0–1)"]
-        Word --> Wtext["text: Optional[str]"]
-        Word --> Wrec["recognition_confidence: Optional[float] (0–1)"]
-        Word --> WordOrder["order: Optional[int]<br>assigned after sorting"]
+        %% TextSpan fields
+        TextSpan --> Tpoly["polygon: List[(x, y)]<br>≥ 4 points, clockwise"]
+        TextSpan --> Tdet["detection_confidence: float (0–1)"]
+        TextSpan --> Ttext["text: Optional[str]"]
+        TextSpan --> Trec["recognition_confidence: Optional[float] (0–1)"]
+        TextSpan --> Torder["order: Optional[int]<br>assigned after sorting"]
 
         %% Line fields
         Line --> LineOrder["order: Optional[int]<br>assigned after sorting"]
 
         %% Block fields
         Block --> BlockOrder["order: Optional[int]<br>assigned after sorting"]
+        Block --> FlatInput["text_spans: List[TextSpan]<br>optional flat input"]
 
-API Reference
--------------
+Module Reference
+----------------
 
 .. automodule:: manuscript.data
    :members:
    :undoc-members:
    :show-inheritance:
-

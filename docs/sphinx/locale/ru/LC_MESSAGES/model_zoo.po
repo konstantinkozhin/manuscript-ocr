@@ -242,3 +242,12 @@ msgstr "`prereform_charlm_g1.json <https://github.com/konstantinkozhin/manuscrip
 
 msgid "`prereform_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt>`_"
 msgstr "`prereform_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt>`_"
+
+msgid "Architecture Sources"
+msgstr "Источники архитектур"
+
+msgid "`EAST: An Efficient and Accurate Scene Text Detector <https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_ is the academic source for the ``EAST`` detector family documented here."
+msgstr "`EAST: An Efficient and Accurate Scene Text Detector <https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_ является академическим источником для семейства детекторов ``EAST``, описанного здесь."
+
+msgid "`What Is Wrong With Scene Text Recognition Model Comparisons? Dataset and Model Analysis <https://arxiv.org/abs/1904.01906>`_ is the architectural basis for the ``TRBA`` family (TPS-ResNet-BiLSTM-Attn). The recognizers in manuscript-ocr are adapted for this project and are not a 1:1 reproduction of the original implementation."
+msgstr "`What Is Wrong With Scene Text Recognition Model Comparisons? Dataset and Model Analysis <https://arxiv.org/abs/1904.01906>`_ является архитектурной основой для семейства ``TRBA`` (TPS-ResNet-BiLSTM-Attn). Распознаватели в manuscript-ocr адаптированы под задачи проекта и не являются точной копией исходной реализации."

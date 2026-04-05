@@ -149,3 +149,14 @@ Correction
        | `prereform_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt>`_
      - Manuscript
      - MIT
+
+Architecture Sources
+--------------------
+
+- `EAST: An Efficient and Accurate Scene Text Detector <https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_
+  is the academic source for the ``EAST`` detector family documented here.
+- `What Is Wrong With Scene Text Recognition Model Comparisons? Dataset and Model Analysis <https://arxiv.org/abs/1904.01906>`_
+  is the architectural basis for the ``TRBA`` family
+  (TPS-ResNet-BiLSTM-Attn). The recognizers in manuscript-ocr are adapted
+  for this project and are not a 1:1 reproduction of the original
+  implementation.

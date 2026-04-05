@@ -6,116 +6,147 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr \n"
+"Project-Id-Version: manuscript-ocr 0.1.11\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-03 15:31+0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2026-04-05 19:57+0700\n"
+"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"Last-Translator: OpenAI Codex\n"
+"Language-Team: ru\n"
 "Language: ru\n"
-"Language-Team: ru <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.18.0\n"
 
-#: ../../api/detectors.rst:2 ceb1305e46224a39861118ffdf1a09b1
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:2
+#: f0c877947c3948b49a44205aadf28066
 msgid "Detectors"
 msgstr "Детекторы"
 
-#: ../../api/detectors.rst:4 3c6e6a007c0f4db1867b1e24642f16b0
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:4
+#: b40a3449a6c643d3a3e89e7cabdeb549
 msgid "Text detection models."
 msgstr "Модели детекции текста."
 
-#: 27968e3a4b784493a05a3089e93b1531 manuscript.detectors._east.EAST:1 of
-msgid "Bases: :py:class:`~manuscript.api.base.BaseModel`"
-msgstr ""
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:1 manuscript.detectors._yolo.YOLO:1
+#: 9440516693fc43a98cd5721211786daf 11e3288809954f3caf45f5c223757378
+msgid "Bases: :py:class:`~manuscript.api.detector.BaseDetector`"
+msgstr "Базовый класс: :py:class:`~manuscript.api.detector.BaseDetector`"
 
-#: d6cf8296b80b47eca6180c0a7c64c7ed manuscript.detectors._east.EAST:2 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:2 789a2594b9714e448746fbcc764d88aa
 msgid "Initialize EAST text detector with ONNX Runtime."
 msgstr "Инициализация текстового детектора EAST с использованием ONNX Runtime."
 
-#: ../../api/detectors.rst 75c9e3f4f05142bc9132bd4d0b5d7fbc
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:0
+#: ad69e165d0af4e3d867fb8d37b9519d5 58259b8a11334b8aaa4482c0562c9479
+#: b094400fee0f4b54ba3da782c2e35b45 4cd0d3f725c647199bba9b916815f66b
+#: e746486c228e4d9d9a3714af5bbdcaaa 223ea6eb006349aeb73361c735abcba8
+#: bcbe401a4b624f49b31cfadefc388c9f 05157ea6f9a042228772b677a9c12ce5
 msgid "Parameters"
 msgstr "Параметры"
 
-#: 3d79844ab414481d9cf1f799adc06032 manuscript.detectors._east.EAST:5 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:5 9cabd9eb6f444116b366121a86fe3823
 msgid ""
 "Path or identifier for ONNX model weights. Supports:  - Local file path: "
-"``\"path/to/model.onnx\"`` - HTTP/HTTPS URL: "
-"``\"https://example.com/model.onnx\"`` - GitHub release: "
-"``\"github://owner/repo/tag/file.onnx\"`` - Google Drive: "
-"``\"gdrive:FILE_ID\"`` - Preset name: ``\"east_50_g1\"`` - ``None``: "
-"auto-downloads default preset (east_50_g1)"
+"``\"path/to/model.onnx\"`` - HTTP/HTTPS URL: ``\"https://example.com/"
+"model.onnx\"`` - GitHub release: ``\"github://owner/repo/tag/file.onnx\"`` - "
+"Google Drive: ``\"gdrive:FILE_ID\"`` - Preset name: ``\"east_50_g1\"`` - "
+"``None``: auto-downloads default preset (east_50_g1)"
 msgstr ""
-"Путь или идентификатор для весов модели ONNX. Поддерживает: локальный "
-"путь, HTTP/HTTPS URL, GitHub release, Google Drive, имя пресета "
+"Путь или идентификатор для весов модели ONNX. Поддерживает: локальный путь, "
+"HTTP/HTTPS URL, GitHub release, Google Drive, имя пресета "
 "(``\"east_50_g1\"``), ``None`` — автозагрузка пресета по умолчанию "
 "(east_50_g1)"
 
-#: e3cac75df34747978dc33365439a0b67 manuscript.detectors._east.EAST:5 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:5 manuscript.detectors._yolo.YOLO:5
+#: 6cf6a8da92d3407ba3f44efa5c429a07 9909928960e04e7da5656ec2bc9fba90
 msgid "Path or identifier for ONNX model weights. Supports:"
 msgstr "Путь или идентификатор для весов модели ONNX. Поддерживает:"
 
-#: 9497c58bde8b417bbf20cfa8220db589 manuscript.detectors._east.EAST:7 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:7 manuscript.detectors._yolo.YOLO:7
+#: 8acecdcddeb34cc98cc2835844e838a8 12608f60947447e2b8772d4a9a128825
 msgid "Local file path: ``\"path/to/model.onnx\"``"
 msgstr "Локальный путь: ``\"path/to/model.onnx\"``"
 
-#: 105143c67b92479c9b80145673fdb3ba manuscript.detectors._east.EAST:8 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:8 manuscript.detectors._yolo.YOLO:8
+#: ecf1806d8a7746fa866dd347e0b548ff 05a5458616bc44159e4cf4282f436351
 msgid "HTTP/HTTPS URL: ``\"https://example.com/model.onnx\"``"
 msgstr "HTTP/HTTPS URL: ``\"https://example.com/model.onnx\"``"
 
-#: 6f3cb423915f4f56ae2a8f64e4a23929 manuscript.detectors._east.EAST:9 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:9 manuscript.detectors._yolo.YOLO:9
+#: 53e2a9a0de3e43c08c4152969e0621f4 cfddf803417c409aa0e15c52ebeb8301
 msgid "GitHub release: ``\"github://owner/repo/tag/file.onnx\"``"
 msgstr "GitHub release: ``\"github://owner/repo/tag/file.onnx\"``"
 
-#: 4df45a27502e411586f6dda7117029f9 manuscript.detectors._east.EAST:10 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:10 manuscript.detectors._yolo.YOLO:10
+#: 3211264828b44891a62db6f473f32bfc 6e97842a90ad4880ac8c7a8cba0982b6
 msgid "Google Drive: ``\"gdrive:FILE_ID\"``"
 msgstr "Google Drive: ``\"gdrive:FILE_ID\"``"
 
-#: d1f0db5ffbd94adda48b65cf941ead64 manuscript.detectors._east.EAST:11 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:11 d79c6719c3554734bc45ed51a71d2ea0
 msgid "Preset name: ``\"east_50_g1\"``"
 msgstr "Имя пресета: ``\"east_50_g1\"`` (из pretrained_registry)"
 
-#: fdc209250a644319aa15011330912ec4 manuscript.detectors._east.EAST:12 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:12 831455f6c63a47bdb08d07232d65f07c
 msgid "``None``: auto-downloads default preset (east_50_g1)"
 msgstr "``None``: автозагрузка пресета по умолчанию (east_50_g1)"
 
-#: 330f327643c44cd8ab4615991c5c4ba1 manuscript.detectors._east.EAST:15 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:15 manuscript.detectors._yolo.YOLO:25
+#: bf236de93ca54bcdb6a686be5e658d35 fccce4622ec845888afde9adf92599c8
 msgid ""
 "Compute device: ``\"cuda\"``, ``\"coreml\"``, or ``\"cpu\"``. If None, "
-"automatically selects CPU. For GPU/CoreML acceleration:  - CUDA (NVIDIA):"
-" ``pip install onnxruntime-gpu`` - CoreML (Apple Silicon M1/M2/M3): ``pip"
-" install onnxruntime-silicon``  Default is ``None`` (CPU)."
+"automatically selects CPU. For GPU/CoreML acceleration:  - CUDA (NVIDIA): "
+"``pip install onnxruntime-gpu`` - CoreML (Apple Silicon M1/M2/M3): ``pip "
+"install onnxruntime-silicon``  Default is ``None`` (CPU)."
 msgstr ""
-"Устройство вычислений: ``\"cuda\"``, ``\"coreml\"`` или ``\"cpu\"``. Если"
-" None, автоматически выбирается CPU. Для ускорения GPU/CoreML:  - CUDA "
-"(NVIDIA): ``pip install onnxruntime-gpu``  - CoreML (Apple Silicon "
-"M1/M2/M3): ``pip install onnxruntime-silicon``  По умолчанию ``None`` "
-"(CPU)."
+"Устройство вычислений: ``\"cuda\"``, ``\"coreml\"`` или ``\"cpu\"``. Если "
+"None, автоматически выбирается CPU. Для ускорения GPU/CoreML:  - CUDA "
+"(NVIDIA): ``pip install onnxruntime-gpu``  - CoreML (Apple Silicon M1/M2/"
+"M3): ``pip install onnxruntime-silicon``  По умолчанию ``None`` (CPU)."
 
-#: a0260e63092a42bdbc1a72dc8a3b5cc2 manuscript.detectors._east.EAST:15 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:15 manuscript.detectors._yolo.YOLO:25
+#: 15ccfe633e494bfc9dcef3dc4f7eefb5 2bf63853f51245ddb51a11aa507866f1
 msgid ""
 "Compute device: ``\"cuda\"``, ``\"coreml\"``, or ``\"cpu\"``. If None, "
 "automatically selects CPU. For GPU/CoreML acceleration:"
 msgstr ""
-"Устройство вычислений: ``\"cuda\"``, ``\"coreml\"`` или ``\"cpu\"``. Если"
-" None, автоматически выбирается CPU. Для ускорения GPU/CoreML:"
+"Устройство вычислений: ``\"cuda\"``, ``\"coreml\"`` или ``\"cpu\"``. Если "
+"None, автоматически выбирается CPU. Для ускорения GPU/CoreML:"
 
-#: fa850b75ff974169b9b1afef2c11cf04 manuscript.detectors._east.EAST:18 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:18 manuscript.detectors._yolo.YOLO:28
+#: bfbcddee49ab46e19684622cc859d5a1 d075c587085f4f6b8079aa3ef0228cd6
 msgid "CUDA (NVIDIA): ``pip install onnxruntime-gpu``"
 msgstr "CUDA (NVIDIA): ``pip install onnxruntime-gpu``"
 
-#: 04d530309a3d47598cfa0149b70a35e7 manuscript.detectors._east.EAST:19 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:19 manuscript.detectors._yolo.YOLO:29
+#: ccc493f35a6749c0a05c6e357323b2b0 f7264fbc8cd64f2b81d9a4fad5948a17
 msgid "CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``"
 msgstr "CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``"
 
-#: 7728aceac5bf478d964a7a96f9bdd98e manuscript.detectors._east.EAST:21 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:21 manuscript.detectors._yolo.YOLO:31
+#: acbf52f0a33a46e5ae3f0c6940807b17 7ad71ab680df46488fa2f3f5ae433514
 msgid "Default is ``None`` (CPU)."
 msgstr "По умолчанию ``None`` (CPU)."
 
-#: 9255633e2f3b493b99ac511370e76924 manuscript.detectors._east.EAST:24 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:24 6bf7b11118184c7c8a663a67259f3d69
 msgid ""
 "Input image size for inference. Images are resized to ``(target_size, "
 "target_size)``. Default is 1280."
@@ -123,76 +154,86 @@ msgstr ""
 "Размер входного изображения для инференса. Изображения приводятся к "
 "``(target_size, target_size)``. Значение по умолчанию — 1280."
 
-#: a961c89e527d4095a642b1d3121f2218 manuscript.detectors._east.EAST:28 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:28 cfe5c91a3f274d70b86491ca177cb823
 msgid ""
-"Horizontal expansion factor applied to detected boxes after NMS. Default "
-"is 0.7."
+"Horizontal expansion factor applied to detected boxes after NMS. Default is "
+"0.7."
 msgstr ""
-"Коэффициент горизонтального расширения, применяемый к боксам после NMS. "
-"По умолчанию 0.7."
+"Коэффициент горизонтального расширения, применяемый к боксам после NMS. По "
+"умолчанию 0.7."
 
-#: f0e4aa27e8b641f9aa06d73ec2894aef manuscript.detectors._east.EAST:32 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:32 cb8b8d00131e4145934cbf5b3fcf97ce
 msgid ""
-"Vertical expansion factor applied to detected boxes after NMS. Default is"
-" 0.7."
+"Vertical expansion factor applied to detected boxes after NMS. Default is "
+"0.7."
 msgstr ""
 "Коэффициент вертикального расширения, применяемый к боксам после NMS. По "
 "умолчанию 0.7."
 
-#: 6ba8fd53627f4820a761ad76fe7099a0 manuscript.detectors._east.EAST:36 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:36 509b6775176446b2a50790725189bac9
 msgid ""
-"Power for non-linear box expansion. Controls how expansion scales with "
-"box size. - 1.0 = linear (small and large boxes expand equally) - <1.0 = "
-"small boxes expand more (e.g., 0.5, recommended for character-level "
-"detection) - >1.0 = large boxes expand more Default is 0.5."
+"Power for non-linear box expansion. Controls how expansion scales with box "
+"size. - 1.0 = linear (small and large boxes expand equally) - <1.0 = small "
+"boxes expand more (e.g., 0.5, recommended for character-level detection) - "
+">1.0 = large boxes expand more Default is 0.5."
 msgstr ""
 "Степень нелинейного расширения боксов. Определяет, как масштабируется "
-"расширение в зависимости от размера бокса.  - 1.0 = линейно (малые и "
-"большие боксы расширяются одинаково)  - <1.0 = малые боксы расширяются "
-"сильнее (например, 0.5, рекомендуется для детекции символов)  - >1.0 = "
-"большие боксы расширяются сильнее  Значение по умолчанию — 0.5."
+"расширение в зависимости от размера бокса.  - 1.0 = линейно (малые и большие "
+"боксы расширяются одинаково)  - <1.0 = малые боксы расширяются сильнее "
+"(например, 0.5, рекомендуется для детекции символов)  - >1.0 = большие боксы "
+"расширяются сильнее  Значение по умолчанию — 0.5."
 
-#: 47d7a7b6130440c39f7d74089af21f92 manuscript.detectors._east.EAST:43 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:43 b84cfd4a90ad4ed798f7e250b3906d51
 msgid ""
-"Confidence threshold for selecting candidate detections before NMS. "
-"Default is 0.7."
+"Confidence threshold for selecting candidate detections before NMS. Default "
+"is 0.7."
 msgstr ""
-"Порог уверенности для отбора кандидатов перед NMS. Значение по умолчанию "
-"— 0.7."
+"Порог уверенности для отбора кандидатов перед NMS. Значение по умолчанию — "
+"0.7."
 
-#: 5cad103afef34321af31684d9a8cfd6c manuscript.detectors._east.EAST:47 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:47 a250c3c1d20f4445a11ee899dc0d311c
 msgid "IoU threshold for locality-aware NMS merging phase. Default is 0.2."
 msgstr "Порог IoU для фазы объединения locality-aware NMS. По умолчанию 0.2."
 
-#: 1587fc2100b3409f825a079d7f3b77e3 manuscript.detectors._east.EAST:50 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:50 4f16265b8e1c479d919e589d9590d32b
 msgid ""
-"IoU threshold for standard NMS after locality-aware merging. If None, "
-"uses the same value as iou_threshold. Default is None."
+"IoU threshold for standard NMS after locality-aware merging. If None, uses "
+"the same value as iou_threshold. Default is None."
 msgstr ""
-"Порог IoU для стандартного NMS после locality-aware объединения. Если "
-"None, используется значение iou_threshold. По умолчанию None."
+"Порог IoU для стандартного NMS после locality-aware объединения. Если None, "
+"используется значение iou_threshold. По умолчанию None."
 
-#: 3eb03f003a7c4b3080481d55962a48d4 manuscript.detectors._east.EAST:54 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:54 bcf44aff679f4b638292847ee5875854
 msgid "Scale factor for decoding geometry/score maps. Default is 0.25."
 msgstr ""
 "Коэффициент масштабирования при декодировании карт геометрии/оценок. По "
 "умолчанию 0.25."
 
-#: b15d69f09d0e4de9a92ec80daaeaf050 manuscript.detectors._east.EAST:57 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:57 10e242ff755042c38944cf05a1cf5414
 msgid ""
-"Quantization resolution for point coordinates during decoding. Default is"
-" 2."
-msgstr "Разрешение квантования координат точек при декодировании. По умолчанию 2."
-
-#: 7a6cc343ace74d179753025a6bdfce95 manuscript.detectors._east.EAST:61 of
-msgid ""
-"If True, outputs axis-aligned rectangles instead of original quads. "
-"Default is True."
+"Quantization resolution for point coordinates during decoding. Default is 2."
 msgstr ""
-"Если True, возвращаются осево-ориентированные прямоугольники вместо "
-"исходных четырёхугольников. По умолчанию True."
+"Разрешение квантования координат точек при декодировании. По умолчанию 2."
 
-#: 82f3317bdc0a49deb7a63ab3ac28ac97 manuscript.detectors._east.EAST:65 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:61 c9517251fb0444279392eb6bb73facf6
+msgid ""
+"If True, outputs axis-aligned rectangles instead of original quads. Default "
+"is True."
+msgstr ""
+"Если True, возвращаются осево-ориентированные прямоугольники вместо исходных "
+"четырёхугольников. По умолчанию True."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:65 f0d8cd79e3c64529a0a98ebbc2dc9f92
 msgid ""
 "If True, removes quads with extremely large area relative to the "
 "distribution. Default is False."
@@ -200,69 +241,90 @@ msgstr ""
 "Если True, удаляет четырёхугольники с аномально большой площадью "
 "относительно распределения. По умолчанию False."
 
-#: 674f151cc0de4cc2ad16f535c383c964 manuscript.detectors._east.EAST:69 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:69 fe553a0260844333a61792b773ff36dd
 msgid "Sigma threshold for anomaly area filtering. Default is 5.0."
 msgstr "Порог сигмы для фильтрации аномальных площадей. По умолчанию 5.0."
 
-#: 7e793b955f23480aae07a9e5fae22167 manuscript.detectors._east.EAST:72 of
-msgid "Minimum number of boxes required before anomaly filtering. Default is 30."
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:72 64aacf4981cd450c90a7f7d5b33495a4
+msgid ""
+"Minimum number of boxes required before anomaly filtering. Default is 30."
 msgstr ""
 "Минимальное количество боксов перед применением фильтрации аномалий. По "
 "умолчанию 30."
 
-#: 15cc6e462e9043128125780e3d2b0dbf manuscript.detectors._east.EAST:76 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:76 69f5ad44608d4d5a8e1e6eef0cddaa25
 msgid ""
-"Enable Test-Time Augmentation (TTA). When enabled, inference is run on "
-"both the original and horizontally flipped image, and results are merged."
-" This can improve detection of partially visible or edge text. Default is"
-" False."
+"Enable Test-Time Augmentation (TTA). When enabled, inference is run on both "
+"the original and horizontally flipped image, and results are merged. This "
+"can improve detection of partially visible or edge text. Default is False."
 msgstr ""
+"Включает аугментацию во время инференса (TTA). Когда она активна, инференс "
+"выполняется как на исходном, так и на горизонтально отражённом "
+"изображении, после чего результаты объединяются. Это может улучшить "
+"детекцию частично видимого текста или текста у краёв изображения. По "
+"умолчанию False."
 
-#: 738f62f946f941ff90580155e3565592 manuscript.detectors._east.EAST:82 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:82 0401b7fabd90463e9ab39b8d88ec9a93
 msgid ""
-"IoU threshold for merging boxes from original and flipped images during "
-"TTA. Boxes with IoU > threshold are considered matches and merged. "
-"Default is 0.1."
+"IoU threshold for merging boxes from original and flipped images during TTA. "
+"Boxes with IoU > threshold are considered matches and merged. Default is 0.1."
 msgstr ""
+"Порог IoU для объединения боксов с исходного и отражённого изображения при "
+"TTA. Боксы с IoU > threshold считаются совпавшими и объединяются. По "
+"умолчанию 0.1."
 
-#: 2840dec89d594d118e20884b5e469561 manuscript.detectors._east.EAST:88
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:88
 #: manuscript.detectors._east.EAST.export:41
-#: manuscript.detectors._east.EAST.predict:42 of
+#: manuscript.detectors._east.EAST.predict:15
+#: manuscript.detectors._yolo.YOLO:63 ae720d1cb0334c28a21e6e852c257f7e
+#: 55cc16a1073043e2869a3093bfbdc1ac 87c64b9c77d74bdbb70a1d233e3bb623
+#: 3def40d5e1534c93a4fd559c682ecd06
 msgid "Notes"
 msgstr "Примечания"
 
-#: 067627fecf8c474e9b6ff887667a1ce0 manuscript.detectors._east.EAST:89 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:89 f2c72356d0634e6f8c102f632864a0c1
 msgid "The class provides two main public methods:"
 msgstr "Класс предоставляет два основных публичных метода:"
 
-#: 663d2d36465f4fc2bef0525f652f6b69 manuscript.detectors._east.EAST:91 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:91 ebc2c99ea2ea4108bc933989223c691f
 msgid "``predict`` — run inference on a single image and return detections."
 msgstr ""
-"``predict`` — выполняет инференс на одном изображении и возвращает "
-"детекции."
+"``predict`` — выполняет инференс на одном изображении и возвращает детекции."
 
-#: bd743abac34c40b7a6f5159ae6578079 manuscript.detectors._east.EAST:92 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:92 ef17de6b766d4f94894fdac540f57f8b
 msgid ""
-"``train`` — high-level training entrypoint to train an EAST model on "
-"custom datasets."
+"``train`` — high-level training entrypoint to train an EAST model on custom "
+"datasets."
 msgstr ""
 "``train`` — высокоуровневая точка входа для обучения модели EAST на "
 "пользовательских датасетах."
 
-#: f924be66866c4fdba373dc4f5e44888b manuscript.detectors._east.EAST:94 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:94 c9fd2bc0f6c646f0b698854bcd52eb5c
 msgid ""
-"The detector uses ONNX Runtime for fast inference on CPU and GPU. For GPU"
-" acceleration, install: ``pip install onnxruntime-gpu``"
+"The detector uses ONNX Runtime for fast inference on CPU and GPU. For GPU "
+"acceleration, install: ``pip install onnxruntime-gpu``"
 msgstr ""
-"Детектор использует ONNX Runtime для быстрого инференса на CPU и GPU. Для"
-" ускорения на GPU установите: ``pip install onnxruntime-gpu``"
+"Детектор использует ONNX Runtime для быстрого инференса на CPU и GPU. Для "
+"ускорения на GPU установите: ``pip install onnxruntime-gpu``"
 
-#: 8f28e6175d6745bfa83bb32fcd71f5ee manuscript.detectors._east.EAST:100 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:100 manuscript.detectors._yolo.YOLO:76
+#: a31bccf1a82e4403a0b55e76c22a0b83 9e6fdbd8c7f44047970d9bc2d7308f7d
 msgid "Methods"
 msgstr "Методы"
 
-#: daa274dc4c574c938d4736237747d469
-#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:119:<autosummary>:1
+#: 4cc989ea288342f8a23e062e0b91ea00
 msgid ""
 ":py:obj:`__call__ <manuscript.detectors.EAST.__call__>`\\ \\(\\*args\\, "
 "\\*\\*kwargs\\)"
@@ -270,55 +332,66 @@ msgstr ""
 ":py:obj:`__call__ <manuscript.detectors.EAST.__call__>`\\ \\(\\*args\\, "
 "\\*\\*kwargs\\)"
 
-#: 0f218785c8cb4d23978ccfb9414db8d1
-#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:119:<autosummary>:1
+#: manuscript.detectors._yolo.YOLO:84:<autosummary>:1
+#: f57128ace4ac41e9a32285dcf862f9d9 f223279df34546a29b547b4e21c34ea9
 msgid "Call self as a function."
 msgstr "Вызов объекта как функции."
 
-#: 38d17ed6ac12468ebbd119cb4a81a8e3
-#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:119:<autosummary>:1
+#: de98146c90e74cb28141ddf54df3ec62
 msgid ""
-":py:obj:`export <manuscript.detectors.EAST.export>`\\ "
-"\\(weights\\_path\\, output\\_path\\[\\, ...\\]\\)"
+":py:obj:`export <manuscript.detectors.EAST.export>`\\ \\(weights\\_path\\, "
+"output\\_path\\[\\, ...\\]\\)"
 msgstr ""
-":py:obj:`export <manuscript.detectors.EAST.export>`\\ "
-"\\(weights\\_path\\, output\\_path\\[\\, ...\\]\\)"
+":py:obj:`export <manuscript.detectors.EAST.export>`\\ \\(weights\\_path\\, "
+"output\\_path\\[\\, ...\\]\\)"
 
-#: 6547c656e3e748349950d20a43ef1e24 manuscript.detectors._east.EAST.export:2
-#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:2
+#: manuscript.detectors._east.EAST:119:<autosummary>:1
+#: 56ea67739fa847afa7fb68209677c7bd 2d74a69413074f39a14faebd8d347584
 msgid "Export EAST PyTorch model to ONNX format."
 msgstr "Экспорт модели EAST из PyTorch в формат ONNX."
 
-#: d366ff5469e1442182c1ed835df62cc3
-#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:119:<autosummary>:1
+#: 9b4c5484c0924045b6f03758fbc01baf
 msgid ""
-":py:obj:`predict <manuscript.detectors.EAST.predict>`\\ "
-"\\(img\\_or\\_path\\[\\, return\\_maps\\, ...\\]\\)"
+":py:obj:`predict <manuscript.detectors.EAST.predict>`\\ \\(img\\_or\\_path\\)"
 msgstr ""
-":py:obj:`predict <manuscript.detectors.EAST.predict>`\\ "
-"\\(img\\_or\\_path\\[\\, return\\_maps\\, ...\\]\\)"
+":py:obj:`predict <manuscript.detectors.EAST.predict>`\\ \\(img\\_or\\_path\\)"
 
-#: bb529eedcba945f9b16a587a1a361991 manuscript.detectors._east.EAST.predict:2
-#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
-msgid "Run EAST inference and return detection results."
-msgstr "Запуск инференса EAST и возврат результатов детекции."
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.predict:2
+#: manuscript.detectors._east.EAST:119:<autosummary>:1
+#: 22e1da68873145bc95d9c4b1b777aef1 2f423fa89d12463094e46700ccfea619
+msgid "Run EAST inference and return detected page structure."
+msgstr "Запустить инференс EAST и вернуть обнаруженную структуру страницы."
 
-#: d927f786eb7247cfa1f5f8d5ac6f92e3
-#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:119:<autosummary>:1
+#: 63f5cce347b4414e898f68b3235e1d75
 msgid ""
-":py:obj:`runtime_providers "
-"<manuscript.detectors.EAST.runtime_providers>`\\ \\(\\)"
+":py:obj:`runtime_providers <manuscript.detectors.EAST.runtime_providers>`\\ "
+"\\(\\)"
 msgstr ""
-":py:obj:`runtime_providers "
-"<manuscript.detectors.EAST.runtime_providers>`\\ \\(\\)"
+":py:obj:`runtime_providers <manuscript.detectors.EAST.runtime_providers>`\\ "
+"\\(\\)"
 
-#: f6b7a0fa60fd4b0fa964cb3704754512
-#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:119:<autosummary>:1
+#: manuscript.detectors._yolo.YOLO:84:<autosummary>:1
+#: d1fbc3d9144147ada07e69af2961b747 a184277c6a7f4695a0f6f4fae7444a03
 msgid "Get ONNX Runtime execution providers based on device."
-msgstr "Получение провайдеров выполнения ONNX Runtime в зависимости от устройства."
+msgstr ""
+"Получение провайдеров выполнения ONNX Runtime в зависимости от устройства."
 
-#: ca43ca54ea274ffdb5e00d7ea1a35de0
-#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST:119:<autosummary>:1
+#: a65b962b467746bd971141eb6b163545
 msgid ""
 ":py:obj:`train <manuscript.detectors.EAST.train>`\\ \\(train\\_images\\, "
 "train\\_anns\\, val\\_images\\, ...\\)"
@@ -326,196 +399,288 @@ msgstr ""
 ":py:obj:`train <manuscript.detectors.EAST.train>`\\ \\(train\\_images\\, "
 "train\\_anns\\, val\\_images\\, ...\\)"
 
-#: 073b7a21cfba42579a4342691a7505a5 manuscript.detectors._east.EAST.train:2
-#: manuscript.detectors._east.EAST:119:<autosummary>:1 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:2
+#: manuscript.detectors._east.EAST:119:<autosummary>:1
+#: 4c3a3aa30e95474f929ccd3381255fd9 9a8e20ef9a124916aebfe7bb52b99792
 msgid "Train EAST model on custom datasets."
 msgstr "Обучение модели EAST на пользовательских датасетах."
 
-#: c45b1bca2ce24192b96f2863b2850f41 manuscript.detectors._east.EAST.predict:5
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:4 b4ae0e75cd1145fd94ebd3dba98cef0e
 msgid ""
-"Path to an image file or an RGB image provided as a NumPy array with "
-"shape ``(H, W, 3)`` in ``uint8`` format."
+"This method converts a trained EAST model from PyTorch to ONNX format, which "
+"can be used for faster inference with ONNX Runtime. The exported model can "
+"be loaded using ``EAST(weights_path=\"model.onnx\", use_onnx=True)``."
 msgstr ""
-"Путь к файлу изображения или RGB-изображение в виде массива NumPy формата"
-" ``uint8`` с формой ``(H, W, 3)``."
+"Этот метод конвертирует обученную модель EAST из PyTorch в формат ONNX, "
+"который может использоваться для более быстрого инференса с ONNX Runtime. "
+"Экспортированную модель можно загрузить с помощью "
+"``EAST(weights_path=\"model.onnx\", use_onnx=True)``."
 
-#: 16874cfffbb54d9581e19ad661ed944d manuscript.detectors._east.EAST.predict:9
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:9 9fb34736d12d4ab593f7a2a419db58b8
+msgid "Path to the PyTorch model weights file (.pth)."
+msgstr "Путь к файлу весов модели PyTorch (.pth)."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:12
+#: f548b8aa7810498e8d2ab08aef6a63bb
+msgid "Path where the ONNX model will be saved (.onnx)."
+msgstr "Путь, по которому будет сохранена модель ONNX (.onnx)."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:15
+#: ff4d7f2e7b104cfdba363a5908bc9075
 msgid ""
-"If True, returns raw model score and geometry maps under keys "
-"``\"score_map\"`` and ``\"geo_map\"``. Default is False."
+"Backbone architecture of the model. If None, will be automatically detected "
+"from the checkpoint. Must match the architecture used during training. "
+"Default is None (auto-detect)."
 msgstr ""
-"Если True, возвращает необработанные карты оценок и геометрии под ключами"
-" ``\"score_map\"`` и ``\"geo_map\"``. По умолчанию False."
+"Архитектура backbone модели. Если None, будет автоматически определена из "
+"чекпоинта. Должна совпадать с архитектурой, использованной при обучении. По "
+"умолчанию None (автоопределение)."
 
-#: 38dfc0aa4dbd4441bff557709c3e2854 manuscript.detectors._east.EAST.predict:13
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:20
+#: 692be909bb134478af137f2165a0fcb6
 msgid ""
-"If True, sorts detected words in natural reading order (left-to-right, "
-"top-to-bottom) and groups them into text lines. Default is True."
+"Input image size (height and width). The model will accept images of shape "
+"``(batch, 3, input_size, input_size)``. Default is 1280."
 msgstr ""
-"Если True, сортирует обнаруженные слова в естественном порядке чтения "
-"(слева направо, сверху вниз) и группирует их в строки. По умолчанию True."
+"Размер входного изображения (высота и ширина). Модель принимает изображения "
+"формы ``(batch, 3, input_size, input_size)``. По умолчанию 1280."
 
-#: 3a8014451a644b46a6f83ba7a68050e1 manuscript.detectors._east.EAST.predict:18
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:25
+#: 3bbb94c280214392ba5ec2f8ef1c17c0
+msgid "ONNX opset version to use for export. Default is 14."
+msgstr "Версия opset ONNX для экспорта. По умолчанию 14."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:28
+#: 81fb52dde2584e3096f5e4e785709ca0
 msgid ""
-"If True and ``sort_reading_order=True``, segments the page into columns "
-"(separate Blocks). If False, treats entire page as single column. Only "
-"used when ``sort_reading_order=True``. Default is True."
+"If True, applies ONNX graph simplification using onnx-simplifier to optimize "
+"the model. Requires ``onnx-simplifier`` package. Default is True."
 msgstr ""
-"Если True и ``sort_reading_order=True``, сегментирует страницу на колонки"
-" (отдельные Blocks). Если False, вся страница рассматривается как одна "
-"колонка. Используется только при ``sort_reading_order=True``. По "
-"умолчанию True."
+"Если True, применяется упрощение графа ONNX с помощью onnx-simplifier для "
+"оптимизации модели. Требуется пакет ``onnx-simplifier``. По умолчанию True."
 
-#: 48212b55d4914329ab750353b1da3139 manuscript.detectors._east.EAST.predict:23
-#: of
-msgid ""
-"Maximum number of columns to detect when ``split_into_columns=True``. "
-"Higher values allow more columns to be detected. Only used when "
-"``sort_reading_order=True`` and ``split_into_columns=True``. Default is "
-"10."
-msgstr ""
-"Максимальное количество колонок для обнаружения при "
-"``split_into_columns=True``. Большие значения позволяют обнаруживать "
-"больше колонок. Используется только при ``sort_reading_order=True`` и "
-"``split_into_columns=True``. По умолчанию 10."
-
-#: ../../api/detectors.rst 74af4ffe4576447687ce250ca01cca33
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:0
+#: 49fb0a8d955c405b842bbe72f71411dc 2094072648f8439285f9ec68de7e107f
+#: 29beaeea4a674dcf8ac4fa1c0a1cb310 18bf0345209948b8b4cc8a8102cb5460
 msgid "Returns"
 msgstr "Возвращает"
 
-#: 4915cea5333349799512bd6136587ae2 manuscript.detectors._east.EAST.predict:29
-#: of
-msgid ""
-"Dictionary with the following keys:  - ``\"page\"`` : Page     Parsed "
-"detection result as a Page object containing Block(s) with     Line(s) of"
-" Word objects. Each Word has polygon coordinates and     confidence "
-"scores. Words and Lines have reading order indices. - ``\"score_map\"`` :"
-" numpy.ndarray or None     Raw score map produced by the network if "
-"``return_maps=True``. - ``\"geo_map\"`` : numpy.ndarray or None     Raw "
-"geometry map if ``return_maps=True``."
-msgstr ""
-"Словарь со следующими ключами:  - ``\"page\"`` : Page     Разобранный "
-"результат детекции в виде объекта Page, содержащего Block(и) со Line(ами)"
-" объектов Word. Каждый Word содержит координаты полигона и оценки "
-"уверенности. Слова и строки имеют индексы порядка чтения.  - "
-"``\"score_map\"`` : numpy.ndarray или None     Необработанная карта "
-"оценок, если ``return_maps=True``.  - ``\"geo_map\"`` : numpy.ndarray или"
-" None     Необработанная карта геометрии, если ``return_maps=True``."
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:33
+#: d1c75db5a3834ec89010d521072477b8
+msgid "The ONNX model is saved to ``output_path``."
+msgstr "Модель ONNX сохраняется в ``output_path``."
 
-#: e6ca87804b974ec6b728ef749ed3746c manuscript.detectors._east.EAST.predict:29
-#: of
-msgid "Dictionary with the following keys:"
-msgstr "Словарь со следующими ключами:"
-
-#: 9212ba21bc7040d7acaf9cd559955a52 manuscript.detectors._east.EAST.predict:31
-#: of
-msgid "``\"page\"``"
-msgstr "``\"page\"``"
-
-#: 5568ef7672ea460b8992f878a19d34be manuscript.detectors._east.EAST.predict:-1
-#: of
-msgid "Page"
-msgstr "Page"
-
-#: ad0eb8444a3b498f90683c0e921eed80 manuscript.detectors._east.EAST.predict:32
-#: of
-msgid ""
-"Parsed detection result as a Page object containing Block(s) with Line(s)"
-" of Word objects. Each Word has polygon coordinates and confidence "
-"scores. Words and Lines have reading order indices."
-msgstr ""
-"Разобранный результат детекции в виде объекта Page, содержащего Block(и) "
-"со Line(ами) объектов Word. Каждый Word имеет координаты полигона и "
-"оценки уверенности. Слова и строки имеют индексы порядка чтения."
-
-#: e6c361add639406ab1bf6e69fe593aa6 manuscript.detectors._east.EAST.predict:35
-#: of
-msgid "``\"score_map\"``"
-msgstr "``\"score_map\"``"
-
-#: b33cc4aa86cf483dab330572851a7a69 manuscript.detectors._east.EAST.predict:-1
-#: of
-msgid "numpy.ndarray or None"
-msgstr "numpy.ndarray или None"
-
-#: dc8d38c9192d4fd48603f603a3274330 manuscript.detectors._east.EAST.predict:36
-#: of
-msgid "Raw score map produced by the network if ``return_maps=True``."
-msgstr "Необработанная карта оценок, полученная сетью, если ``return_maps=True``."
-
-#: 15d695693f3b472486eb1580a771ebfc manuscript.detectors._east.EAST.predict:37
-#: of
-msgid "``\"geo_map\"``"
-msgstr "``\"geo_map\"``"
-
-#: 9e985b0315114210a8a3a75da5eef653 manuscript.detectors._east.EAST.predict:38
-#: of
-msgid "Raw geometry map if ``return_maps=True``."
-msgstr "Необработанная карта геометрии, если ``return_maps=True``."
-
-#: ../../api/detectors.rst 077212810899479e8d3019aeb9a2a6c6
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:0
+#: f1463cc6d34a4c039a161da5c69f5cc1 e7ed11f0ffc54a8385cb72978f625bb0
+#: bdce206825cd4f4a9319a21a6aa3a7d7 901bed6a72254c1ba7134deaba7ccbd8
 msgid "Return type"
 msgstr "Тип возвращаемого значения"
 
-#: 241950b0eed74a68a02ac9fea859b2e6 manuscript.detectors._east.EAST.predict:43
-#: of
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:0
+#: dcf1d390e5c649f7a51b8e9b48366485
+msgid "Raises"
+msgstr "Исключения"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:36
+#: b30ce50b31b84438bc3746293dcf6abb
+msgid "If required packages (torch, onnx) are not installed."
+msgstr "Если необходимые пакеты (torch, onnx) не установлены."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:37
+#: fe3117f173d14d168b29965c7f2cbe4a
+msgid "If ``weights_path`` does not exist."
+msgstr "Если ``weights_path`` не существует."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:38
+#: 10b95934f95248cb904d3f05f8000a42
+msgid "If backbone_name doesn't match the checkpoint architecture."
+msgstr "Если backbone_name не соответствует архитектуре чекпоинта."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:42
+#: cee91bc554b64d89955bd654b5f01570
+msgid "The exported ONNX model has two outputs:"
+msgstr "Экспортированная модель ONNX имеет два выхода:"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:44
+#: 130a2bcc368041b884999f4e48f65c55
+msgid "``score_map``: Text confidence map with shape ``(batch, 1, H, W)``"
+msgstr "``score_map``: карта уверенности текста формы ``(batch, 1, H, W)``"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:45
+#: 95b6fcaf106e4b6fa07c96a0804cb575
+msgid "``geo_map``: Geometry map with shape ``(batch, 8, H, W)``"
+msgstr "``geo_map``: карта геометрии формы ``(batch, 8, H, W)``"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:47
+#: 3e914c57ca8d4510b672801d050d3ead
 msgid ""
-"The method performs: (1) image loading, (2) resizing and normalization, "
-"(3) model inference, (4) quad decoding, (5) NMS, (6) box expansion, (7) "
-"scaling coordinates back to original size, (8) optional reading order "
-"sorting into lines."
+"The model supports dynamic batch size and image dimensions through dynamic "
+"axes configuration."
 msgstr ""
-"Метод выполняет: (1) загрузку изображения, (2) изменение размера и "
-"нормализацию, (3) инференс модели, (4) декодирование четырёхугольников, "
-"(5) NMS, (6) расширение боксов, (7) масштабирование координат обратно к "
-"исходному размеру, (8) опциональную сортировку по порядку чтения с "
-"группировкой в строки."
+"Модель поддерживает динамический размер батча и размеры изображения через "
+"настройку динамических осей."
 
-#: 145d2138d6f14f1aa29e4d3f723f33f4 manuscript.detectors._east.EAST.predict:48
-#: of
-msgid "**Test-Time Augmentation (TTA):**"
-msgstr ""
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:50
+#: 485cc1c4c0e746529eea133394f5a0af
+msgid "**Automatic Backbone Detection:**"
+msgstr "**Автоматическое определение backbone:**"
 
-#: ba6f9dab711d4e2f997b507070f1b777 manuscript.detectors._east.EAST.predict:50
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:52
+#: 66a14dca08ba4c0fb2c7454a0bd5c7d9
 msgid ""
-"When ``use_tta=True`` is set during initialization, the method runs "
-"inference on both the original and horizontally flipped image, then "
-"merges results. Boxes from both views are matched by IoU and merged by "
-"taking the union of coordinates with averaged scores. This can improve "
-"detection of text near image edges or partially visible text."
+"The method automatically detects the backbone architecture from the "
+"checkpoint by analyzing the number of parameters in layer4. This prevents "
+"mismatches between checkpoint and architecture that could lead to incorrect "
+"exports."
 msgstr ""
+"Метод автоматически определяет архитектуру backbone из чекпоинта, анализируя "
+"количество параметров в layer4. Это предотвращает несоответствия между "
+"чекпоинтом и архитектурой, которые могли бы привести к некорректному "
+"экспорту."
 
-#: c095f847463d44a6b93962472578e609 manuscript.detectors._east.EAST.predict:56
-#: of
-msgid "For visualization, use the external ``visualize_page`` utility:"
-msgstr "Для визуализации используйте внешнюю утилиту ``visualize_page``:"
-
-#: 96c29f29b20946568b75927215ab91bb manuscript.detectors._east.EAST.export:57
-#: manuscript.detectors._east.EAST.predict:63
-#: manuscript.detectors._east.EAST.train:157 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:57
+#: manuscript.detectors._east.EAST.predict:36
+#: manuscript.detectors._east.EAST.train:166
+#: manuscript.detectors._yolo.YOLO.predict:14 9faaed3562614741bdb3547e0aca8738
+#: dcb660c6cca14f84a8eb2bac3c68c113 b27c53a91535402087126ce1be53a6d4
+#: d4ff628403464ccfaf210c78043efdda
 msgid "Examples"
 msgstr "Примеры"
 
-#: 365844be83744b53a317230246a25636 manuscript.detectors._east.EAST.predict:64
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:58
+#: c262441cfea342f890ff38a216d3d30c
+msgid "Export with automatic backbone detection:"
+msgstr "Экспорт с автоматическим определением backbone:"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:69
+#: a78397a3d0574698b8da45e335e335f9
+msgid "Export with explicit backbone:"
+msgstr "Экспорт с явным указанием backbone:"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:79
+#: 65eb8e78813442dc9da6577a993f1d2e
+msgid "Use the exported model for inference:"
+msgstr "Использование экспортированной модели для инференса:"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:90
+#: 50fb3e74ddef45e68fc06620e4dde96c
+msgid ":py:obj:`EAST.__init__`"
+msgstr ":py:obj:`EAST.__init__`"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.export:91
+#: 46c4b856e4a04aaf97858ef67d346b5e
+msgid "Initialize EAST detector with ONNX support using ``use_onnx=True``."
+msgstr ""
+"Инициализация детектора EAST с поддержкой ONNX с использованием "
+"``use_onnx=True``."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.predict:5
+#: manuscript.detectors._yolo.YOLO.predict:5 4141f66165764f079d3c97c662c3b0d0
+#: a256d5b9f6cc45f48d6454b187a42275
+msgid ""
+"Path to an image file or an RGB image provided as a NumPy array with shape "
+"``(H, W, 3)`` in ``uint8`` format."
+msgstr ""
+"Путь к файлу изображения или RGB-изображение в виде массива NumPy формата "
+"``uint8`` с формой ``(H, W, 3)``."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.predict:9
+#: cd47ef7295e7451d82d028525a74956c
+msgid ""
+"Parsed detection result as a Page object containing a single Block with a "
+"single Line of TextSpan objects. Each TextSpan has polygon coordinates, "
+"confidence score, and sequential ``order`` index."
+msgstr ""
+"Разобранный результат детекции в виде объекта Page, содержащего один Block с "
+"одной Line из объектов TextSpan. Каждый TextSpan содержит координаты "
+"полигона, оценку уверенности и последовательный индекс ``order``."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.predict:16
+#: f9be6ddf592940d3be87cd6610cec1a9
+msgid ""
+"The method performs: (1) image loading, (2) resizing and normalization, (3) "
+"model inference, (4) quad decoding, (5) NMS, (6) box expansion, (7) scaling "
+"coordinates back to original size."
+msgstr ""
+"Метод выполняет: (1) загрузку изображения, (2) изменение размера и "
+"нормализацию, (3) инференс модели, (4) декодирование четырёхугольников, (5) "
+"NMS, (6) расширение боксов, (7) масштабирование координат обратно к "
+"исходному размеру."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.predict:21
+#: 330cbdbb720a4f45b5250f8c8e1d7ab3
+msgid "**Test-Time Augmentation (TTA):**"
+msgstr "**Аугментация во время инференса (TTA):**"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.predict:23
+#: a28fde1f8ed44e189b363ce153058263
+msgid ""
+"When ``use_tta=True`` is set during initialization, the method runs "
+"inference on both the original and horizontally flipped image, then merges "
+"results. Boxes from both views are matched by IoU and merged by taking the "
+"union of coordinates with averaged scores. This can improve detection of "
+"text near image edges or partially visible text."
+msgstr ""
+"Если при инициализации задано ``use_tta=True``, метод выполняет инференс как "
+"на исходном, так и на горизонтально отражённом изображении, а затем "
+"объединяет результаты. Боксы из обоих представлений сопоставляются по IoU и "
+"объединяются через объединение координат с усреднением оценок. Это может "
+"улучшить детекцию текста у краёв изображения или частично видимого текста."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.predict:29
+#: e5658ab9b20141a9b161859015f56547
+msgid "For visualization, use the external ``visualize_page`` utility:"
+msgstr "Для визуализации используйте внешнюю утилиту ``visualize_page``:"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.predict:37
+#: 3ab9ca16502942a5b0587a4488f8f02e
 msgid "Perform inference and get structured output:"
 msgstr "Выполнить инференс и получить структурированный результат:"
 
-#: 962da959068747c696ae1c312b2233b6 manuscript.detectors._east.EAST.predict:75
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.predict:47
+#: a764df72d52b457a95c8e4305ead3827
 msgid "Visualize results separately:"
 msgstr "Визуализировать результаты отдельно:"
 
-#: 8d52828aa9604db3ad6443bb2ba2248f manuscript.detectors._east.EAST.train:5 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:5 98915dc123fe45ac999ca4bbc046e6cf
 msgid "Path(s) to training image folders."
 msgstr "Путь(и) к каталогам с обучающими изображениями."
 
-#: b9e83ed40b3b469eb50621af3582aae7 manuscript.detectors._east.EAST.train:8 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:8 b9dcafe262f6417e9fa569c9206c24ee
 msgid ""
 "Path(s) to COCO-format JSON annotation files corresponding to "
 "``train_images``."
@@ -523,315 +688,417 @@ msgstr ""
 "Путь(и) к JSON-файлам аннотаций в формате COCO, соответствующим "
 "``train_images``."
 
-#: 388f87a9804847a89970fdb89e6f6347 manuscript.detectors._east.EAST.train:12 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:12 431665fc4bb1439a8ccf06a853042bd4
 msgid "Path(s) to validation image folders."
 msgstr "Путь(и) к каталогам с валидационными изображениями."
 
-#: 147b9879414844feac767c487da497ea manuscript.detectors._east.EAST.train:15 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:15 b330d41ad3374a229f5f5548cf9e9ee2
 msgid ""
-"Path(s) to COCO-format JSON annotation files corresponding to "
-"``val_images``."
+"Path(s) to COCO-format JSON annotation files corresponding to ``val_images``."
 msgstr ""
 "Путь(и) к JSON-файлам аннотаций в формате COCO, соответствующим "
 "``val_images``."
 
-#: 35e05699c1b142ccaef93eb5cac28daa manuscript.detectors._east.EAST.train:19 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:19 a6da05e5156b4cc39eedd0f340b14704
 msgid ""
-"Base directory where experiment folders will be created. Default is "
-"``\"./experiments\"``."
+"Base directory where experiment folders will be created. Default is ``\"./"
+"experiments\"``."
 msgstr ""
 "Базовый каталог, в котором будут создаваться папки экспериментов. По "
 "умолчанию ``\"./experiments\"``."
 
-#: 52ac023ee303436db841a26902ecad32 manuscript.detectors._east.EAST.train:23 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:23 7469e3e0425f45efa9ae8cfffbd51888
 msgid ""
-"Folder name inside ``experiment_root`` for logs and checkpoints. Default "
-"is ``\"resnet_quad\"``."
+"Folder name inside ``experiment_root`` for logs and checkpoints. Default is "
+"``\"resnet_quad\"``."
 msgstr ""
-"Имя папки внутри ``experiment_root`` для логов и чекпоинтов. По умолчанию"
-" ``\"resnet_quad\"``."
+"Имя папки внутри ``experiment_root`` для логов и чекпоинтов. По умолчанию "
+"``\"resnet_quad\"``."
 
-#: d3291a6a13984e068eda62db38dee7ce manuscript.detectors._east.EAST.train:27 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:27 fe3ff2ece05d4285b7eda13cfd135600
 msgid ""
 "Backbone architecture to use. Options:  - ``\"resnet50\"`` — ResNet-50 "
 "(faster, less parameters) - ``\"resnet101\"`` — ResNet-101 (slower, more "
 "capacity)  Default is ``\"resnet50\"``."
 msgstr ""
-"Используемая архитектура backbone. Варианты:  - ``\"resnet50\"`` — "
-"ResNet-50 (быстрее, меньше параметров)  - ``\"resnet101\"`` — ResNet-101 "
-"(медленнее, больше ёмкость)  По умолчанию ``\"resnet50\"``."
+"Используемая архитектура backbone. Варианты:  - ``\"resnet50\"`` — ResNet-50 "
+"(быстрее, меньше параметров)  - ``\"resnet101\"`` — ResNet-101 (медленнее, "
+"больше ёмкость)  По умолчанию ``\"resnet50\"``."
 
-#: 5f5685ad53444e8e92de9040805fec1d manuscript.detectors._east.EAST.train:27 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:27 1ddfd7e4d38d4d0395d93181572531ac
 msgid "Backbone architecture to use. Options:"
 msgstr "Используемая архитектура backbone. Варианты:"
 
-#: 362f8d984c8546c590e3ec3be5b1bd3e manuscript.detectors._east.EAST.train:29 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:29 8d2b9b8038cf490086e07ff21327eb83
 msgid "``\"resnet50\"`` — ResNet-50 (faster, less parameters)"
 msgstr "``\"resnet50\"`` — ResNet-50 (быстрее, меньше параметров)"
 
-#: cf03da5f900c4984b111bf3ce45f7c43 manuscript.detectors._east.EAST.train:30 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:30 f1ce3d1165504b838c798bed789dabc6
 msgid "``\"resnet101\"`` — ResNet-101 (slower, more capacity)"
 msgstr "``\"resnet101\"`` — ResNet-101 (медленнее, больше ёмкость)"
 
-#: 3d08dc0774a646079a3e27b29658b21e manuscript.detectors._east.EAST.train:32 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:32 6548a903120d471f9855761d06d1d254
 msgid "Default is ``\"resnet50\"``."
 msgstr "По умолчанию ``\"resnet50\"``."
 
-#: 73ef3b1abfb14dc387f43adacb771ee7 manuscript.detectors._east.EAST.train:35 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:35 f97c4efc69d14371b58b1641f50f7050
 msgid "Use ImageNet-pretrained backbone weights. Default ``True``."
 msgstr ""
-"Использовать веса backbone, предобученные на ImageNet. По умолчанию "
-"``True``."
+"Использовать веса backbone, предобученные на ImageNet. По умолчанию ``True``."
 
-#: cb9bd3d384044a31b26e2e07f6345264 manuscript.detectors._east.EAST.train:38 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:38 cbf9d0920c3d4141bc7364e9bb860961
 msgid "Freeze lowest layers of the backbone. Default ``True``."
 msgstr "Заморозить нижние слои backbone. По умолчанию ``True``."
 
-#: b0d985298ed74905bd83fcfe596ec6dd manuscript.detectors._east.EAST.train:41 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:41 2231948eee5b420093d6010db44b9a09
 msgid "Resize shorter side of images to this size. Default ``1024``."
 msgstr ""
-"Изменять размер короткой стороны изображений до этого значения. По "
-"умолчанию ``1024``."
+"Изменять размер короткой стороны изображений до этого значения. По умолчанию "
+"``1024``."
 
-#: 62cc9f8c30004d35be6d282570c1c8e0 manuscript.detectors._east.EAST.train:44 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:44 b6a0241733d24e02b9cc4fbb5b5a37a1
 msgid ""
 "Multiplier to recover original coordinates from score/geo maps. If None, "
 "automatically taken from the model. Default ``None``."
 msgstr ""
-"Множитель для восстановления исходных координат из карт оценок/геометрии."
-" Если None, автоматически берётся из модели. По умолчанию ``None``."
+"Множитель для восстановления исходных координат из карт оценок/геометрии. "
+"Если None, автоматически берётся из модели. По умолчанию ``None``."
 
-#: 71780ea3c3df47fe9ac9580ace786537 manuscript.detectors._east.EAST.train:48 of
-#, fuzzy
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:48 695f2906fe5c4533a3d84145b24a08ec
 msgid "Shrink ratio for score map. Default ``0.3``."
-msgstr "Доля сложных негативных примеров для OHEM. По умолчанию ``0.5``."
+msgstr "Коэффициент сжатия для карты оценок. По умолчанию ``0.3``."
 
-#: 5a8c50218ac64a6f8d830ba97a1917a6 manuscript.detectors._east.EAST.train:51 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:51 4e3eadf50d6246ec8d6b7c40a06a47fd
 msgid "Number of training epochs. Default ``500``."
 msgstr "Количество эпох обучения. По умолчанию ``500``."
 
-#: cf0fa06bf44d4c84b438a0df734cb642 manuscript.detectors._east.EAST.train:54 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:54 a94fc2bee4cf4ca4b068e9b999180a1e
 msgid "Batch size per GPU. Default ``3``."
 msgstr "Размер батча на GPU. По умолчанию ``3``."
 
-#: 89ced16037db4787b24d66e50b55b60b manuscript.detectors._east.EAST.train:57 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:57 2499a0387a7542a78da9ebb0dbf74f03
 msgid ""
 "Number of gradient accumulation steps. Effective batch size will be "
-"``batch_size * accumulation_steps``. Use this to train with larger "
-"effective batch sizes when GPU memory is limited. For example:  - "
-"``batch_size=2, accumulation_steps=4`` → effective batch size = 8 - "
-"``batch_size=1, accumulation_steps=8`` → effective batch size = 8  "
-"Default is ``1`` (no accumulation)."
+"``batch_size * accumulation_steps``. Use this to train with larger effective "
+"batch sizes when GPU memory is limited. For example:  - ``batch_size=2, "
+"accumulation_steps=4`` → effective batch size = 8 - ``batch_size=1, "
+"accumulation_steps=8`` → effective batch size = 8  Default is ``1`` (no "
+"accumulation)."
 msgstr ""
 "Количество шагов накопления градиента. Эффективный размер батча будет "
-"``batch_size * accumulation_steps``. Используйте это для обучения с "
-"большими эффективными батчами при ограниченной памяти GPU. Например:  - "
+"``batch_size * accumulation_steps``. Используйте это для обучения с большими "
+"эффективными батчами при ограниченной памяти GPU. Например:  - "
 "``batch_size=2, accumulation_steps=4`` → эффективный размер батча = 8  - "
-"``batch_size=1, accumulation_steps=8`` → эффективный размер батча = 8  По"
-" умолчанию ``1`` (без накопления)."
+"``batch_size=1, accumulation_steps=8`` → эффективный размер батча = 8  По "
+"умолчанию ``1`` (без накопления)."
 
-#: 2c3dee80c6a6402780c2296d02aab52a manuscript.detectors._east.EAST.train:57 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:57 da59fcb0e8344e9b9d5bfff4b12a39fc
 msgid ""
 "Number of gradient accumulation steps. Effective batch size will be "
-"``batch_size * accumulation_steps``. Use this to train with larger "
-"effective batch sizes when GPU memory is limited. For example:"
+"``batch_size * accumulation_steps``. Use this to train with larger effective "
+"batch sizes when GPU memory is limited. For example:"
 msgstr ""
 "Количество шагов накопления градиента. Эффективный размер батча будет "
-"``batch_size * accumulation_steps``. Используется для обучения с большими"
-" эффективными батчами при ограниченной памяти GPU. Например:"
+"``batch_size * accumulation_steps``. Используется для обучения с большими "
+"эффективными батчами при ограниченной памяти GPU. Например:"
 
-#: 4b459a3e368040a887aba6fd18d5eb24 manuscript.detectors._east.EAST.train:61 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:61 44d60fe214fb40189a21d5cc6eb453d8
 msgid "``batch_size=2, accumulation_steps=4`` → effective batch size = 8"
 msgstr "``batch_size=2, accumulation_steps=4`` → эффективный размер батча = 8"
 
-#: f19fb33b8e8a45cfbb3e8312c0fc54d2 manuscript.detectors._east.EAST.train:62 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:62 6d370567c74f41be916c65098a4f758d
 msgid "``batch_size=1, accumulation_steps=8`` → effective batch size = 8"
 msgstr "``batch_size=1, accumulation_steps=8`` → эффективный размер батча = 8"
 
-#: 356e8c85c9e2418cbed2e0c23a79c984 manuscript.detectors._east.EAST.train:64 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:64 1c73edf2d5314f3cacde94bf8b283b1b
 msgid "Default is ``1`` (no accumulation)."
 msgstr "По умолчанию ``1`` (без накопления)."
 
-#: a36be02c6d8a42629334452d6e1730ee manuscript.detectors._east.EAST.train:67 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:67 305cf9eff20749efb24310cef5b09609
 msgid "Learning rate. Default ``1e-3``."
 msgstr "Скорость обучения. По умолчанию ``1e-3``."
 
-#: c02cf87097db4afa8bfbe655f06e61af manuscript.detectors._east.EAST.train:70 of
-#, fuzzy
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:70 269d177577784b4eb59407fb30d1fe31
 msgid "Learning rate scheduler type. Default ``\"cosine_restart\"``."
-msgstr "Скорость обучения. По умолчанию ``1e-3``."
+msgstr "Тип планировщика скорости обучения. По умолчанию ``\"cosine_restart\"``."
 
-#: c354c81166fe4bbf934cbf50f19e4457 manuscript.detectors._east.EAST.train:73 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:73 9eccd3097e3647588be379c70080a648
 msgid ""
 "Extra scheduler parameters (depends on scheduler type). Common keys:  - "
-"``cosine_restart``: ``t0``, ``t_mult``, ``eta_min`` - ``cosine``: "
-"``t_max``, ``eta_min`` - ``linear``: ``final_factor`` - ``step``: "
-"``step_size``, ``gamma`` - ``exponential``: ``gamma`` - ``plateau``: "
-"``factor``, ``patience``, ``min_lr``"
+"``cosine_restart``: ``t0``, ``t_mult``, ``eta_min`` - ``cosine``: ``t_max``, "
+"``eta_min`` - ``linear``: ``final_factor`` - ``step``: ``step_size``, "
+"``gamma`` - ``exponential``: ``gamma`` - ``plateau``: ``factor``, "
+"``patience``, ``min_lr``"
 msgstr ""
+"Дополнительные параметры планировщика (зависят от его типа). Часто "
+"используемые ключи: - ``cosine_restart``: ``t0``, ``t_mult``, ``eta_min`` "
+"- ``cosine``: ``t_max``, ``eta_min`` - ``linear``: ``final_factor`` - "
+"``step``: ``step_size``, ``gamma`` - ``exponential``: ``gamma`` - "
+"``plateau``: ``factor``, ``patience``, ``min_lr``"
 
-#: 6dbb6ba55d734073807379e1445bc271 manuscript.detectors._east.EAST.train:73 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:73 3acfb884378c44e7866bad0e931cf4d9
 msgid "Extra scheduler parameters (depends on scheduler type). Common keys:"
-msgstr ""
+msgstr "Дополнительные параметры планировщика (зависят от его типа). Часто используемые ключи:"
 
-#: d9e667076d164ea8a906ac7a74a7efce manuscript.detectors._east.EAST.train:75 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:75 e7fb980fdfec430fa8f06f10a8560769
 msgid "``cosine_restart``: ``t0``, ``t_mult``, ``eta_min``"
-msgstr ""
+msgstr "``cosine_restart``: ``t0``, ``t_mult``, ``eta_min``"
 
-#: b9bb00837f8c4a07aae6665ed90349a1 manuscript.detectors._east.EAST.train:76 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:76 614d1543bedc4fffb894d7a37e0cfb12
 msgid "``cosine``: ``t_max``, ``eta_min``"
-msgstr ""
+msgstr "``cosine``: ``t_max``, ``eta_min``"
 
-#: cda5fa0c0a8b417598985c57ee99f8ea manuscript.detectors._east.EAST.train:77 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:77 20d3509e7556486e99658e9e4c329935
 msgid "``linear``: ``final_factor``"
-msgstr ""
+msgstr "``linear``: ``final_factor``"
 
-#: ba69484339414b80a9c81e0247f0bd08 manuscript.detectors._east.EAST.train:78 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:78 7a5632ca03b24ee9b32a96a5081184f9
 msgid "``step``: ``step_size``, ``gamma``"
-msgstr ""
+msgstr "``step``: ``step_size``, ``gamma``"
 
-#: 91724faeb6c3476fb0d3bfc1e3336eff manuscript.detectors._east.EAST.train:79 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:79 f63d4454b775481b9884d7b5effa1444
 msgid "``exponential``: ``gamma``"
-msgstr ""
+msgstr "``exponential``: ``gamma``"
 
-#: 03dad44f41eb4b1a85ab55d4183a7c0d manuscript.detectors._east.EAST.train:80 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:80 bca7444e373c4be59560d6a885577fe7
 msgid "``plateau``: ``factor``, ``patience``, ``min_lr``"
-msgstr ""
+msgstr "``plateau``: ``factor``, ``patience``, ``min_lr``"
 
-#: ebaec8cebeb44355b1d7245fd04eb421 manuscript.detectors._east.EAST.train:83 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:83 80bb4a42be8b40a2af23f558b801a63f
 msgid ""
 "Full augmentation configuration passed to ``EASTDataset``. This is the "
-"preferred place for all augmentation settings. Any keys here override the"
-" corresponding defaults. Supported keys include:  - ``flip_prob``, "
-"``color_jitter`` - ``small_rotate_prob``, ``small_rotate_deg`` - "
-"``perspective_prob``, ``perspective_scale`` - ``blur_prob``, "
-"``blur_ksize_range`` - ``noise_prob``, ``noise_std``, "
-"``salt_pepper_prob`` - ``jpeg_prob``, ``jpeg_quality_range`` - "
-"``shading_prob``, ``shading_strength`` - ``gamma_prob``, ``gamma_range`` "
-"- ``downscale_prob``, ``downscale_range`` - ``negative_prob``"
+"preferred place for all augmentation settings. Any keys here override the "
+"corresponding defaults. Supported keys include:  - ``quad_source`` for COCO "
+"polygon-to-quad conversion:   ``\"auto\"`` preserves 4-point polygons and "
+"falls back to   ``\"min_area_rect\"`` for longer polygons, ``\"as_is\"`` "
+"accepts only   4-point polygons, and ``\"min_area_rect\"`` always fits the "
+"minimum-area   rectangle - ``flip_prob``, ``color_jitter`` - "
+"``small_rotate_prob``, ``small_rotate_deg`` - ``perspective_prob``, "
+"``perspective_scale`` - ``blur_prob``, ``blur_ksize_range`` - "
+"``noise_prob``, ``noise_std``, ``salt_pepper_prob`` - ``jpeg_prob``, "
+"``jpeg_quality_range`` - ``shading_prob``, ``shading_strength`` - "
+"``gamma_prob``, ``gamma_range`` - ``downscale_prob``, ``downscale_range`` - "
+"``negative_prob``"
 msgstr ""
+"Полная конфигурация аугментаций, передаваемая в ``EASTDataset``. Это "
+"предпочтительное место для всех настроек аугментации. Любые ключи здесь "
+"переопределяют соответствующие значения по умолчанию. Поддерживаются, в "
+"частности: - ``quad_source`` для преобразования COCO-полигона в quad: "
+"``\"auto\"`` сохраняет 4-точечные полигоны и для более длинных полигонов "
+"переходит к ``\"min_area_rect\"``, ``\"as_is\"`` принимает только "
+"4-точечные полигоны, а ``\"min_area_rect\"`` всегда строит прямоугольник "
+"минимальной площади - ``flip_prob``, ``color_jitter`` - "
+"``small_rotate_prob``, ``small_rotate_deg`` - ``perspective_prob``, "
+"``perspective_scale`` - ``blur_prob``, ``blur_ksize_range`` - "
+"``noise_prob``, ``noise_std``, ``salt_pepper_prob`` - ``jpeg_prob``, "
+"``jpeg_quality_range`` - ``shading_prob``, ``shading_strength`` - "
+"``gamma_prob``, ``gamma_range`` - ``downscale_prob``, ``downscale_range`` - "
+"``negative_prob``"
 
-#: 93834d3f8a284494885c846cbaba2571 manuscript.detectors._east.EAST.train:83 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:83 2b5fac5883f74cf89f0af633d4eaf803
 msgid ""
 "Full augmentation configuration passed to ``EASTDataset``. This is the "
-"preferred place for all augmentation settings. Any keys here override the"
-" corresponding defaults. Supported keys include:"
+"preferred place for all augmentation settings. Any keys here override the "
+"corresponding defaults. Supported keys include:"
 msgstr ""
+"Полная конфигурация аугментаций, передаваемая в ``EASTDataset``. Это "
+"предпочтительное место для всех настроек аугментации. Любые ключи здесь "
+"переопределяют соответствующие значения по умолчанию. Поддерживаются, в "
+"частности:"
 
-#: 041af2f2f77d4d82a49159fe4589b1cc manuscript.detectors._east.EAST.train:87 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:87 a0b16767bdd243c184bc3b4014bba2f1
+msgid ""
+"``quad_source`` for COCO polygon-to-quad conversion: ``\"auto\"`` preserves "
+"4-point polygons and falls back to ``\"min_area_rect\"`` for longer "
+"polygons, ``\"as_is\"`` accepts only 4-point polygons, and "
+"``\"min_area_rect\"`` always fits the minimum-area rectangle"
+msgstr ""
+"``quad_source`` для преобразования COCO-полигонов в quad: ``\"auto\"`` "
+"сохраняет 4-точечные полигоны и для более длинных полигонов переходит к "
+"``\"min_area_rect\"``, ``\"as_is\"`` принимает только 4-точечные полигоны, "
+"а ``\"min_area_rect\"`` всегда строит прямоугольник минимальной площади"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:92 a38b9fc0216b40ebab4dc55c201d04c1
 msgid "``flip_prob``, ``color_jitter``"
-msgstr ""
+msgstr "``flip_prob``, ``color_jitter``"
 
-#: cb5b230154b547a0843859287d2bd73f manuscript.detectors._east.EAST.train:88 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:93 904861b689434aebba89220d566e1bb2
 msgid "``small_rotate_prob``, ``small_rotate_deg``"
-msgstr ""
+msgstr "``small_rotate_prob``, ``small_rotate_deg``"
 
-#: b33bfc24781e45f3a548332097bca07e manuscript.detectors._east.EAST.train:89 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:94 a0c4b4750da9484aa06333d2b7547a4e
 msgid "``perspective_prob``, ``perspective_scale``"
-msgstr ""
+msgstr "``perspective_prob``, ``perspective_scale``"
 
-#: d165a353d99d40f291e2e4c344e565a3 manuscript.detectors._east.EAST.train:90 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:95 2269abca70954814a6e961058cb1efb7
 msgid "``blur_prob``, ``blur_ksize_range``"
-msgstr ""
+msgstr "``blur_prob``, ``blur_ksize_range``"
 
-#: 8eab52bb6b254bd3bd0a94a4cd83b157 manuscript.detectors._east.EAST.train:91 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:96 395394bcb2f644b39fd81eb47b399f6d
 msgid "``noise_prob``, ``noise_std``, ``salt_pepper_prob``"
-msgstr ""
+msgstr "``noise_prob``, ``noise_std``, ``salt_pepper_prob``"
 
-#: 0e45ae3543d7453dbcef19d538326999 manuscript.detectors._east.EAST.train:92 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:97 22aa3494ef23445e95c8978afcbc8c0d
 msgid "``jpeg_prob``, ``jpeg_quality_range``"
-msgstr ""
+msgstr "``jpeg_prob``, ``jpeg_quality_range``"
 
-#: fa68ba97241f4f4ba34f8c5319a3f068 manuscript.detectors._east.EAST.train:93 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:98 342fc7c63a204952a437812f9090850e
 msgid "``shading_prob``, ``shading_strength``"
-msgstr ""
+msgstr "``shading_prob``, ``shading_strength``"
 
-#: 79d4e6e8578341d3b26a229885f115f2 manuscript.detectors._east.EAST.train:94 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:99 5644ec04179e47778596565f35dda5bd
 msgid "``gamma_prob``, ``gamma_range``"
-msgstr ""
+msgstr "``gamma_prob``, ``gamma_range``"
 
-#: 59c344bfc9174bae9c5a1621ed696754 manuscript.detectors._east.EAST.train:95 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:100
+#: 7b18ab6396d34ddba0d94cac806ce700
 msgid "``downscale_prob``, ``downscale_range``"
-msgstr ""
+msgstr "``downscale_prob``, ``downscale_range``"
 
-#: 3cf8576921224441aa66561d28cf4880 manuscript.detectors._east.EAST.train:96 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:101
+#: 8e227432f52b4c3bb5d4468234060b64
 msgid "``negative_prob``"
-msgstr ""
+msgstr "``negative_prob``"
 
-#: c6e5d7330c2f45afb12e3a1414b915f5 manuscript.detectors._east.EAST.train:99 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:104
+#: 796c1dd8cc7c4854b475b9b5402096d8
 msgid "Gradient clipping value (L2 norm). Default ``5.0``."
 msgstr "Значение отсечения градиента (L2-норма). По умолчанию ``5.0``."
 
-#: fcafd408db91418ca6e77629b2521fbd manuscript.detectors._east.EAST.train:102
-#: of
-msgid "Patience (epochs without improvement) for early stopping. Default ``100``."
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:107
+#: 12a587a7519d400daaf7bee2751906db
+msgid ""
+"Patience (epochs without improvement) for early stopping. Default ``100``."
 msgstr ""
 "Терпение (число эпох без улучшений) для ранней остановки. По умолчанию "
 "``100``."
 
-#: 328262a5930144e0aed0d9d04258e652 manuscript.detectors._east.EAST.train:106
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:111
+#: ce74a661dea5483a8e8babacf12c1d3c
 msgid "Enable SAM optimizer. Default ``True``."
 msgstr "Включить оптимизатор SAM. По умолчанию ``True``."
 
-#: b09ff01bdbf74bac81481619b599006c manuscript.detectors._east.EAST.train:109
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:114
+#: 5270678ea4d54659bf185632b6438833
 msgid "Variant of SAM to use. Default ``\"asam\"``."
 msgstr "Используемый вариант SAM. По умолчанию ``\"asam\"``."
 
-#: 4878199d9a08407dabfa5791b77eb708 manuscript.detectors._east.EAST.train:112
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:117
+#: 21c8f96ca31e40b892b6fe5b46b69ffd
 msgid "Wrap optimizer with Lookahead. Default ``True``."
 msgstr "Обернуть оптимизатор в Lookahead. По умолчанию ``True``."
 
-#: e3cac75df34747978dc33365439a0b67 manuscript.detectors._east.EAST.train:115
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:120
+#: 7ff07ed5a5084dcc8d4c714ed2faa4fe
 msgid "Maintain EMA version of model weights. Default ``False``."
 msgstr "Поддерживать EMA-версию весов модели. По умолчанию ``False``."
 
-#: c0abf19e7d7a4e0f929e99f3db9a2794 manuscript.detectors._east.EAST.train:118
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:123
+#: a21001f3552647938da88fa606f4ffb7
 msgid "Random multi-scale training. Default ``True``."
 msgstr "Случайное мульти-масштабное обучение. По умолчанию ``True``."
 
-#: e7b893952fa346fdb99e169ffca09d74 manuscript.detectors._east.EAST.train:121
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:126
+#: df33476c2ac845e1984a57554102d996
 msgid "Online Hard Example Mining. Default ``True``."
 msgstr "Онлайн-отбор сложных примеров (OHEM). По умолчанию ``True``."
 
-#: 71780ea3c3df47fe9ac9580ace786537 manuscript.detectors._east.EAST.train:124
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:129
+#: 96d6e6c50e744672ba03912ddcaf0971
 msgid "Ratio of hard negatives for OHEM. Default ``0.5``."
 msgstr "Доля сложных негативных примеров для OHEM. По умолчанию ``0.5``."
 
-#: 96db701ef49f471584ce98fe4b841f2e manuscript.detectors._east.EAST.train:127
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:132
+#: 6e62a6ac5e1745dc97157538153232cb
 msgid "Apply focal loss to geometry channels. Default ``True``."
 msgstr "Применять focal loss к геометрическим каналам. По умолчанию ``True``."
 
-#: 322025b4aee647d78a83e84fb43d24f1 manuscript.detectors._east.EAST.train:130
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:135
+#: b28ede3bf78c496d927abc42d89cfdaf
 msgid "Gamma for focal geometry loss. Default ``2.0``."
 msgstr "Параметр gamma для focal loss геометрии. По умолчанию ``2.0``."
 
-#: fabfcbd5b56a4dc5bb8dcf5a60f1ca77 manuscript.detectors._east.EAST.train:133
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:138
+#: 81cfcaa9ebfe4ef8b4939d875a206c5a
 msgid ""
-"Resume training from a previous experiment or initialize from local "
-"weights: a) experiment directory, b) `.../checkpoints/`, c) direct path "
-"to full-state checkpoint (`last_state.pt`). If a weights-only file is "
-"provided (e.g. `best.pth`), model weights are loaded, but training starts"
-" in the current ``experiment_root/model_name`` directory. Default "
-"``None``."
+"Resume training from a previous experiment or initialize from local weights: "
+"a) experiment directory, b) `.../checkpoints/`, c) direct path to full-state "
+"checkpoint (`last_state.pt`). If a weights-only file is provided (e.g. "
+"`best.pth`), model weights are loaded, but training starts in the current "
+"``experiment_root/model_name`` directory. Default ``None``."
 msgstr ""
+"Возобновить обучение из предыдущего эксперимента или инициализировать его из "
+"локальных весов: a) каталог эксперимента, b) `.../checkpoints/`, c) прямой "
+"путь к чекпоинту с полным состоянием (`last_state.pt`). Если передан файл "
+"только с весами (например, `best.pth`), веса модели будут загружены, но "
+"обучение начнётся в текущем каталоге ``experiment_root/model_name``. По "
+"умолчанию ``None``."
 
-#: 060a86e448e4481aabedc7c0b6e85f65 manuscript.detectors._east.EAST.train:143
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:148
+#: 2e397cb0eb2a4e7794e5abc22f84296a
 msgid "Run validation every N epochs. Default ``1``."
 msgstr "Запускать валидацию каждые N эпох. По умолчанию ``1``."
 
-#: 5cf4d97790e94fd28f9d2a9bcc10960a manuscript.detectors._east.EAST.train:146
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:151
+#: 1fc0c5bd672745d0b006696fe9e9c245
 msgid ""
 "Number of worker processes for data loading. Set to 0 for single-process "
 "loading (safer on Windows). Default ``0``."
@@ -839,215 +1106,279 @@ msgstr ""
 "Количество рабочих процессов для загрузки данных. Установите 0 для "
 "однопроцессной загрузки (безопаснее на Windows). По умолчанию ``0``."
 
-#: f007cc0948194b9884f88c681e0668d7 manuscript.detectors._east.EAST.train:150
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:155
+#: c3d150916d53498e93cf58b02de9bc46
+msgid ""
+"Whether to generate and log validation collage images to TensorBoard. "
+"Disable to save memory on GPUs with limited VRAM. Default ``True``."
+msgstr ""
+"Нужно ли генерировать и логировать коллажи валидационных изображений в "
+"TensorBoard. Отключите, чтобы сэкономить память на GPU с ограниченным "
+"объёмом VRAM. По умолчанию ``True``."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:159
+#: e47a271ba334461aae2f372a77e9fdd4
 msgid "CUDA or CPU device. Auto-selects if None."
 msgstr "Устройство CUDA или CPU. Автоматически выбирается, если None."
 
-#: 3e8e479da3744a7e848b82e38113b3e5 manuscript.detectors._east.EAST.train:153
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:162
+#: e8f751c0838345e1b6299e7165e8054b
 msgid "Best model weights (EMA if enabled, otherwise base model)."
 msgstr "Лучшие веса модели (EMA, если включено, иначе базовая модель)."
 
-#: d54713678864400a9a5ea9acb22524da manuscript.detectors._east.EAST.train:158
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:167
+#: a33686fb98d54a90860fc4ee94f49e03
 msgid "Train on two datasets with validation:"
 msgstr "Обучение на двух датасетах с валидацией:"
 
-#: d971879060d5445b8f93e086b0d252da manuscript.detectors._east.EAST.train:194
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._east.EAST.train:203
+#: 44425048d48d471aada4f52ce7021fb4
 msgid "Configure augmentations via ``augmentation_config``:"
-msgstr ""
+msgstr "Настройка аугментаций через ``augmentation_config``:"
 
-#: c2b6d62c382d4738aef123d164d92532 manuscript.detectors._east.EAST.export:4 of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:2 cdfe5a3051a24e76a74fc9a282f56615
+msgid "Initialize YOLO text detector with ONNX Runtime."
+msgstr "Инициализация текстового детектора YOLO с использованием ONNX Runtime."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:5 02c7c3c1128d4dda9e705c7406647f65
 msgid ""
-"This method converts a trained EAST model from PyTorch to ONNX format, "
-"which can be used for faster inference with ONNX Runtime. The exported "
-"model can be loaded using ``EAST(weights_path=\"model.onnx\", "
-"use_onnx=True)``."
+"Path or identifier for ONNX model weights. Supports:  - Local file path: "
+"``\"path/to/model.onnx\"`` - HTTP/HTTPS URL: ``\"https://example.com/"
+"model.onnx\"`` - GitHub release: ``\"github://owner/repo/tag/file.onnx\"`` - "
+"Google Drive: ``\"gdrive:FILE_ID\"`` - Preset name: "
+"``\"yolo26s_obb_text_g1\"`` or ``\"yolo26x_obb_text_g1\"`` - ``None``: auto-"
+"downloads default preset (``yolo26x_obb_text_g1``)  The ONNX model may "
+"return either standard detections in ``xyxy, score, class_id`` format with "
+"shape ``[N, 6]`` / ``[1, N, 6]`` or oriented detections in ``cx, cy, w, h, "
+"score, class_id, angle`` format with shape ``[N, 7]`` / ``[1, N, 7]``."
 msgstr ""
-"Этот метод конвертирует обученную модель EAST из PyTorch в формат ONNX, "
-"который может использоваться для более быстрого инференса с ONNX Runtime."
-" Экспортированную модель можно загрузить с помощью "
-"``EAST(weights_path=\"model.onnx\", use_onnx=True)``."
+"Путь или идентификатор для весов модели ONNX. Поддерживает: локальный путь, "
+"HTTP/HTTPS URL, GitHub release, Google Drive, имя пресета "
+"(``\"yolo26s_obb_text_g1\"`` или ``\"yolo26x_obb_text_g1\"``), ``None`` — "
+"автозагрузка пресета по умолчанию (``yolo26x_obb_text_g1``). ONNX-модель "
+"может возвращать либо обычные детекции в формате ``xyxy, score, class_id`` "
+"с формой ``[N, 6]`` / ``[1, N, 6]``, либо ориентированные детекции в "
+"формате ``cx, cy, w, h, score, class_id, angle`` с формой ``[N, 7]`` / "
+"``[1, N, 7]``."
 
-#: 9cdb3a4d1be54d4ebb44616b39431609 manuscript.detectors._east.EAST.export:9 of
-msgid "Path to the PyTorch model weights file (.pth)."
-msgstr "Путь к файлу весов модели PyTorch (.pth)."
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:11 5edf035f48754c02b27b47c1c4db57f1
+msgid "Preset name: ``\"yolo26s_obb_text_g1\"`` or ``\"yolo26x_obb_text_g1\"``"
+msgstr "Имя пресета: ``\"yolo26s_obb_text_g1\"`` или ``\"yolo26x_obb_text_g1\"``"
 
-#: c68eb4ba7a1d477d83e3245dea00cde9 manuscript.detectors._east.EAST.export:12
-#: of
-msgid "Path where the ONNX model will be saved (.onnx)."
-msgstr "Путь, по которому будет сохранена модель ONNX (.onnx)."
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:12 3d664d08e6a648479daba485eb296260
+msgid "``None``: auto-downloads default preset (``yolo26x_obb_text_g1``)"
+msgstr "``None``: автозагрузка пресета по умолчанию (``yolo26x_obb_text_g1``)"
 
-#: 6c7089d494364417865f9d2f53f21f53 manuscript.detectors._east.EAST.export:15
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:14 42e782e15a6440ddbcb092144daed49a
 msgid ""
-"Backbone architecture of the model. If None, will be automatically "
-"detected from the checkpoint. Must match the architecture used during "
-"training. Default is None (auto-detect)."
+"The ONNX model may return either standard detections in ``xyxy, score, "
+"class_id`` format with shape ``[N, 6]`` / ``[1, N, 6]`` or oriented "
+"detections in ``cx, cy, w, h, score, class_id, angle`` format with shape "
+"``[N, 7]`` / ``[1, N, 7]``."
 msgstr ""
-"Архитектура backbone модели. Если None, будет автоматически определена из"
-" чекпоинта. Должна совпадать с архитектурой, использованной при обучении."
-" По умолчанию None (автоопределение)."
+"ONNX-модель может возвращать либо обычные детекции в формате ``xyxy, score, "
+"class_id`` с формой ``[N, 6]`` / ``[1, N, 6]``, либо ориентированные "
+"детекции в формате ``cx, cy, w, h, score, class_id, angle`` с формой "
+"``[N, 7]`` / ``[1, N, 7]``."
 
-#: e57588dccce449f69980f97916f705a4 manuscript.detectors._east.EAST.export:20
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:20 0595ab5f0b4447aa814a7035960da8f2
 msgid ""
-"Input image size (height and width). The model will accept images of "
-"shape ``(batch, 3, input_size, input_size)``. Default is 1280."
+"Path or identifier for model configuration YAML. Same URL schemes as "
+"``weights``. If ``None``, attempts to infer a YAML file next to the weights "
+"or uses the preset config from ``config_registry``."
 msgstr ""
-"Размер входного изображения (высота и ширина). Модель принимает "
-"изображения формы ``(batch, 3, input_size, input_size)``. По умолчанию "
-"1280."
+"Путь или идентификатор YAML-конфигурации модели. Поддерживаются те же URL-"
+"схемы, что и для ``weights``. Если ``None``, предпринимается попытка найти "
+"YAML-файл рядом с весами или использовать конфиг пресета из "
+"``config_registry``."
 
-#: a597915823674239b9d51df83fe58ad3 manuscript.detectors._east.EAST.export:25
-#: of
-msgid "ONNX opset version to use for export. Default is 14."
-msgstr "Версия opset ONNX для экспорта. По умолчанию 14."
-
-#: 4ce7249fab64462b927e87a4917b04c4 manuscript.detectors._east.EAST.export:28
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:34 9fc4c0b3343f4ad6931a06108ee0303f
 msgid ""
-"If True, applies ONNX graph simplification using onnx-simplifier to "
-"optimize the model. Requires ``onnx-simplifier`` package. Default is "
-"True."
+"Confidence threshold applied to model outputs after ONNX inference and "
+"before the additional containment cleanup pass. Default is ``0.1``."
 msgstr ""
-"Если True, применяется упрощение графа ONNX с помощью onnx-simplifier для"
-" оптимизации модели. Требуется пакет ``onnx-simplifier``. По умолчанию "
-"True."
+"Порог уверенности, применяемый к выходам модели после ONNX-инференса и до "
+"дополнительного этапа очистки по вложенности. По умолчанию ``0.1``."
 
-#: f68e0f994906482b9257aa41c8b5155f manuscript.detectors._east.EAST.export:33
-#: of
-msgid "The ONNX model is saved to ``output_path``."
-msgstr "Модель ONNX сохраняется в ``output_path``."
-
-#: ../../api/detectors.rst fc94c23625f4418fb56b000497232786
-msgid "Raises"
-msgstr "Исключения"
-
-#: c13f8bc7d0c64b21bb2620acfe3872f2 manuscript.detectors._east.EAST.export:36
-#: of
-msgid "If required packages (torch, onnx) are not installed."
-msgstr "Если необходимые пакеты (torch, onnx) не установлены."
-
-#: 412e53b3758b4dd1b2f456ff80bffc9e manuscript.detectors._east.EAST.export:37
-#: of
-msgid "If ``weights_path`` does not exist."
-msgstr "Если ``weights_path`` не существует."
-
-#: 34d9be185c1f462eb7eba94884baa574 manuscript.detectors._east.EAST.export:38
-#: of
-msgid "If backbone_name doesn't match the checkpoint architecture."
-msgstr "Если backbone_name не соответствует архитектуре чекпоинта."
-
-#: 8256e1bc169f42f78f637fc7491cdecc manuscript.detectors._east.EAST.export:42
-#: of
-msgid "The exported ONNX model has two outputs:"
-msgstr "Экспортированная модель ONNX имеет два выхода:"
-
-#: 86a231684eb64759b37eab1fc71b4af2 manuscript.detectors._east.EAST.export:44
-#: of
-msgid "``score_map``: Text confidence map with shape ``(batch, 1, H, W)``"
-msgstr "``score_map``: карта уверенности текста формы ``(batch, 1, H, W)``"
-
-#: c8a24738748c4a3bb62d6ac7f6491008 manuscript.detectors._east.EAST.export:45
-#: of
-msgid "``geo_map``: Geometry map with shape ``(batch, 8, H, W)``"
-msgstr "``geo_map``: карта геометрии формы ``(batch, 8, H, W)``"
-
-#: f3e78ba39a31408dbd46bcdb73b9618a manuscript.detectors._east.EAST.export:47
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:38 0a9255df5dcd4975a42c8a876f58d74d
 msgid ""
-"The model supports dynamic batch size and image dimensions through "
-"dynamic axes configuration."
+"Optional whitelist of class IDs to keep. If ``None``, all classes are kept. "
+"Default is ``None``."
 msgstr ""
-"Модель поддерживает динамический размер батча и размеры изображения через"
-" настройку динамических осей."
+"Необязательный белый список class ID, которые нужно сохранить. Если "
+"``None``, сохраняются все классы. По умолчанию ``None``."
 
-#: 99b968790e794e3cb6e0f0028ce19e3d manuscript.detectors._east.EAST.export:50
-#: of
-msgid "**Automatic Backbone Detection:**"
-msgstr "**Автоматическое определение backbone:**"
-
-#: 76df155d749449f8ac4fa162384d7e50 manuscript.detectors._east.EAST.export:52
-#: of
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:42 1377023bc96d487da1183b2784410996
 msgid ""
-"The method automatically detects the backbone architecture from the "
-"checkpoint by analyzing the number of parameters in layer4. This prevents"
-" mismatches between checkpoint and architecture that could lead to "
-"incorrect exports."
+"Square inference size used for letterbox preprocessing. Images are resized "
+"into ``(target_size, target_size)`` before ONNX inference. If ``None``, the "
+"detector tries to read ``imgsz`` from a YAML config located next to the "
+"weights or downloaded from the preset registry. Unknown/custom weights "
+"without YAML fall back to ``1280``."
 msgstr ""
-"Метод автоматически определяет архитектуру backbone из чекпоинта, "
-"анализируя количество параметров в layer4. Это предотвращает "
-"несоответствия между чекпоинтом и архитектурой, которые могли бы привести"
-" к некорректному экспорту."
+"Квадратный размер инференса, используемый при letterbox-предобработке. "
+"Перед ONNX-инференсом изображения приводятся к размеру "
+"``(target_size, target_size)``. Если ``None``, детектор пытается прочитать "
+"``imgsz`` из YAML-конфига рядом с весами или из конфигурации пресета. Для "
+"неизвестных или пользовательских весов без YAML используется ``1280``."
 
-#: 1bdb5444cf2a4b2d887837760fc32e5d manuscript.detectors._east.EAST.export:58
-#: of
-msgid "Export with automatic backbone detection:"
-msgstr "Экспорт с автоматическим определением backbone:"
-
-#: caab3a41a80840329938fe09edffe612 manuscript.detectors._east.EAST.export:69
-#: of
-msgid "Export with explicit backbone:"
-msgstr "Экспорт с явным указанием backbone:"
-
-#: 96173d5958784c5a88847ad2b4cf40d6 manuscript.detectors._east.EAST.export:79
-#: of
-msgid "Use the exported model for inference:"
-msgstr "Использование экспортированной модели для инференса:"
-
-#: 31caf8df307d4fefa9a8148ac65c67d2 manuscript.detectors._east.EAST.export:90
-#: of
-#, fuzzy
-msgid ":obj:`EAST.__init__`"
-msgstr ":py:obj:`EAST.__init__`"
-
-#: 2dd12d56ee394826806996b6dcce13cf manuscript.detectors._east.EAST.export:91
-#: of
-msgid "Initialize EAST detector with ONNX support using ``use_onnx=True``."
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:49 7fb4eeebb172492096a928c9c68d1021
+msgid ""
+"If ``True`` (default), OBB detections are converted to standard axis-aligned "
+"rectangles. If ``False``, OBB detections are returned as rotated polygons "
+"via ``page`` / ``polygons`` and as ``cx, cy, w, h, score, class_id, angle`` "
+"rows in ``boxes``. For non-OBB models this flag has no effect."
 msgstr ""
-"Инициализация детектора EAST с поддержкой ONNX с использованием "
-"``use_onnx=True``."
+"Если ``True`` (по умолчанию), OBB-детекции преобразуются в обычные "
+"осеориентированные прямоугольники. Если ``False``, OBB-детекции "
+"возвращаются как повёрнутые полигоны через ``page`` / ``polygons`` и как "
+"строки ``cx, cy, w, h, score, class_id, angle`` в ``boxes``. Для моделей "
+"без OBB этот флаг не влияет на результат."
 
-#~ msgid ""
-#~ "Path to ONNX model weights. If "
-#~ "None, the model will be automatically"
-#~ " downloaded to ``~/.manuscript/east/east_50_g1.onnx``."
-#~ msgstr ""
-#~ "Путь к весам модели ONNX. Если "
-#~ "None, модель будет автоматически загружена "
-#~ "в ``~/.manuscript/east/east_50_g1.onnx``."
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:56 7358765fb1794853a5d2574e8a1d62f8
+msgid ""
+"Removes a smaller box when at least this fraction of its area is covered by "
+"a larger box. For example, ``0.9`` removes boxes that are contained by "
+"``90%`` or more. Set to ``None`` to disable this extra cleanup. Default is "
+"``0.9``."
+msgstr ""
+"Удаляет меньший бокс, если как минимум такая доля его площади покрыта "
+"большим боксом. Например, ``0.9`` удаляет боксы, которые покрыты на "
+"``90%`` и более. Установите ``None``, чтобы отключить эту дополнительную "
+"очистку. По умолчанию ``0.9``."
 
-#~ msgid ""
-#~ "Resume training from a previous "
-#~ "experiment: a) experiment directory, b) "
-#~ "`.../checkpoints/`, c) direct path to "
-#~ "`last_state.pt`. Default ``None``."
-#~ msgstr ""
-#~ "Возобновить обучение из предыдущего "
-#~ "эксперимента: a) каталог эксперимента, b) "
-#~ "`.../checkpoints/`, c) прямой путь к "
-#~ "`last_state.pt`. По умолчанию ``None``."
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:64 d074a80cd3d0412caef17f341c27ce8d
+msgid "The class provides one main public method:"
+msgstr "Класс предоставляет один основной публичный метод:"
 
-#: ../../api/detectors.rst:9
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:66 e88eba6057cb4073afe2a846162fcc49
+msgid "``predict`` - run inference on a single image and return detections."
+msgstr ""
+"``predict`` — выполняет инференс на одном изображении и возвращает "
+"детекции."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:68 0a11192813c54fbbb6433e499cf37786
+msgid "Available presets:"
+msgstr "Доступные пресеты:"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:70 1a3c7156d00c4e96b0a023d3b34c6aa5
+msgid "``\"yolo26s_obb_text_g1\"`` - YOLO26-S OBB text detector"
+msgstr "``\"yolo26s_obb_text_g1\"`` - OBB-детектор текста YOLO26-S"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:71 5daf221972054c41a71b76a7aff9286f
+msgid "``\"yolo26x_obb_text_g1\"`` - YOLO26-X OBB text detector"
+msgstr "``\"yolo26x_obb_text_g1\"`` - OBB-детектор текста YOLO26-X"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:84:<autosummary>:1
+#: fc04690d7d964fd287b5389f0224893c
+msgid ""
+":py:obj:`__call__ <manuscript.detectors.YOLO.__call__>`\\ \\(\\*args\\, "
+"\\*\\*kwargs\\)"
+msgstr ""
+":py:obj:`__call__ <manuscript.detectors.YOLO.__call__>`\\ \\(\\*args\\, "
+"\\*\\*kwargs\\)"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:84:<autosummary>:1
+#: 5395627a67af439d966cc36a0baefdfd
+msgid ""
+":py:obj:`predict <manuscript.detectors.YOLO.predict>`\\ \\(img\\_or\\_path\\)"
+msgstr ""
+":py:obj:`predict <manuscript.detectors.YOLO.predict>`\\ \\(img\\_or\\_path\\)"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO.predict:2
+#: manuscript.detectors._yolo.YOLO:84:<autosummary>:1
+#: 47f51d64dcef4cc687fdece757aecef1 fdfad768657248b49bfa2f18e1daadc7
+msgid ""
+"Run YOLO ONNX inference on a single image and return detected page structure."
+msgstr ""
+"Запустить YOLO ONNX-инференс на одном изображении и вернуть обнаруженную "
+"структуру страницы."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:84:<autosummary>:1
+#: 64086d72a3b748ffb03fe7dc6b480e41
+msgid ""
+":py:obj:`runtime_providers <manuscript.detectors.YOLO.runtime_providers>`\\ "
+"\\(\\)"
+msgstr ""
+":py:obj:`runtime_providers <manuscript.detectors.YOLO.runtime_providers>`\\ "
+"\\(\\)"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:84:<autosummary>:1
+#: 91bbe0c27767450f9edbcbe29f323494
+msgid ""
+":py:obj:`train <manuscript.detectors.YOLO.train>`\\ \\(\\*args\\, "
+"\\*\\*kwargs\\)"
+msgstr ""
+":py:obj:`train <manuscript.detectors.YOLO.train>`\\ \\(\\*args\\, "
+"\\*\\*kwargs\\)"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO:86 5c5f9c37d087423a85d79800ea2d300a
+msgid "**export**"
+msgstr "**export**"
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO.predict:9
+#: b6ade030d9c84f3e9029497ce3e740ce
+msgid ""
+"Parsed detection result as a Page object containing a single Block with a "
+"single Line of TextSpan objects."
+msgstr ""
+"Разобранный результат детекции в виде объекта Page, содержащего один Block с "
+"одной Line из объектов TextSpan."
+
+#: ../../../Users/user/manuscript-ocr-1/src/manuscript/detectors/__init__.py:docstring
+#: of manuscript.detectors._yolo.YOLO.predict:15
+#: 0dcbecad864b4052a9e465f0ba17e659
+msgid "Run inference and get structured output:"
+msgstr "Выполнить инференс и получить структурированный результат:"
+
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:12
+#: 8e7e11bd053644bfb51291eedb23236f
 msgid "EAST Training Quads"
-msgstr "Квадрилатерали для обучения EAST"
+msgstr "Четырёхугольные области для обучения EAST"
 
-#: ../../api/detectors.rst:11
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:14
+#: daddfc4aa8334833abc2df52fa85b092
 msgid ""
 "EAST training expects quadrilateral targets. When loading COCO "
 "``segmentation`` polygons, use ``augmentation_config[\"quad_source\"]`` in "
 "``EAST.train(...)`` to control how polygons are converted into 4-point "
 "training quads:"
 msgstr ""
-"Обучение EAST ожидает цели в виде четырехугольников. При загрузке "
-"полигонов COCO ``segmentation`` используйте "
-"``augmentation_config[\"quad_source\"]`` в ``EAST.train(...)``, чтобы "
-"управлять тем, как полигоны преобразуются в 4-точечные обучающие квады:"
+"Обучение EAST ожидает цели в виде четырехугольников. При загрузке полигонов "
+"COCO ``segmentation`` используйте ``augmentation_config[\"quad_source\"]`` в "
+"``EAST.train(...)``, чтобы управлять тем, как полигоны преобразуются в 4-"
+"точечные обучающие квады:"
 
-#: ../../api/detectors.rst:16
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:19
+#: 98fc00bfcafd4058a5317e602a9ad61a
 msgid ""
 "``\"auto\"`` keeps existing 4-point polygons as-is and falls back to "
 "``minAreaRect`` for longer polygons."
@@ -1055,18 +1386,112 @@ msgstr ""
 "``\"auto\"`` сохраняет готовые 4-точечные полигоны как есть и использует "
 "``minAreaRect`` только для полигонов с большим числом вершин."
 
-#: ../../api/detectors.rst:18
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:21
+#: 91c85f62b02f40078495dd76be8d6a8b
 msgid ""
 "``\"as_is\"`` accepts only 4-point polygons and skips polygons with a "
 "different number of vertices."
 msgstr ""
-"``\"as_is\"`` принимает только 4-точечные полигоны и пропускает полигоны "
-"с другим числом вершин."
+"``\"as_is\"`` принимает только 4-точечные полигоны и пропускает полигоны с "
+"другим числом вершин."
 
-#: ../../api/detectors.rst:20
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:23
+#: 09c2035a46b644efb895a6423b9e286a
 msgid ""
-"``\"min_area_rect\"`` always fits the minimum-area rectangle and matches "
-"the legacy conversion path."
+"``\"min_area_rect\"`` always fits the minimum-area rectangle and matches the "
+"legacy conversion path."
 msgstr ""
 "``\"min_area_rect\"`` всегда строит прямоугольник минимальной площади и "
 "соответствует старому пути преобразования."
+
+#~ msgid ""
+#~ "If True, returns raw model score and geometry maps under keys "
+#~ "``\"score_map\"`` and ``\"geo_map\"``. Default is False."
+#~ msgstr ""
+#~ "Если True, возвращает необработанные карты оценок и геометрии под ключами "
+#~ "``\"score_map\"`` и ``\"geo_map\"``. По умолчанию False."
+
+#~ msgid ""
+#~ "If True, sorts detected words in natural reading order (left-to-right, "
+#~ "top-to-bottom) and groups them into text lines. Default is True."
+#~ msgstr ""
+#~ "Если True, сортирует обнаруженные слова в естественном порядке чтения "
+#~ "(слева направо, сверху вниз) и группирует их в строки. По умолчанию True."
+
+#~ msgid ""
+#~ "If True and ``sort_reading_order=True``, segments the page into columns "
+#~ "(separate Blocks). If False, treats entire page as single column. Only "
+#~ "used when ``sort_reading_order=True``. Default is True."
+#~ msgstr ""
+#~ "Если True и ``sort_reading_order=True``, сегментирует страницу на колонки "
+#~ "(отдельные Blocks). Если False, вся страница рассматривается как одна "
+#~ "колонка. Используется только при ``sort_reading_order=True``. По "
+#~ "умолчанию True."
+
+#~ msgid ""
+#~ "Maximum number of columns to detect when ``split_into_columns=True``. "
+#~ "Higher values allow more columns to be detected. Only used when "
+#~ "``sort_reading_order=True`` and ``split_into_columns=True``. Default is "
+#~ "10."
+#~ msgstr ""
+#~ "Максимальное количество колонок для обнаружения при "
+#~ "``split_into_columns=True``. Большие значения позволяют обнаруживать "
+#~ "больше колонок. Используется только при ``sort_reading_order=True`` и "
+#~ "``split_into_columns=True``. По умолчанию 10."
+
+#~ msgid ""
+#~ "Dictionary with the following keys:  - ``\"page\"`` : Page     Parsed "
+#~ "detection result as a Page object containing Block(s) with     Line(s) of "
+#~ "Word objects. Each Word has polygon coordinates and     confidence "
+#~ "scores. Words and Lines have reading order indices. - ``\"score_map\"`` : "
+#~ "numpy.ndarray or None     Raw score map produced by the network if "
+#~ "``return_maps=True``. - ``\"geo_map\"`` : numpy.ndarray or None     Raw "
+#~ "geometry map if ``return_maps=True``."
+#~ msgstr ""
+#~ "Словарь со следующими ключами:  - ``\"page\"`` : Page     Разобранный "
+#~ "результат детекции в виде объекта Page, содержащего Block(и) со Line(ами) "
+#~ "объектов Word. Каждый Word содержит координаты полигона и оценки "
+#~ "уверенности. Слова и строки имеют индексы порядка чтения.  - "
+#~ "``\"score_map\"`` : numpy.ndarray или None     Необработанная карта "
+#~ "оценок, если ``return_maps=True``.  - ``\"geo_map\"`` : numpy.ndarray или "
+#~ "None     Необработанная карта геометрии, если ``return_maps=True``."
+
+#~ msgid "Dictionary with the following keys:"
+#~ msgstr "Словарь со следующими ключами:"
+
+#~ msgid "``\"page\"``"
+#~ msgstr "``\"page\"``"
+
+#~ msgid "Page"
+#~ msgstr "Page"
+
+#~ msgid "``\"score_map\"``"
+#~ msgstr "``\"score_map\"``"
+
+#~ msgid "numpy.ndarray or None"
+#~ msgstr "numpy.ndarray или None"
+
+#~ msgid "Raw score map produced by the network if ``return_maps=True``."
+#~ msgstr ""
+#~ "Необработанная карта оценок, полученная сетью, если ``return_maps=True``."
+
+#~ msgid "``\"geo_map\"``"
+#~ msgstr "``\"geo_map\"``"
+
+#~ msgid "Raw geometry map if ``return_maps=True``."
+#~ msgstr "Необработанная карта геометрии, если ``return_maps=True``."
+
+#~ msgid ""
+#~ "Path to ONNX model weights. If None, the model will be automatically "
+#~ "downloaded to ``~/.manuscript/east/east_50_g1.onnx``."
+#~ msgstr ""
+#~ "Путь к весам модели ONNX. Если None, модель будет автоматически загружена "
+#~ "в ``~/.manuscript/east/east_50_g1.onnx``."
+
+#~ msgid ""
+#~ "Resume training from a previous experiment: a) experiment directory, b) "
+#~ "`.../checkpoints/`, c) direct path to `last_state.pt`. Default ``None``."
+#~ msgstr ""
+#~ "Возобновить обучение из предыдущего эксперимента: a) каталог "
+#~ "эксперимента, b) `.../checkpoints/`, c) прямой путь к `last_state.pt`. По "
+#~ "умолчанию ``None``."

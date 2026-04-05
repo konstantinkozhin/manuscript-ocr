@@ -220,6 +220,31 @@ class TestBaseArtifactModelRuntimeEdges:
             with pytest.raises(RuntimeError, match="Failed to download from Google Drive"):
                 model._download_gdrive("gdrive:missing-file")
 
+    def test_download_gdrive_force_download_replaces_cached_file(self, tmp_path):
+        cache_root = tmp_path / "cache_home"
+        cached_file = cache_root / ".manuscript" / "weights" / "abc123.bin"
+        cached_file.parent.mkdir(parents=True, exist_ok=True)
+        cached_file.write_text("stale", encoding="utf-8")
+
+        model = _make_model(tmp_path)
+        model.force_download = True
+
+        def fake_download(*, id, output, quiet):
+            assert id == "abc123"
+            assert quiet is False
+            Path(output).write_text("fresh", encoding="utf-8")
+            return output
+
+        with patch.object(base_module.Path, "home", return_value=cache_root):
+            with patch.dict(
+                "sys.modules",
+                {"gdown": SimpleNamespace(download=fake_download)},
+            ):
+                result = model._download_gdrive("gdrive:abc123")
+
+        assert result == str(cached_file)
+        assert cached_file.read_text(encoding="utf-8") == "fresh"
+
 
 def test_base_module_falls_back_when_tqdm_is_missing(monkeypatch):
     repo_root = Path(__file__).resolve().parents[2]

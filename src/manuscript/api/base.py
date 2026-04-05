@@ -34,9 +34,14 @@ class BaseArtifactModel(ABC):
     pretrained_registry: Dict[str, str] = {}
 
     def __init__(
-        self, weights: Optional[str] = None, device: Optional[str] = None, **kwargs
+        self,
+        weights: Optional[str] = None,
+        device: Optional[str] = None,
+        force_download: bool = False,
+        **kwargs,
     ):
         self.device = self._resolve_device(device)
+        self.force_download = bool(force_download)
         self.weights = self._resolve_weights(weights)
         self.extra_config = kwargs
         self.session = None
@@ -260,10 +265,11 @@ class BaseArtifactModel(ABC):
     def _download_http(self, url: str) -> str:
         """Download file from HTTP/HTTPS URL"""
         file = self._cache_dir / Path(url).name
-        if file.exists():
+        if file.exists() and not self.force_download:
             return str(file)
 
-        print(f"Downloading {Path(url).name} from {url}")
+        action = "Re-downloading" if file.exists() else "Downloading"
+        print(f"{action} {Path(url).name} from {url}")
         max_attempts = 5
         retry_statuses = {429, 500, 502, 503, 504}
         base_backoff_seconds = 1.0
@@ -304,8 +310,11 @@ class BaseArtifactModel(ABC):
                     # No tqdm available, simple download
                     urllib.request.urlretrieve(url, tmp)
 
-                # Move to cache
-                shutil.move(tmp, file)
+                # Overwrite cached files only after a successful download.
+                if file.exists():
+                    shutil.copy2(tmp, file)
+                else:
+                    shutil.move(tmp, file)
                 print(f" Downloaded to {file}")
                 return str(file)
 
@@ -350,6 +359,9 @@ class BaseArtifactModel(ABC):
     def _download_gdrive(self, spec: str) -> str:
         """Download file from Google Drive with progress bar."""
         file_id = spec.split("gdrive:", 1)[1]
+        file: Optional[Path] = None
+        tmp: Optional[str] = None
+        downloaded_path: Optional[Path] = None
 
         # Check if gdown is available for better GDrive support
         try:
@@ -357,14 +369,23 @@ class BaseArtifactModel(ABC):
 
             # Extract filename from cache or use file_id
             file = self._cache_dir / f"{file_id}.bin"  # Will be renamed after download
+            if file.exists() and not self.force_download:
+                return str(file)
 
-            print(f"Downloading from Google Drive (ID: {file_id})")
-            output = gdown.download(id=file_id, output=str(file), quiet=False)
+            action = "Re-downloading" if file.exists() else "Downloading"
+            print(f"{action} from Google Drive (ID: {file_id})")
+            tmp = tempfile.NamedTemporaryFile(delete=False).name
+            output = gdown.download(id=file_id, output=tmp, quiet=False)
 
             if output is None:
                 raise RuntimeError(f"Failed to download from Google Drive: {file_id}")
 
-            return output
+            downloaded_path = Path(output)
+            if file.exists():
+                shutil.copy2(downloaded_path, file)
+            else:
+                shutil.move(downloaded_path, file)
+            return str(file)
         except ImportError:
             # Fallback to direct URL (may not work for large files)
             print(
@@ -373,6 +394,23 @@ class BaseArtifactModel(ABC):
             print("Install gdown for better Google Drive support: pip install gdown")
             url = f"https://drive.google.com/uc?export=download&id={file_id}"
             return self._download_http(url)
+        finally:
+            if tmp:
+                tmp_file = Path(tmp)
+                if tmp_file.exists():
+                    try:
+                        tmp_file.unlink()
+                    except OSError:
+                        pass
+            if (
+                downloaded_path
+                and downloaded_path != file
+                and downloaded_path.exists()
+            ):
+                try:
+                    downloaded_path.unlink()
+                except OSError:
+                    pass
 
     # -------------------------------------------------------------------------
     # BACKEND INITIALIZATION

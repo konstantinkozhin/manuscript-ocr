@@ -7,15 +7,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>manuscript.data.structures &mdash; manuscript-ocr 0.1.11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/language_switcher.css?v=d768f156" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/model_zoo.css?v=2d297567" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=1e825a29"></script>
-      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
       <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
 
@@ -450,8 +451,10 @@ mermaid.initialize(
     }
 );
 
-window.addEventListener("load", load);</script>
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
       <script src="../../../_static/language_switcher.js?v=db730534"></script>
+      <script src="../../../_static/version_sidebar.js?v=50cbed02"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../../genindex.html" />
     <link rel="search" title="Search" href="../../../search.html" /> 
@@ -481,58 +484,50 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#example-notebooks">Example Notebooks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#main-components">Main Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#model-zoo">Model Zoo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#related-work">Related Work</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model_zoo.html">Model Zoo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../model_zoo.html#detection">Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../model_zoo.html#layout">Layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../model_zoo.html#recognition">Recognition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../model_zoo.html#correction">Correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../model_zoo.html#architecture-sources">Architecture Sources</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pipeline_usage.html">Pipeline Usage Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#detector-requirements">Detector Requirements</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#result-structure">Result Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#stage-contracts">Stage Contracts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#detector">Detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#recognizer">Recognizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#layout">Layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#corrector">Corrector</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#recognizer-requirements">Recognizer Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#corrector-requirements">Corrector Requirements</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#built-in-charlm-corrector">Built-in CharLM Corrector</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#compatible-implementation-examples">Compatible Implementation Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#complete-detector-example">Complete Detector Example</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#using-custom-components">Using Custom Components</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#pipeline-usage-examples">Pipeline Usage Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#basic-usage">Basic Usage</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#detection-only-without-recognition">Detection Only (Without Recognition)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#with-visualization">With Visualization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#export-import-page-to-json">Export/Import Page to JSON</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#with-profiling">With Profiling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#batch-processing">Batch Processing</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#component-configuration">Component Configuration</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#replacing-detector-or-recognizer">Replacing Detector or Recognizer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#built-in-model-configuration">Built-in Model Configuration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#size-filtering">Size Filtering</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#automatic-rotation-control-trba">Automatic Rotation Control (TRBA)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#disable-stages">Disable Stages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#layout-placement">Layout Placement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#trba-region-preparation">TRBA Region Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#collapsing-text-spans">Collapsing Text Spans</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Library Structure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../structure.html#module-descriptions">Module Descriptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../structure.html#overview">Overview</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">API Reference</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/pipeline.html">Pipeline</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.last_layout_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_layout_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
 </ul>
@@ -541,8 +536,8 @@ window.addEventListener("load", load);</script>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/data.html">Data Structures</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/data.html#data-model">Data Model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/data.html#module-manuscript.data">API Reference</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/data.html#manuscript.data.Word"><code class="docutils literal notranslate"><span class="pre">Word</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/data.html#module-manuscript.data">Module Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/data.html#manuscript.data.TextSpan"><code class="docutils literal notranslate"><span class="pre">TextSpan</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/data.html#manuscript.data.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/data.html#manuscript.data.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/data.html#manuscript.data.Page"><code class="docutils literal notranslate"><span class="pre">Page</span></code></a></li>
@@ -552,26 +547,44 @@ window.addEventListener("load", load);</script>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/detectors.html">Detectors</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.YOLO"><code class="docutils literal notranslate"><span class="pre">YOLO</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.YOLO.__init__"><code class="docutils literal notranslate"><span class="pre">YOLO.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.YOLO.config_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.YOLO.default_target_size"><code class="docutils literal notranslate"><span class="pre">YOLO.default_target_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.YOLO.default_weights_name"><code class="docutils literal notranslate"><span class="pre">YOLO.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.YOLO.predict"><code class="docutils literal notranslate"><span class="pre">YOLO.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.YOLO.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.pretrained_registry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/detectors.html#east-training-quads">EAST Training Quads</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/recognizers.html">Recognizers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -596,11 +609,22 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.crop_axis_aligned"><code class="docutils literal notranslate"><span class="pre">crop_axis_aligned()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.crop_polygon_mask"><code class="docutils literal notranslate"><span class="pre">crop_polygon_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.merge_polygons"><code class="docutils literal notranslate"><span class="pre">merge_polygons()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.order_quad_points"><code class="docutils literal notranslate"><span class="pre">order_quad_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.polygon_to_bbox"><code class="docutils literal notranslate"><span class="pre">polygon_to_bbox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.warp_quad"><code class="docutils literal notranslate"><span class="pre">warp_quad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.merge_text_spans"><code class="docutils literal notranslate"><span class="pre">merge_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.collapse_line_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_line_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.collapse_block_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_block_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.collapse_page_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_page_text_spans()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../related_work.html">Related Work</a></li>
 </ul>
 
         </div>
@@ -628,23 +652,30 @@ window.addEventListener("load", load);</script>
            <div itemprop="articleBody">
              
   <h1>Source code for manuscript.data.structures</h1><div class="highlight"><pre>
-<span></span><span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">Field</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span>
+
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">ConfigDict</span><span class="p">,</span> <span class="n">Field</span>
 
 
-<div class="viewcode-block" id="Word">
-<a class="viewcode-back" href="../../../api/data.html#manuscript.data.Word">[docs]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">Word</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<div class="viewcode-block" id="TextSpan">
+<a class="viewcode-back" href="../../../api/data.html#manuscript.data.TextSpan">[docs]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">TextSpan</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A single detected or recognized word.</span>
+<span class="sd">    A single detected or recognized text span.</span>
+
+<span class="sd">    A text span is the smallest OCR region in the pipeline. It may correspond</span>
+<span class="sd">    to a word, a whole text line, or any other contiguous text segment returned</span>
+<span class="sd">    by a detector.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
 <span class="sd">    polygon : List[Tuple[float, float]]</span>
-<span class="sd">        Polygon vertices (x, y), ordered clockwise. For quadrilateral text regions:</span>
-<span class="sd">        TL → TR → BR → BL (Top-Left, Top-Right, Bottom-Right, Bottom-Left).</span>
+<span class="sd">        Polygon vertices (x, y), ordered clockwise.</span>
+<span class="sd">        The public data model supports arbitrary polygons with 4 or more points.</span>
+<span class="sd">        For quadrilateral text regions, the canonical order is</span>
+<span class="sd">        TL -&gt; TR -&gt; BR -&gt; BL (Top-Left, Top-Right, Bottom-Right, Bottom-Left).</span>
 <span class="sd">    detection_confidence : float</span>
 <span class="sd">        Text detection confidence score from detector (0.0 to 1.0).</span>
 <span class="sd">    text : str, optional</span>
@@ -654,24 +685,30 @@ window.addEventListener("load", load);</script>
 <span class="sd">        Text recognition confidence score from recognizer (0.0 to 1.0). None if only</span>
 <span class="sd">        detection was performed.</span>
 <span class="sd">    order : int, optional</span>
-<span class="sd">        Word position inside the line after sorting. None before sorting.</span>
+<span class="sd">        Text span position inside the line after sorting. None before sorting.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; word = Word(</span>
+<span class="sd">    &gt;&gt;&gt; text_span = TextSpan(</span>
 <span class="sd">    ...     polygon=[(10, 20), (100, 20), (100, 40), (10, 40)],</span>
 <span class="sd">    ...     detection_confidence=0.95,</span>
 <span class="sd">    ...     text=&quot;Hello&quot;,</span>
 <span class="sd">    ...     recognition_confidence=0.98</span>
 <span class="sd">    ... )</span>
-<span class="sd">    &gt;&gt;&gt; print(word.text)</span>
+<span class="sd">    &gt;&gt;&gt; print(text_span.text)</span>
 <span class="sd">    Hello</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
 
     <span class="n">polygon</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">float</span><span class="p">,</span> <span class="nb">float</span><span class="p">]]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="o">...</span><span class="p">,</span>
         <span class="n">min_length</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Polygon vertices (x, y), ordered clockwise. For quadrilateral text regions: TL → TR → BR → BL.&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;Polygon vertices (x, y), ordered clockwise. Supports arbitrary &quot;</span>
+            <span class="s2">&quot;polygons with 4 or more points. For quadrilateral text regions: &quot;</span>
+            <span class="s2">&quot;TL -&gt; TR -&gt; BR -&gt; BL.&quot;</span>
+        <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">detection_confidence</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="o">...</span><span class="p">,</span> <span class="n">ge</span><span class="o">=</span><span class="mf">0.0</span><span class="p">,</span> <span class="n">le</span><span class="o">=</span><span class="mf">1.0</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Text detection confidence score from detector&quot;</span>
@@ -687,7 +724,7 @@ window.addEventListener("load", load);</script>
     <span class="p">)</span>
     <span class="n">order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="kc">None</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Word position inside the line after sorting. None before sorting.&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Text span position inside the line after sorting. None before sorting.&quot;</span><span class="p">,</span>
     <span class="p">)</span></div>
 
 
@@ -696,28 +733,39 @@ window.addEventListener("load", load);</script>
 <a class="viewcode-back" href="../../../api/data.html#manuscript.data.Line">[docs]</a>
 <span class="k">class</span><span class="w"> </span><span class="nc">Line</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">    A single text line containing one or more words.</span>
+<span class="sd">    A single text line containing one or more text spans.</span>
 
 <span class="sd">    Attributes</span>
 <span class="sd">    ----------</span>
-<span class="sd">    words : List[Word]</span>
-<span class="sd">        List of words in the line.</span>
+<span class="sd">    text_spans : List[TextSpan]</span>
+<span class="sd">        List of text spans in the line.</span>
 <span class="sd">    order : int, optional</span>
 <span class="sd">        Line position inside a block or page after sorting. None before sorting.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
-<span class="sd">    &gt;&gt;&gt; line = Line(words=[</span>
-<span class="sd">    ...     Word(polygon=[(10, 20), (50, 20), (50, 40), (10, 40)],</span>
-<span class="sd">    ...          detection_confidence=0.95, text=&quot;Hello&quot;),</span>
-<span class="sd">    ...     Word(polygon=[(60, 20), (110, 20), (110, 40), (60, 40)],</span>
-<span class="sd">    ...          detection_confidence=0.97, text=&quot;World&quot;),</span>
+<span class="sd">    &gt;&gt;&gt; line = Line(text_spans=[</span>
+<span class="sd">    ...     TextSpan(</span>
+<span class="sd">    ...         polygon=[(10, 20), (50, 20), (50, 40), (10, 40)],</span>
+<span class="sd">    ...         detection_confidence=0.95,</span>
+<span class="sd">    ...         text=&quot;Hello&quot;,</span>
+<span class="sd">    ...     ),</span>
+<span class="sd">    ...     TextSpan(</span>
+<span class="sd">    ...         polygon=[(60, 20), (110, 20), (110, 40), (60, 40)],</span>
+<span class="sd">    ...         detection_confidence=0.97,</span>
+<span class="sd">    ...         text=&quot;World&quot;,</span>
+<span class="sd">    ...     ),</span>
 <span class="sd">    ... ])</span>
-<span class="sd">    &gt;&gt;&gt; print(len(line.words))</span>
+<span class="sd">    &gt;&gt;&gt; print(len(line.text_spans))</span>
 <span class="sd">    2</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
-    <span class="n">words</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Word</span><span class="p">]</span>
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
+
+    <span class="n">text_spans</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TextSpan</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+        <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;List of text spans in the line.&quot;</span><span class="p">,</span>
+    <span class="p">)</span>
     <span class="n">order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="kc">None</span><span class="p">,</span>
         <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Line position inside a block or page after sorting. None before sorting.&quot;</span><span class="p">,</span>
@@ -735,29 +783,43 @@ window.addEventListener("load", load);</script>
 <span class="sd">    ----------</span>
 <span class="sd">    lines : List[Line]</span>
 <span class="sd">        List of text lines in the block.</span>
-<span class="sd">    words : List[Word], optional</span>
-<span class="sd">        Legacy: Direct list of words without line structure. Used for backward</span>
-<span class="sd">        compatibility. If both `lines` and `words` are empty, creates a single</span>
-<span class="sd">        line from words.</span>
+<span class="sd">    text_spans : List[TextSpan], optional</span>
+<span class="sd">        Optional flat list of text spans used as a shorthand input. If ``lines``</span>
+<span class="sd">        is empty and ``text_spans`` are provided, they are wrapped into a</span>
+<span class="sd">        single line.</span>
 <span class="sd">    order : int, optional</span>
 <span class="sd">        Block reading-order position after sorting. None before sorting.</span>
 
 <span class="sd">    Examples</span>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; block = Block(lines=[</span>
-<span class="sd">    ...     Line(words=[Word(polygon=[(10, 20), (50, 20), (50, 40), (10, 40)],</span>
-<span class="sd">    ...                      detection_confidence=0.95, text=&quot;Line 1&quot;)]),</span>
-<span class="sd">    ...     Line(words=[Word(polygon=[(10, 50), (50, 50), (50, 70), (10, 70)],</span>
-<span class="sd">    ...                      detection_confidence=0.97, text=&quot;Line 2&quot;)]),</span>
+<span class="sd">    ...     Line(text_spans=[</span>
+<span class="sd">    ...         TextSpan(</span>
+<span class="sd">    ...             polygon=[(10, 20), (50, 20), (50, 40), (10, 40)],</span>
+<span class="sd">    ...             detection_confidence=0.95,</span>
+<span class="sd">    ...             text=&quot;Line 1&quot;,</span>
+<span class="sd">    ...         )</span>
+<span class="sd">    ...     ]),</span>
+<span class="sd">    ...     Line(text_spans=[</span>
+<span class="sd">    ...         TextSpan(</span>
+<span class="sd">    ...             polygon=[(10, 50), (50, 50), (50, 70), (10, 70)],</span>
+<span class="sd">    ...             detection_confidence=0.97,</span>
+<span class="sd">    ...             text=&quot;Line 2&quot;,</span>
+<span class="sd">    ...         )</span>
+<span class="sd">    ...     ]),</span>
 <span class="sd">    ... ])</span>
 <span class="sd">    &gt;&gt;&gt; print(len(block.lines))</span>
 <span class="sd">    2</span>
 <span class="sd">    &quot;&quot;&quot;</span>
 
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
+
     <span class="n">lines</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Line</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">)</span>
-    <span class="n">words</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Word</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
+    <span class="n">text_spans</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TextSpan</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="n">default_factory</span><span class="o">=</span><span class="nb">list</span><span class="p">,</span>
-        <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Legacy: Direct list of words. Use &#39;lines&#39; for structured output.&quot;</span><span class="p">,</span>
+        <span class="n">description</span><span class="o">=</span><span class="p">(</span>
+            <span class="s2">&quot;Optional flat list of text spans. Use &#39;lines&#39; for structured output.&quot;</span>
+        <span class="p">),</span>
     <span class="p">)</span>
     <span class="n">order</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span>
         <span class="kc">None</span><span class="p">,</span>
@@ -767,11 +829,10 @@ window.addEventListener("load", load);</script>
 <div class="viewcode-block" id="Block.__init__">
 <a class="viewcode-back" href="../../../api/data.html#manuscript.data.Block.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="o">**</span><span class="n">data</span><span class="p">):</span>
-<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize Block with backward compatibility for words-only input.&quot;&quot;&quot;</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Initialize Block, normalizing flat ``text_spans`` into one line.&quot;&quot;&quot;</span>
         <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="o">**</span><span class="n">data</span><span class="p">)</span>
-        <span class="c1"># If lines is empty but words is provided, wrap words in a single line</span>
-        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">Line</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">words</span><span class="p">)]</span></div>
+        <span class="k">if</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">text_spans</span><span class="p">:</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">lines</span> <span class="o">=</span> <span class="p">[</span><span class="n">Line</span><span class="p">(</span><span class="n">text_spans</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">text_spans</span><span class="p">)]</span></div>
 </div>
 
 
@@ -794,13 +855,20 @@ window.addEventListener("load", load);</script>
 <span class="sd">    --------</span>
 <span class="sd">    &gt;&gt;&gt; page = Page(blocks=[</span>
 <span class="sd">    ...     Block(lines=[</span>
-<span class="sd">    ...         Line(words=[Word(polygon=[(10, 20), (50, 20), (50, 40), (10, 40)],</span>
-<span class="sd">    ...                          detection_confidence=0.95, text=&quot;Hello&quot;)])</span>
+<span class="sd">    ...         Line(text_spans=[</span>
+<span class="sd">    ...             TextSpan(</span>
+<span class="sd">    ...                 polygon=[(10, 20), (50, 20), (50, 40), (10, 40)],</span>
+<span class="sd">    ...                 detection_confidence=0.95,</span>
+<span class="sd">    ...                 text=&quot;Hello&quot;,</span>
+<span class="sd">    ...             )</span>
+<span class="sd">    ...         ])</span>
 <span class="sd">    ...     ])</span>
 <span class="sd">    ... ])</span>
 <span class="sd">    &gt;&gt;&gt; print(len(page.blocks))</span>
 <span class="sd">    1</span>
 <span class="sd">    &quot;&quot;&quot;</span>
+
+    <span class="n">model_config</span> <span class="o">=</span> <span class="n">ConfigDict</span><span class="p">(</span><span class="n">extra</span><span class="o">=</span><span class="s2">&quot;forbid&quot;</span><span class="p">)</span>
 
     <span class="n">blocks</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Block</span><span class="p">]</span>
 

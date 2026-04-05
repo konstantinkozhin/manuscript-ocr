@@ -128,6 +128,7 @@ class EAST(BaseDetector):
         self,
         weights: Optional[Union[str, Path]] = None,
         device: Optional[str] = None,
+        force_download: bool = False,
         *,
         target_size: int = 1280,
         expand_ratio_w: float = 1.4,
@@ -146,7 +147,12 @@ class EAST(BaseDetector):
         tta_iou_thresh: float = 0.1,
         **kwargs,
     ):
-        super().__init__(weights=weights, device=device, **kwargs)
+        super().__init__(
+            weights=weights,
+            device=device,
+            force_download=force_download,
+            **kwargs,
+        )
 
         self.onnx_session = None
 

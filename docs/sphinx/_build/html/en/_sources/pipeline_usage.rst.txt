@@ -7,9 +7,9 @@ The pipeline is stage-based and passes one ``Page`` object through the stages:
 
 By default, ``Pipeline()`` creates:
 
-- detector: ``EAST()``
+- detector: ``YOLO(weights="yolo26x_obb_text_g1")``
 - layout: ``SimpleSorting()``
-- recognizer: ``TRBA()``
+- recognizer: ``TRBA(weights="trba_lite_g2")``
 - corrector: ``None``
 
 Stage Contracts
@@ -22,8 +22,8 @@ Detector must implement:
 
 .. code-block:: python
 
-    def predict(self, image) -> Dict[str, Any]:
-        return {"page": page}
+    def predict(self, image) -> Page:
+        ...
 
 Recognizer
 ~~~~~~~~~~
@@ -64,8 +64,7 @@ Basic Usage
 
     pipeline = Pipeline()
     result = pipeline.predict("document.jpg")
-    page = result["page"]
-    text = pipeline.get_text(page)
+    text = pipeline.get_text(result["page"])
     print(text)
 
 Disable Stages
@@ -121,7 +120,7 @@ Built-in Components
 
     detector = EAST(weights="east_50_g1", score_thresh=0.8, iou_threshold=0.2)
     layout = SimpleSorting(max_splits=10, use_columns=True)
-    recognizer = TRBA(weights="trba_lite_g1", device="cuda")
+    recognizer = TRBA(weights="trba_lite_g1", device="cuda", min_text_size=5)
     corrector = CharLM()
 
     pipeline = Pipeline(
@@ -130,8 +129,99 @@ Built-in Components
         recognizer=recognizer,
         corrector=corrector,
         layout_after="detector",
-        min_text_size=5,
     )
+
+TRBA Region Preparation
+-----------------------
+
+``TRBA`` supports configurable crop preparation before recognition.
+
+Default settings:
+
+- ``region_preparer="bbox"`` extracts axis-aligned bounding boxes
+- ``rotate_threshold=1.5`` auto-rotates tall crops before recognition
+- ``min_text_size=5`` skips tiny detections
+
+Built-in preparer presets:
+
+- ``"bbox"``: axis-aligned crop
+- ``"polygon_mask"``: tight crop with pixels outside the polygon masked to white
+- ``"quad_warp"``: perspective rectification for 4-point polygons, with bbox fallback
+
+.. code-block:: python
+
+    from manuscript.recognizers import TRBA
+
+    recognizer = TRBA(region_preparer="bbox")
+    recognizer = TRBA(region_preparer="polygon_mask")
+    recognizer = TRBA(region_preparer="quad_warp")
+    recognizer = TRBA(
+        region_preparer="bbox",
+        region_preparer_options={"pad": 2},
+    )
+
+``region_preparer_options`` is reserved for built-in preset configuration:
+
+- ``"bbox"`` / ``"polygon_mask"``: ``pad``
+- ``"polygon_mask"``: ``background``
+- ``"quad_warp"``: ``output_size=(width, height)``, ``fallback_to_bbox``
+
+For advanced cases, you can inject hooks into ``TRBA`` instead of writing a
+full custom recognizer:
+
+.. code-block:: python
+
+    import numpy as np
+
+    def my_preparer(page, image, recognizer=None, options=None):
+        regions = []
+        for block in page.blocks:
+            for line in block.lines:
+                for text_span in line.text_spans:
+                    poly = np.asarray(text_span.polygon, dtype=np.float32)
+                    crop = image[10:40, 10:80]
+                    regions.append(
+                        {"text_span": text_span, "image": crop, "polygon": poly}
+                    )
+        return regions
+
+    recognizer = TRBA(region_preparer=my_preparer)
+
+If you need complete control over recognition logic, the simplest route is
+still to provide your own recognizer class with ``predict(page, image) -> Page``.
+
+Collapsing Text Spans
+---------------------
+
+Some recognizers work on whole lines or blocks rather than on individual
+text-span crops. Use ``collapse_page_text_spans`` to convert a narrow page
+structure into a wider one before recognition.
+
+.. code-block:: python
+
+    from manuscript.utils import collapse_page_text_spans
+
+    line_level_page = collapse_page_text_spans(
+        page,
+        level="line",
+        method="bbox",
+    )
+
+    block_level_page = collapse_page_text_spans(
+        page,
+        level="block",
+        method="convex_hull",
+    )
+
+``"line"`` keeps the same blocks and lines, but replaces each line with one
+merged ``TextSpan``. ``"block"`` replaces each block with one line
+containing one merged ``TextSpan``.
+
+Lower-level helpers are also available:
+
+- ``merge_text_spans(text_spans, method="bbox")``
+- ``collapse_line_text_spans(line, method="bbox")``
+- ``collapse_block_text_spans(block, method="bbox")``
 
 Visualization and Profiling
 ---------------------------

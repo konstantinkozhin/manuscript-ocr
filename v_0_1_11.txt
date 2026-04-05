@@ -1,424 +1,64 @@
-Changes in branch v_0_1_11
-==================================
-
-1) EAST training pipeline update (commit 32acec9)
-- Added config options in EAST.train: score_map_shrink_ratio, lr_scheduler, lr_scheduler_params, augmentation_config.
-- Expanded EASTDataset augmentations (geometric + photometric) with parameter validation.
-- Added augmentation preview/list and TensorBoard preview logging.
-- Added multiple LR schedulers: cosine_restart/cosine/linear/step/exponential/plateau/none.
-- Updated default training settings: lr=1e-4, freeze_first=False, use_sam=False, use_lookahead=False, use_ohem=False.
-
-Files:
-- src/manuscript/detectors/_east/__init__.py
-- src/manuscript/detectors/_east/dataset.py
-- src/manuscript/detectors/_east/train_utils.py
-
-2) Better TRBA import diagnostics (commit c7e4aa9)
-- On training-import failure, saves original ImportError and traceback.
-- Re-raises error with root-cause details (raise ... from ...).
-
-File:
-- src/manuscript/recognizers/_trba/__init__.py
-
-3) TRBA validation size handling fix (local)
-- Fixed case where val_size=0 was incorrectly treated as falsy and replaced with default 3000.
-- Now fallback to 3000 happens only when val_size is None.
-
-File:
-- src/manuscript/recognizers/_trba/training/train.py
-
-4) EAST experiment naming fix when loading local weights/checkpoints (local)
-- Fixed behavior where passing a weights path from another experiment could force reusing old experiment folder name.
-- Now only full-state resume checkpoints (last_state.pt / checkpoint_last.pth / checkpoint_last.pt) reuse source experiment dir.
-- Weights-only files (for example best.pth) now initialize model but keep current experiment_root/model_name for a new run.
-
-File:
-- src/manuscript/detectors/_east/__init__.py
-
-5) HTTP download retry/backoff for model weights (local)
-- Added retry logic in BaseModel._download_http for transient network/server errors.
-- Retries on HTTP 429/500/502/503/504 and URLError/timeout-style failures.
-- Uses exponential backoff (up to 5 attempts) and cleans temporary files between attempts.
-
-File:
-- src/manuscript/api/base.py
-
-6) Docs fix for EAST parameter name (local)
-- Replaced deprecated/invalid example parameter nms_thresh with iou_threshold in Pipeline usage docs.
-
-Files:
-- docs/PIPELINE_API.md
-- docs/sphinx/pipeline_usage.rst
-
-7) Versioned static docs deployment (local)
-- Updated GitHub Pages workflow to publish two documentation versions: 0.1.11 (latest) and 0.1.10 (legacy).
-- Added root index redirect and versions metadata file for static hosting.
-- Added docs deploy trigger for branch v_0_1_11.
-- Updated Sphinx config to allow release/version override via environment variables.
-
-Files:
-- .github/workflows/docs.yml
-- docs/sphinx/conf.py
-
-8) Text-crop rotation moved from Pipeline to TRBA recognizer (local)
-- Removed crop extraction/rotation logic from `Pipeline`; recognition now passes `Page` + source image to recognizer.
-- Rotation/orientation logic is now applied inside `TRBA` per crop during preprocessing.
-- Rotation control is configured via `TRBA(rotate_threshold=...)` instead of `Pipeline(...)`.
-- Updated pipeline docs/examples and tests to reflect the new behavior.
-
-Files:
-- src/manuscript/_pipeline.py
-- src/manuscript/recognizers/_trba/__init__.py
-- tests/test_pipeline_api_compatibility.py
-- tests/recognizers/test_trba_infer.py
-- docs/sphinx/pipeline_usage.rst
-
-9) Docs versions switcher moved to left sidebar Contents (local)
-- Added a `Versions` section in left navigation for static docs paths like `/0.1.11/en/...`.
-- Versions list currently includes `0.1.11` and `0.1.10` and preserves current page path when switching.
-- Replaced top-button approach for version switching with sidebar navigation.
-
-Files:
-- docs/sphinx/conf.py
-- docs/sphinx/_static/version_sidebar.js
-- .github/workflows/docs.yml
-
-10) Archived static docs for 0.1.10 (local)
-- Added frozen docs snapshot at `docs/sphinx/_archive/0.1.10`.
-- Updated GitHub Pages workflow to stop rebuilding legacy docs.
-- Workflow now copies archived `0.1.10` into `_site/0.1.10` and builds only latest docs (`0.1.11`).
-- Restricted `deploy` job to `main/master`, so docs CI on feature/release branches (e.g. `v_0_1_11`) builds without failing on protected `github-pages` environment.
-
-Files:
-- docs/sphinx/_archive/0.1.10/*
-- .github/workflows/docs.yml
-
-11) Corrector API extended with optional image context (local)
-- Updated corrector contract to `predict(page, image=None) -> Page`.
-- `CharLM.predict` now accepts optional `image` argument (currently ignored by CharLM logic).
-- Updated custom-corrector tests and added coverage for optional image argument.
-- Updated API and Sphinx docs for corrector requirements and examples.
-
-Files:
-- src/manuscript/correctors/_charlm/__init__.py
-- src/manuscript/_pipeline.py
-- tests/correctors/test_correctors.py
-- tests/test_pipeline_api_compatibility.py
-- docs/sphinx/pipeline_usage.rst
-- docs/PIPELINE_API.md
-- docs/sphinx/api/correctors.rst
-- src/manuscript/api/LIBRARY_STRUCTURE.md
-
-12) Recognizer API switched to Page-through contract (local)
-- `TRBA.predict` now accepts `page` (required) and `image` (optional), and returns updated `Page`.
-- TRBA writes recognition output directly into `word.text` and `word.recognition_confidence`.
-- `Pipeline` now forwards detection `Page` into recognizer (instead of image list flow).
-- Added/updated tests for the new recognizer interface and min-text-size behavior.
-- Updated docs/examples to reflect `predict(page, image=None) -> Page`.
-
-Files:
-- src/manuscript/recognizers/_trba/__init__.py
-- src/manuscript/_pipeline.py
-- tests/test_pipeline_api_compatibility.py
-- tests/recognizers/test_trba_infer.py
-- docs/sphinx/pipeline_usage.rst
-- docs/PIPELINE_API.md
-- docs/sphinx/structure.rst
-- src/manuscript/api/LIBRARY_STRUCTURE.md
-
-13) New Layout stage extracted from detector and integrated into Pipeline (local)
-- Added new module `manuscript.layouts` with `SimpleSorting`.
-- Moved reading-order and column organization logic out of `EAST` into `SimpleSorting.predict(page, image=None)`.
-- `EAST.predict` now performs detection only and returns raw `Page` with sequential `word.order`.
-- Kept `manuscript.utils.organize_page` as compatibility wrapper over `SimpleSorting`.
-- `Pipeline` now supports `layout` and `layout_after` (`detector`/`recognizer`/`corrector`), default is after detector.
-- Removed `recognize_text` from `Pipeline.predict`; optional stages are now disabled via `None` (`layout`, `recognizer`, `corrector`).
-- Added `last_layout_page` property and updated stage snapshot behavior for skipped stages.
-- Reworked pipeline API tests and added dedicated layout tests.
-- Updated Sphinx/Markdown documentation and API structure references for the new stage.
-
-Files:
-- src/manuscript/layouts/__init__.py
-- src/manuscript/layouts/_simplesorting/__init__.py
-- src/manuscript/detectors/_east/__init__.py
-- src/manuscript/utils/sorting.py
-- src/manuscript/_pipeline.py
-- src/manuscript/__init__.py
-- src/manuscript/api/LIBRARY_STRUCTURE.md
-- tests/layouts/test_simplesorting.py
-- tests/test_pipeline_api_compatibility.py
-- docs/PIPELINE_API.md
-- docs/sphinx/pipeline_usage.rst
-- docs/sphinx/api/index.rst
-- docs/sphinx/api/layouts.rst
-- docs/sphinx/structure.rst
-- docs/sphinx/getting_started.rst
-- docs/sphinx/conf.py
-
-14) Recognition size threshold moved from Pipeline to TRBA (local)
-- Removed `min_text_size` from `Pipeline` constructor and internal recognizer forwarding.
-- Added `min_text_size` parameter to `TRBA(...)` so recognition filtering is configured at recognizer level.
-- Updated tests and docs to use `TRBA(min_text_size=...)` instead of `Pipeline(min_text_size=...)`.
-
-Files:
-- src/manuscript/_pipeline.py
-- src/manuscript/recognizers/_trba/__init__.py
-- tests/test_pipeline_api_compatibility.py
-- tests/recognizers/test_trba_infer.py
-- docs/PIPELINE_API.md
-- docs/sphinx/pipeline_usage.rst
-
-15) TRBA crop preparation presets and hooks (local)
-- Preserved the default recognizer behavior with axis-aligned bbox extraction plus auto-rotation.
-- Added configurable `region_preparer` presets: `bbox`, `polygon_mask`, and `quad_warp`.
-- Added `region_preparer_options` for built-in preset tuning and `region_predictor` hook for advanced reuse of the TRBA recognizer pipeline.
-- Moved crop geometry decisions out of model preprocessing and into the region-preparation stage.
-- Added reusable geometry helpers for axis-aligned crop, polygon masking, and quadrilateral warping.
-- Updated recognizer tests and user-facing docs, including Russian Sphinx translations.
-
-Files:
-- src/manuscript/recognizers/_trba/__init__.py
-- src/manuscript/recognizers/__init__.py
-- src/manuscript/utils/geometry.py
-- src/manuscript/utils/__init__.py
-- tests/recognizers/test_trba_infer.py
-- docs/PIPELINE_API.md
-- docs/sphinx/pipeline_usage.rst
-- docs/sphinx/locale/ru/LC_MESSAGES/pipeline_usage.po
-
-16) EAST training quad-source policy and unified segmentation parsing (local)
-- Unified COCO `segmentation` parsing between dataset filtering and quad loading, including multipart polygon handling.
-- Added `quad_source` to `EASTDataset` and `EAST.train(..., augmentation_config=...)` with modes:
-  `auto`, `as_is`, and `min_area_rect`.
-- Default `auto` mode now preserves existing 4-point polygons as-is and falls back to `minAreaRect` only for longer polygons.
-- Added tests for multipart segmentations, quad-preserving behavior, legacy `min_area_rect`, and train-time config forwarding.
-- Updated API docs and Russian translations for the new EAST training geometry policy.
-
-Files:
-- src/manuscript/detectors/_east/dataset.py
-- src/manuscript/detectors/_east/__init__.py
-- tests/detectors/east/test_dataset.py
-- tests/detectors/east/test_east_train_export.py
-- docs/sphinx/api/detectors.rst
-- docs/sphinx/locale/ru/LC_MESSAGES/api/detectors.po
-
-17) TRBA pretrain_weights=None bug fix (local)
-- Fixed bug where passing `pretrain_weights=None` (train from scratch) still loaded default pretrained weights.
-- Cause: `None` was not forwarded into training config due to `if pretrain_weights is not None` guard,
-  so `getattr(cfg, "pretrain_weights", "default")` fell back to `"default"` and loaded release weights.
-- Fix: `pretrain_weights` is now always written into config_payload regardless of its value.
-
-File:
-- src/manuscript/recognizers/_trba/__init__.py
-
-18) EAST training stability: collage crash fix, pre-training validation, and decode alignment (local)
-- Wrapped `make_collage` calls in try/except so collage failures no longer crash training.
-- Added `log_collage` parameter to `EAST.train(...)` (default True) to optionally disable collage generation.
-- Added `torch.cuda.empty_cache()` before collage creation to prevent CUDA OOM.
-- Aligned `decode_quads_from_maps` parameters in collage visualization with inference defaults
-  (score_thresh=0.6, quantization=2, iou_threshold=0.05) instead of aggressive values (0.7, 1, 0.2).
-- Added pre-training validation pass (epoch 0) that computes and logs Loss/Val and Dice/Val
-  before any weight updates, providing a baseline for comparing training progress.
-
-Files:
-- src/manuscript/detectors/_east/train_utils.py
-- src/manuscript/detectors/_east/__init__.py
-
-19) EAST training: dual best-model checkpoints and combined early stopping (local)
-- Best model is now saved to two separate files: `best_loss.pth` (lowest val loss) and `best_dice.pth` (highest val Dice).
-- Early stopping now triggers only when BOTH patience counters (`patience_loss` and `patience_dice`) reach `early_stop` epochs without improvement.
-- Resume (`last_state.pt`) now stores and restores `best_val_dice`, `patience_loss`, and `patience_dice` instead of single `patience`.
-- ONNX export at end of training uses `best_loss.pth` with fallback to `best_dice.pth`.
-- A console message is printed each time a new best checkpoint is saved, showing the metric value.
-
-File:
-- src/manuscript/detectors/_east/train_utils.py
-
-20) EAST augmentation expansion: 8 new augmentations (local)
-- Added 8 new augmentation methods to `EASTDataset`, all configurable via `augmentation_config` in `EAST.train`.
-
-Geometric (with quad coordinate transformation):
-- `vflip` — vertical flip (`vflip_prob=0.0` by default, off for documents).
-- `shear` — affine shear along X/Y axes (`shear_prob=0.15`, `shear_deg=5.0`).
-- `random_crop` — random crop + resize back to target_size (`random_crop_prob=0.2`, `random_crop_scale=(0.7,1.0)`).
-- `mosaic` — 4-image 2×2 mosaic with random center split (`mosaic_prob=0.0` by default, enable for scene/license-plate datasets).
-
-Photometric (no coordinate change):
-- `motion_blur` — directional motion blur at random angle (`motion_blur_prob=0.1`, `motion_blur_ksize_range=(3,9)`).
-- `hsv` — independent hue/saturation/value shift (`hsv_prob=0.15`, `hsv_h=0.015`, `hsv_s=0.3`, `hsv_v=0.2`).
-- `cutout` — random rectangular fill with mean color (`cutout_prob=0.15`, `cutout_num_holes=2`, `cutout_hole_size_range=(0.05,0.15)`).
-- `elastic` — elastic grid distortion via Gaussian-smoothed displacement fields (`elastic_prob=0.1`, `elastic_alpha=20.0`, `elastic_sigma=4.0`).
-- `fog` — directional fog gradient blending image with white mist (`fog_prob=0.1`, `fog_strength_range=(0.1,0.4)`, `fog_direction="random"`).
-  Directions: `top`, `bottom`, `left`, `right`, `random`. Simulates glare, mist, and uneven lighting typical in outdoor/mobile photography.
-
-All new augmentations are added to `list_augmentations()` and `preview_augmentation()`.
-Default probabilities are conservative — new augmentations do not degrade document/manuscript training out of the box.
-Mosaic is off (`0.0`) by default and should be enabled explicitly for mixed-scene or license-plate datasets.
-
-Files:
-- src/manuscript/detectors/_east/dataset.py
-- src/manuscript/detectors/_east/__init__.py
-
-21) EAST augmentation expansion: CutMix, RICAP, ResizeMix (local)
-- Added 3 mixing augmentations to `EASTDataset`, all off by default (`prob=0.0`) and configurable via
-  `augmentation_config` in `EAST.train`.
-- All three augmentations are **mutually exclusive per sample** — the first one that fires (by probability)
-  is applied; the rest are skipped. This preserves the expected sample distribution.
-
-CutMix (`cutmix_prob`, `cutmix_alpha`):
-- Cuts a rectangular patch from a randomly sampled second image and pastes it over the base image.
-- Patch size is proportional to √(1 − λ) where λ ~ Beta(alpha, alpha).
-- Label logic for quads:
-  - Base-image quads whose bounding box **overlaps** the cut region are discarded (conservative; avoids
-    partial-text labels).
-  - Second-image quads that fall **entirely inside** the cut region are added to the label set.
-- Default: `cutmix_prob=0.0`, `cutmix_alpha=1.0`.
-- Enable for scene/license-plate/mixed datasets where detecting partially occluded text is important.
-
-RICAP (`ricap_prob`, `ricap_beta`):
-- Randomly crops regions from 4 different images and assembles them into a single 2×2 grid at a
-  randomly sampled center split (Beta-distributed around 0.5).
-- Crop origin for each tile is randomly chosen inside the source image.
-- Label logic for quads:
-  - Each tile's quads are translated by (crop_origin → tile_canvas_offset).
-  - Only quads fully contained within their tile's canvas region are kept.
-- Default: `ricap_prob=0.0`, `ricap_beta=0.3`.
-- More aggressive spatial mixing than Mosaic; best for highly varied scene datasets.
-
-ResizeMix (`resizemix_prob`, `resizemix_scale_range`):
-- Downscales a second image to a small thumbnail (scale sampled uniformly from `resizemix_scale_range`)
-  and pastes it at a random location on the base image.
-- Preserves the entire source image context at a small scale (unlike CutMix which only copies a crop).
-- Label logic for quads:
-  - Base-image quads that do **not** overlap the paste region are kept.
-  - Second-image quads are scaled (by the resize factor) and offset into the paste location; only those
-    fully contained within the paste region are added.
-- Default: `resizemix_prob=0.0`, `resizemix_scale_range=(0.1, 0.8)`.
-- Useful for improving small-text detection generalization; the pasted thumbnail teaches scale invariance.
-
-Implementation notes:
-- All three methods return `None` (skip) when dataset has fewer than 2 images.
-- `list_augmentations()` now includes `"cutmix"`, `"ricap"`, `"resizemix"`.
-- `preview_augmentation(idx, name)` supports all three new names.
-- Mutual-exclusion ordering in `__getitem__`: mosaic → cutmix → ricap → resizemix (first hit wins).
-- No torchvision/external mixing libraries used — custom implementation for direct quad-label compatibility.
-
-Files:
-- src/manuscript/detectors/_east/dataset.py
-- src/manuscript/detectors/_east/__init__.py
-
-22) EAST dataset: NaN guard and augmentation pipeline fixes (local)
-- All non-mixing augmentations (geometric + photometric) now always run after mixing augmentations,
-  so vflip/shear/random_crop/etc. work together with mosaic/cutmix/ricap/resizemix in the same sample.
-- Factored sample-building logic into `_build_sample()` for clarity.
-- Added `__getitem__` retry wrapper (`_MAX_RETRIES=3`):
-  - If NaN or Inf is detected in the image tensor or any target map, the sample is retried with a
-    randomly chosen index (up to 3 times).
-  - If all retries fail, a zero-filled dummy sample is returned instead of crashing the DataLoader.
-  - Each failure emits a `UserWarning` so problems are visible in logs without stopping training.
-- Added `_has_nan()` and `_sample_is_valid()` static helpers for tensor/array NaN detection.
-- Fixed `shrink_poly()` NaN safety:
-  - Threshold for `n_avg` normalization raised from `> 0` to `> 1e-6` to avoid division by near-zero.
-  - If the result contains NaN after shrink, original (unshrunk) polygon is returned as fallback.
-- Fixed `compute_quad_maps()` NaN safety:
-  - Each quad is wrapped in try/except; a single bad quad is skipped with a warning, not crashing.
-  - Explicit NaN/Inf guards around `shrunk`, `coords`, and `dx/dy` geometry offsets.
-  - Final `np.nan_to_num()` applied to both `score_map` and `geo_map` as belt-and-suspenders.
-
-Files:
-- src/manuscript/detectors/_east/dataset.py
-
-23) TRBA recognizer: expanded augmentation pipeline, TensorBoard previews, epoch-0 baseline (local)
-
-Major update to the TRBA word-level OCR training pipeline.
-
-Augmentation pipeline (src/manuscript/recognizers/_trba/data/transforms.py):
-- Replaced 4-step albumentations pipeline with a full 20-step pipeline in the recommended OCR order.
-- All probabilities and strengths are configurable via the same `params` dict passed to
-  `get_train_transform`, with safe defaults in `DEFAULT_AUG_PARAMS`.
-- All augmentations are independent (each fires based on its own probability).
-
-New augmentations added (all are new custom ImageOnlyTransform subclasses):
-
-Detector-noise simulation (important for real-world OCR):
-- `RandomZoomOut` (p=0.25): shrinks text inside the crop box, simulates detector adding padding.
-  `zoom_out_scale_min=0.65`, `zoom_out_scale_max=1.0`
-- `RandomZoomIn` (p=0.2): zooms in — characters near edges may be clipped.
-  `zoom_in_scale_min=1.0`, `zoom_in_scale_max=1.25`
-- `BBoxJitter` (p=0.25): random shift/crop simulating bbox misalignment from detector.
-  `bbox_jitter_offset=0.12`
-
-Geometric:
-- `A.Perspective` (p=0.25): perspective warp via albumentations.
-  `perspective_scale_min=0.02`, `perspective_scale_max=0.05`
-- `TextWarp` (p=0.2): sinusoidal warp — simulates curved pages, banners, signboards.
-  `text_warp_strength=0.03`
-
-Morphology:
-- `StrokeWidthPerturbation` (p=0.1): random erosion or dilation — varies stroke width.
-  `stroke_kernel_min=1`, `stroke_kernel_max=2`
-
-Photometric (expanded):
-- `A.RandomGamma` (p=0.2): gamma correction. `gamma_min=70`, `gamma_max=150`
-- `A.InvertImg` (p=0.08): inversion (was 0.0 before — now active by default)
-- `A.RandomBrightnessContrast` unchanged (p=0.3)
-
-Blur (expanded):
-- `A.GaussianBlur` (p=0.2): gaussian blur.
-- `A.MotionBlur` (p=0.15): directional motion blur.
-
-Noise (expanded):
-- `GaussianNoiseCustom` (p=0.2): gaussian noise, std sampled from `[std_min, std_max] * 255`.
-  `gauss_noise_std_min=0.01`, `gauss_noise_std_max=0.03`
-- `SaltPepperNoise` (p=0.1): salt-and-pepper noise.
-  `salt_pepper_amount_min=0.001`, `salt_pepper_amount_max=0.005`
-
-Compression / resolution:
-- `A.ImageCompression` (JPEG, p=0.15): `jpeg_quality_min=60`, `jpeg_quality_max=95`
-- `DownscaleUpscale` (p=0.2): downscale then upscale — simulates low-resolution text.
-  `downscale_min=0.5`, `downscale_max=0.9`
-
-Occlusion:
-- `RandomErasing` (p=0.1): fill random rectangles with mean color.
-  `erasing_holes=2`, `erasing_size_min=0.05`, `erasing_size_max=0.15`
-
-Text Mosaic (new augmentation concept):
-- `make_text_mosaic(images, gap_ratio=0.2)`: horizontally concatenates 2–3 word crop images
-  with a white gap equal to `gap_ratio` of the average image height (default 20% of height).
-  This can be used in a custom dataset wrapper to create synthetic compound words / phrases
-  from individual word crops.  Listed in `list_augmentations()` as `"text_mosaic"`.
-
-Utilities added:
-- `DEFAULT_AUG_PARAMS` dict: single source of truth for all default values.
-- `list_augmentations()`: returns ordered list of all augmentation names.
-- `preview_augmentation(img, name, params)`: apply a single named augmentation to a numpy image
-  without normalization/tensor conversion — useful for notebook visualization.
-
-TensorBoard preview (src/manuscript/recognizers/_trba/training/train.py):
-- Added `log_augmentation_previews_tensorboard(...)` function: logs a grid of ``num_samples``
-  examples for every augmentation under `Augmentations/<name>` at step 0.
-- Called automatically once at the start of training (epoch=0), only on fresh runs (not resume).
-
-Epoch-0 baseline validation:
-- Before the first weight update, a full validation pass is run on all validation loaders.
-- Metrics (val_loss, accuracy, CER, WER) are written to TensorBoard at step 0, so the baseline
-  is visible on the same plots as training progress.
-- Wrapped in try/except — a failing baseline never blocks training.
-
-Files:
-- src/manuscript/recognizers/_trba/data/transforms.py
-- src/manuscript/recognizers/_trba/training/train.py
-
-Albumentations 2.x compatibility (local):
-- Replaced deprecated `A.ShiftScaleRotate` (removed in albumentations 2.x) with equivalent
-  `A.Affine(translate_percent=..., scale=..., rotate=...)` in both `get_train_transform` and
-  `preview_augmentation`.
-- Replaced deprecated `value=` kwarg of `A.ShiftScaleRotate` / `fill=` of `A.Affine` and
-  `pad_val=` of `A.Perspective` with the new `fill=` keyword.
-- Replaced deprecated `quality_lower` / `quality_upper` kwargs of `A.ImageCompression` with
-  the new `quality_range=(low, high)` tuple argument.
-- All changes are backwards-compatible with albumentations ≥ 1.3 when using the `fill` name
-  but specifically tested against albumentations 2.0.8.
-
-Summary:
-- v_0_1_11 is ahead of main by 2 commits (+ local uncommitted fixes).
+Changes in v_0_1_11 relative to 0.1.10
+======================================
+
+This note lists the main user-facing changes only. Smaller fixes, test-only
+changes, and internal refactors are intentionally omitted.
+
+1) Public OCR API and pipeline redesign
+- The library now uses a consistent `Page -> Page` stage contract for
+  detector, layout, recognizer, and corrector components.
+- Added `manuscript.api` base classes and protocols for custom stages.
+- `Pipeline` was refactored around explicit stages and stage snapshots.
+- Rotation handling and recognition size filtering moved out of `Pipeline`
+  into `TRBA`.
+
+2) New default pipeline and layout stage
+- `Pipeline` now defaults to `YOLO(weights="yolo26x_obb_text_g1")`,
+  `SimpleSorting()`, and `TRBA(weights="trba_lite_g2")`.
+- Added a new `manuscript.layouts` module with the `SimpleSorting` layout.
+- `layout_after` can run layout after detection, recognition, or correction.
+- `manuscript.utils.organize_page` remains available as a compatibility
+  wrapper.
+
+3) YOLO detector support
+- Added a new `YOLO` ONNX Runtime text detector.
+- Supports preset weights, YAML config resolution, runtime provider handling,
+  and local/URL/GitHub/GDrive model resolution.
+- Supports both axis-aligned and rotated detections.
+
+4) Data model and geometry updates
+- The OCR data model now centers on `TextSpan`, `Line`, `Block`, and `Page`.
+- Polygons with more than 4 points are now supported across the data model,
+  geometry helpers, visualization, and region preparation.
+- Added `page_transforms` helpers for merging and collapsing text spans.
+
+5) Recognizer and corrector improvements
+- `TRBA` and `CharLM` now operate directly on `Page` objects and accept
+  optional source-image context.
+- Added TRBA region preparation presets: `bbox`, `polygon_mask`, and
+  `quad_warp`.
+- Improved TRBA training/export support, validation, metrics, and debug
+  tooling.
+- Added the `trba_lite_g2` preset and expanded TRBA/EAST/CharLM
+  train/export coverage.
+
+6) EAST training and dataset improvements
+- Improved COCO segmentation parsing, quad handling, and support for
+  non-quad polygons.
+- Expanded augmentation and preview utilities for EAST training.
+- Improved resume behavior, checkpoint selection, and training stability.
+
+7) Reliability and compatibility fixes
+- HTTP model downloads now retry with backoff.
+- Legacy `Word` / `words` names remain available as compatibility aliases, and
+  `Page` export supports explicit schemas: `v0_1_11` and `v0_1_10`.
+- Fixed Python 3.8 compatibility issues in dataclasses and type hints.
+- Fixed TRBA edge cases such as `val_size=0` and
+  `pretrain_weights=None`.
+- Improved training reliability, including picklable collate handling and
+  safer checkpoint recovery behavior.
+
+8) Documentation and release assets
+- Refreshed pipeline, API, data-model, detector, recognizer, and layout docs.
+- Added versioned documentation deployment and archived `0.1.10` docs.
+- Added layout API docs, model-zoo docs, and updated example notebooks.

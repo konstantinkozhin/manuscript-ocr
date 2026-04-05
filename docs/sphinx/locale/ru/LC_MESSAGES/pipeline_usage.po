@@ -1,307 +1,353 @@
-# SOME DESCRIPTIVE TITLE.
-# Copyright (C) 2026, Konstantin Kozhin
-# This file is distributed under the same license as the manuscript-ocr
-# package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
-#
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr \n"
+"Project-Id-Version: manuscript-ocr 0.1.11\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-03-03 15:31+0700\n"
-"PO-Revision-Date: 2026-01-24 15:30+0700\n"
-"Last-Translator: Konstantin Kozhin\n"
+"POT-Creation-Date: 2026-04-05 19:57+0700\n"
+"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"Last-Translator: OpenAI Codex\n"
+"Language-Team: ru\n"
 "Language: ru\n"
-"Language-Team: ru <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
-"Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.18.0\n"
 
-#: ../../pipeline_usage.rst:2 749ebab203ae4312a2aa1e06dee503f8
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:2
+#: b8f7cb05f54a4f87873800de750248a2
 msgid "Pipeline Usage Guide"
 msgstr "Руководство по использованию Pipeline"
 
-#: ../../pipeline_usage.rst:4 759a0014fd16405da017c26fc8bd2721
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:4
+#: c368162885934bf5affb2f4c4adc942c
 msgid ""
-"The Pipeline class in ``manuscript-ocr`` is designed to work with **any**"
-" detectors, recognizers, and correctors that implement a simple "
-"interface."
+"The pipeline is stage-based and passes one ``Page`` object through the "
+"stages:"
 msgstr ""
-"Класс Pipeline в ``manuscript-ocr`` спроектирован для работы с **любыми**"
-" детекторами, распознавателями и корректорами, реализующими простой "
-"интерфейс."
+"Pipeline построен из этапов и передаёт один объект ``Page`` через все этапы:"
 
-#: ../../pipeline_usage.rst:7 58dbd801c9ab4c62a31ed3757636cb0f
-msgid "Detector Requirements"
-msgstr "Требования к детектору"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:6
+#: 9d25059b3f0a44a98da0a1da76c3489f
+msgid "``detector -> layout -> recognizer -> corrector``"
+msgstr "``detector -> layout -> recognizer -> corrector``"
 
-#: ../../pipeline_usage.rst:9 51464a20c6f047fe85b4b5440335d104
-msgid ""
-"A detector class must implement a ``predict`` method that takes an image "
-"and returns a dictionary with a ``\"page\"`` key:"
-msgstr ""
-"Класс детектора должен реализовать метод ``predict``, который принимает "
-"изображение и возвращает словарь с ключом ``\"page\"``:"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:8
+#: eb69cc10add0413b8b3cf39956908acf
+msgid "By default, ``Pipeline()`` creates:"
+msgstr "По умолчанию ``Pipeline()`` создаёт:"
 
-#: ../../pipeline_usage.rst:26 048cfac6195e49b8aaeefe51fc6ee517
-msgid "Result Structure"
-msgstr "Структура результата"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:10
+#: 1e8e553d535c4caf8b7df78be350e215
+msgid "detector: ``YOLO(weights=\"yolo26x_obb_text_g1\")``"
+msgstr "детектор: ``YOLO(weights=\"yolo26x_obb_text_g1\")``"
 
-#: ../../pipeline_usage.rst:28 37ea3cc944aa4ea9af6c2307647dbc35
-msgid ""
-"The result must contain a ``Page`` object with hierarchy: **Page** → "
-"**Block** → **Line** → **Word**"
-msgstr ""
-"Результат должен содержать объект ``Page`` с иерархией: **Page** → "
-"**Block** → **Line** → **Word**"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:11
+#: 30976c5af1354e11941d0996919ef463
+msgid "layout: ``SimpleSorting()``"
+msgstr "layout: ``SimpleSorting()``"
 
-#: ../../pipeline_usage.rst:31 18aef502b46d4f59bfd5f2606b15447a
-msgid ""
-"See ``src/manuscript/data/structures.py`` for detailed structure "
-"documentation."
-msgstr ""
-"См. ``src/manuscript/data/structures.py`` для подробной документации по "
-"структурам данных."
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:12
+#: 06d004ea9c414553b30775b274ff0a1b
+msgid "recognizer: ``TRBA(weights=\"trba_lite_g2\")``"
+msgstr "распознаватель: ``TRBA(weights=\"trba_lite_g2\")``"
 
-#: ../../pipeline_usage.rst:33 b90308bf8c8f40e7980be0a0f456ca2c
-msgid "**Minimal example of creating a Page:**"
-msgstr "**Минимальный пример создания Page:**"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:13
+#: 4e86bb2f174142e78eb7ac4d2fa40f3c
+msgid "corrector: ``None``"
+msgstr "корректор: ``None``"
 
-#: ../../pipeline_usage.rst:55 c4a946d46bcd45ca8730fbf254a9c58a
-msgid "Recognizer Requirements"
-msgstr "Требования к распознавателю"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:16
+#: ca5b57c57467456ebf4ce4801243571f
+msgid "Stage Contracts"
+msgstr "Контракты этапов"
 
-#: ../../pipeline_usage.rst:57 b258c20f03b849d098d95f9875ba146d
-msgid ""
-"A recognizer class must implement a ``predict`` method that takes a list "
-"of images and returns a list of results:"
-msgstr ""
-"Класс распознавателя должен реализовать метод ``predict``, который "
-"принимает список изображений и возвращает список результатов:"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:19
+#: 32013f2f01964e1d82730d7a84f4172a
+msgid "Detector"
+msgstr "Детектор"
 
-#: ../../pipeline_usage.rst:75 ../../pipeline_usage.rst:106
-#: 0ea9dc0c79b84a7688ea398f6de3619b 57290a52c0534ecc921f3f06b917b831
-msgid "**Example:**"
-msgstr "**Пример:**"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:21
+#: 532556c09ef6480d89d6eb847917baf6
+msgid "Detector must implement:"
+msgstr "Детектор должен реализовывать:"
 
-#: ../../pipeline_usage.rst:90 0e6e408313b14111b8d87fb9c87eaaf0
-msgid "Corrector Requirements"
-msgstr "Требования к корректору"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:29
+#: f662c1ddbd564bba90d2251e56cb9aa9
+msgid "Recognizer"
+msgstr "Распознаватель"
 
-#: ../../pipeline_usage.rst:92 180f57646709468f99cc1afc75a1db3d
-msgid ""
-"A corrector class must implement a ``predict`` method that takes a Page "
-"object and returns a corrected Page:"
-msgstr ""
-"Класс корректора должен реализовать метод ``predict``, который принимает "
-"объект Page и возвращает исправленный Page:"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:31
+#: 64c36fc26c9447a8a90180c3852341eb
+msgid "Recognizer must implement:"
+msgstr "Распознаватель должен реализовывать:"
 
-#: ../../pipeline_usage.rst:128 a0a8b520513143d28bb704fe869fffcc
-msgid "Built-in CharLM Corrector"
-msgstr "Встроенный корректор CharLM"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:39
+#: 30f7f8b6c7e9470f8a8f986eae76125a
+msgid "Layout"
+msgstr "Layout"
 
-#: ../../pipeline_usage.rst:130 d1de0ac43c2d42a88265779c29f6e4ac
-msgid ""
-"CharLM is a Transformer-based character-level language model for "
-"correcting OCR errors:"
-msgstr ""
-"CharLM — это символьная языковая модель на основе Transformer для "
-"исправления ошибок OCR:"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:41
+#: 75b3616083d64f0ab485b79b8d5a6c70
+msgid "Layout model must implement:"
+msgstr "Layout-модель должна реализовывать:"
 
-#: ../../pipeline_usage.rst:150 f4017de256e04facb36d26d7d8f561e7
-msgid "Compatible Implementation Examples"
-msgstr "Примеры совместимых реализаций"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:49
+#: 730778d484b74c1d880a16de70bc0655
+msgid "Corrector"
+msgstr "Корректор"
 
-#: ../../pipeline_usage.rst:153 9a5b73d1a02d458a954b24dec52002e1
-msgid "Complete Detector Example"
-msgstr "Полный пример детектора"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:51
+#: 05516a1f439c4d7c80158966f1e107e9
+msgid "Corrector must implement:"
+msgstr "Корректор должен реализовывать:"
 
-#: ../../pipeline_usage.rst:183 bb6bdd70c18d4e31b2a4492b96ef826f
-msgid "Using Custom Components"
-msgstr "Использование кастомных компонентов"
-
-#: ../../pipeline_usage.rst:204 0a0d71ae6d9647019b28791fe8bfa424
-msgid "Pipeline Usage Examples"
-msgstr "Примеры использования Pipeline"
-
-#: ../../pipeline_usage.rst:207 d107aadc327143119caeb1e45ea414ba
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:59
+#: f101a7f6210d4627b33d5151e2e2e904
 msgid "Basic Usage"
 msgstr "Базовое использование"
 
-#: ../../pipeline_usage.rst:225 601b2696cdf644b384419086280e01d6
-msgid "Detection Only (Without Recognition)"
-msgstr "Только детекция (без распознавания)"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:71
+#: bbf941d494fb4f658d087b9c8fb3ce0a
+msgid "Disable Stages"
+msgstr "Отключение этапов"
 
-#: ../../pipeline_usage.rst:239 b157162aedfd44348a6c8249632ff8d4
-msgid "With Visualization"
-msgstr "С визуализацией"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:73
+#: 359c475bf7cf43278990a43552a292eb
+msgid "You can disable optional stages via ``None``:"
+msgstr "Необязательные этапы можно отключать через ``None``:"
 
-#: ../../pipeline_usage.rst:247 1fbe81289f864b5a81e55d9c8c22ab98
-msgid "Intermediate Results"
-msgstr "Промежуточные результаты"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:89
+#: 7e2ce7f562834117b097109cfeed2ef6
+msgid "Layout Placement"
+msgstr "Положение этапа layout"
 
-#: ../../pipeline_usage.rst:266 d97a6f890f8245e292f8a00e4bec14ac
-msgid "Export/Import Page to JSON"
-msgstr "Экспорт/импорт Page в JSON"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:91
+#: cf1af80bf1754b0095f0591ab8ea841f
+msgid "Use ``layout_after`` to choose where layout runs:"
+msgstr ""
+"Используйте ``layout_after``, чтобы выбрать, после какого этапа запускать "
+"layout:"
 
-#: ../../pipeline_usage.rst:286 16ac42f164b2422ab0fa994e9af12396
-msgid "With Profiling"
-msgstr "С профилированием"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:93
+#: b9ee6d3196a84a3ca04c551d7df0d7ee
+msgid "``\"detector\"`` (default)"
+msgstr "``\"detector\"`` (по умолчанию)"
 
-#: ../../pipeline_usage.rst:300 92c18771ce2b49528656d856969728c1
-msgid "Batch Processing"
-msgstr "Пакетная обработка"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:94
+#: 37b92d89cd58428e9c00d7f1ecb78970
+msgid "``\"recognizer\"``"
+msgstr "``\"recognizer\"``"
 
-#: ../../pipeline_usage.rst:312 e8b84c7c3e364ecc8f427b0cead84e45
-msgid "Component Configuration"
-msgstr "Настройка компонентов"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:95
+#: d0ce4431b7684144a315d374aaeef382
+msgid "``\"corrector\"``"
+msgstr "``\"corrector\"``"
 
-#: ../../pipeline_usage.rst:315 ab515d2c6d6148e48e4a090d7f41f3c0
-msgid "Replacing Detector or Recognizer"
-msgstr "Замена детектора или распознавателя"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:107
+#: 442c9ce160724ae6a31690507ca09c7f
+msgid ""
+"If the anchor stage is disabled (for example, ``recognizer=None`` with "
+"``layout_after=\"recognizer\"``), layout still executes in that slot."
+msgstr ""
+"Если опорный этап отключён, например ``recognizer=None`` при "
+"``layout_after=\"recognizer\"``, layout всё равно выполнится в этой позиции."
 
-#: ../../pipeline_usage.rst:333 b1d9302dd84448aa8552ee914f813759
-msgid "Built-in Model Configuration"
-msgstr "Настройка встроенных моделей"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:111
+#: 7ba23328b97d43e1901ff5b2ba4f13cd
+msgid "Built-in Components"
+msgstr "Встроенные компоненты"
 
-#: ../../pipeline_usage.rst:358 a3d31024d10443c4b196f5fba3fd179d
-msgid "Size Filtering"
-msgstr "Фильтрация по размеру"
-
-#: ../../pipeline_usage.rst:366 6e3224244c5249a1a683989ef8b15f97
-#, fuzzy
-msgid "Automatic Rotation Control (TRBA)"
-msgstr "Управление автоматическим поворотом"
-#: ../../pipeline_usage.rst:100
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:135
+#: c2fa461fea104f07bc5532dc20c5458f
 msgid "TRBA Region Preparation"
 msgstr "Подготовка регионов в TRBA"
 
-#: ../../pipeline_usage.rst:102
-msgid ""
-"``TRBA`` keeps the current default crop behavior, but now allows crop "
-"preparation customization when needed."
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:137
+#: 82d958b461624562870f6e71dd014a78
+msgid "``TRBA`` supports configurable crop preparation before recognition."
 msgstr ""
-"``TRBA`` сохраняет текущее поведение по умолчанию для вырезания кропов, "
-"но теперь позволяет настраивать подготовку регионов при необходимости."
+"``TRBA`` поддерживает настраиваемую подготовку кропов перед распознаванием."
 
-#: ../../pipeline_usage.rst:105
-msgid "Default behavior is unchanged:"
-msgstr "Поведение по умолчанию не изменилось:"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:139
+#: 3666084579914ba2aaa0b82bf647dcf8
+msgid "Default settings:"
+msgstr "Настройки по умолчанию:"
 
-#: ../../pipeline_usage.rst:107
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:141
+#: 6cdf197c970e482892cd8cd46d60b28c
 msgid "``region_preparer=\"bbox\"`` extracts axis-aligned bounding boxes"
 msgstr "``region_preparer=\"bbox\"`` вырезает осеориентированные bounding box"
 
-#: ../../pipeline_usage.rst:108
-msgid ""
-"``rotate_threshold=1.5`` auto-rotates tall crops before recognition"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:142
+#: f16c4ac733a54da08694d6e72aa748c5
+msgid "``rotate_threshold=1.5`` auto-rotates tall crops before recognition"
 msgstr ""
 "``rotate_threshold=1.5`` автоматически поворачивает высокие кропы перед "
 "распознаванием"
 
-#: ../../pipeline_usage.rst:109
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:143
+#: 03c5d739618b497bb09bc2f0d4c3ba8d
 msgid "``min_text_size=5`` skips tiny detections"
 msgstr "``min_text_size=5`` пропускает слишком маленькие детекции"
 
-#: ../../pipeline_usage.rst:111
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:145
+#: ab11e801e597435ebc273833ec1e8599
 msgid "Built-in preparer presets:"
 msgstr "Встроенные пресеты preparer:"
 
-#: ../../pipeline_usage.rst:113
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:147
+#: 5ab22352ae7c4ff0a564f375ff090de0
 msgid "``\"bbox\"``: axis-aligned crop"
 msgstr "``\"bbox\"``: осеориентированный кроп"
 
-#: ../../pipeline_usage.rst:114
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:148
+#: a7187426d3da4485b42d09af6b73cb0b
 msgid ""
 "``\"polygon_mask\"``: tight crop with pixels outside the polygon masked to "
 "white"
 msgstr ""
-"``\"polygon_mask\"``: плотный кроп с маскированием пикселей вне полигона в белый цвет"
+"``\"polygon_mask\"``: плотный кроп с маскированием пикселей вне полигона в "
+"белый цвет"
 
-#: ../../pipeline_usage.rst:115
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:149
+#: 6e0069bfd4474da689934ff50ae36d17
 msgid ""
-"``\"quad_warp\"``: perspective rectification for 4-point polygons, with "
-"bbox fallback"
+"``\"quad_warp\"``: perspective rectification for 4-point polygons, with bbox "
+"fallback"
 msgstr ""
 "``\"quad_warp\"``: перспективное выравнивание для 4-точечных полигонов с "
-"fallback на bbox"
+"переходом на bbox при необходимости"
 
-#: ../../pipeline_usage.rst:124
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:163
+#: 1184bc5fbb7e44b3b0ef7a8b12ad3249
 msgid ""
 "``region_preparer_options`` is reserved for built-in preset configuration:"
 msgstr ""
 "``region_preparer_options`` зарезервирован для настройки встроенных пресетов:"
 
-#: ../../pipeline_usage.rst:126
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:165
+#: 009ae2f4114b448d86ea47b2f4726c4a
 msgid "``\"bbox\"`` / ``\"polygon_mask\"``: ``pad``"
 msgstr "``\"bbox\"`` / ``\"polygon_mask\"``: ``pad``"
 
-#: ../../pipeline_usage.rst:127
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:166
+#: 97710d6398c149b5937ecc02ef1b4d71
 msgid "``\"polygon_mask\"``: ``background``"
 msgstr "``\"polygon_mask\"``: ``background``"
 
-#: ../../pipeline_usage.rst:128
-msgid "``\"quad_warp\"``: ``output_size=(width, height)``, ``fallback_to_bbox``"
-msgstr "``\"quad_warp\"``: ``output_size=(width, height)``, ``fallback_to_bbox``"
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:167
+#: fa8b1cd4b22a4631a25e5ac26c884d1e
+msgid ""
+"``\"quad_warp\"``: ``output_size=(width, height)``, ``fallback_to_bbox``"
+msgstr ""
+"``\"quad_warp\"``: ``output_size=(width, height)``, ``fallback_to_bbox``"
 
-#: ../../pipeline_usage.rst:130
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:169
+#: 8b0b75078ed347a69418f175d65dcf52
 msgid ""
 "For advanced cases, you can inject hooks into ``TRBA`` instead of writing a "
 "full custom recognizer:"
 msgstr ""
-"Для продвинутых сценариев можно передать hook'и в ``TRBA`` вместо "
-"написания полностью кастомного распознавателя:"
+"Для более сложных сценариев можно внедрить хуки в ``TRBA`` вместо того, "
+"чтобы писать полностью собственный распознаватель:"
 
-#: ../../pipeline_usage.rst:143
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:190
+#: 0ed499e165054c21bd8d23507d2a6d17
 msgid ""
 "If you need complete control over recognition logic, the simplest route is "
 "still to provide your own recognizer class with ``predict(page, image) -> "
 "Page``."
 msgstr ""
 "Если нужен полный контроль над логикой распознавания, самым простым "
-"вариантом остаётся собственный класс recognizer с ``predict(page, image) -> "
-"Page``."
+"вариантом по-прежнему остаётся собственный класс распознавателя с "
+"``predict(page, image) -> Page``."
 
-#: ../../pipeline_usage.rst:146
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:194
+#: fc02b7e1941d4178b2d65713bf1e1981
 msgid "Collapsing Text Spans"
-msgstr "Объединение Text Span"
+msgstr "Объединение TextSpan"
 
-#: ../../pipeline_usage.rst:148
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:196
+#: 904072a5907a47d9b06b0e9c6d064b68
 msgid ""
 "Some recognizers work on whole lines or blocks rather than on individual "
 "text-span crops. Use ``collapse_page_text_spans`` to convert a narrow page "
 "structure into a wider one before recognition."
 msgstr ""
-"Некоторые распознаватели работают не с отдельными crop text span, а с "
-"целыми строками или блоками. Используйте ``collapse_page_text_spans``, "
+"Некоторые распознаватели работают с целыми строками или блоками, а не с "
+"кропами отдельных text span. Используйте ``collapse_page_text_spans``, "
 "чтобы перед распознаванием преобразовать узкую структуру страницы в более "
 "широкую."
 
-#: ../../pipeline_usage.rst:164
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:216
+#: f3b37b28306c43daa69c62fea1bb8b22
 msgid ""
-"``\"line\"`` keeps the same blocks and lines, but replaces each line with one "
-"merged ``TextSpan``. ``\"block\"`` replaces each block with one line "
+"``\"line\"`` keeps the same blocks and lines, but replaces each line with "
+"one merged ``TextSpan``. ``\"block\"`` replaces each block with one line "
 "containing one merged ``TextSpan``."
 msgstr ""
 "``\"line\"`` сохраняет те же блоки и строки, но заменяет каждую строку "
 "одним объединённым ``TextSpan``. ``\"block\"`` заменяет каждый блок одной "
 "строкой, содержащей один объединённый ``TextSpan``."
 
-#: ../../pipeline_usage.rst:167
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:220
+#: 8af5462bc80c4ecf96cc5c69df688fdd
 msgid "Lower-level helpers are also available:"
-msgstr "Также доступны более низкоуровневые хелперы:"
+msgstr "Также доступны низкоуровневые вспомогательные функции:"
 
-#: ../../pipeline_usage.rst:169
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:222
+#: 1056d18a9ad1459997edb17beee3073c
 msgid "``merge_text_spans(text_spans, method=\"bbox\")``"
 msgstr "``merge_text_spans(text_spans, method=\"bbox\")``"
 
-#: ../../pipeline_usage.rst:170
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:223
+#: 9a6f27808cca4734bca50f737d292d13
 msgid "``collapse_line_text_spans(line, method=\"bbox\")``"
 msgstr "``collapse_line_text_spans(line, method=\"bbox\")``"
 
-#: ../../pipeline_usage.rst:171
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:224
+#: 2db83dc50dd249acbdd9942d90e10ecc
 msgid "``collapse_block_text_spans(block, method=\"bbox\")``"
 msgstr "``collapse_block_text_spans(block, method=\"bbox\")``"
+
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:227
+#: 6674b3c0b34744519093d305b7511971
+msgid "Visualization and Profiling"
+msgstr "Визуализация и профилирование"
+
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:237
+#: de801bcf4c93444ca2cd4c025a82c1df
+msgid "Intermediate Results"
+msgstr "Промежуточные результаты"
+
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:239
+#: 820578e75dc244a2ba47555de30932f8
+msgid "After each run, the pipeline keeps snapshots:"
+msgstr ""
+"После каждого запуска pipeline сохраняет снимки промежуточных результатов:"
+
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:241
+#: 9e94976a13ad422fb6501e661d35c03d
+msgid "``pipeline.last_detection_page``"
+msgstr "``pipeline.last_detection_page``"
+
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:242
+#: 405650d769ed48dda276b83cf57e197b
+msgid "``pipeline.last_layout_page``"
+msgstr "``pipeline.last_layout_page``"
+
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:243
+#: 2344710cf8804701a8d34f0c1bac55a8
+msgid "``pipeline.last_recognition_page``"
+msgstr "``pipeline.last_recognition_page``"
+
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:244
+#: 06ab17130cec4315b7092d28aa4e7201
+msgid "``pipeline.last_correction_page``"
+msgstr "``pipeline.last_correction_page``"
+
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:246
+#: a57118d9648b4e5fb642b6a926a2fb06
+msgid "Skipped stages keep corresponding ``last_*`` value as ``None``."
+msgstr ""
+"Для пропущенных этапов соответствующее значение ``last_*`` остаётся ``None``."

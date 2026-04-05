@@ -1,71 +1,52 @@
-# Translations template for PROJECT.
-# Copyright (C) 2026 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
-#
-#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-01-23 18:42+0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Project-Id-Version: manuscript-ocr 0.1.11\n"
+"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"Last-Translator: OpenAI Codex\n"
+"Language: ru\n"
+"Language-Team: ru\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.17.0\n"
 
-#: ../../getting_started.rst:2 fa8322693daf4619ac92dee1370a7f76
 msgid "Getting Started"
 msgstr "Начало работы"
 
-#: ../../getting_started.rst:5 e0dc611f40e641a8b14a9ffbd5ee9a5b
 msgid "Installation"
 msgstr "Установка"
 
-#: ../../getting_started.rst:7 267db7362ae44104a7a8a84102b0cdb9
 msgid "**Basic installation** (inference only):"
 msgstr "**Базовая установка** (только инференс):"
 
-#: ../../getting_started.rst:13 fdf51bfcd99f4d2a8ffe4db28b5515d3
 msgid "**Installation with training support** (includes PyTorch):"
 msgstr "**Установка с поддержкой обучения** (включает PyTorch):"
 
-#: ../../getting_started.rst:19 d1f8c0faf283419eaa839977b160f7ff
 msgid "This installs additional dependencies for model training:"
 msgstr "Будут установлены дополнительные зависимости для обучения моделей:"
 
-#: ../../getting_started.rst:21 64624f1c093a45989e72c3c28e342b63
 msgid "PyTorch and TorchVision"
 msgstr "PyTorch и TorchVision"
 
-#: ../../getting_started.rst:22 0be8d61a3c6f41bfb129940468035968
 msgid "ONNX export tools"
 msgstr "Инструменты экспорта ONNX"
 
-#: ../../getting_started.rst:23 f23a48a486414e92b05ffa94c15140d0
 msgid "Training utilities (albumentations, tensorboard, etc.)"
 msgstr "Утилиты для обучения (albumentations, TensorBoard и др.)"
 
-#: ../../getting_started.rst:24 69829b68833c4b30b590affde2f8a62d
 msgid "Development tools (pytest, black, flake8, etc.)"
 msgstr "Инструменты разработки (pytest, black, flake8 и др.)"
 
-#: ../../getting_started.rst:26 4612809a7acb435586efe8c35f290a28
 msgid "**GPU acceleration** (NVIDIA CUDA):"
 msgstr "**Аппаратное ускорение GPU** (NVIDIA CUDA):"
 
-#: ../../getting_started.rst:33 54a97c9e75c24d3382e7ecd041ef304d
 msgid "**Apple Silicon acceleration** (CoreML):"
 msgstr "**Ускорение на Apple Silicon** (CoreML):"
 
-#: ../../getting_started.rst:41 8cb14b395a85466693bc5fa95641cb70
 msgid "Quick Start"
 msgstr "Быстрый старт"
 
-#: ../../getting_started.rst:43 2810631c4845474083130e0e53f92b2c
 msgid "Basic usage example:"
 msgstr "Пример базового использования:"
 
@@ -75,66 +56,118 @@ msgstr "Примеры ноутбуков"
 msgid ""
 "Current example notebooks are available in the repository ``notebooks`` "
 "folder:"
+msgstr "Актуальные примеры ноутбуков доступны в папке ``notebooks`` репозитория:"
+
+msgid ""
+"`End-to-end inference <https://github.com/konstantinkozhin/manuscript-ocr/"
+"blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B8%D0%BD%D1%84"
+"%D0%B5%D1%80%D0%B5%D0%BD%D1%81%D0%B0_endtoend.ipynb>`_"
 msgstr ""
-"Актуальные примеры ноутбуков доступны в папке ``notebooks`` репозитория:"
+"`Сквозной инференс <https://github.com/konstantinkozhin/manuscript-ocr/blob/"
+"main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B8%D0%BD%D1%84%D0%B5"
+"%D1%80%D0%B5%D0%BD%D1%81%D0%B0_endtoend.ipynb>`_"
 
-msgid "`End-to-end inference <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B8%D0%BD%D1%84%D0%B5%D1%80%D0%B5%D0%BD%D1%81%D0%B0_endtoend.ipynb>`_"
-msgstr "`End-to-end инференс <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B8%D0%BD%D1%84%D0%B5%D1%80%D0%B5%D0%BD%D1%81%D0%B0_endtoend.ipynb>`_"
+msgid ""
+"`Pipeline with YOLO detector <https://github.com/konstantinkozhin/"
+"manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%"
+"B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yolo.ipynb>`_"
+msgstr ""
+"`Pipeline с детектором YOLO <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0"
+"%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yolo.ipynb>`_"
 
-msgid "`Pipeline with YOLO detector <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yolo.ipynb>`_"
-msgstr "`Pipeline с детектором YOLO <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yolo.ipynb>`_"
+msgid ""
+"`Pipeline with TrOCR recognizer <https://github.com/konstantinkozhin/"
+"manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%"
+"B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_trocr.ipynb>`_"
+msgstr ""
+"`Pipeline с распознавателем TrOCR <https://github.com/konstantinkozhin/"
+"manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%"
+"B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_trocr.ipynb>`_"
 
-msgid "`Pipeline with TrOCR recognizer <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_trocr.ipynb>`_"
-msgstr "`Pipeline с распознавателем TrOCR <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_trocr.ipynb>`_"
+msgid ""
+"`Pipeline with Yandex Speller <https://github.com/konstantinkozhin/"
+"manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%"
+"B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yandex_speller.ipynb>`_"
+msgstr ""
+"`Pipeline с Yandex Speller <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0"
+"%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yandex_speller.ipynb>`_"
 
-msgid "`Pipeline with Yandex Speller <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yandex_speller.ipynb>`_"
-msgstr "`Pipeline с Yandex Speller <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yandex_speller.ipynb>`_"
+msgid ""
+"`Gradio demo launch <https://github.com/konstantinkozhin/manuscript-ocr/"
+"blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF"
+"%D1%83%D1%81%D0%BA%D0%B0_%D0%B4%D0%B5%D0%BC%D0%BE.ipynb>`_"
+msgstr ""
+"`Запуск Gradio-демо <https://github.com/konstantinkozhin/manuscript-ocr/"
+"blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF"
+"%D1%83%D1%81%D0%BA%D0%B0_%D0%B4%D0%B5%D0%BC%D0%BE.ipynb>`_"
 
-msgid "`Gradio demo launch <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%B4%D0%B5%D0%BC%D0%BE.ipynb>`_"
-msgstr "`Запуск Gradio demo <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%B4%D0%B5%D0%BC%D0%BE.ipynb>`_"
+msgid ""
+"`Detector training launch <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0"
+"%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F"
+"_%D0%B4%D0%B5%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
+msgstr ""
+"`Запуск обучения детектора <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0"
+"%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F"
+"_%D0%B4%D0%B5%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
 
-msgid "`Detector training launch <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D0%B4%D0%B5%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
-msgstr "`Запуск обучения детектора <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D0%B4%D0%B5%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
+msgid ""
+"`Recognition training launch <https://github.com/konstantinkozhin/"
+"manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%"
+"B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD"
+"%D0%B8%D1%8F_%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D0"
+"%BD%D0%B8%D1%8F.ipynb>`_"
+msgstr ""
+"`Запуск обучения распознавания <https://github.com/konstantinkozhin/"
+"manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%"
+"B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD"
+"%D0%B8%D1%8F_%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D0"
+"%BD%D0%B8%D1%8F.ipynb>`_"
 
-msgid "`Recognition training launch <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F.ipynb>`_"
-msgstr "`Запуск обучения распознавания <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F.ipynb>`_"
+msgid ""
+"`Corrector training launch <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0"
+"%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F"
+"_%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
+msgstr ""
+"`Запуск обучения корректора <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0"
+"%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F"
+"_%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
 
-msgid "`Corrector training launch <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
-msgstr "`Запуск обучения корректора <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
-
-#: ../../getting_started.rst:60 f8fc97537008450ab9d735910af658ee
 msgid "Main Components"
 msgstr "Основные компоненты"
 
-#: ../../getting_started.rst:62 185c313f3fb042fb8c7eb8a65289e195
 msgid ":class:`~manuscript.Pipeline` - High-level OCR pipeline"
 msgstr ":class:`~manuscript.Pipeline` — высокоуровневый OCR-конвейер"
 
-#: ../../getting_started.rst:63 79106386720e49fb8619baab55c431e2
+msgid ":class:`~manuscript.detectors.YOLO` - ONNX text detector for YOLO-family models"
+msgstr ":class:`~manuscript.detectors.YOLO` — ONNX-детектор текста для моделей семейства YOLO"
+
 msgid ":class:`~manuscript.detectors.EAST` - Text detector"
 msgstr ":class:`~manuscript.detectors.EAST` — детектор текста"
 
-#: ../../getting_started.rst:64 a5ad7e27c5b84a8e9f39094048bd5995
-msgid ":class:`~manuscript.recognizers.TRBA` - Text recognizer"
-msgstr ":class:`~manuscript.recognizers.TRBA` — модель распознавания текста"
+msgid ":class:`~manuscript.layouts.SimpleSorting` - Layout ordering model"
+msgstr ":class:`~manuscript.layouts.SimpleSorting` — модель упорядочивания layout"
 
-#: ../../getting_started.rst:65 fd06413ae672467ba4f4c2608e8ccaed
+msgid ":class:`~manuscript.recognizers.TRBA` - Text recognizer"
+msgstr ":class:`~manuscript.recognizers.TRBA` — распознаватель текста"
+
 msgid ":class:`~manuscript.correctors.CharLM` - Character-level text corrector"
 msgstr ":class:`~manuscript.correctors.CharLM` — посимвольный корректор текста"
 
-#: ../../getting_started.rst:66 688bc42cca7a4cb38017bb8e0cd95255
 msgid ":class:`~manuscript.data.Page` - Page data structure"
 msgstr ":class:`~manuscript.data.Page` — структура данных страницы"
 
-#: ../../getting_started.rst:67 945d39529bc34e0bbb17b4647ca8d5a1
 msgid ":class:`~manuscript.data.Block` - Block data structure"
 msgstr ":class:`~manuscript.data.Block` — структура данных блока"
 
-#: ../../getting_started.rst:68 399815d594a94415956270810e4fa1ce
 msgid ":class:`~manuscript.data.Line` - Line data structure"
 msgstr ":class:`~manuscript.data.Line` — структура данных строки"
 
-#: ../../getting_started.rst:69 483fab9d2a6343bbb9ece0ad3a7ea5bf
 msgid ":class:`~manuscript.data.TextSpan` - Smallest OCR text region"
 msgstr ":class:`~manuscript.data.TextSpan` — минимальный текстовый регион OCR"
 
@@ -148,3 +181,8 @@ msgstr ""
 "Список встроенных пресетов и релизных артефактов, задокументированных для "
 "этой версии документации, см. в :doc:`model_zoo`."
 
+msgid "Related Work"
+msgstr "Связанные работы"
+
+msgid "For publications related to the project and its manuscript OCR experiments, see :doc:`related_work`."
+msgstr "См. :doc:`related_work`, чтобы ознакомиться с публикациями, связанными с проектом и экспериментами по OCR рукописей."

@@ -8,21 +8,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Утилиты &mdash; документация manuscript-ocr 0.1.11</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/language_switcher.css?v=d768f156" />
+      <link rel="stylesheet" type="text/css" href="../_static/model_zoo.css?v=2d297567" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=708478e6"></script>
-      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/translations.js?v=cd1d70c9"></script>
       <script src="../_static/language_switcher.js?v=db730534"></script>
-      <script src="../_static/version_sidebar.js?v=edadfa97"></script>
+      <script src="../_static/version_sidebar.js?v=50cbed02"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Алфавитный указатель" href="../genindex.html" />
     <link rel="search" title="Поиск" href="../search.html" />
+    <link rel="next" title="Связанные работы" href="../related_work.html" />
     <link rel="prev" title="Корректоры" href="correctors.html" /> 
 </head>
 
@@ -50,28 +52,40 @@
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Начало работы</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#installation">Установка</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#quick-start">Быстрый старт</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#example-notebooks">Примеры ноутбуков</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#main-components">Основные компоненты</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#pipeline-defaults">Pipeline Defaults</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#model-zoo">Зоопарк моделей</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#related-work">Связанные работы</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../model_zoo.html">Зоопарк моделей</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#detection">Детекция</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#layout">Layout-анализ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#recognition">Распознавание</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#correction">Посткоррекция</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#architecture-sources">Источники архитектур</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../pipeline_usage.html">Руководство по использованию Pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#stage-contracts">Stage Contracts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#detector">Detector</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#recognizer">Recognizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#stage-contracts">Контракты этапов</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#detector">Детектор</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#recognizer">Распознаватель</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#layout">Layout</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#corrector">Corrector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#corrector">Корректор</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#basic-usage">Базовое использование</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#disable-stages">Disable Stages</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#layout-placement">Layout Placement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#built-in-components">Built-in Components</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#disable-stages">Отключение этапов</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#layout-placement">Положение этапа layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#built-in-components">Встроенные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#trba-region-preparation">Подготовка регионов в TRBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#collapsing-text-spans">Объединение TextSpan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#visualization-and-profiling">Визуализация и профилирование</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#intermediate-results">Промежуточные результаты</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../structure.html">Структура библиотеки</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../structure.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure.html#overview">Обзор</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">Справочник API</a><ul class="current">
@@ -90,8 +104,9 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">Структуры данных</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data.html#data-model">Модель данных</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data.html#module-manuscript.data">Справочник API</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Word"><code class="docutils literal notranslate"><span class="pre">Word</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#compatibility">Совместимость</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#module-manuscript.data">Справочник модуля</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.TextSpan"><code class="docutils literal notranslate"><span class="pre">TextSpan</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Page"><code class="docutils literal notranslate"><span class="pre">Page</span></code></a></li>
@@ -101,17 +116,27 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="detectors.html">Детекторы</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO"><code class="docutils literal notranslate"><span class="pre">YOLO</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.__init__"><code class="docutils literal notranslate"><span class="pre">YOLO.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.config_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.default_target_size"><code class="docutils literal notranslate"><span class="pre">YOLO.default_target_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.default_weights_name"><code class="docutils literal notranslate"><span class="pre">YOLO.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.predict"><code class="docutils literal notranslate"><span class="pre">YOLO.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.pretrained_registry</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="detectors.html#east-training-quads">Четырёхугольные области для обучения EAST</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="layouts.html">Layout-модели</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
@@ -121,14 +146,14 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="recognizers.html">Распознаватели</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -153,11 +178,22 @@
 <li class="toctree-l3"><a class="reference internal" href="#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manuscript.utils.crop_axis_aligned"><code class="docutils literal notranslate"><span class="pre">crop_axis_aligned()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manuscript.utils.crop_polygon_mask"><code class="docutils literal notranslate"><span class="pre">crop_polygon_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manuscript.utils.merge_polygons"><code class="docutils literal notranslate"><span class="pre">merge_polygons()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manuscript.utils.order_quad_points"><code class="docutils literal notranslate"><span class="pre">order_quad_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manuscript.utils.polygon_to_bbox"><code class="docutils literal notranslate"><span class="pre">polygon_to_bbox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manuscript.utils.warp_quad"><code class="docutils literal notranslate"><span class="pre">warp_quad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manuscript.utils.merge_text_spans"><code class="docutils literal notranslate"><span class="pre">merge_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manuscript.utils.collapse_line_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_line_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manuscript.utils.collapse_block_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_block_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#manuscript.utils.collapse_page_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_page_text_spans()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../related_work.html">Связанные работы</a></li>
 </ul>
 
         </div>
@@ -187,7 +223,7 @@
              
   <section id="utilities">
 <h1>Утилиты<a class="headerlink" href="#utilities" title="Ссылка на этот заголовок"></a></h1>
-<p>Вспомогательные функции для обработки изображений, визуализации и других задач.</p>
+<p>Вспомогательные функции для обработки изображений, визуализации, организации страницы, объединения text span и других задач.</p>
 <p id="module-manuscript.utils">Общие утилиты для manuscript-ocr.</p>
 <dl class="py function">
 <dt class="sig sig-object py" id="manuscript.utils.read_image">
@@ -195,7 +231,7 @@
 <dd><p>Универсальное чтение изображений с поддержкой различных типов входных данных.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Параметры<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>img_or_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(in Python v3.14)"><em>bytes</em></a><em>, </em><em>np.ndarray</em><em>, or </em><em>PIL.Image</em>) – Источник изображения в одном из следующих форматов:  - путь к файлу (str или Path) — поддерживаются Unicode-пути (например, кириллица)  - буфер байтов (например, из HTTP-ответа)  - массив NumPy (уже загруженное изображение)  - объект PIL Image</p>
+<dd class="field-odd"><p><strong>img_or_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em>, </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#bytes" title="(в Python v3.14)"><em>bytes</em></a><em>, </em><em>np.ndarray</em><em>, or </em><em>PIL.Image</em>) – Источник изображения в одном из следующих форматов:  - путь к файлу (str или Path) — поддерживаются Unicode-пути (например, кириллица)  - буфер байтов (например, из HTTP-ответа)  - массив NumPy (уже загруженное изображение)  - объект PIL Image</p>
 </dd>
 <dt class="field-even">Результат<span class="colon">:</span></dt>
 <dd class="field-even"><p>RGB-изображение в виде массива NumPy с формой (H, W, 3) и типом uint8.</p>
@@ -205,9 +241,9 @@
 </dd>
 <dt class="field-even">Исключение<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError" title="(in Python v3.14)"><strong>FileNotFoundError</strong></a> – Если файл изображения не удаётся прочитать ни с помощью OpenCV, ни с помощью PIL.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(in Python v3.14)"><strong>TypeError</strong></a> – Если тип входных данных не поддерживается.</p></li>
-<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – Если байты не могут быть декодированы в изображение.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError" title="(в Python v3.14)"><strong>FileNotFoundError</strong></a> – Если файл изображения не удаётся прочитать ни с помощью OpenCV, ни с помощью PIL.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#TypeError" title="(в Python v3.14)"><strong>TypeError</strong></a> – Если тип входных данных не поддерживается.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(в Python v3.14)"><strong>ValueError</strong></a> – Если байты не могут быть декодированы в изображение.</p></li>
 </ul>
 </dd>
 </dl>
@@ -241,14 +277,14 @@
 <p>This utility function creates a simple Page structure from raw text,
 useful for testing correctors or other text processing components
 without requiring actual OCR detection/recognition.</p>
-<p>Each line becomes a Line object with words split by whitespace.
-Words are assigned dummy polygon coordinates for compatibility
+<p>Each line becomes a Line object with text spans split by whitespace.
+Text spans are assigned dummy polygon coordinates for compatibility
 with the data structures.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Параметры<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>lines</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>]</em>) – List of text lines. Each line will be split into words.</p></li>
-<li><p><strong>confidence</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Confidence score to assign to all words (default 1.0).</p></li>
+<li><p><strong>lines</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em>]</em>) – List of text lines. Each line will be split into text spans.</p></li>
+<li><p><strong>confidence</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Confidence score to assign to all text spans (default 1.0).</p></li>
 </ul>
 </dd>
 <dt class="field-even">Результат<span class="colon">:</span></dt>
@@ -261,7 +297,7 @@ with the data structures.</p>
 <p class="rubric">Примеры</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_page_from_text</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">page</span> <span class="o">=</span> <span class="n">create_page_from_text</span><span class="p">([</span><span class="s2">&quot;Hello world&quot;</span><span class="p">,</span> <span class="s2">&quot;This is a test&quot;</span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">page</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">words</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">page</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text_spans</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text</span>
 <span class="go">&#39;Hello&#39;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">len</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lines</span><span class="p">)</span>
 <span class="go">2</span>
@@ -280,33 +316,36 @@ with the data structures.</p>
 <span class="gp">&gt;&gt;&gt;</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Get corrected text</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">corrected</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
-<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">w</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">words</span><span class="p">))</span>
+<span class="gp">... </span>    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">span</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">text_spans</span><span class="p">))</span>
 </pre></div>
 </div>
 </dd></dl>
 
 <dl class="py function">
 <dt class="sig sig-object py" id="manuscript.utils.visualize_page">
-<span class="sig-prename descclassname"><span class="pre">manuscript.utils.</span></span><span class="sig-name descname"><span class="pre">visualize_page</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">255,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thickness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_lines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_numbers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">165,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_bg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">255,</span> <span class="pre">255)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4096</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/utils/visualization.html#visualize_page"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.utils.visualize_page" title="Ссылка на это определение"></a></dt>
-<dd><p>Визуализация объекта Page с обнаруженными словами и блоками.</p>
-<p>Эта функция рисует все слова из структуры Page на изображении, при необходимости отображая порядок чтения с помощью нумерованных маркеров и соединяющих линий. При show_order=True также визуализируются блоки с полупрозрачными ограничивающими рамками, при этом каждый блок имеет свой цвет.</p>
+<span class="sig-prename descclassname"><span class="pre">manuscript.utils.</span></span><span class="sig-name descname"><span class="pre">visualize_page</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">page</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">255,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">thickness</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_order</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_lines</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">show_numbers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">line_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">165,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_bg</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(255,</span> <span class="pre">255,</span> <span class="pre">255)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">number_color</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">(0,</span> <span class="pre">0,</span> <span class="pre">0)</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4096</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/utils/visualization.html#visualize_page"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.utils.visualize_page" title="Ссылка на это определение"></a></dt>
+<dd><p>Visualize a Page object with detected text spans/blocks.</p>
+<p>This function draws all text spans from the Page structure on the image,
+optionally showing reading order with numbered markers and connecting lines.
+When show_order=True, it also visualizes blocks with semi-transparent
+bounding boxes, each block having a distinct color.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Параметры<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>image</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em>, </em><em>np.ndarray</em><em>, or </em><em>PIL.Image</em>) – Входное изображение. Может быть:  - путь к файлу изображения (str или Path) — поддерживаются Unicode-пути  - RGB-массив NumPy с формой (H, W, 3)  - объект PIL Image</p></li>
-<li><p><strong>page</strong> (<a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page"><em>Page</em></a>) – Объект Page из manuscript.data, содержащий обнаруженные блоки и слова.</p></li>
-<li><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>default=</em><em>(</em><em>0</em><em>, </em><em>255</em><em>, </em><em>0</em><em>)</em>) – RGB-цвет для границ слов.</p></li>
-<li><p><strong>thickness</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>default=2</em>) – Толщина линий для границ слов.</p></li>
-<li><p><strong>show_order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=True</em>) – If True, colors different text lines with different colors and shows
+<li><p><strong>image</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em>, </em><em>np.ndarray</em><em>, or </em><em>PIL.Image</em>) – Входное изображение. Может быть:  - путь к файлу изображения (str или Path) — поддерживаются Unicode-пути  - RGB-массив NumPy с формой (H, W, 3)  - объект PIL Image</p></li>
+<li><p><strong>page</strong> (<a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page"><em>Page</em></a>) – Page object from manuscript.data containing detected blocks/text spans.</p></li>
+<li><p><strong>color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(в Python v3.14)"><em>tuple</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>default=</em><em>(</em><em>0</em><em>, </em><em>255</em><em>, </em><em>0</em><em>)</em>) – RGB color for text span boundaries.</p></li>
+<li><p><strong>thickness</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>default=4</em>) – Line thickness for text span boundaries.</p></li>
+<li><p><strong>show_order</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>default=True</em>) – If True, colors different text lines with different colors and shows
 semi-transparent block boundaries with different colors per block.</p></li>
-<li><p><strong>show_lines</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=False</em>) – If True and show_order=True, draw connecting lines between consecutive
-words showing the reading sequence.</p></li>
-<li><p><strong>show_numbers</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>default=False</em>) – If True and show_order=True, display numbered markers on each word
+<li><p><strong>show_lines</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>default=False</em>) – If True and show_order=True, draw connecting lines between consecutive
+text spans showing the reading sequence.</p></li>
+<li><p><strong>show_numbers</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>default=False</em>) – If True and show_order=True, display numbered markers on each text span
 showing the reading order.</p></li>
-<li><p><strong>line_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>default=</em><em>(</em><em>255</em><em>, </em><em>165</em><em>, </em><em>0</em><em>)</em>) – RGB-цвет для соединяющих линий между словами.</p></li>
-<li><p><strong>number_bg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>default=</em><em>(</em><em>255</em><em>, </em><em>255</em><em>, </em><em>255</em><em>)</em>) – Цвет фона для блоков с номерами порядка.</p></li>
-<li><p><strong>number_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(in Python v3.14)"><em>tuple</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>default=</em><em>(</em><em>0</em><em>, </em><em>0</em><em>, </em><em>0</em><em>)</em>) – Цвет текста для номеров порядка.</p></li>
-<li><p><strong>max_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>default=4096</em>) – Максимальный размер большей стороны выходного изображения. Если изображение больше, оно будет пропорционально уменьшено. Установите None, чтобы сохранить исходный размер.</p></li>
+<li><p><strong>line_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(в Python v3.14)"><em>tuple</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>default=</em><em>(</em><em>255</em><em>, </em><em>165</em><em>, </em><em>0</em><em>)</em>) – RGB color for connecting lines between text spans.</p></li>
+<li><p><strong>number_bg</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(в Python v3.14)"><em>tuple</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>default=</em><em>(</em><em>255</em><em>, </em><em>255</em><em>, </em><em>255</em><em>)</em>) – Цвет фона для блоков с номерами порядка.</p></li>
+<li><p><strong>number_color</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(в Python v3.14)"><em>tuple</em></a><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>default=</em><em>(</em><em>0</em><em>, </em><em>0</em><em>, </em><em>0</em><em>)</em>) – Цвет текста для номеров порядка.</p></li>
+<li><p><strong>max_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>default=4096</em>) – Максимальный размер большей стороны выходного изображения. Если изображение больше, оно будет пропорционально уменьшено. Установите None, чтобы сохранить исходный размер.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Результат<span class="colon">:</span></dt>
@@ -321,9 +360,9 @@ showing the reading order.</p></li>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualize_page</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">detector</span> <span class="o">=</span> <span class="n">EAST</span><span class="p">()</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">page</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="c1"># Can pass path directly</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span> <span class="o">=</span> <span class="n">visualize_page</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">,</span> <span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">])</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span> <span class="o">=</span> <span class="n">visualize_page</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;output.jpg&quot;</span><span class="p">)</span>
 </pre></div>
 </div>
@@ -333,17 +372,17 @@ showing the reading order.</p></li>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">read_image</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">)</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span> <span class="o">=</span> <span class="n">visualize_page</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">img</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">page</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">show_order</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">color</span><span class="o">=</span><span class="p">(</span><span class="mi">255</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">),</span>
 <span class="gp">... </span>    <span class="n">thickness</span><span class="o">=</span><span class="mi">3</span>
 <span class="gp">... </span><span class="p">)</span>
 </pre></div>
 </div>
-<p>Show connecting lines and numbers between words:</p>
+<p>Show connecting lines and numbers between text spans:</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">vis</span> <span class="o">=</span> <span class="n">visualize_page</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="s2">&quot;document.jpg&quot;</span><span class="p">,</span>
-<span class="gp">... </span>    <span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">],</span>
+<span class="gp">... </span>    <span class="n">page</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">show_order</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">show_lines</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">show_numbers</span><span class="o">=</span><span class="kc">True</span>
@@ -359,13 +398,215 @@ showing the reading order.</p></li>
 <dl class="field-list simple">
 <dt class="field-odd">Параметры<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>page</strong> (<a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page"><em>Page</em></a>) – Input page with detected words.</p></li>
-<li><p><strong>max_splits</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum number of column split attempts. Default is 10.</p></li>
-<li><p><strong>use_columns</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, segment into columns before line grouping. Default is True.</p></li>
+<li><p><strong>page</strong> (<a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page"><em>Page</em></a>) – Input page with detected text spans.</p></li>
+<li><p><strong>max_splits</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Maximum number of column split attempts. Default is 10.</p></li>
+<li><p><strong>use_columns</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, segment into columns before line grouping. Default is True.</p></li>
 </ul>
 </dd>
 <dt class="field-even">Результат<span class="colon">:</span></dt>
 <dd class="field-even"><p>Organized page.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page">Page</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manuscript.utils.crop_axis_aligned">
+<span class="sig-prename descclassname"><span class="pre">manuscript.utils.</span></span><span class="sig-name descname"><span class="pre">crop_axis_aligned</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polygon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/utils/geometry.html#crop_axis_aligned"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.utils.crop_axis_aligned" title="Ссылка на это определение"></a></dt>
+<dd><p>Crop an axis-aligned rectangle covering the polygon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(в Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(в NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]</span></p>
+</dd>
+<dt class="field-even">Параметры<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>image</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(в NumPy v2.4)"><em>numpy.ndarray</em></a>)</p></li>
+<li><p><strong>polygon</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(в NumPy v2.4)"><em>numpy.ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(в Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(в Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manuscript.utils.crop_polygon_mask">
+<span class="sig-prename descclassname"><span class="pre">manuscript.utils.</span></span><span class="sig-name descname"><span class="pre">crop_polygon_mask</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polygon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">255</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/utils/geometry.html#crop_polygon_mask"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.utils.crop_polygon_mask" title="Ссылка на это определение"></a></dt>
+<dd><p>Crop the polygon bounding box and mask pixels outside the polygon.</p>
+<p>Works with arbitrary polygons of shape <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">2)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(в Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(в NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]</span></p>
+</dd>
+<dt class="field-even">Параметры<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>image</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(в NumPy v2.4)"><em>numpy.ndarray</em></a>)</p></li>
+<li><p><strong>polygon</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(в NumPy v2.4)"><em>numpy.ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(в Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(в Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>background</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manuscript.utils.merge_polygons">
+<span class="sig-prename descclassname"><span class="pre">manuscript.utils.</span></span><span class="sig-name descname"><span class="pre">merge_polygons</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polygons</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bbox'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/utils/geometry.html#merge_polygons"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.utils.merge_polygons" title="Ссылка на это определение"></a></dt>
+<dd><p>Merge multiple polygons into a single polygon.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>polygons</strong> (<em>sequence</em><em> of </em><em>array-like polygons</em>) – Input polygons with shape <code class="docutils literal notranslate"><span class="pre">(N,</span> <span class="pre">2)</span></code>.</p></li>
+<li><p><strong>method</strong> (<em>{&quot;bbox&quot;</em><em>, </em><em>&quot;convex_hull&quot;}</em><em>, </em><em>optional</em>) – Merge strategy. <code class="docutils literal notranslate"><span class="pre">&quot;bbox&quot;</span></code> returns an axis-aligned rectangle covering
+all points. <code class="docutils literal notranslate"><span class="pre">&quot;convex_hull&quot;</span></code> returns a convex hull over all points.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Merged polygon, or <code class="docutils literal notranslate"><span class="pre">None</span></code> when <code class="docutils literal notranslate"><span class="pre">polygons</span></code> is empty.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#list" title="(в Python v3.14)">list</a> of <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(в Python v3.14)">tuple</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manuscript.utils.order_quad_points">
+<span class="sig-prename descclassname"><span class="pre">manuscript.utils.</span></span><span class="sig-name descname"><span class="pre">order_quad_points</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">points</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/utils/geometry.html#order_quad_points"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.utils.order_quad_points" title="Ссылка на это определение"></a></dt>
+<dd><p>Order exactly 4 polygon points as top-left, top-right, bottom-right,
+bottom-left.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(в NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a></span></p>
+</dd>
+<dt class="field-even">Параметры<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>points</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(в NumPy v2.4)"><em>numpy.ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(в Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(в Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>...</em><em>]</em>)</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manuscript.utils.polygon_to_bbox">
+<span class="sig-prename descclassname"><span class="pre">manuscript.utils.</span></span><span class="sig-name descname"><span class="pre">polygon_to_bbox</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">polygon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image_shape</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pad</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/utils/geometry.html#polygon_to_bbox"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.utils.polygon_to_bbox" title="Ссылка на это определение"></a></dt>
+<dd><p>Convert a polygon with any number of vertices to a clipped axis-aligned
+bounding box.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>polygon</strong> (<em>array-like</em><em> of </em><em>shape</em><em> (</em><em>N</em><em>, </em><em>2</em><em>)</em>) – Polygon vertices in image coordinates.</p></li>
+<li><p><strong>image_shape</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(в Python v3.14)"><em>tuple</em></a><em>, </em><em>optional</em>) – Source image shape used for clipping.</p></li>
+<li><p><strong>pad</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Extra padding in pixels around the polygon. Default is <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Bounding box as <code class="docutils literal notranslate"><span class="pre">(x1,</span> <span class="pre">y1,</span> <span class="pre">x2,</span> <span class="pre">y2)</span></code> or <code class="docutils literal notranslate"><span class="pre">None</span></code> if invalid.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#tuple" title="(в Python v3.14)">tuple</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manuscript.utils.warp_quad">
+<span class="sig-prename descclassname"><span class="pre">manuscript.utils.</span></span><span class="sig-name descname"><span class="pre">warp_quad</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">image</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">polygon</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">background</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">255</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/utils/geometry.html#warp_quad"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.utils.warp_quad" title="Ссылка на это определение"></a></dt>
+<dd><p>Perspective-warp a quadrilateral polygon into a rectified crop.</p>
+<p>This helper is intentionally quad-specific. For non-quad polygons it
+returns <code class="docutils literal notranslate"><span class="pre">None</span></code> so callers may choose a fallback strategy.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(в Python v3.14)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a>[<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(в NumPy v2.4)"><code class="xref py py-class docutils literal notranslate"><span class="pre">ndarray</span></code></a>]</span></p>
+</dd>
+<dt class="field-even">Параметры<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><strong>image</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(в NumPy v2.4)"><em>numpy.ndarray</em></a>)</p></li>
+<li><p><strong>polygon</strong> (<a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(в NumPy v2.4)"><em>numpy.ndarray</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(в Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(в Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>]</em><em>, </em><em>...</em><em>]</em>)</p></li>
+<li><p><strong>output_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(в Python v3.14)"><em>Tuple</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>background</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manuscript.utils.merge_text_spans">
+<span class="sig-prename descclassname"><span class="pre">manuscript.utils.</span></span><span class="sig-name descname"><span class="pre">merge_text_spans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">text_spans</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bbox'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/utils/page_transforms.html#merge_text_spans"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.utils.merge_text_spans" title="Ссылка на это определение"></a></dt>
+<dd><p>Merge multiple <code class="docutils literal notranslate"><span class="pre">TextSpan</span></code> objects into a single wider <code class="docutils literal notranslate"><span class="pre">TextSpan</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>text_spans</strong> (<em>sequence</em><em> of </em><a class="reference internal" href="data.html#manuscript.data.TextSpan" title="manuscript.data.TextSpan"><em>TextSpan</em></a>) – Input text spans to merge.</p></li>
+<li><p><strong>method</strong> (<em>{&quot;bbox&quot;</em><em>, </em><em>&quot;convex_hull&quot;}</em><em>, </em><em>optional</em>) – Polygon merge strategy. <code class="docutils literal notranslate"><span class="pre">&quot;bbox&quot;</span></code> creates an axis-aligned rectangle
+covering all span polygons. <code class="docutils literal notranslate"><span class="pre">&quot;convex_hull&quot;</span></code> creates a convex hull
+around all polygon vertices. Default is <code class="docutils literal notranslate"><span class="pre">&quot;bbox&quot;</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Merged text span, or <code class="docutils literal notranslate"><span class="pre">None</span></code> when <code class="docutils literal notranslate"><span class="pre">text_spans</span></code> is empty.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="data.html#manuscript.data.TextSpan" title="manuscript.data.TextSpan">TextSpan</a> or None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manuscript.utils.collapse_line_text_spans">
+<span class="sig-prename descclassname"><span class="pre">manuscript.utils.</span></span><span class="sig-name descname"><span class="pre">collapse_line_text_spans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">line</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bbox'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/utils/page_transforms.html#collapse_line_text_spans"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.utils.collapse_line_text_spans" title="Ссылка на это определение"></a></dt>
+<dd><p>Collapse all text spans inside a line into a single text span.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>line</strong> (<a class="reference internal" href="data.html#manuscript.data.Line" title="manuscript.data.Line"><em>Line</em></a>) – Input line.</p></li>
+<li><p><strong>method</strong> (<em>{&quot;bbox&quot;</em><em>, </em><em>&quot;convex_hull&quot;}</em><em>, </em><em>optional</em>) – Polygon merge strategy. Default is <code class="docutils literal notranslate"><span class="pre">&quot;bbox&quot;</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>New line containing one merged text span or an empty span list.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="data.html#manuscript.data.Line" title="manuscript.data.Line">Line</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manuscript.utils.collapse_block_text_spans">
+<span class="sig-prename descclassname"><span class="pre">manuscript.utils.</span></span><span class="sig-name descname"><span class="pre">collapse_block_text_spans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">block</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bbox'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/utils/page_transforms.html#collapse_block_text_spans"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.utils.collapse_block_text_spans" title="Ссылка на это определение"></a></dt>
+<dd><p>Collapse all text spans inside a block into a single line with one text span.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>block</strong> (<a class="reference internal" href="data.html#manuscript.data.Block" title="manuscript.data.Block"><em>Block</em></a>) – Input block.</p></li>
+<li><p><strong>method</strong> (<em>{&quot;bbox&quot;</em><em>, </em><em>&quot;convex_hull&quot;}</em><em>, </em><em>optional</em>) – Polygon merge strategy. Default is <code class="docutils literal notranslate"><span class="pre">&quot;bbox&quot;</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>New block containing a single collapsed line.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="data.html#manuscript.data.Block" title="manuscript.data.Block">Block</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="manuscript.utils.collapse_page_text_spans">
+<span class="sig-prename descclassname"><span class="pre">manuscript.utils.</span></span><span class="sig-name descname"><span class="pre">collapse_page_text_spans</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">level</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'line'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">method</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'bbox'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/utils/page_transforms.html#collapse_page_text_spans"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.utils.collapse_page_text_spans" title="Ссылка на это определение"></a></dt>
+<dd><p>Collapse narrow OCR structure into wider line-level or block-level spans.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>page</strong> (<a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page"><em>Page</em></a>) – Input page.</p></li>
+<li><p><strong>level</strong> (<em>{&quot;line&quot;</em><em>, </em><em>&quot;block&quot;}</em><em>, </em><em>optional</em>) – Collapse target. <code class="docutils literal notranslate"><span class="pre">&quot;line&quot;</span></code> keeps the same block/line structure and
+replaces each line with one merged text span. <code class="docutils literal notranslate"><span class="pre">&quot;block&quot;</span></code> replaces each
+block with one line containing one merged text span. Default is <code class="docutils literal notranslate"><span class="pre">&quot;line&quot;</span></code>.</p></li>
+<li><p><strong>method</strong> (<em>{&quot;bbox&quot;</em><em>, </em><em>&quot;convex_hull&quot;}</em><em>, </em><em>optional</em>) – Polygon merge strategy. Default is <code class="docutils literal notranslate"><span class="pre">&quot;bbox&quot;</span></code>.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Collapsed page.</p>
 </dd>
 <dt class="field-odd">Тип результата<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page">Page</a></p>
@@ -379,10 +620,10 @@ showing the reading order.</p></li>
 <dd><p>Установка случайного зерна для воспроизводимости в random, NumPy и PyTorch.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Тип результата<span class="colon">:</span></dt>
-<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(в Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
 </dd>
 <dt class="field-even">Параметры<span class="colon">:</span></dt>
-<dd class="field-even"><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p>
+<dd class="field-even"><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a>)</p>
 </dd>
 </dl>
 </dd></dl>
@@ -394,6 +635,7 @@ showing the reading order.</p></li>
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Нижняя область">
         <a href="correctors.html" class="btn btn-neutral float-left" title="Корректоры" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Предыдущая</a>
+        <a href="../related_work.html" class="btn btn-neutral float-right" title="Связанные работы" accesskey="n" rel="next">Следующая <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

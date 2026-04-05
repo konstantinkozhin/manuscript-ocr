@@ -7,15 +7,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>manuscript._pipeline &mdash; manuscript-ocr 0.1.11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../_static/language_switcher.css?v=d768f156" />
+      <link rel="stylesheet" type="text/css" href="../../_static/model_zoo.css?v=2d297567" />
 
   
       <script src="../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../_static/documentation_options.js?v=1e825a29"></script>
-      <script src="../../_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
       <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
 
@@ -450,9 +451,10 @@ mermaid.initialize(
     }
 );
 
-window.addEventListener("load", load);</script>
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
       <script src="../../_static/language_switcher.js?v=db730534"></script>
-      <script src="../../_static/version_sidebar.js?v=edadfa97"></script>
+      <script src="../../_static/version_sidebar.js?v=50cbed02"></script>
     <script src="../../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../../genindex.html" />
     <link rel="search" title="Search" href="../../search.html" /> 
@@ -482,8 +484,18 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l1"><a class="reference internal" href="../../getting_started.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#example-notebooks">Example Notebooks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#main-components">Main Components</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#pipeline-defaults">Pipeline Defaults</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#model-zoo">Model Zoo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../getting_started.html#related-work">Related Work</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../model_zoo.html">Model Zoo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../model_zoo.html#detection">Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../model_zoo.html#layout">Layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../model_zoo.html#recognition">Recognition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../model_zoo.html#correction">Correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../model_zoo.html#architecture-sources">Architecture Sources</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../pipeline_usage.html">Pipeline Usage Guide</a><ul>
@@ -498,6 +510,8 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#disable-stages">Disable Stages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#layout-placement">Layout Placement</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#trba-region-preparation">TRBA Region Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#collapsing-text-spans">Collapsing Text Spans</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
 </ul>
@@ -522,8 +536,8 @@ window.addEventListener("load", load);</script>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/data.html">Data Structures</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/data.html#data-model">Data Model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../api/data.html#module-manuscript.data">API Reference</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api/data.html#manuscript.data.Word"><code class="docutils literal notranslate"><span class="pre">Word</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/data.html#module-manuscript.data">Module Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/data.html#manuscript.data.TextSpan"><code class="docutils literal notranslate"><span class="pre">TextSpan</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/data.html#manuscript.data.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/data.html#manuscript.data.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/data.html#manuscript.data.Page"><code class="docutils literal notranslate"><span class="pre">Page</span></code></a></li>
@@ -533,14 +547,24 @@ window.addEventListener("load", load);</script>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/detectors.html">Detectors</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.YOLO"><code class="docutils literal notranslate"><span class="pre">YOLO</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.YOLO.__init__"><code class="docutils literal notranslate"><span class="pre">YOLO.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.YOLO.config_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.YOLO.default_target_size"><code class="docutils literal notranslate"><span class="pre">YOLO.default_target_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.YOLO.default_weights_name"><code class="docutils literal notranslate"><span class="pre">YOLO.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.YOLO.predict"><code class="docutils literal notranslate"><span class="pre">YOLO.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/detectors.html#manuscript.detectors.YOLO.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.pretrained_registry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/detectors.html#east-training-quads">EAST Training Quads</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/layouts.html">Layouts</a><ul>
@@ -553,14 +577,14 @@ window.addEventListener("load", load);</script>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../api/recognizers.html">Recognizers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../api/recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -585,11 +609,22 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.crop_axis_aligned"><code class="docutils literal notranslate"><span class="pre">crop_axis_aligned()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.crop_polygon_mask"><code class="docutils literal notranslate"><span class="pre">crop_polygon_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.merge_polygons"><code class="docutils literal notranslate"><span class="pre">merge_polygons()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.order_quad_points"><code class="docutils literal notranslate"><span class="pre">order_quad_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.polygon_to_bbox"><code class="docutils literal notranslate"><span class="pre">polygon_to_bbox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.warp_quad"><code class="docutils literal notranslate"><span class="pre">warp_quad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.merge_text_spans"><code class="docutils literal notranslate"><span class="pre">merge_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.collapse_line_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_line_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.collapse_block_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_block_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.collapse_page_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_page_text_spans()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../api/utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../related_work.html">Related Work</a></li>
 </ul>
 
         </div>
@@ -617,22 +652,29 @@ window.addEventListener("load", load);</script>
            <div itemprop="articleBody">
              
   <h1>Source code for manuscript._pipeline</h1><div class="highlight"><pre>
-<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">inspect</span>
-<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span></span><span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">pathlib</span><span class="w"> </span><span class="kn">import</span> <span class="n">Path</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">TYPE_CHECKING</span><span class="p">,</span> <span class="n">Union</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Union</span>
 
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">PIL</span><span class="w"> </span><span class="kn">import</span> <span class="n">Image</span>
 
+<span class="kn">from</span><span class="w"> </span><span class="nn">.api._page_helpers</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">accepts_predict_kwarg</span><span class="p">,</span>
+    <span class="n">call_page_stage</span><span class="p">,</span>
+    <span class="n">filter_predict_kwargs</span><span class="p">,</span>
+<span class="p">)</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.api.protocols</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
+    <span class="n">CorrectorProtocol</span><span class="p">,</span>
+    <span class="n">DetectorProtocol</span><span class="p">,</span>
+    <span class="n">LayoutProtocol</span><span class="p">,</span>
+    <span class="n">RecognizerProtocol</span><span class="p">,</span>
+<span class="p">)</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Page</span>
-<span class="kn">from</span><span class="w"> </span><span class="nn">.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">YOLO</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.layouts</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleSorting</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.recognizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRBA</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_image</span><span class="p">,</span> <span class="n">visualize_page</span>
-
-<span class="k">if</span> <span class="n">TYPE_CHECKING</span><span class="p">:</span>
-    <span class="kn">from</span><span class="w"> </span><span class="nn">.api.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span> <span class="k">as</span> <span class="n">BaseCorrector</span>
 
 <span class="n">_DEFAULT</span> <span class="o">=</span> <span class="nb">object</span><span class="p">()</span>
 <span class="n">_VALID_LAYOUT_AFTER</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span> <span class="s2">&quot;recognizer&quot;</span><span class="p">,</span> <span class="s2">&quot;corrector&quot;</span><span class="p">}</span>
@@ -653,12 +695,11 @@ window.addEventListener("load", load);</script>
 <a class="viewcode-back" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.__init__">[docs]</a>
     <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
-        <span class="n">detector</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">_DEFAULT</span><span class="p">,</span>
-        <span class="n">layout</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">_DEFAULT</span><span class="p">,</span>
-        <span class="n">recognizer</span><span class="p">:</span> <span class="n">Any</span> <span class="o">=</span> <span class="n">_DEFAULT</span><span class="p">,</span>
-        <span class="n">corrector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;BaseCorrector&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">detector</span><span class="p">:</span> <span class="n">DetectorProtocol</span> <span class="o">=</span> <span class="n">_DEFAULT</span><span class="p">,</span>
+        <span class="n">layout</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">LayoutProtocol</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DEFAULT</span><span class="p">,</span>
+        <span class="n">recognizer</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">RecognizerProtocol</span><span class="p">]</span> <span class="o">=</span> <span class="n">_DEFAULT</span><span class="p">,</span>
+        <span class="n">corrector</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">CorrectorProtocol</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">layout_after</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;detector&quot;</span><span class="p">,</span>
-        <span class="n">min_text_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">5</span><span class="p">,</span>
     <span class="p">):</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">        Initialize OCR pipeline.</span>
@@ -666,8 +707,8 @@ window.addEventListener("load", load);</script>
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        detector : object, optional</span>
-<span class="sd">            Detector instance with ``predict(image) -&gt; {&quot;page&quot;: Page}``.</span>
-<span class="sd">            If omitted, default ``EAST()`` is used.</span>
+<span class="sd">            Detector instance with ``predict(image) -&gt; Page``.</span>
+<span class="sd">            If omitted, default ``YOLO(weights=&quot;yolo26x_obb_text_g1&quot;)`` is used.</span>
 <span class="sd">            Detector cannot be disabled.</span>
 <span class="sd">        layout : object or None, optional</span>
 <span class="sd">            Layout model instance with ``predict(page, image=None) -&gt; Page``.</span>
@@ -675,19 +716,16 @@ window.addEventListener("load", load);</script>
 <span class="sd">            Pass ``None`` to disable layout stage.</span>
 <span class="sd">        recognizer : object or None, optional</span>
 <span class="sd">            Recognizer instance with ``predict(page, image=None, ...) -&gt; Page``.</span>
-<span class="sd">            If omitted, default ``TRBA()`` is used.</span>
+<span class="sd">            If omitted, default ``TRBA(weights=&quot;trba_lite_g2&quot;)`` is used.</span>
 <span class="sd">            Pass ``None`` to disable recognition stage.</span>
 <span class="sd">        corrector : object or None, optional</span>
 <span class="sd">            Corrector instance with ``predict(page, image=None) -&gt; Page``.</span>
 <span class="sd">            Default is ``None`` (disabled).</span>
 <span class="sd">        layout_after : {&quot;detector&quot;, &quot;recognizer&quot;, &quot;corrector&quot;}, optional</span>
 <span class="sd">            Slot where layout stage is executed. Default is ``&quot;detector&quot;``.</span>
-<span class="sd">        min_text_size : int, optional</span>
-<span class="sd">            Minimum text box size in pixels (width and height) passed to</span>
-<span class="sd">            recognizers that support ``min_text_size``. Default is 5.</span>
 <span class="sd">        &quot;&quot;&quot;</span>
         <span class="k">if</span> <span class="n">detector</span> <span class="ow">is</span> <span class="n">_DEFAULT</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">EAST</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">detector</span> <span class="o">=</span> <span class="n">YOLO</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;yolo26x_obb_text_g1&quot;</span><span class="p">)</span>
         <span class="k">elif</span> <span class="n">detector</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;detector cannot be None&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
@@ -699,12 +737,11 @@ window.addEventListener("load", load);</script>
             <span class="bp">self</span><span class="o">.</span><span class="n">layout</span> <span class="o">=</span> <span class="n">layout</span>
 
         <span class="k">if</span> <span class="n">recognizer</span> <span class="ow">is</span> <span class="n">_DEFAULT</span><span class="p">:</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">()</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;trba_lite_g2&quot;</span><span class="p">)</span>
         <span class="k">else</span><span class="p">:</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span> <span class="o">=</span> <span class="n">recognizer</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">corrector</span> <span class="o">=</span> <span class="n">corrector</span>
-        <span class="bp">self</span><span class="o">.</span><span class="n">min_text_size</span> <span class="o">=</span> <span class="n">min_text_size</span>
 
         <span class="k">if</span> <span class="n">layout_after</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">_VALID_LAYOUT_AFTER</span><span class="p">:</span>
             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
@@ -717,23 +754,6 @@ window.addEventListener("load", load);</script>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_recognition_page</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Page</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_correction_page</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Page</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span></div>
 
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_filter_predict_kwargs</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
-        <span class="k">try</span><span class="p">:</span>
-            <span class="n">params</span> <span class="o">=</span> <span class="n">inspect</span><span class="o">.</span><span class="n">signature</span><span class="p">(</span><span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">)</span><span class="o">.</span><span class="n">parameters</span>
-        <span class="k">except</span> <span class="p">(</span><span class="ne">TypeError</span><span class="p">,</span> <span class="ne">ValueError</span><span class="p">):</span>
-            <span class="k">return</span> <span class="p">{}</span>
-
-        <span class="k">if</span> <span class="nb">any</span><span class="p">(</span><span class="n">p</span><span class="o">.</span><span class="n">kind</span> <span class="o">==</span> <span class="n">inspect</span><span class="o">.</span><span class="n">Parameter</span><span class="o">.</span><span class="n">VAR_KEYWORD</span> <span class="k">for</span> <span class="n">p</span> <span class="ow">in</span> <span class="n">params</span><span class="o">.</span><span class="n">values</span><span class="p">()):</span>
-            <span class="k">return</span> <span class="n">kwargs</span>
-
-        <span class="k">return</span> <span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">v</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">kwargs</span><span class="o">.</span><span class="n">items</span><span class="p">()</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">params</span><span class="p">}</span>
-
-    <span class="nd">@staticmethod</span>
-    <span class="k">def</span><span class="w"> </span><span class="nf">_call_predict</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Any</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
-        <span class="n">filtered_kwargs</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="o">.</span><span class="n">_filter_predict_kwargs</span><span class="p">(</span><span class="n">model</span><span class="p">,</span> <span class="n">kwargs</span><span class="p">)</span>
-        <span class="k">return</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="o">**</span><span class="n">filtered_kwargs</span><span class="p">)</span>
 
 <div class="viewcode-block" id="Pipeline.predict">
 <a class="viewcode-back" href="../../api/pipeline.html#manuscript._pipeline.Pipeline.predict">[docs]</a>
@@ -779,9 +799,9 @@ window.addEventListener("load", load);</script>
 
             <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="n">layout_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">if</span> <span class="s2">&quot;image&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_predict_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}):</span>
+            <span class="k">if</span> <span class="n">accepts_predict_kwarg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">):</span>
                 <span class="n">layout_kwargs</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_image_array</span><span class="p">()</span>
-            <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">layout_kwargs</span><span class="p">)</span>
+            <span class="n">page</span> <span class="o">=</span> <span class="n">call_page_stage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">layout</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="o">**</span><span class="n">layout_kwargs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_layout_page</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Layout (</span><span class="si">{</span><span class="n">anchor</span><span class="si">}</span><span class="s2">): </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
@@ -789,11 +809,7 @@ window.addEventListener("load", load);</script>
 
         <span class="c1"># Detection</span>
         <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-        <span class="n">detection_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_predict_kwargs</span><span class="p">(</span>
-            <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;return_maps&quot;</span><span class="p">:</span> <span class="kc">False</span><span class="p">}</span>
-        <span class="p">)</span>
-        <span class="n">detection_result</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">image</span><span class="p">,</span> <span class="o">**</span><span class="n">detection_kwargs</span><span class="p">)</span>
-        <span class="n">page</span><span class="p">:</span> <span class="n">Page</span> <span class="o">=</span> <span class="n">detection_result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">]</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">image</span><span class="p">)</span>
         <span class="bp">self</span><span class="o">.</span><span class="n">_last_detection_page</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
             <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Detection: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
@@ -804,16 +820,15 @@ window.addEventListener("load", load);</script>
         <span class="c1"># Recognition slot</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
-            <span class="n">recognizer_kwargs</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_predict_kwargs</span><span class="p">(</span>
+            <span class="n">recognizer_kwargs</span> <span class="o">=</span> <span class="n">filter_predict_kwargs</span><span class="p">(</span>
                 <span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="p">,</span>
                 <span class="p">{</span>
                     <span class="s2">&quot;batch_size&quot;</span><span class="p">:</span> <span class="mi">32</span><span class="p">,</span>
-                    <span class="s2">&quot;min_text_size&quot;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">min_text_size</span><span class="p">,</span>
                 <span class="p">},</span>
             <span class="p">)</span>
-            <span class="k">if</span> <span class="s2">&quot;image&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_predict_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}):</span>
+            <span class="k">if</span> <span class="n">accepts_predict_kwarg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">):</span>
                 <span class="n">recognizer_kwargs</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_image_array</span><span class="p">()</span>
-            <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">recognizer_kwargs</span><span class="p">)</span>
+            <span class="n">page</span> <span class="o">=</span> <span class="n">call_page_stage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">recognizer</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="o">**</span><span class="n">recognizer_kwargs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_recognition_page</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Recognition: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
@@ -825,9 +840,9 @@ window.addEventListener("load", load);</script>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">corrector</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="n">t0</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span>
             <span class="n">corrector_kwargs</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-            <span class="k">if</span> <span class="s2">&quot;image&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_filter_predict_kwargs</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">corrector</span><span class="p">,</span> <span class="p">{</span><span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">}):</span>
+            <span class="k">if</span> <span class="n">accepts_predict_kwarg</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">corrector</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">):</span>
                 <span class="n">corrector_kwargs</span><span class="p">[</span><span class="s2">&quot;image&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">get_image_array</span><span class="p">()</span>
-            <span class="n">page</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_call_predict</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">corrector</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="n">corrector_kwargs</span><span class="p">)</span>
+            <span class="n">page</span> <span class="o">=</span> <span class="n">call_page_stage</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">corrector</span><span class="p">,</span> <span class="n">page</span><span class="p">,</span> <span class="o">**</span><span class="n">corrector_kwargs</span><span class="p">)</span>
             <span class="bp">self</span><span class="o">.</span><span class="n">_last_correction_page</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">model_copy</span><span class="p">(</span><span class="n">deep</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
             <span class="k">if</span> <span class="n">profile</span><span class="p">:</span>
                 <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Correction: </span><span class="si">{</span><span class="n">time</span><span class="o">.</span><span class="n">time</span><span class="p">()</span><span class="w"> </span><span class="o">-</span><span class="w"> </span><span class="n">t0</span><span class="si">:</span><span class="s2">.3f</span><span class="si">}</span><span class="s2">s&quot;</span><span class="p">)</span>
@@ -858,7 +873,7 @@ window.addEventListener("load", load);</script>
         <span class="n">lines</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">page</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
             <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
-                <span class="n">texts</span> <span class="o">=</span> <span class="p">[</span><span class="n">w</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">words</span> <span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">text</span><span class="p">]</span>
+                <span class="n">texts</span> <span class="o">=</span> <span class="p">[</span><span class="n">span</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">text_spans</span> <span class="k">if</span> <span class="n">span</span><span class="o">.</span><span class="n">text</span><span class="p">]</span>
                 <span class="k">if</span> <span class="n">texts</span><span class="p">:</span>
                     <span class="n">lines</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">texts</span><span class="p">))</span>
         <span class="k">return</span> <span class="s2">&quot;</span><span class="se">\n</span><span class="s2">&quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">lines</span><span class="p">)</span></div>

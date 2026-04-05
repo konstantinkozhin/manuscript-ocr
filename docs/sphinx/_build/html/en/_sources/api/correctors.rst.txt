@@ -65,7 +65,7 @@ Use ``create_page_from_text`` to quickly test correction on text:
 
     # Extract corrected text
     for line in corrected.blocks[0].lines:
-        text = " ".join(w.text for w in line.words)
+        text = " ".join(span.text for span in line.text_spans if span.text)
         print(text)
 
 Basic Usage

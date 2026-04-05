@@ -5,8 +5,12 @@ manuscript-ocr Documentation
    :align: center
    :alt: manuscript-ocr logo
 
-**manuscript-ocr** is a Python library for OCR (Optical Character Recognition) 
-of handwritten manuscripts and documents.
+**Manuscript OCR** is an open-source Python framework for full OCR/HTR
+pipelines targeting pre-reform Russian manuscripts of the 18th-19th
+centuries as well as modern texts. The project focuses on digitization and
+analysis of historical textual heritage, with methods tailored to legacy
+orthography, complex page layouts, handwriting variation, and high
+computational efficiency under limited resources.
 
 .. toctree::
    :maxdepth: 2
@@ -17,6 +21,7 @@ of handwritten manuscripts and documents.
    pipeline_usage
    structure
    api/index
+   related_work
 
 Indices and tables
 ==================

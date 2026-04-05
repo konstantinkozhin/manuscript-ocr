@@ -7,15 +7,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>manuscript.detectors._east &mdash; документация manuscript-ocr 0.1.11</title>
       <link rel="stylesheet" type="text/css" href="../../../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../../../_static/language_switcher.css?v=d768f156" />
+      <link rel="stylesheet" type="text/css" href="../../../_static/model_zoo.css?v=2d297567" />
 
   
       <script src="../../../_static/jquery.js?v=5d32c60e"></script>
       <script src="../../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../../../_static/documentation_options.js?v=708478e6"></script>
-      <script src="../../../_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="../../../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../../../_static/translations.js?v=cd1d70c9"></script>
       <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
       <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
@@ -451,9 +452,10 @@ mermaid.initialize(
     }
 );
 
-window.addEventListener("load", load);</script>
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
       <script src="../../../_static/language_switcher.js?v=db730534"></script>
-      <script src="../../../_static/version_sidebar.js?v=edadfa97"></script>
+      <script src="../../../_static/version_sidebar.js?v=50cbed02"></script>
     <script src="../../../_static/js/theme.js"></script>
     <link rel="index" title="Алфавитный указатель" href="../../../genindex.html" />
     <link rel="search" title="Поиск" href="../../../search.html" /> 
@@ -483,28 +485,40 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l1"><a class="reference internal" href="../../../getting_started.html">Начало работы</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#installation">Установка</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#quick-start">Быстрый старт</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#example-notebooks">Примеры ноутбуков</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#main-components">Основные компоненты</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#pipeline-defaults">Pipeline Defaults</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#model-zoo">Зоопарк моделей</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../getting_started.html#related-work">Связанные работы</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../../../model_zoo.html">Зоопарк моделей</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../../../model_zoo.html#detection">Детекция</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../model_zoo.html#layout">Layout-анализ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../model_zoo.html#recognition">Распознавание</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../model_zoo.html#correction">Посткоррекция</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../model_zoo.html#architecture-sources">Источники архитектур</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../pipeline_usage.html">Руководство по использованию Pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#stage-contracts">Stage Contracts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#detector">Detector</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#recognizer">Recognizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#stage-contracts">Контракты этапов</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#detector">Детектор</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#recognizer">Распознаватель</a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#layout">Layout</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#corrector">Corrector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../pipeline_usage.html#corrector">Корректор</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#basic-usage">Базовое использование</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#disable-stages">Disable Stages</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#layout-placement">Layout Placement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#built-in-components">Built-in Components</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#disable-stages">Отключение этапов</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#layout-placement">Положение этапа layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#built-in-components">Встроенные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#trba-region-preparation">Подготовка регионов в TRBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#collapsing-text-spans">Объединение TextSpan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#visualization-and-profiling">Визуализация и профилирование</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../../../pipeline_usage.html#intermediate-results">Промежуточные результаты</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../structure.html">Структура библиотеки</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../../../structure.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../../../structure.html#overview">Обзор</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../../../api/index.html">Справочник API</a><ul>
@@ -523,8 +537,9 @@ window.addEventListener("load", load);</script>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/data.html">Структуры данных</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/data.html#data-model">Модель данных</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../../../api/data.html#module-manuscript.data">Справочник API</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/data.html#manuscript.data.Word"><code class="docutils literal notranslate"><span class="pre">Word</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/data.html#compatibility">Совместимость</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/data.html#module-manuscript.data">Справочник модуля</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/data.html#manuscript.data.TextSpan"><code class="docutils literal notranslate"><span class="pre">TextSpan</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/data.html#manuscript.data.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/data.html#manuscript.data.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/data.html#manuscript.data.Page"><code class="docutils literal notranslate"><span class="pre">Page</span></code></a></li>
@@ -534,17 +549,27 @@ window.addEventListener("load", load);</script>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/detectors.html">Детекторы</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.YOLO"><code class="docutils literal notranslate"><span class="pre">YOLO</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.YOLO.__init__"><code class="docutils literal notranslate"><span class="pre">YOLO.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.YOLO.config_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.YOLO.default_target_size"><code class="docutils literal notranslate"><span class="pre">YOLO.default_target_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.YOLO.default_weights_name"><code class="docutils literal notranslate"><span class="pre">YOLO.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.YOLO.predict"><code class="docutils literal notranslate"><span class="pre">YOLO.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/detectors.html#manuscript.detectors.YOLO.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.pretrained_registry</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../../../api/layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/detectors.html#east-training-quads">Четырёхугольные области для обучения EAST</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../../../api/layouts.html">Layout-модели</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
@@ -554,14 +579,14 @@ window.addEventListener("load", load);</script>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="../../../api/recognizers.html">Распознаватели</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="../../../api/recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -586,11 +611,22 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.crop_axis_aligned"><code class="docutils literal notranslate"><span class="pre">crop_axis_aligned()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.crop_polygon_mask"><code class="docutils literal notranslate"><span class="pre">crop_polygon_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.merge_polygons"><code class="docutils literal notranslate"><span class="pre">merge_polygons()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.order_quad_points"><code class="docutils literal notranslate"><span class="pre">order_quad_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.polygon_to_bbox"><code class="docutils literal notranslate"><span class="pre">polygon_to_bbox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.warp_quad"><code class="docutils literal notranslate"><span class="pre">warp_quad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.merge_text_spans"><code class="docutils literal notranslate"><span class="pre">merge_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.collapse_line_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_line_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.collapse_block_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_block_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.collapse_page_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_page_text_spans()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="../../../api/utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../../../related_work.html">Связанные работы</a></li>
 </ul>
 
         </div>
@@ -626,9 +662,9 @@ window.addEventListener("load", load);</script>
 <span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">onnxruntime</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ort</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.api.base</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.api.detector</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseDetector</span>
 
-<span class="kn">from</span><span class="w"> </span><span class="nn">...data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">Line</span><span class="p">,</span> <span class="n">Page</span><span class="p">,</span> <span class="n">Word</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">...data</span><span class="w"> </span><span class="kn">import</span> <span class="n">Block</span><span class="p">,</span> <span class="n">Line</span><span class="p">,</span> <span class="n">Page</span><span class="p">,</span> <span class="n">TextSpan</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">...utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">read_image</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.lanms</span><span class="w"> </span><span class="kn">import</span> <span class="n">locality_aware_nms</span>
 <span class="kn">from</span><span class="w"> </span><span class="nn">.utils</span><span class="w"> </span><span class="kn">import</span> <span class="p">(</span>
@@ -656,7 +692,7 @@ window.addEventListener("load", load);</script>
 
 <div class="viewcode-block" id="EAST">
 <a class="viewcode-back" href="../../../api/detectors.html#manuscript.detectors.EAST">[документация]</a>
-<span class="k">class</span><span class="w"> </span><span class="nc">EAST</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="k">class</span><span class="w"> </span><span class="nc">EAST</span><span class="p">(</span><span class="n">BaseDetector</span><span class="p">):</span>
 <span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
 <span class="sd">    Initialize EAST text detector with ONNX Runtime.</span>
 
@@ -752,6 +788,7 @@ window.addEventListener("load", load);</script>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">weights</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+        <span class="n">force_download</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
         <span class="o">*</span><span class="p">,</span>
         <span class="n">target_size</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1280</span><span class="p">,</span>
         <span class="n">expand_ratio_w</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">1.4</span><span class="p">,</span>
@@ -770,7 +807,12 @@ window.addEventListener("load", load);</script>
         <span class="n">tta_iou_thresh</span><span class="p">:</span> <span class="nb">float</span> <span class="o">=</span> <span class="mf">0.1</span><span class="p">,</span>
         <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
     <span class="p">):</span>
-        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span> <span class="o">**</span><span class="n">kwargs</span><span class="p">)</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="fm">__init__</span><span class="p">(</span>
+            <span class="n">weights</span><span class="o">=</span><span class="n">weights</span><span class="p">,</span>
+            <span class="n">device</span><span class="o">=</span><span class="n">device</span><span class="p">,</span>
+            <span class="n">force_download</span><span class="o">=</span><span class="n">force_download</span><span class="p">,</span>
+            <span class="o">**</span><span class="n">kwargs</span><span class="p">,</span>
+        <span class="p">)</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">onnx_session</span> <span class="o">=</span> <span class="kc">None</span>
 
@@ -800,6 +842,7 @@ window.addEventListener("load", load);</script>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">onnx_session</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
             <span class="k">return</span>
 
+        <span class="bp">self</span><span class="o">.</span><span class="n">_prepare_runtime_dependencies</span><span class="p">()</span>
         <span class="n">providers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">runtime_providers</span><span class="p">()</span>
 
         <span class="bp">self</span><span class="o">.</span><span class="n">onnx_session</span> <span class="o">=</span> <span class="n">ort</span><span class="o">.</span><span class="n">InferenceSession</span><span class="p">(</span>
@@ -1038,33 +1081,21 @@ window.addEventListener("load", load);</script>
     <span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span>
         <span class="bp">self</span><span class="p">,</span>
         <span class="n">img_or_path</span><span class="p">:</span> <span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">,</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span>
-        <span class="n">return_maps</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">False</span><span class="p">,</span>
-    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+    <span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
-<span class="sd">        Run EAST inference and return detection results.</span>
+<span class="sd">        Run EAST inference and return detected page structure.</span>
 
 <span class="sd">        Parameters</span>
 <span class="sd">        ----------</span>
 <span class="sd">        img_or_path : str or pathlib.Path or numpy.ndarray</span>
 <span class="sd">            Path to an image file or an RGB image provided as a NumPy array</span>
 <span class="sd">            with shape ``(H, W, 3)`` in ``uint8`` format.</span>
-<span class="sd">        return_maps : bool, optional</span>
-<span class="sd">            If True, returns raw model score and geometry maps under keys</span>
-<span class="sd">            ``&quot;score_map&quot;`` and ``&quot;geo_map&quot;``. Default is False.</span>
-
 <span class="sd">        Returns</span>
 <span class="sd">        -------</span>
-<span class="sd">        dict</span>
-<span class="sd">            Dictionary with the following keys:</span>
-
-<span class="sd">            - ``&quot;page&quot;`` : Page</span>
-<span class="sd">                Parsed detection result as a Page object containing a single</span>
-<span class="sd">                Block with a single Line of Word objects. Each Word has polygon</span>
-<span class="sd">                coordinates, confidence score, and sequential ``order`` index.</span>
-<span class="sd">            - ``&quot;score_map&quot;`` : numpy.ndarray or None</span>
-<span class="sd">                Raw score map produced by the network if ``return_maps=True``.</span>
-<span class="sd">            - ``&quot;geo_map&quot;`` : numpy.ndarray or None</span>
-<span class="sd">                Raw geometry map if ``return_maps=True``.</span>
+<span class="sd">        Page</span>
+<span class="sd">            Parsed detection result as a Page object containing a single</span>
+<span class="sd">            Block with a single Line of TextSpan objects. Each TextSpan has polygon</span>
+<span class="sd">            coordinates, confidence score, and sequential ``order`` index.</span>
 
 <span class="sd">        Notes</span>
 <span class="sd">        -----</span>
@@ -1084,8 +1115,8 @@ window.addEventListener("load", load);</script>
 <span class="sd">        For visualization, use the external ``visualize_page`` utility:</span>
 
 <span class="sd">        &gt;&gt;&gt; from manuscript.utils import visualize_page</span>
-<span class="sd">        &gt;&gt;&gt; result = model.predict(img_path)</span>
-<span class="sd">        &gt;&gt;&gt; vis_img = visualize_page(img, result[&quot;page&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; page = model.predict(img_path)</span>
+<span class="sd">        &gt;&gt;&gt; vis_img = visualize_page(img, page)</span>
 
 <span class="sd">        Examples</span>
 <span class="sd">        --------</span>
@@ -1094,18 +1125,17 @@ window.addEventListener("load", load);</script>
 <span class="sd">        &gt;&gt;&gt; from manuscript.detectors import EAST</span>
 <span class="sd">        &gt;&gt;&gt; model = EAST()</span>
 <span class="sd">        &gt;&gt;&gt; img_path = r&quot;example/ocr_example_image.jpg&quot;</span>
-<span class="sd">        &gt;&gt;&gt; result = model.predict(img_path)</span>
-<span class="sd">        &gt;&gt;&gt; page = result[&quot;page&quot;]</span>
-<span class="sd">        &gt;&gt;&gt; # Access first line&#39;s first word</span>
-<span class="sd">        &gt;&gt;&gt; first_word = page.blocks[0].lines[0].words[0]</span>
-<span class="sd">        &gt;&gt;&gt; print(f&quot;Confidence: {first_word.detection_confidence}&quot;)</span>
+<span class="sd">        &gt;&gt;&gt; page = model.predict(img_path)</span>
+<span class="sd">        &gt;&gt;&gt; # Access first line&#39;s first text span</span>
+<span class="sd">        &gt;&gt;&gt; first_text_span = page.blocks[0].lines[0].text_spans[0]</span>
+<span class="sd">        &gt;&gt;&gt; print(f&quot;Confidence: {first_text_span.detection_confidence}&quot;)</span>
 
 <span class="sd">        Visualize results separately:</span>
 
 <span class="sd">        &gt;&gt;&gt; from manuscript.utils import visualize_page, read_image</span>
-<span class="sd">        &gt;&gt;&gt; result = model.predict(img_path)</span>
+<span class="sd">        &gt;&gt;&gt; page = model.predict(img_path)</span>
 <span class="sd">        &gt;&gt;&gt; img = read_image(img_path)</span>
-<span class="sd">        &gt;&gt;&gt; vis_img = visualize_page(img, result[&quot;page&quot;])</span>
+<span class="sd">        &gt;&gt;&gt; vis_img = visualize_page(img, page)</span>
 <span class="sd">        &gt;&gt;&gt; vis_img.show()</span>
 
 <span class="sd">        &quot;&quot;&quot;</span>
@@ -1117,7 +1147,7 @@ window.addEventListener("load", load);</script>
         <span class="n">orig_h</span><span class="p">,</span> <span class="n">orig_w</span> <span class="o">=</span> <span class="n">img</span><span class="o">.</span><span class="n">shape</span><span class="p">[:</span><span class="mi">2</span><span class="p">]</span>
 
         <span class="c1"># Run inference on original image</span>
-        <span class="n">final_quads_nms</span><span class="p">,</span> <span class="n">score_map</span><span class="p">,</span> <span class="n">geo_map</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_inference_on_image</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
+        <span class="n">final_quads_nms</span><span class="p">,</span> <span class="n">_</span><span class="p">,</span> <span class="n">_</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_run_inference_on_image</span><span class="p">(</span><span class="n">img</span><span class="p">)</span>
 
         <span class="c1"># TTA: Run on horizontally flipped image and merge results</span>
         <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">use_tta</span><span class="p">:</span>
@@ -1200,22 +1230,20 @@ window.addEventListener("load", load);</script>
             <span class="k">else</span> <span class="n">processed_quads</span>
         <span class="p">)</span>
 
-        <span class="n">words</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Word</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">text_spans</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">TextSpan</span><span class="p">]</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="k">for</span> <span class="n">quad</span> <span class="ow">in</span> <span class="n">output_quads</span><span class="p">:</span>
             <span class="n">pts</span> <span class="o">=</span> <span class="n">quad</span><span class="p">[:</span><span class="mi">8</span><span class="p">]</span><span class="o">.</span><span class="n">reshape</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
             <span class="n">score</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">clip</span><span class="p">(</span><span class="n">quad</span><span class="p">[</span><span class="mi">8</span><span class="p">],</span> <span class="mf">0.0</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">))</span>
-            <span class="n">words</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">Word</span><span class="p">(</span><span class="n">polygon</span><span class="o">=</span><span class="n">pts</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">detection_confidence</span><span class="o">=</span><span class="n">score</span><span class="p">))</span>
+            <span class="n">text_spans</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">TextSpan</span><span class="p">(</span><span class="n">polygon</span><span class="o">=</span><span class="n">pts</span><span class="o">.</span><span class="n">tolist</span><span class="p">(),</span> <span class="n">detection_confidence</span><span class="o">=</span><span class="n">score</span><span class="p">))</span>
 
-        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">w</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">words</span><span class="p">):</span>
-            <span class="n">w</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">idx</span>
+        <span class="k">for</span> <span class="n">idx</span><span class="p">,</span> <span class="n">text_span</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">text_spans</span><span class="p">):</span>
+            <span class="n">text_span</span><span class="o">.</span><span class="n">order</span> <span class="o">=</span> <span class="n">idx</span>
 
-        <span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="p">(</span><span class="n">blocks</span><span class="o">=</span><span class="p">[</span><span class="n">Block</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="p">[</span><span class="n">Line</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="n">words</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">)],</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">)])</span>
+        <span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="p">(</span>
+            <span class="n">blocks</span><span class="o">=</span><span class="p">[</span><span class="n">Block</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="p">[</span><span class="n">Line</span><span class="p">(</span><span class="n">text_spans</span><span class="o">=</span><span class="n">text_spans</span><span class="p">,</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">)],</span> <span class="n">order</span><span class="o">=</span><span class="mi">0</span><span class="p">)]</span>
+        <span class="p">)</span>
 
-        <span class="k">return</span> <span class="p">{</span>
-            <span class="s2">&quot;page&quot;</span><span class="p">:</span> <span class="n">page</span><span class="p">,</span>
-            <span class="s2">&quot;score_map&quot;</span><span class="p">:</span> <span class="n">score_map</span> <span class="k">if</span> <span class="n">return_maps</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-            <span class="s2">&quot;geo_map&quot;</span><span class="p">:</span> <span class="n">geo_map</span> <span class="k">if</span> <span class="n">return_maps</span> <span class="k">else</span> <span class="kc">None</span><span class="p">,</span>
-        <span class="p">}</span></div>
+        <span class="k">return</span> <span class="n">page</span></div>
 
 
 <div class="viewcode-block" id="EAST.train">
@@ -1256,6 +1284,7 @@ window.addEventListener("load", load);</script>
         <span class="n">resume_from</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Path</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
         <span class="n">val_interval</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">1</span><span class="p">,</span>
         <span class="n">num_workers</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span><span class="p">,</span>
+        <span class="n">log_collage</span><span class="p">:</span> <span class="nb">bool</span> <span class="o">=</span> <span class="kc">True</span><span class="p">,</span>
         <span class="n">device</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="s2">&quot;torch.device&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
     <span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;torch.nn.Module&quot;</span><span class="p">:</span>
 <span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
@@ -1328,6 +1357,11 @@ window.addEventListener("load", load);</script>
 <span class="sd">            preferred place for all augmentation settings. Any keys here override the</span>
 <span class="sd">            corresponding defaults. Supported keys include:</span>
 
+<span class="sd">            - ``quad_source`` for COCO polygon-to-quad conversion:</span>
+<span class="sd">              ``&quot;auto&quot;`` preserves 4-point polygons and falls back to</span>
+<span class="sd">              ``&quot;min_area_rect&quot;`` for longer polygons, ``&quot;as_is&quot;`` accepts only</span>
+<span class="sd">              4-point polygons, and ``&quot;min_area_rect&quot;`` always fits the minimum-area</span>
+<span class="sd">              rectangle</span>
 <span class="sd">            - ``flip_prob``, ``color_jitter``</span>
 <span class="sd">            - ``small_rotate_prob``, ``small_rotate_deg``</span>
 <span class="sd">            - ``perspective_prob``, ``perspective_scale``</span>
@@ -1375,6 +1409,9 @@ window.addEventListener("load", load);</script>
 <span class="sd">        num_workers : int, optional</span>
 <span class="sd">            Number of worker processes for data loading. Set to 0 for single-process</span>
 <span class="sd">            loading (safer on Windows). Default ``0``.</span>
+<span class="sd">        log_collage : bool, optional</span>
+<span class="sd">            Whether to generate and log validation collage images to TensorBoard.</span>
+<span class="sd">            Disable to save memory on GPUs with limited VRAM. Default ``True``.</span>
 <span class="sd">        device : torch.device, optional</span>
 <span class="sd">            CUDA or CPU device. Auto-selects if None.</span>
 
@@ -1424,6 +1461,7 @@ window.addEventListener("load", load);</script>
 <span class="sd">        Configure augmentations via ``augmentation_config``:</span>
 
 <span class="sd">        &gt;&gt;&gt; aug_cfg = {</span>
+<span class="sd">        ...     &quot;quad_source&quot;: &quot;auto&quot;,</span>
 <span class="sd">        ...     &quot;flip_prob&quot;: 0.02,</span>
 <span class="sd">        ...     &quot;color_jitter&quot;: (0.1, 0.1, 0.1, 0.05),</span>
 <span class="sd">        ...     &quot;small_rotate_prob&quot;: 0.15,</span>
@@ -1472,14 +1510,22 @@ window.addEventListener("load", load);</script>
             <span class="n">score_geo_scale</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">score_scale</span>
 
         <span class="n">base_augmentation_config</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s2">&quot;quad_source&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
             <span class="s2">&quot;flip_prob&quot;</span><span class="p">:</span> <span class="mf">0.01</span><span class="p">,</span>
+            <span class="s2">&quot;vflip_prob&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
             <span class="s2">&quot;color_jitter&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span>
             <span class="s2">&quot;small_rotate_prob&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
             <span class="s2">&quot;small_rotate_deg&quot;</span><span class="p">:</span> <span class="mf">2.0</span><span class="p">,</span>
+            <span class="s2">&quot;shear_prob&quot;</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">,</span>
+            <span class="s2">&quot;shear_deg&quot;</span><span class="p">:</span> <span class="mf">5.0</span><span class="p">,</span>
+            <span class="s2">&quot;random_crop_prob&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+            <span class="s2">&quot;random_crop_scale&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">1.0</span><span class="p">),</span>
             <span class="s2">&quot;perspective_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
             <span class="s2">&quot;perspective_scale&quot;</span><span class="p">:</span> <span class="mf">0.015</span><span class="p">,</span>
             <span class="s2">&quot;blur_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
             <span class="s2">&quot;blur_ksize_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+            <span class="s2">&quot;motion_blur_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">&quot;motion_blur_ksize_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">9</span><span class="p">),</span>
             <span class="s2">&quot;noise_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
             <span class="s2">&quot;noise_std&quot;</span><span class="p">:</span> <span class="mf">0.008</span><span class="p">,</span>
             <span class="s2">&quot;salt_pepper_prob&quot;</span><span class="p">:</span> <span class="mf">0.0005</span><span class="p">,</span>
@@ -1492,6 +1538,27 @@ window.addEventListener("load", load);</script>
             <span class="s2">&quot;downscale_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
             <span class="s2">&quot;downscale_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">),</span>
             <span class="s2">&quot;negative_prob&quot;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
+            <span class="s2">&quot;hsv_prob&quot;</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">,</span>
+            <span class="s2">&quot;hsv_h&quot;</span><span class="p">:</span> <span class="mf">0.015</span><span class="p">,</span>
+            <span class="s2">&quot;hsv_s&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+            <span class="s2">&quot;hsv_v&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+            <span class="s2">&quot;cutout_prob&quot;</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">,</span>
+            <span class="s2">&quot;cutout_num_holes&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">,</span>
+            <span class="s2">&quot;cutout_hole_size_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.05</span><span class="p">,</span> <span class="mf">0.15</span><span class="p">),</span>
+            <span class="s2">&quot;elastic_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">&quot;elastic_alpha&quot;</span><span class="p">:</span> <span class="mf">20.0</span><span class="p">,</span>
+            <span class="s2">&quot;elastic_sigma&quot;</span><span class="p">:</span> <span class="mf">4.0</span><span class="p">,</span>
+            <span class="s2">&quot;fog_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+            <span class="s2">&quot;fog_strength_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.4</span><span class="p">),</span>
+            <span class="s2">&quot;fog_direction&quot;</span><span class="p">:</span> <span class="s2">&quot;random&quot;</span><span class="p">,</span>
+            <span class="s2">&quot;mosaic_prob&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;mosaic_center_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.3</span><span class="p">,</span> <span class="mf">0.7</span><span class="p">),</span>
+            <span class="s2">&quot;cutmix_prob&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;cutmix_alpha&quot;</span><span class="p">:</span> <span class="mf">1.0</span><span class="p">,</span>
+            <span class="s2">&quot;ricap_prob&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;ricap_beta&quot;</span><span class="p">:</span> <span class="mf">0.3</span><span class="p">,</span>
+            <span class="s2">&quot;resizemix_prob&quot;</span><span class="p">:</span> <span class="mf">0.0</span><span class="p">,</span>
+            <span class="s2">&quot;resizemix_scale_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.8</span><span class="p">),</span>
         <span class="p">}</span>
         <span class="n">aug_cfg</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">base_augmentation_config</span><span class="p">)</span>
         <span class="k">if</span> <span class="n">augmentation_config</span><span class="p">:</span>
@@ -1682,6 +1749,7 @@ window.addEventListener("load", load);</script>
             <span class="p">),</span>
             <span class="n">score_map_shrink_ratio</span><span class="o">=</span><span class="n">score_map_shrink_ratio</span><span class="p">,</span>
             <span class="n">augmentation_config</span><span class="o">=</span><span class="n">aug_cfg</span><span class="p">,</span>
+            <span class="n">log_collage</span><span class="o">=</span><span class="n">log_collage</span><span class="p">,</span>
         <span class="p">)</span>
         <span class="k">return</span> <span class="n">best_model</span></div>
 

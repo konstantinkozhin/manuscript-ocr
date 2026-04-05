@@ -97,6 +97,7 @@ class YOLO(BaseDetector):
         weights: Optional[Union[str, Path]] = None,
         config: Optional[Union[str, Path]] = None,
         device: Optional[str] = None,
+        force_download: bool = False,
         *,
         score_thresh: float = 0.1,
         class_ids: Optional[Sequence[int]] = None,
@@ -105,7 +106,12 @@ class YOLO(BaseDetector):
         containment_threshold: Optional[float] = 0.9,
         **kwargs,
     ):
-        super().__init__(weights=weights, device=device, **kwargs)
+        super().__init__(
+            weights=weights,
+            device=device,
+            force_download=force_download,
+            **kwargs,
+        )
 
         self.onnx_session = None
         self.score_thresh = float(score_thresh)

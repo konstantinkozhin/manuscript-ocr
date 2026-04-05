@@ -75,6 +75,7 @@ Main Components
 ---------------
 
 - :class:`~manuscript.Pipeline` - High-level OCR pipeline
+- :class:`~manuscript.detectors.YOLO` - ONNX text detector for YOLO-family models
 - :class:`~manuscript.detectors.EAST` - Text detector
 - :class:`~manuscript.layouts.SimpleSorting` - Layout ordering model
 - :class:`~manuscript.recognizers.TRBA` - Text recognizer
@@ -89,3 +90,9 @@ Model Zoo
 
 For the list of built-in presets and release artifacts documented for this
 documentation version, see :doc:`model_zoo`.
+
+Related Work
+------------
+
+For publications related to the project and its manuscript OCR experiments,
+see :doc:`related_work`.

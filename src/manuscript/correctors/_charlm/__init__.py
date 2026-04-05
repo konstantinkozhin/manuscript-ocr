@@ -90,6 +90,7 @@ class CharLM(BaseCorrector):
         vocab: Optional[Union[str, Path]] = None,
         lexicon: Optional[Union[str, Path, set]] = None,
         device: Optional[str] = None,
+        force_download: bool = False,
         mask_threshold: float = 0.05,
         apply_threshold: float = 0.95,
         max_edits: int = 2,
@@ -104,11 +105,17 @@ class CharLM(BaseCorrector):
 
         if weights is None:
             self.device = device or "cpu"
+            self.force_download = bool(force_download)
             self.weights = None
             self.extra_config = kwargs
             self.session = None
         else:
-            super().__init__(weights=weights, device=device, **kwargs)
+            super().__init__(
+                weights=weights,
+                device=device,
+                force_download=force_download,
+                **kwargs,
+            )
 
         self.mask_threshold = mask_threshold
         self.apply_threshold = apply_threshold

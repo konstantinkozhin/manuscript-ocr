@@ -5,50 +5,80 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2025-12-22 17:48+0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Project-Id-Version: manuscript-ocr 0.1.11\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-05 19:57+0700\n"
+"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"Last-Translator: OpenAI Codex\n"
+"Language-Team: ru\n"
+"Language: ru\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf-8\n"
+"Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../index.rst:11
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:15
 msgid "Contents:"
 msgstr "Содержание:"
 
-#: ../../index.rst:2 e13fc71272a0410fa08d7e9f81a5632b
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:2
+#: 07363bb1677346ba8e8dacc3f8828488
 msgid "manuscript-ocr Documentation"
 msgstr "Документация manuscript-ocr"
 
-#: ../../index.rst:4 bfca9852c55a46f79ff179ebcef56339
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:4
+#: 1bbbd2029fb74488a1baea709177bbfc
 msgid "manuscript-ocr logo"
 msgstr "Логотип manuscript-ocr"
 
-#: ../../index.rst:8 bbb628b14cd54fa19d9d8e84ebdcbd01
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:8
+#: b4d358224c754249baab82e6f5471446
 msgid ""
-"**manuscript-ocr** is a Python library for OCR (Optical Character "
-"Recognition) of handwritten manuscripts and documents."
+"**Manuscript OCR** is an open-source Python framework for full OCR/HTR "
+"pipelines targeting pre-reform Russian manuscripts of the 18th-19th "
+"centuries as well as modern texts. The project focuses on digitization and "
+"analysis of historical textual heritage, with methods tailored to legacy "
+"orthography, complex page layouts, handwriting variation, and high "
+"computational efficiency under limited resources."
 msgstr ""
-"**manuscript-ocr** — это библиотека на Python для оптического "
-"распознавания символов (OCR)."
+"**Manuscript OCR** – открытый Python-фреймворк полного OCR/HTR-пайплайна "
+"для распознавания дореформенных рукописей на русском языке XVIII–XIX веков "
+"и современных текстов. Проект направлен на цифровизацию и анализ "
+"исторического текстового наследия с использованием разработанных методов, "
+"учитывающих устаревшую орфографию, сложную структуру страниц и "
+"вариативность почерков, и обеспечивающих высокую вычислительную "
+"эффективность на ограниченных ресурсах."
 
-#: ../../index.rst:20 fb0c804143e54800a8c64a588bb0894b
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:27
+#: ce07bcb0777549afa57659b43860521a
 msgid "Indices and tables"
 msgstr "Индексы и таблицы"
 
-#: ../../index.rst:22 5a15798717dd4d73a2ffa34b1640cf79
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:29
+#: 23c4d7aa432a4e0e823d40dc533f7640
 msgid ":ref:`genindex`"
 msgstr ":ref:`genindex`"
 
-#: ../../index.rst:23 cfd617c8dd894e4ebb5808dcf66867c1
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:30
+#: 5f5037ec1e3d45dcb447407820b849e7
 msgid ":ref:`modindex`"
 msgstr ":ref:`modindex`"
 
-#: ../../index.rst:24 fee9c07bfe564d3aa63d3232418d433a
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:31
+#: 15f02be3b74a4b38b6259e93e9bfcf28
 msgid ":ref:`search`"
 msgstr ":ref:`search`"
 
+#~ msgid ""
+#~ "**manuscript-ocr** is a Python library for OCR (Optical Character "
+#~ "Recognition) of handwritten manuscripts and documents."
+#~ msgstr ""
+#~ "Manuscript OCR – открытый Python-фреймворк полного OCR/HTR-пайплайна для "
+#~ "распознавания дореформенных рукописей на русском языке XVIII–XIX веков и "
+#~ "современных текстов. Проект направлен на цифровизацию и анализ "
+#~ "исторического текстового наследия с использованием разработанных методов, "
+#~ "учитывающих устаревшую орфографию, сложную структуру страниц и "
+#~ "вариативность почерков, и обеспечивающих высокую вычислительную "
+#~ "эффективность на ограниченных ресурсах."

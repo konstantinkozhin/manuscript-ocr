@@ -23,6 +23,7 @@ Library Structure
         Pipeline --> p6[last_correction_page]
 
         detectors --> EAST[EAST]
+        detectors --> YOLO[YOLO]
         layouts --> SimpleSorting[SimpleSorting]
         recognizers --> TRBA[TRBA]
         correctors --> CharLM[CharLM]
@@ -33,7 +34,7 @@ Overview
 --------
 
 - ``Pipeline`` orchestrates OCR stages.
-- ``detectors`` provide detection models.
+- ``detectors`` provide detection models such as ``YOLO`` and ``EAST``.
 - ``layouts`` provide ordering/grouping models (for example ``SimpleSorting``).
 - ``recognizers`` provide text recognition models.
 - ``correctors`` provide text post-processing models.

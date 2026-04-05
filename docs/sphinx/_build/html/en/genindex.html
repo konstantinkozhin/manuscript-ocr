@@ -7,15 +7,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Index &mdash; manuscript-ocr 0.1.11 documentation</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/language_switcher.css?v=d768f156" />
+      <link rel="stylesheet" type="text/css" href="_static/model_zoo.css?v=2d297567" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=1e825a29"></script>
-      <script src="_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
       <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
 
@@ -450,9 +451,10 @@ mermaid.initialize(
     }
 );
 
-window.addEventListener("load", load);</script>
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
       <script src="_static/language_switcher.js?v=db730534"></script>
-      <script src="_static/version_sidebar.js?v=edadfa97"></script>
+      <script src="_static/version_sidebar.js?v=50cbed02"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Index" href="#" />
     <link rel="search" title="Search" href="search.html" /> 
@@ -482,8 +484,18 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l1"><a class="reference internal" href="getting_started.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#example-notebooks">Example Notebooks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="getting_started.html#main-components">Main Components</a></li>
-<li class="toctree-l2"><a class="reference internal" href="getting_started.html#pipeline-defaults">Pipeline Defaults</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#model-zoo">Model Zoo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#related-work">Related Work</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model_zoo.html">Model Zoo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#detection">Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#layout">Layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#recognition">Recognition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#correction">Correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#architecture-sources">Architecture Sources</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline_usage.html">Pipeline Usage Guide</a><ul>
@@ -498,6 +510,8 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#disable-stages">Disable Stages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#layout-placement">Layout Placement</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#trba-region-preparation">TRBA Region Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#collapsing-text-spans">Collapsing Text Spans</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
 </ul>
@@ -522,8 +536,8 @@ window.addEventListener("load", load);</script>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/data.html">Data Structures</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/data.html#data-model">Data Model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/data.html#module-manuscript.data">API Reference</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Word"><code class="docutils literal notranslate"><span class="pre">Word</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#module-manuscript.data">Module Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.TextSpan"><code class="docutils literal notranslate"><span class="pre">TextSpan</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Page"><code class="docutils literal notranslate"><span class="pre">Page</span></code></a></li>
@@ -533,14 +547,24 @@ window.addEventListener("load", load);</script>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/detectors.html">Detectors</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO"><code class="docutils literal notranslate"><span class="pre">YOLO</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.__init__"><code class="docutils literal notranslate"><span class="pre">YOLO.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.config_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.default_target_size"><code class="docutils literal notranslate"><span class="pre">YOLO.default_target_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.default_weights_name"><code class="docutils literal notranslate"><span class="pre">YOLO.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.predict"><code class="docutils literal notranslate"><span class="pre">YOLO.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.pretrained_registry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/detectors.html#east-training-quads">EAST Training Quads</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/layouts.html">Layouts</a><ul>
@@ -553,14 +577,14 @@ window.addEventListener("load", load);</script>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/recognizers.html">Recognizers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -585,11 +609,22 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.crop_axis_aligned"><code class="docutils literal notranslate"><span class="pre">crop_axis_aligned()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.crop_polygon_mask"><code class="docutils literal notranslate"><span class="pre">crop_polygon_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.merge_polygons"><code class="docutils literal notranslate"><span class="pre">merge_polygons()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.order_quad_points"><code class="docutils literal notranslate"><span class="pre">order_quad_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.polygon_to_bbox"><code class="docutils literal notranslate"><span class="pre">polygon_to_bbox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.warp_quad"><code class="docutils literal notranslate"><span class="pre">warp_quad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.merge_text_spans"><code class="docutils literal notranslate"><span class="pre">merge_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.collapse_line_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_line_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.collapse_block_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_block_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.collapse_page_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_page_text_spans()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="related_work.html">Related Work</a></li>
 </ul>
 
         </div>
@@ -635,6 +670,7 @@ window.addEventListener("load", load);</script>
  | <a href="#T"><strong>T</strong></a>
  | <a href="#V"><strong>V</strong></a>
  | <a href="#W"><strong>W</strong></a>
+ | <a href="#Y"><strong>Y</strong></a>
  
 </div>
 <h2 id="_">_</h2>
@@ -648,6 +684,8 @@ window.addEventListener("load", load);</script>
         <li><a href="api/data.html#manuscript.data.Block.__init__">(manuscript.data.Block method)</a>
 </li>
         <li><a href="api/detectors.html#manuscript.detectors.EAST.__init__">(manuscript.detectors.EAST method)</a>
+</li>
+        <li><a href="api/detectors.html#manuscript.detectors.YOLO.__init__">(manuscript.detectors.YOLO method)</a>
 </li>
         <li><a href="api/layouts.html#manuscript.layouts.SimpleSorting.__init__">(manuscript.layouts.SimpleSorting method)</a>
 </li>
@@ -664,7 +702,7 @@ window.addEventListener("load", load);</script>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data.html#id8">blocks (manuscript.data.Page attribute)</a>, <a href="api/data.html#manuscript.data.Page.blocks">[1]</a>
+      <li><a href="api/data.html#id7">blocks (manuscript.data.Page attribute)</a>, <a href="api/data.html#manuscript.data.Page.blocks">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -676,11 +714,25 @@ window.addEventListener("load", load);</script>
 </li>
       <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.charset_registry">charset_registry (manuscript.recognizers.TRBA attribute)</a>
 </li>
+      <li><a href="api/utils.html#manuscript.utils.collapse_block_text_spans">collapse_block_text_spans() (in module manuscript.utils)</a>
+</li>
+      <li><a href="api/utils.html#manuscript.utils.collapse_line_text_spans">collapse_line_text_spans() (in module manuscript.utils)</a>
+</li>
+      <li><a href="api/utils.html#manuscript.utils.collapse_page_text_spans">collapse_page_text_spans() (in module manuscript.utils)</a>
+</li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.config_registry">config_registry (manuscript.recognizers.TRBA attribute)</a>
+      <li><a href="api/detectors.html#manuscript.detectors.YOLO.config_registry">config_registry (manuscript.detectors.YOLO attribute)</a>
+
+      <ul>
+        <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.config_registry">(manuscript.recognizers.TRBA attribute)</a>
 </li>
+      </ul></li>
       <li><a href="api/utils.html#manuscript.utils.create_page_from_text">create_page_from_text() (in module manuscript.utils)</a>
+</li>
+      <li><a href="api/utils.html#manuscript.utils.crop_axis_aligned">crop_axis_aligned() (in module manuscript.utils)</a>
+</li>
+      <li><a href="api/utils.html#manuscript.utils.crop_polygon_mask">crop_polygon_mask() (in module manuscript.utils)</a>
 </li>
   </ul></td>
 </tr></table>
@@ -690,17 +742,21 @@ window.addEventListener("load", load);</script>
   <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/correctors.html#manuscript.correctors.CharLM.default_lexicon_for_model">default_lexicon_for_model (manuscript.correctors.CharLM attribute)</a>
 </li>
+      <li><a href="api/detectors.html#manuscript.detectors.YOLO.default_target_size">default_target_size (manuscript.detectors.YOLO attribute)</a>
+</li>
       <li><a href="api/correctors.html#manuscript.correctors.CharLM.default_weights_name">default_weights_name (manuscript.correctors.CharLM attribute)</a>
 
       <ul>
         <li><a href="api/detectors.html#manuscript.detectors.EAST.default_weights_name">(manuscript.detectors.EAST attribute)</a>
+</li>
+        <li><a href="api/detectors.html#manuscript.detectors.YOLO.default_weights_name">(manuscript.detectors.YOLO attribute)</a>
 </li>
         <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name">(manuscript.recognizers.TRBA attribute)</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data.html#id1">detection_confidence (manuscript.data.Word attribute)</a>, <a href="api/data.html#manuscript.data.Word.detection_confidence">[1]</a>
+      <li><a href="api/data.html#id0">detection_confidence (manuscript.data.TextSpan attribute)</a>, <a href="api/data.html#manuscript.data.TextSpan.detection_confidence">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -806,6 +862,10 @@ window.addEventListener("load", load);</script>
         <li><a href="api/utils.html#module-manuscript.utils">module</a>
 </li>
       </ul></li>
+      <li><a href="api/utils.html#manuscript.utils.merge_polygons">merge_polygons() (in module manuscript.utils)</a>
+</li>
+      <li><a href="api/utils.html#manuscript.utils.merge_text_spans">merge_text_spans() (in module manuscript.utils)</a>
+</li>
       <li>
     module
 
@@ -829,16 +889,18 @@ window.addEventListener("load", load);</script>
 <h2 id="O">O</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data.html#id7">order (manuscript.data.Block attribute)</a>, <a href="api/data.html#manuscript.data.Block.order">[1]</a>
+      <li><a href="api/data.html#id6">order (manuscript.data.Block attribute)</a>, <a href="api/data.html#manuscript.data.Block.order">[1]</a>
 
       <ul>
-        <li><a href="api/data.html#id6">(manuscript.data.Line attribute)</a>, <a href="api/data.html#manuscript.data.Line.order">[1]</a>
+        <li><a href="api/data.html#id5">(manuscript.data.Line attribute)</a>, <a href="api/data.html#manuscript.data.Line.order">[1]</a>
 </li>
-        <li><a href="api/data.html#id4">(manuscript.data.Word attribute)</a>, <a href="api/data.html#manuscript.data.Word.order">[1]</a>
+        <li><a href="api/data.html#id1">(manuscript.data.TextSpan attribute)</a>, <a href="api/data.html#manuscript.data.TextSpan.order">[1]</a>
 </li>
       </ul></li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/utils.html#manuscript.utils.order_quad_points">order_quad_points() (in module manuscript.utils)</a>
+</li>
       <li><a href="api/utils.html#manuscript.utils.organize_page">organize_page() (in module manuscript.utils)</a>
 </li>
   </ul></td>
@@ -851,7 +913,9 @@ window.addEventListener("load", load);</script>
 </li>
       <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline">Pipeline (class in manuscript._pipeline)</a>
 </li>
-      <li><a href="api/data.html#id0">polygon (manuscript.data.Word attribute)</a>, <a href="api/data.html#manuscript.data.Word.polygon">[1]</a>
+      <li><a href="api/data.html#id2">polygon (manuscript.data.TextSpan attribute)</a>, <a href="api/data.html#manuscript.data.TextSpan.polygon">[1]</a>
+</li>
+      <li><a href="api/utils.html#manuscript.utils.polygon_to_bbox">polygon_to_bbox() (in module manuscript.utils)</a>
 </li>
       <li><a href="api/pipeline.html#manuscript._pipeline.Pipeline.predict">predict() (manuscript._pipeline.Pipeline method)</a>
 
@@ -859,6 +923,8 @@ window.addEventListener("load", load);</script>
         <li><a href="api/correctors.html#manuscript.correctors.CharLM.predict">(manuscript.correctors.CharLM method)</a>
 </li>
         <li><a href="api/detectors.html#manuscript.detectors.EAST.predict">(manuscript.detectors.EAST method)</a>
+</li>
+        <li><a href="api/detectors.html#manuscript.detectors.YOLO.predict">(manuscript.detectors.YOLO method)</a>
 </li>
         <li><a href="api/layouts.html#manuscript.layouts.SimpleSorting.predict">(manuscript.layouts.SimpleSorting method)</a>
 </li>
@@ -871,6 +937,8 @@ window.addEventListener("load", load);</script>
 
       <ul>
         <li><a href="api/detectors.html#manuscript.detectors.EAST.pretrained_registry">(manuscript.detectors.EAST attribute)</a>
+</li>
+        <li><a href="api/detectors.html#manuscript.detectors.YOLO.pretrained_registry">(manuscript.detectors.YOLO attribute)</a>
 </li>
         <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry">(manuscript.recognizers.TRBA attribute)</a>
 </li>
@@ -885,7 +953,7 @@ window.addEventListener("load", load);</script>
 </li>
   </ul></td>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data.html#id3">recognition_confidence (manuscript.data.Word attribute)</a>, <a href="api/data.html#manuscript.data.Word.recognition_confidence">[1]</a>
+      <li><a href="api/data.html#id3">recognition_confidence (manuscript.data.TextSpan attribute)</a>, <a href="api/data.html#manuscript.data.TextSpan.recognition_confidence">[1]</a>
 </li>
   </ul></td>
 </tr></table>
@@ -905,8 +973,18 @@ window.addEventListener("load", load);</script>
 <h2 id="T">T</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data.html#id2">text (manuscript.data.Word attribute)</a>, <a href="api/data.html#manuscript.data.Word.text">[1]</a>
+      <li><a href="api/data.html#id4">text (manuscript.data.TextSpan attribute)</a>, <a href="api/data.html#manuscript.data.TextSpan.text">[1]</a>
 </li>
+      <li><a href="api/data.html#manuscript.data.Block.text_spans">text_spans (manuscript.data.Block attribute)</a>
+
+      <ul>
+        <li><a href="api/data.html#manuscript.data.Line.text_spans">(manuscript.data.Line attribute)</a>
+</li>
+      </ul></li>
+      <li><a href="api/data.html#manuscript.data.TextSpan">TextSpan (class in manuscript.data)</a>
+</li>
+  </ul></td>
+  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/data.html#manuscript.data.Page.to_json">to_json() (manuscript.data.Page method)</a>
 </li>
       <li><a href="api/correctors.html#manuscript.correctors.CharLM.train">train() (manuscript.correctors.CharLM static method)</a>
@@ -917,8 +995,6 @@ window.addEventListener("load", load);</script>
         <li><a href="api/recognizers.html#manuscript.recognizers.TRBA.train">(manuscript.recognizers.TRBA static method)</a>
 </li>
       </ul></li>
-  </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
       <li><a href="api/recognizers.html#manuscript.recognizers.TRBA">TRBA (class in manuscript.recognizers)</a>
 </li>
   </ul></td>
@@ -939,16 +1015,16 @@ window.addEventListener("load", load);</script>
 <h2 id="W">W</h2>
 <table style="width: 100%" class="indextable genindextable"><tr>
   <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data.html#manuscript.data.Word">Word (class in manuscript.data)</a>
+      <li><a href="api/utils.html#manuscript.utils.warp_quad">warp_quad() (in module manuscript.utils)</a>
 </li>
   </ul></td>
-  <td style="width: 33%; vertical-align: top;"><ul>
-      <li><a href="api/data.html#manuscript.data.Block.words">words (manuscript.data.Block attribute)</a>
+</tr></table>
 
-      <ul>
-        <li><a href="api/data.html#id5">(manuscript.data.Line attribute)</a>, <a href="api/data.html#manuscript.data.Line.words">[1]</a>
+<h2 id="Y">Y</h2>
+<table style="width: 100%" class="indextable genindextable"><tr>
+  <td style="width: 33%; vertical-align: top;"><ul>
+      <li><a href="api/detectors.html#manuscript.detectors.YOLO">YOLO (class in manuscript.detectors)</a>
 </li>
-      </ul></li>
   </ul></td>
 </tr></table>
 

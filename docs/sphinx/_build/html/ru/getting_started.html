@@ -8,22 +8,23 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Начало работы &mdash; документация manuscript-ocr 0.1.11</title>
       <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="_static/language_switcher.css?v=d768f156" />
+      <link rel="stylesheet" type="text/css" href="_static/model_zoo.css?v=2d297567" />
 
   
       <script src="_static/jquery.js?v=5d32c60e"></script>
       <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="_static/documentation_options.js?v=708478e6"></script>
-      <script src="_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="_static/translations.js?v=cd1d70c9"></script>
       <script src="_static/language_switcher.js?v=db730534"></script>
-      <script src="_static/version_sidebar.js?v=edadfa97"></script>
+      <script src="_static/version_sidebar.js?v=50cbed02"></script>
     <script src="_static/js/theme.js"></script>
     <link rel="index" title="Алфавитный указатель" href="genindex.html" />
     <link rel="search" title="Поиск" href="search.html" />
-    <link rel="next" title="Руководство по использованию Pipeline" href="pipeline_usage.html" />
+    <link rel="next" title="Зоопарк моделей" href="model_zoo.html" />
     <link rel="prev" title="Документация manuscript-ocr" href="index.html" /> 
 </head>
 
@@ -51,28 +52,40 @@
 <li class="toctree-l1 current"><a class="current reference internal" href="#">Начало работы</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="#installation">Установка</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#quick-start">Быстрый старт</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#example-notebooks">Примеры ноутбуков</a></li>
 <li class="toctree-l2"><a class="reference internal" href="#main-components">Основные компоненты</a></li>
-<li class="toctree-l2"><a class="reference internal" href="#pipeline-defaults">Pipeline Defaults</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#model-zoo">Зоопарк моделей</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#related-work">Связанные работы</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model_zoo.html">Зоопарк моделей</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#detection">Детекция</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#layout">Layout-анализ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#recognition">Распознавание</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#correction">Посткоррекция</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#architecture-sources">Источники архитектур</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="pipeline_usage.html">Руководство по использованию Pipeline</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#stage-contracts">Stage Contracts</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#detector">Detector</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#recognizer">Recognizer</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#stage-contracts">Контракты этапов</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#detector">Детектор</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#recognizer">Распознаватель</a></li>
 <li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#layout">Layout</a></li>
-<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#corrector">Corrector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="pipeline_usage.html#corrector">Корректор</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#basic-usage">Базовое использование</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#disable-stages">Disable Stages</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#layout-placement">Layout Placement</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#built-in-components">Built-in Components</a></li>
-<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#disable-stages">Отключение этапов</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#layout-placement">Положение этапа layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#built-in-components">Встроенные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#trba-region-preparation">Подготовка регионов в TRBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#collapsing-text-spans">Объединение TextSpan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#visualization-and-profiling">Визуализация и профилирование</a></li>
 <li class="toctree-l2"><a class="reference internal" href="pipeline_usage.html#intermediate-results">Промежуточные результаты</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="structure.html">Структура библиотеки</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="structure.html#overview">Overview</a></li>
+<li class="toctree-l2"><a class="reference internal" href="structure.html#overview">Обзор</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="api/index.html">Справочник API</a><ul>
@@ -91,8 +104,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/data.html">Структуры данных</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/data.html#data-model">Модель данных</a></li>
-<li class="toctree-l3"><a class="reference internal" href="api/data.html#module-manuscript.data">Справочник API</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Word"><code class="docutils literal notranslate"><span class="pre">Word</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#module-manuscript.data">Справочник модуля</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.TextSpan"><code class="docutils literal notranslate"><span class="pre">TextSpan</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Page"><code class="docutils literal notranslate"><span class="pre">Page</span></code></a></li>
@@ -102,17 +115,27 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/detectors.html">Детекторы</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO"><code class="docutils literal notranslate"><span class="pre">YOLO</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.__init__"><code class="docutils literal notranslate"><span class="pre">YOLO.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.config_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.default_target_size"><code class="docutils literal notranslate"><span class="pre">YOLO.default_target_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.default_weights_name"><code class="docutils literal notranslate"><span class="pre">YOLO.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.predict"><code class="docutils literal notranslate"><span class="pre">YOLO.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.pretrained_registry</span></code></a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="api/layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/detectors.html#east-training-quads">Четырёхугольные области для обучения EAST</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/layouts.html">Layout-модели</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
 <li class="toctree-l4"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
@@ -122,14 +145,14 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="api/recognizers.html">Распознаватели</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -154,11 +177,22 @@
 <li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.crop_axis_aligned"><code class="docutils literal notranslate"><span class="pre">crop_axis_aligned()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.crop_polygon_mask"><code class="docutils literal notranslate"><span class="pre">crop_polygon_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.merge_polygons"><code class="docutils literal notranslate"><span class="pre">merge_polygons()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.order_quad_points"><code class="docutils literal notranslate"><span class="pre">order_quad_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.polygon_to_bbox"><code class="docutils literal notranslate"><span class="pre">polygon_to_bbox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.warp_quad"><code class="docutils literal notranslate"><span class="pre">warp_quad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.merge_text_spans"><code class="docutils literal notranslate"><span class="pre">merge_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.collapse_line_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_line_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.collapse_block_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_block_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.collapse_page_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_page_text_spans()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="related_work.html">Связанные работы</a></li>
 </ul>
 
         </div>
@@ -232,29 +266,42 @@ pip<span class="w"> </span>install<span class="w"> </span>onnxruntime-silicon
 </pre></div>
 </div>
 </section>
+<section id="example-notebooks">
+<h2>Примеры ноутбуков<a class="headerlink" href="#example-notebooks" title="Ссылка на этот заголовок"></a></h2>
+<p>Актуальные примеры ноутбуков доступны в папке <code class="docutils literal notranslate"><span class="pre">notebooks</span></code> репозитория:</p>
+<ul class="simple">
+<li><p><a class="reference external" href="https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B8%D0%BD%D1%84%D0%B5%D1%80%D0%B5%D0%BD%D1%81%D0%B0_endtoend.ipynb">Сквозной инференс</a></p></li>
+<li><p><a class="reference external" href="https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yolo.ipynb">Pipeline с детектором YOLO</a></p></li>
+<li><p><a class="reference external" href="https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_trocr.ipynb">Pipeline с распознавателем TrOCR</a></p></li>
+<li><p><a class="reference external" href="https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yandex_speller.ipynb">Pipeline с Yandex Speller</a></p></li>
+<li><p><a class="reference external" href="https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%B4%D0%B5%D0%BC%D0%BE.ipynb">Запуск Gradio-демо</a></p></li>
+<li><p><a class="reference external" href="https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D0%B4%D0%B5%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb">Запуск обучения детектора</a></p></li>
+<li><p><a class="reference external" href="https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F.ipynb">Запуск обучения распознавания</a></p></li>
+<li><p><a class="reference external" href="https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb">Запуск обучения корректора</a></p></li>
+</ul>
+</section>
 <section id="main-components">
 <h2>Основные компоненты<a class="headerlink" href="#main-components" title="Ссылка на этот заголовок"></a></h2>
 <ul class="simple">
 <li><p><code class="xref py py-class docutils literal notranslate"><span class="pre">Pipeline</span></code> — высокоуровневый OCR-конвейер</p></li>
+<li><p><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO" title="manuscript.detectors.YOLO"><code class="xref py py-class docutils literal notranslate"><span class="pre">YOLO</span></code></a> — ONNX-детектор текста для моделей семейства YOLO</p></li>
 <li><p><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST" title="manuscript.detectors.EAST"><code class="xref py py-class docutils literal notranslate"><span class="pre">EAST</span></code></a> — детектор текста</p></li>
-<li><p><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting" title="manuscript.layouts.SimpleSorting"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a> - Layout ordering model</p></li>
-<li><p><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA" title="manuscript.recognizers.TRBA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TRBA</span></code></a> — модель распознавания текста</p></li>
-<li><p><a class="reference internal" href="api/correctors.html#manuscript.correctors.CharLM" title="manuscript.correctors.CharLM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharLM</span></code></a> - Character-level text corrector</p></li>
+<li><p><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting" title="manuscript.layouts.SimpleSorting"><code class="xref py py-class docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a> — модель упорядочивания layout</p></li>
+<li><p><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA" title="manuscript.recognizers.TRBA"><code class="xref py py-class docutils literal notranslate"><span class="pre">TRBA</span></code></a> — распознаватель текста</p></li>
+<li><p><a class="reference internal" href="api/correctors.html#manuscript.correctors.CharLM" title="manuscript.correctors.CharLM"><code class="xref py py-class docutils literal notranslate"><span class="pre">CharLM</span></code></a> — посимвольный корректор текста</p></li>
 <li><p><a class="reference internal" href="api/data.html#manuscript.data.Page" title="manuscript.data.Page"><code class="xref py py-class docutils literal notranslate"><span class="pre">Page</span></code></a> — структура данных страницы</p></li>
 <li><p><a class="reference internal" href="api/data.html#manuscript.data.Block" title="manuscript.data.Block"><code class="xref py py-class docutils literal notranslate"><span class="pre">Block</span></code></a> — структура данных блока</p></li>
 <li><p><a class="reference internal" href="api/data.html#manuscript.data.Line" title="manuscript.data.Line"><code class="xref py py-class docutils literal notranslate"><span class="pre">Line</span></code></a> — структура данных строки</p></li>
-<li><p><a class="reference internal" href="api/data.html#manuscript.data.Word" title="manuscript.data.Word"><code class="xref py py-class docutils literal notranslate"><span class="pre">Word</span></code></a> — структура данных слова</p></li>
+<li><p><a class="reference internal" href="api/data.html#manuscript.data.TextSpan" title="manuscript.data.TextSpan"><code class="xref py py-class docutils literal notranslate"><span class="pre">TextSpan</span></code></a> — минимальный текстовый регион OCR</p></li>
 </ul>
 </section>
-<section id="pipeline-defaults">
-<h2>Pipeline Defaults<a class="headerlink" href="#pipeline-defaults" title="Ссылка на этот заголовок"></a></h2>
-<p><code class="docutils literal notranslate"><span class="pre">Pipeline()</span></code> uses:</p>
-<ul class="simple">
-<li><p><code class="docutils literal notranslate"><span class="pre">EAST</span></code> detector</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code> layout</p></li>
-<li><p><code class="docutils literal notranslate"><span class="pre">TRBA</span></code> recognizer</p></li>
-<li><p>no corrector (<code class="docutils literal notranslate"><span class="pre">None</span></code>)</p></li>
-</ul>
+<section id="model-zoo">
+<h2>Зоопарк моделей<a class="headerlink" href="#model-zoo" title="Ссылка на этот заголовок"></a></h2>
+<p>Список встроенных пресетов и релизных артефактов, задокументированных для этой версии документации, см. в <a class="reference internal" href="model_zoo.html"><span class="doc">Зоопарк моделей</span></a>.</p>
+</section>
+<section id="related-work">
+<h2>Связанные работы<a class="headerlink" href="#related-work" title="Ссылка на этот заголовок"></a></h2>
+<p>См. <a class="reference internal" href="related_work.html"><span class="doc">Связанные работы</span></a>, чтобы ознакомиться с публикациями, связанными с проектом и экспериментами по OCR рукописей.</p>
 </section>
 </section>
 
@@ -263,7 +310,7 @@ pip<span class="w"> </span>install<span class="w"> </span>onnxruntime-silicon
           </div>
           <footer><div class="rst-footer-buttons" role="navigation" aria-label="Нижняя область">
         <a href="index.html" class="btn btn-neutral float-left" title="Документация manuscript-ocr" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Предыдущая</a>
-        <a href="pipeline_usage.html" class="btn btn-neutral float-right" title="Руководство по использованию Pipeline" accesskey="n" rel="next">Следующая <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+        <a href="model_zoo.html" class="btn btn-neutral float-right" title="Зоопарк моделей" accesskey="n" rel="next">Следующая <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
     </div>
 
   <hr/>

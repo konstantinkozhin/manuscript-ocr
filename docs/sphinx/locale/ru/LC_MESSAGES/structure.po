@@ -1,83 +1,36 @@
-#: ../../structure.rst:2 7132229d5d1c4f399c5cda9b6cb0fe4b
+msgid ""
+msgstr ""
+"Project-Id-Version: manuscript-ocr 0.1.11\n"
+"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"Last-Translator: OpenAI Codex\n"
+"Language: ru\n"
+"Language-Team: ru\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
 msgid "Library Structure"
 msgstr "Структура библиотеки"
 
-#: ../../structure.rst:4 34f7089a909a4f109497ad81b54c9c7b
-msgid "Overview of the manuscript-ocr library architecture."
-msgstr "Обзор архитектуры библиотеки manuscript-ocr."
+msgid "Overview"
+msgstr "Обзор"
 
-#: ../../structure.rst:86 d3dcd4e78f71439fa72e90491185f12c
-msgid "Module Descriptions"
-msgstr "Описание модулей"
+msgid "``Pipeline`` orchestrates OCR stages."
+msgstr "``Pipeline`` координирует этапы OCR."
 
-#: ../../structure.rst:88 64db78db5ee74cbeb3407f627809f6aa
-msgid "**Pipeline**"
-msgstr "**Pipeline**"
+msgid "``detectors`` provide detection models such as ``YOLO`` and ``EAST``."
+msgstr "``detectors`` предоставляют модели детекции, такие как ``YOLO`` и ``EAST``."
 
-#: ../../structure.rst:89 8f63bde9c3d84d1eaaa72a383acc56a7
-msgid ""
-"The main high-level interface that combines detection and recognition "
-"into a single OCR workflow."
-msgstr ""
-"Основной высокоуровневый интерфейс, объединяющий детекцию и распознавание "
-"в единый OCR-конвейер."
+msgid "``layouts`` provide ordering/grouping models (for example ``SimpleSorting``)."
+msgstr "``layouts`` предоставляют модели упорядочивания и группировки, например ``SimpleSorting``."
 
-#: ../../structure.rst:92 21ce1ce0459b4cf9ae0c165532e10059
-msgid "**data**"
-msgstr "**data**"
+msgid "``recognizers`` provide text recognition models."
+msgstr "``recognizers`` предоставляют модели распознавания текста."
 
-#: ../../structure.rst:93 ff876a3edf144ba88d3edb2be586b9be
-msgid ""
-"Data structures (``Page``, ``Block``, ``Line``, ``Word``) for "
-"representing OCR results in a hierarchical format."
-msgstr ""
-"Структуры данных (``Page``, ``Block``, ``Line``, ``Word``) для представления "
-"результатов OCR в иерархическом формате."
+msgid "``correctors`` provide text post-processing models."
+msgstr "``correctors`` предоставляют модели постобработки текста."
 
-#: ../../structure.rst:96 33164a95e0e046e8ba7dbfd35e3d7356
-msgid "**detectors**"
-msgstr "**detectors**"
-
-#: ../../structure.rst:97 24f1ffdeb2a0461489c77cbf29c31d48
-msgid ""
-"Text detection models. Currently includes ``EAST`` (Efficient and "
-"Accurate Scene Text Detector)."
-msgstr ""
-"Модели детекции текста. В настоящее время включает ``EAST`` "
-"(Efficient and Accurate Scene Text Detector)."
-
-#: ../../structure.rst:100 0bb613ceb11d4750808539bfa2d135dc
-msgid "**recognizers**"
-msgstr "**recognizers**"
-
-#: ../../structure.rst:101 5dca33c078ad478a9568c264ed5e80e5
-msgid ""
-"Text recognition models. Currently includes ``TRBA`` (Text Recognition "
-"with BiLSTM and Attention mechanism)."
-msgstr ""
-"Модели распознавания текста. В настоящее время включает ``TRBA`` "
-"(TPS-ResNet-BiLSTM-Attention)."
-
-#: ../../structure.rst:104 752961c7b3bd4cda9d78c2482fadc59b
-msgid "**utils**"
-msgstr "**utils**"
-
-#: ../../structure.rst:105 fe5f058732f041f7b085551a041028e6
-msgid "Utility functions for:"
-msgstr "Вспомогательные функции для:"
-
-#: ../../structure.rst:107 1ae11129ba6d4103b7e0a285e2062663
-msgid "I/O operations (``read_image``)"
-msgstr "операций ввода-вывода (``read_image``)"
-
-#: ../../structure.rst:108 ce3411ddae6548f9aad1e87034dbaccb
-msgid "Visualization (``visualize_page``)"
-msgstr "визуализации (``visualize_page``)"
-
-#: ../../structure.rst:109 4a915e65ea9e4c0eb8ce4fb96668b6a6
-msgid "Sorting and organization (``organize_page``)"
-msgstr "сортировки и организации данных (``organize_page``)"
-
-#: ../../structure.rst:110 823a2a8812464508b0ebefcc3393f40c
-msgid "Training utilities (``set_seed``)"
-msgstr "утилит для обучения (``set_seed``)"
+msgid "``utils.organize_page`` remains as a compatibility wrapper over layout logic."
+msgstr "``utils.organize_page`` остаётся совместимым обёрточным вызовом над layout-логикой."

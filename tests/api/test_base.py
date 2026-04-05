@@ -7,6 +7,7 @@ from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
 import onnxruntime as ort
 
+import manuscript.api.base as base_module
 from manuscript.api.base import BaseArtifactModel
 
 
@@ -295,21 +296,26 @@ class TestWeightResolution:
     def test_gdrive_url_resolution(self, tmp_path):
         """Test Google Drive URL resolution with gdown."""
         gdrive_spec = "gdrive:1234567890abcdef"
-        
+
         mock_file = tmp_path / "model.onnx"
         mock_file.write_text("mock")
-        
-        with patch.dict("sys.modules", {"gdown": MagicMock()}):
-            import gdown
+        cache_root = tmp_path / "cache_home"
+        cached_file = cache_root / ".manuscript" / "weights" / "1234567890abcdef.bin"
 
-            gdown.download.return_value = str(mock_file)
-            model = ConcreteModel(weights=gdrive_spec)
-        
+        with patch.object(base_module.Path, "home", return_value=cache_root):
+            with patch.dict("sys.modules", {"gdown": MagicMock()}):
+                import gdown
+
+                gdown.download.return_value = str(mock_file)
+                model = ConcreteModel(weights=gdrive_spec)
+
         # Verify gdown.download was called with correct file_id
         gdown.download.assert_called_once()
         call_kwargs = gdown.download.call_args.kwargs
         assert call_kwargs['id'] == '1234567890abcdef'
         assert call_kwargs['quiet'] == False
+        assert model.weights == str(cached_file)
+        assert cached_file.read_text(encoding="utf-8") == "mock"
 
 
 # ============================================================================
@@ -427,27 +433,32 @@ class TestExtraArtifactResolution:
         """Test downloading artifact from Google Drive with gdown."""
         weights_file = tmp_path / "model.onnx"
         weights_file.write_text("mock")
-        
+
         mock_file = tmp_path / "artifact.txt"
         mock_file.write_text("downloaded")
-        
-        with patch.dict("sys.modules", {"gdown": MagicMock()}):
-            import gdown
+        cache_root = tmp_path / "cache_home"
+        cached_file = cache_root / ".manuscript" / "weights" / "ABCDEFG123.bin"
 
-            gdown.download.return_value = str(mock_file)
-            model = ConcreteModel(weights=str(weights_file))
-        
-            result = model._resolve_extra_artifact(
-                "gdrive:ABCDEFG123",
-                default_name=None,
-                registry={},
-                description="artifact"
-            )
-        
+        with patch.object(base_module.Path, "home", return_value=cache_root):
+            with patch.dict("sys.modules", {"gdown": MagicMock()}):
+                import gdown
+
+                gdown.download.return_value = str(mock_file)
+                model = ConcreteModel(weights=str(weights_file))
+
+                result = model._resolve_extra_artifact(
+                    "gdrive:ABCDEFG123",
+                    default_name=None,
+                    registry={},
+                    description="artifact"
+                )
+
         # Verify gdown.download was called with correct file_id
         gdown.download.assert_called_once()
         call_kwargs = gdown.download.call_args.kwargs
         assert call_kwargs['id'] == 'ABCDEFG123'
+        assert result == str(cached_file)
+        assert cached_file.read_text(encoding="utf-8") == "downloaded"
     
     def test_artifact_no_default_raises_error(self, tmp_path):
         """Test error when no default artifact and None specified."""
@@ -564,6 +575,34 @@ class TestDownloadHelpers:
         finally:
             if cached_file.exists():
                 cached_file.unlink()
+
+    def test_download_http_force_download_replaces_cached_file(self, tmp_path):
+        """Test force_download refreshes an existing cached HTTP artifact."""
+        weights_file = tmp_path / "model.onnx"
+        weights_file.write_text("mock", encoding="utf-8")
+
+        cache_root = tmp_path / "cache_home"
+        cached_file = cache_root / ".manuscript" / "weights" / "cached.onnx"
+        cached_file.parent.mkdir(parents=True, exist_ok=True)
+        cached_file.write_text("stale", encoding="utf-8")
+
+        def fake_urlretrieve(url, target):
+            Path(target).write_text("fresh", encoding="utf-8")
+
+        with patch.object(base_module.Path, "home", return_value=cache_root):
+            with patch(
+                "manuscript.api.base.urllib.request.urlretrieve",
+                side_effect=fake_urlretrieve,
+            ) as mock_urlretrieve:
+                model = ConcreteModel(
+                    weights=str(weights_file),
+                    force_download=True,
+                )
+                result = model._download_http("https://example.com/cached.onnx")
+
+        assert result == str(cached_file)
+        assert cached_file.read_text(encoding="utf-8") == "fresh"
+        assert mock_urlretrieve.call_count == 1
     
     def test_download_github_url_construction(self, tmp_path):
         """Test GitHub URL is correctly constructed."""
@@ -585,25 +624,29 @@ class TestDownloadHelpers:
         """Test Google Drive download with gdown."""
         weights_file = tmp_path / "model.onnx"
         weights_file.write_text("mock")
-        
+
         downloaded_file = tmp_path / "downloaded.onnx"
         downloaded_file.write_text("mock_downloaded")
-        
-        with patch.dict("sys.modules", {"gdown": MagicMock()}):
-            import gdown
+        cache_root = tmp_path / "cache_home"
+        cached_file = cache_root / ".manuscript" / "weights" / "1Ab2Cd3Ef4Gh5.bin"
 
-            gdown.download.return_value = str(downloaded_file)
-            model = ConcreteModel(weights=str(weights_file))
-        
-            spec = "gdrive:1Ab2Cd3Ef4Gh5"
-            result = model._download_gdrive(spec)
-        
+        with patch.object(base_module.Path, "home", return_value=cache_root):
+            with patch.dict("sys.modules", {"gdown": MagicMock()}):
+                import gdown
+
+                gdown.download.return_value = str(downloaded_file)
+                model = ConcreteModel(weights=str(weights_file))
+
+                spec = "gdrive:1Ab2Cd3Ef4Gh5"
+                result = model._download_gdrive(spec)
+
         # Verify gdown.download was called with correct file_id
         gdown.download.assert_called_once()
         call_kwargs = gdown.download.call_args.kwargs
         assert call_kwargs['id'] == '1Ab2Cd3Ef4Gh5'
         assert call_kwargs['quiet'] == False
-        assert result == str(downloaded_file)
+        assert result == str(cached_file)
+        assert cached_file.read_text(encoding="utf-8") == "mock_downloaded"
     
     def test_download_gdrive_fallback_without_gdown(self, tmp_path):
         """Test Google Drive fallback to HTTP when gdown not available."""
@@ -645,6 +688,21 @@ class TestModelInitialization:
         
         assert model.extra_config["custom_param1"] == "value1"
         assert model.extra_config["custom_param2"] == 42
+
+    def test_model_initialization_with_force_download(self, tmp_path):
+        """Test force_download is stored separately from extra kwargs."""
+        weights_file = tmp_path / "model.onnx"
+        weights_file.write_text("mock", encoding="utf-8")
+
+        model = ConcreteModel(
+            weights=str(weights_file),
+            force_download=True,
+            custom_param="value",
+        )
+
+        assert model.force_download is True
+        assert "force_download" not in model.extra_config
+        assert model.extra_config["custom_param"] == "value"
     
     def test_session_initially_none(self, tmp_path):
         """Test session is None on initialization."""

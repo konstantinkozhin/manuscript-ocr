@@ -171,6 +171,7 @@ class TRBA(BaseRecognizer):
         config: Optional[str] = None,
         charset: Optional[str] = None,
         device: Optional[str] = None,
+        force_download: bool = False,
         rotate_threshold: Optional[float] = 1.5,
         region_preparer: Union[str, Callable[..., Sequence[Any]]] = "bbox",
         region_preparer_options: Optional[Dict[str, Any]] = None,
@@ -191,7 +192,12 @@ class TRBA(BaseRecognizer):
         default_debug_save_dir = kwargs.pop("debug_save_dir", None)
 
         # Initialize artifact-backed recognizer infrastructure.
-        super().__init__(weights=weights, device=device, **kwargs)
+        super().__init__(
+            weights=weights,
+            device=device,
+            force_download=force_download,
+            **kwargs,
+        )
 
         # Resolve config
         self.config_path = self._resolve_config(config)

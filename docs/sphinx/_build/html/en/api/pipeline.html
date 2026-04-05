@@ -8,17 +8,18 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Pipeline &mdash; manuscript-ocr 0.1.11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/language_switcher.css?v=d768f156" />
+      <link rel="stylesheet" type="text/css" href="../_static/model_zoo.css?v=2d297567" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=1e825a29"></script>
-      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="../_static/language_switcher.js?v=db730534"></script>
-      <script src="../_static/version_sidebar.js?v=edadfa97"></script>
+      <script src="../_static/version_sidebar.js?v=50cbed02"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -50,8 +51,18 @@
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#example-notebooks">Example Notebooks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#main-components">Main Components</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#pipeline-defaults">Pipeline Defaults</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#model-zoo">Model Zoo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#related-work">Related Work</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../model_zoo.html">Model Zoo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#detection">Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#layout">Layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#recognition">Recognition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#correction">Correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#architecture-sources">Architecture Sources</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../pipeline_usage.html">Pipeline Usage Guide</a><ul>
@@ -66,6 +77,8 @@
 <li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#disable-stages">Disable Stages</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#layout-placement">Layout Placement</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#trba-region-preparation">TRBA Region Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#collapsing-text-spans">Collapsing Text Spans</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
 </ul>
@@ -90,8 +103,8 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="data.html">Data Structures</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="data.html#data-model">Data Model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="data.html#module-manuscript.data">API Reference</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Word"><code class="docutils literal notranslate"><span class="pre">Word</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#module-manuscript.data">Module Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.TextSpan"><code class="docutils literal notranslate"><span class="pre">TextSpan</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Page"><code class="docutils literal notranslate"><span class="pre">Page</span></code></a></li>
@@ -101,14 +114,24 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="detectors.html">Detectors</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
 </ul>
 </li>
+<li class="toctree-l3"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO"><code class="docutils literal notranslate"><span class="pre">YOLO</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.__init__"><code class="docutils literal notranslate"><span class="pre">YOLO.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.config_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.default_target_size"><code class="docutils literal notranslate"><span class="pre">YOLO.default_target_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.default_weights_name"><code class="docutils literal notranslate"><span class="pre">YOLO.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.predict"><code class="docutils literal notranslate"><span class="pre">YOLO.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.pretrained_registry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="detectors.html#east-training-quads">EAST Training Quads</a></li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="layouts.html">Layouts</a><ul>
@@ -121,14 +144,14 @@
 </li>
 <li class="toctree-l2"><a class="reference internal" href="recognizers.html">Recognizers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -153,11 +176,22 @@
 <li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.crop_axis_aligned"><code class="docutils literal notranslate"><span class="pre">crop_axis_aligned()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.crop_polygon_mask"><code class="docutils literal notranslate"><span class="pre">crop_polygon_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.merge_polygons"><code class="docutils literal notranslate"><span class="pre">merge_polygons()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.order_quad_points"><code class="docutils literal notranslate"><span class="pre">order_quad_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.polygon_to_bbox"><code class="docutils literal notranslate"><span class="pre">polygon_to_bbox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.warp_quad"><code class="docutils literal notranslate"><span class="pre">warp_quad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.merge_text_spans"><code class="docutils literal notranslate"><span class="pre">merge_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.collapse_line_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_line_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.collapse_block_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_block_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.collapse_page_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_page_text_spans()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../related_work.html">Related Work</a></li>
 </ul>
 
         </div>
@@ -190,7 +224,7 @@
 <p>The main high-level interface for OCR processing.</p>
 <span class="target" id="module-manuscript._pipeline"></span><dl class="py class">
 <dt class="sig sig-object py" id="manuscript._pipeline.Pipeline">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">manuscript._pipeline.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recognizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'detector'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_text_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/_pipeline.html#Pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript._pipeline.Pipeline" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manuscript._pipeline.</span></span><span class="sig-name descname"><span class="pre">Pipeline</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detector=&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout=&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recognizer=&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrector=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_after='detector'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/_pipeline.html#Pipeline"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript._pipeline.Pipeline" title="Link to this definition"></a></dt>
 <dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
 <p>High-level OCR pipeline with configurable stage ordering.</p>
 <p>Default pipeline:
@@ -207,12 +241,11 @@
 </dd>
 <dt class="field-even">Parameters<span class="colon">:</span></dt>
 <dd class="field-even"><ul class="simple">
-<li><p><strong>detector</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
-<li><p><strong>layout</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
-<li><p><strong>recognizer</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(in Python v3.14)"><em>Any</em></a>)</p></li>
-<li><p><strong>corrector</strong> (<em>BaseCorrector</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>detector</strong> (<em>DetectorProtocol</em>)</p></li>
+<li><p><strong>layout</strong> (<em>LayoutProtocol</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>recognizer</strong> (<em>RecognizerProtocol</em><em> | </em><em>None</em>)</p></li>
+<li><p><strong>corrector</strong> (<em>CorrectorProtocol</em><em> | </em><em>None</em>)</p></li>
 <li><p><strong>layout_after</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a>)</p></li>
-<li><p><strong>min_text_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
 </ul>
 </dd>
 </dl>
@@ -229,25 +262,23 @@
 </table>
 <dl class="py method">
 <dt class="sig sig-object py" id="manuscript._pipeline.Pipeline.__init__">
-<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recognizer</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrector</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_after</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'detector'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_text_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/_pipeline.html#Pipeline.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript._pipeline.Pipeline.__init__" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">detector=&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout=&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">recognizer=&lt;object</span> <span class="pre">object&gt;</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">corrector=None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">layout_after='detector'</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/_pipeline.html#Pipeline.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript._pipeline.Pipeline.__init__" title="Link to this definition"></a></dt>
 <dd><p>Initialize OCR pipeline.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
-<li><p><strong>detector</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a><em>, </em><em>optional</em>) – Detector instance with <code class="docutils literal notranslate"><span class="pre">predict(image)</span> <span class="pre">-&gt;</span> <span class="pre">{&quot;page&quot;:</span> <span class="pre">Page}</span></code>.
-If omitted, default <code class="docutils literal notranslate"><span class="pre">EAST()</span></code> is used.
+<li><p><strong>detector</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a><em>, </em><em>optional</em>) – Detector instance with <code class="docutils literal notranslate"><span class="pre">predict(image)</span> <span class="pre">-&gt;</span> <span class="pre">Page</span></code>.
+If omitted, default <code class="docutils literal notranslate"><span class="pre">YOLO(weights=&quot;yolo26x_obb_text_g1&quot;)</span></code> is used.
 Detector cannot be disabled.</p></li>
 <li><p><strong>layout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Layout model instance with <code class="docutils literal notranslate"><span class="pre">predict(page,</span> <span class="pre">image=None)</span> <span class="pre">-&gt;</span> <span class="pre">Page</span></code>.
 If omitted, default <code class="docutils literal notranslate"><span class="pre">SimpleSorting()</span></code> is used.
 Pass <code class="docutils literal notranslate"><span class="pre">None</span></code> to disable layout stage.</p></li>
 <li><p><strong>recognizer</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Recognizer instance with <code class="docutils literal notranslate"><span class="pre">predict(page,</span> <span class="pre">image=None,</span> <span class="pre">...)</span> <span class="pre">-&gt;</span> <span class="pre">Page</span></code>.
-If omitted, default <code class="docutils literal notranslate"><span class="pre">TRBA()</span></code> is used.
+If omitted, default <code class="docutils literal notranslate"><span class="pre">TRBA(weights=&quot;trba_lite_g2&quot;)</span></code> is used.
 Pass <code class="docutils literal notranslate"><span class="pre">None</span></code> to disable recognition stage.</p></li>
 <li><p><strong>corrector</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(in Python v3.14)"><em>object</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Corrector instance with <code class="docutils literal notranslate"><span class="pre">predict(page,</span> <span class="pre">image=None)</span> <span class="pre">-&gt;</span> <span class="pre">Page</span></code>.
 Default is <code class="docutils literal notranslate"><span class="pre">None</span></code> (disabled).</p></li>
 <li><p><strong>layout_after</strong> (<em>{&quot;detector&quot;</em><em>, </em><em>&quot;recognizer&quot;</em><em>, </em><em>&quot;corrector&quot;}</em><em>, </em><em>optional</em>) – Slot where layout stage is executed. Default is <code class="docutils literal notranslate"><span class="pre">&quot;detector&quot;</span></code>.</p></li>
-<li><p><strong>min_text_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Minimum text box size in pixels (width and height) passed to
-recognizers that support <code class="docutils literal notranslate"><span class="pre">min_text_size</span></code>. Default is 5.</p></li>
 </ul>
 </dd>
 </dl>
@@ -287,22 +318,22 @@ recognizers that support <code class="docutils literal notranslate"><span class=
 
 <dl class="py property">
 <dt class="sig sig-object py" id="manuscript._pipeline.Pipeline.last_detection_page">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">last_detection_page</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.structures.Page"><span class="pre">Page</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#manuscript._pipeline.Pipeline.last_detection_page" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_detection_page</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.structures.Page"><span class="pre">Page</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#manuscript._pipeline.Pipeline.last_detection_page" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="manuscript._pipeline.Pipeline.last_layout_page">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">last_layout_page</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.structures.Page"><span class="pre">Page</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#manuscript._pipeline.Pipeline.last_layout_page" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_layout_page</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.structures.Page"><span class="pre">Page</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#manuscript._pipeline.Pipeline.last_layout_page" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="manuscript._pipeline.Pipeline.last_recognition_page">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">last_recognition_page</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.structures.Page"><span class="pre">Page</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#manuscript._pipeline.Pipeline.last_recognition_page" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_recognition_page</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.structures.Page"><span class="pre">Page</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#manuscript._pipeline.Pipeline.last_recognition_page" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py property">
 <dt class="sig sig-object py" id="manuscript._pipeline.Pipeline.last_correction_page">
-<span class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">last_correction_page</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.structures.Page"><span class="pre">Page</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><a class="headerlink" href="#manuscript._pipeline.Pipeline.last_correction_page" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">last_correction_page</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.structures.Page"><span class="pre">Page</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><a class="headerlink" href="#manuscript._pipeline.Pipeline.last_correction_page" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>

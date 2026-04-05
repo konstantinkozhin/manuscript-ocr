@@ -8,15 +8,16 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Data Structures &mdash; manuscript-ocr 0.1.11 documentation</title>
       <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
-      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=9edc463e" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
       <link rel="stylesheet" type="text/css" href="../_static/language_switcher.css?v=d768f156" />
+      <link rel="stylesheet" type="text/css" href="../_static/model_zoo.css?v=2d297567" />
 
   
       <script src="../_static/jquery.js?v=5d32c60e"></script>
       <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
       <script src="../_static/documentation_options.js?v=1e825a29"></script>
-      <script src="../_static/doctools.js?v=fd6eb6e6"></script>
-      <script src="../_static/sphinx_highlight.js?v=6ffebe34"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
       <script src="https://cdn.jsdelivr.net/npm/d3@7.9.0/dist/d3.min.js"></script>
       <script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@11.12.1/dist/mermaid.esm.min.mjs";
 
@@ -451,9 +452,10 @@ mermaid.initialize(
     }
 );
 
-window.addEventListener("load", load);</script>
+window.addEventListener("load", load);
+window.runMermaid = runMermaid;</script>
       <script src="../_static/language_switcher.js?v=db730534"></script>
-      <script src="../_static/version_sidebar.js?v=edadfa97"></script>
+      <script src="../_static/version_sidebar.js?v=50cbed02"></script>
     <script src="../_static/js/theme.js"></script>
     <link rel="index" title="Index" href="../genindex.html" />
     <link rel="search" title="Search" href="../search.html" />
@@ -485,58 +487,50 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#installation">Installation</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#example-notebooks">Example Notebooks</a></li>
 <li class="toctree-l2"><a class="reference internal" href="../getting_started.html#main-components">Main Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#model-zoo">Model Zoo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#related-work">Related Work</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../model_zoo.html">Model Zoo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#detection">Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#layout">Layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#recognition">Recognition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#correction">Correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#architecture-sources">Architecture Sources</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../pipeline_usage.html">Pipeline Usage Guide</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#detector-requirements">Detector Requirements</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#result-structure">Result Structure</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#stage-contracts">Stage Contracts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#detector">Detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#recognizer">Recognizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#layout">Layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#corrector">Corrector</a></li>
 </ul>
 </li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#recognizer-requirements">Recognizer Requirements</a></li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#corrector-requirements">Corrector Requirements</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#built-in-charlm-corrector">Built-in CharLM Corrector</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#compatible-implementation-examples">Compatible Implementation Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#complete-detector-example">Complete Detector Example</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#using-custom-components">Using Custom Components</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#pipeline-usage-examples">Pipeline Usage Examples</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#basic-usage">Basic Usage</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#detection-only-without-recognition">Detection Only (Without Recognition)</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#with-visualization">With Visualization</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#export-import-page-to-json">Export/Import Page to JSON</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#with-profiling">With Profiling</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#batch-processing">Batch Processing</a></li>
-</ul>
-</li>
-<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#component-configuration">Component Configuration</a><ul>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#replacing-detector-or-recognizer">Replacing Detector or Recognizer</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#built-in-model-configuration">Built-in Model Configuration</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#size-filtering">Size Filtering</a></li>
-<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#automatic-rotation-control-trba">Automatic Rotation Control (TRBA)</a></li>
-</ul>
-</li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#disable-stages">Disable Stages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#layout-placement">Layout Placement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#trba-region-preparation">TRBA Region Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#collapsing-text-spans">Collapsing Text Spans</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
 </ul>
 </li>
 <li class="toctree-l1"><a class="reference internal" href="../structure.html">Library Structure</a><ul>
-<li class="toctree-l2"><a class="reference internal" href="../structure.html#module-descriptions">Module Descriptions</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../structure.html#overview">Overview</a></li>
 </ul>
 </li>
 <li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
 <li class="toctree-l2"><a class="reference internal" href="pipeline.html">Pipeline</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.detector"><code class="docutils literal notranslate"><span class="pre">Pipeline.detector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.recognizer"><code class="docutils literal notranslate"><span class="pre">Pipeline.recognizer</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.corrector"><code class="docutils literal notranslate"><span class="pre">Pipeline.corrector</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.min_text_size"><code class="docutils literal notranslate"><span class="pre">Pipeline.min_text_size</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_layout_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_layout_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
 </ul>
@@ -545,8 +539,8 @@ window.addEventListener("load", load);</script>
 </li>
 <li class="toctree-l2 current"><a class="current reference internal" href="#">Data Structures</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="#data-model">Data Model</a></li>
-<li class="toctree-l3"><a class="reference internal" href="#module-manuscript.data">API Reference</a><ul>
-<li class="toctree-l4"><a class="reference internal" href="#manuscript.data.Word"><code class="docutils literal notranslate"><span class="pre">Word</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#module-manuscript.data">Module Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.data.TextSpan"><code class="docutils literal notranslate"><span class="pre">TextSpan</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#manuscript.data.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#manuscript.data.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="#manuscript.data.Page"><code class="docutils literal notranslate"><span class="pre">Page</span></code></a></li>
@@ -556,26 +550,44 @@ window.addEventListener("load", load);</script>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="detectors.html">Detectors</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO"><code class="docutils literal notranslate"><span class="pre">YOLO</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.__init__"><code class="docutils literal notranslate"><span class="pre">YOLO.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.config_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.default_target_size"><code class="docutils literal notranslate"><span class="pre">YOLO.default_target_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.default_weights_name"><code class="docutils literal notranslate"><span class="pre">YOLO.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.predict"><code class="docutils literal notranslate"><span class="pre">YOLO.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.pretrained_registry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="detectors.html#east-training-quads">EAST Training Quads</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
 <li class="toctree-l2"><a class="reference internal" href="recognizers.html">Recognizers</a><ul>
 <li class="toctree-l3"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
-<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
 <li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
 </ul>
 </li>
 </ul>
@@ -600,11 +612,22 @@ window.addEventListener("load", load);</script>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.crop_axis_aligned"><code class="docutils literal notranslate"><span class="pre">crop_axis_aligned()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.crop_polygon_mask"><code class="docutils literal notranslate"><span class="pre">crop_polygon_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.merge_polygons"><code class="docutils literal notranslate"><span class="pre">merge_polygons()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.order_quad_points"><code class="docutils literal notranslate"><span class="pre">order_quad_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.polygon_to_bbox"><code class="docutils literal notranslate"><span class="pre">polygon_to_bbox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.warp_quad"><code class="docutils literal notranslate"><span class="pre">warp_quad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.merge_text_spans"><code class="docutils literal notranslate"><span class="pre">merge_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.collapse_line_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_line_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.collapse_block_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_block_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.collapse_page_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_page_text_spans()</span></code></a></li>
 <li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
 </ul>
 </li>
 </ul>
 </li>
+<li class="toctree-l1"><a class="reference internal" href="../related_work.html">Related Work</a></li>
 </ul>
 
         </div>
@@ -645,36 +668,40 @@ window.addEventListener("load", load);</script>
     Page[Page]
     Block[Block]
     Line[Line]
-    Word[Word]
+    TextSpan[TextSpan]
 
     %% Relations
     Page --&gt;|&quot;blocks: List[Block]&quot;| Block
     Block --&gt;|&quot;lines: List[Line]&quot;| Line
-    Line --&gt;|&quot;words: List[Word]&quot;| Word
+    Line --&gt;|&quot;text_spans: List[TextSpan]&quot;| TextSpan
 
-    %% Word fields
-    Word --&gt; Wpoly[&quot;polygon: List[(x, y)]&lt;br&gt;≥ 4 points, clockwise&quot;]
-    Word --&gt; Wdet[&quot;detection_confidence: float (0–1)&quot;]
-    Word --&gt; Wtext[&quot;text: Optional[str]&quot;]
-    Word --&gt; Wrec[&quot;recognition_confidence: Optional[float] (0–1)&quot;]
-    Word --&gt; WordOrder[&quot;order: Optional[int]&lt;br&gt;assigned after sorting&quot;]
+    %% TextSpan fields
+    TextSpan --&gt; Tpoly[&quot;polygon: List[(x, y)]&lt;br&gt;≥ 4 points, clockwise&quot;]
+    TextSpan --&gt; Tdet[&quot;detection_confidence: float (0–1)&quot;]
+    TextSpan --&gt; Ttext[&quot;text: Optional[str]&quot;]
+    TextSpan --&gt; Trec[&quot;recognition_confidence: Optional[float] (0–1)&quot;]
+    TextSpan --&gt; Torder[&quot;order: Optional[int]&lt;br&gt;assigned after sorting&quot;]
 
     %% Line fields
     Line --&gt; LineOrder[&quot;order: Optional[int]&lt;br&gt;assigned after sorting&quot;]
 
     %% Block fields
     Block --&gt; BlockOrder[&quot;order: Optional[int]&lt;br&gt;assigned after sorting&quot;]
+    Block --&gt; FlatInput[&quot;text_spans: List[TextSpan]&lt;br&gt;optional flat input&quot;]
     </pre></section>
 <section id="module-manuscript.data">
-<span id="api-reference"></span><h2>API Reference<a class="headerlink" href="#module-manuscript.data" title="Link to this heading"></a></h2>
+<span id="module-reference"></span><h2>Module Reference<a class="headerlink" href="#module-manuscript.data" title="Link to this heading"></a></h2>
 <p>Data structures for manuscript OCR.</p>
 <p>This package contains the core data structures used to represent OCR results
 throughout the manuscript-ocr library.</p>
 <dl class="py class">
-<dt class="sig sig-object py" id="manuscript.data.Word">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">manuscript.data.</span></span><span class="sig-name descname"><span class="pre">Word</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/data/structures.html#Word"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.data.Word" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="manuscript.data.TextSpan">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manuscript.data.</span></span><span class="sig-name descname"><span class="pre">TextSpan</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/data/structures.html#TextSpan"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.data.TextSpan" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
-<p>A single detected or recognized word.</p>
+<p>A single detected or recognized text span.</p>
+<p>A text span is the smallest OCR region in the pipeline. It may correspond
+to a word, a whole text line, or any other contiguous text segment returned
+by a detector.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -687,10 +714,12 @@ throughout the manuscript-ocr library.</p>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="manuscript.data.Word.polygon">
-<span class="sig-name descname"><span class="pre">polygon</span></span><a class="headerlink" href="#manuscript.data.Word.polygon" title="Link to this definition"></a></dt>
-<dd><p>Polygon vertices (x, y), ordered clockwise. For quadrilateral text regions:
-TL → TR → BR → BL (Top-Left, Top-Right, Bottom-Right, Bottom-Left).</p>
+<dt class="sig sig-object py" id="manuscript.data.TextSpan.polygon">
+<span class="sig-name descname"><span class="pre">polygon</span></span><a class="headerlink" href="#manuscript.data.TextSpan.polygon" title="Link to this definition"></a></dt>
+<dd><p>Polygon vertices (x, y), ordered clockwise.
+The public data model supports arbitrary polygons with 4 or more points.
+For quadrilateral text regions, the canonical order is
+TL -&gt; TR -&gt; BR -&gt; BL (Top-Left, Top-Right, Bottom-Right, Bottom-Left).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p>List[Tuple[<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>, <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)">float</a>]]</p>
@@ -699,8 +728,8 @@ TL → TR → BR → BL (Top-Left, Top-Right, Bottom-Right, Bottom-Left).</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="manuscript.data.Word.detection_confidence">
-<span class="sig-name descname"><span class="pre">detection_confidence</span></span><a class="headerlink" href="#manuscript.data.Word.detection_confidence" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="manuscript.data.TextSpan.detection_confidence">
+<span class="sig-name descname"><span class="pre">detection_confidence</span></span><a class="headerlink" href="#manuscript.data.TextSpan.detection_confidence" title="Link to this definition"></a></dt>
 <dd><p>Text detection confidence score from detector (0.0 to 1.0).</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
@@ -710,8 +739,8 @@ TL → TR → BR → BL (Top-Left, Top-Right, Bottom-Right, Bottom-Left).</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="manuscript.data.Word.text">
-<span class="sig-name descname"><span class="pre">text</span></span><a class="headerlink" href="#manuscript.data.Word.text" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="manuscript.data.TextSpan.text">
+<span class="sig-name descname"><span class="pre">text</span></span><a class="headerlink" href="#manuscript.data.TextSpan.text" title="Link to this definition"></a></dt>
 <dd><p>Recognized text content (populated by OCR pipeline). None if only detection
 was performed.</p>
 <dl class="field-list simple">
@@ -722,8 +751,8 @@ was performed.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="manuscript.data.Word.recognition_confidence">
-<span class="sig-name descname"><span class="pre">recognition_confidence</span></span><a class="headerlink" href="#manuscript.data.Word.recognition_confidence" title="Link to this definition"></a></dt>
+<dt class="sig sig-object py" id="manuscript.data.TextSpan.recognition_confidence">
+<span class="sig-name descname"><span class="pre">recognition_confidence</span></span><a class="headerlink" href="#manuscript.data.TextSpan.recognition_confidence" title="Link to this definition"></a></dt>
 <dd><p>Text recognition confidence score from recognizer (0.0 to 1.0). None if only
 detection was performed.</p>
 <dl class="field-list simple">
@@ -734,9 +763,9 @@ detection was performed.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="manuscript.data.Word.order">
-<span class="sig-name descname"><span class="pre">order</span></span><a class="headerlink" href="#manuscript.data.Word.order" title="Link to this definition"></a></dt>
-<dd><p>Word position inside the line after sorting. None before sorting.</p>
+<dt class="sig sig-object py" id="manuscript.data.TextSpan.order">
+<span class="sig-name descname"><span class="pre">order</span></span><a class="headerlink" href="#manuscript.data.TextSpan.order" title="Link to this definition"></a></dt>
+<dd><p>Text span position inside the line after sorting. None before sorting.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
 <dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)">int</a>, optional</p>
@@ -745,13 +774,13 @@ detection was performed.</p>
 </dd></dl>
 
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">word</span> <span class="o">=</span> <span class="n">Word</span><span class="p">(</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">text_span</span> <span class="o">=</span> <span class="n">TextSpan</span><span class="p">(</span>
 <span class="gp">... </span>    <span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">100</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
 <span class="gp">... </span>    <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span>
 <span class="gp">... </span>    <span class="n">recognition_confidence</span><span class="o">=</span><span class="mf">0.98</span>
 <span class="gp">... </span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">word</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">text_span</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
 <span class="go">Hello</span>
 </pre></div>
 </div>
@@ -768,52 +797,55 @@ detection was performed.</p>
 <tr class="row-odd"><td><p><strong>detection_confidence</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p><strong>order</strong></p></td>
+<tr class="row-even"><td><p><strong>model_config</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p><strong>polygon</strong></p></td>
+<tr class="row-odd"><td><p><strong>order</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p><strong>recognition_confidence</strong></p></td>
+<tr class="row-even"><td><p><strong>polygon</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p><strong>text</strong></p></td>
+<tr class="row-odd"><td><p><strong>recognition_confidence</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>text</strong></p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id0">
-<span class="sig-name descname"><span class="pre">polygon</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Ellipsis</span></span><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">detection_confidence</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Ellipsis</span></em><a class="headerlink" href="#id0" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id1">
-<span class="sig-name descname"><span class="pre">detection_confidence</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Ellipsis</span></span><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">order</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id1" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id2">
-<span class="sig-name descname"><span class="pre">text</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">polygon</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(in Python v3.14)"><span class="pre">Tuple</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="p"><span class="pre">]</span></span><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">Ellipsis</span></em><a class="headerlink" href="#id2" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id3">
-<span class="sig-name descname"><span class="pre">recognition_confidence</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">recognition_confidence</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><span class="pre">float</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id3" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id4">
-<span class="sig-name descname"><span class="pre">order</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id4" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="manuscript.data.Line">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">manuscript.data.</span></span><span class="sig-name descname"><span class="pre">Line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/data/structures.html#Line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.data.Line" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manuscript.data.</span></span><span class="sig-name descname"><span class="pre">Line</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/data/structures.html#Line"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.data.Line" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
-<p>A single text line containing one or more words.</p>
+<p>A single text line containing one or more text spans.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Parameters<span class="colon">:</span></dt>
 <dd class="field-odd"><ul class="simple">
@@ -826,12 +858,12 @@ detection was performed.</p>
 </dd>
 </dl>
 <dl class="py attribute">
-<dt class="sig sig-object py" id="manuscript.data.Line.words">
-<span class="sig-name descname"><span class="pre">words</span></span><a class="headerlink" href="#manuscript.data.Line.words" title="Link to this definition"></a></dt>
-<dd><p>List of words in the line.</p>
+<dt class="sig sig-object py" id="manuscript.data.Line.text_spans">
+<span class="sig-name descname"><span class="pre">text_spans</span></span><a class="headerlink" href="#manuscript.data.Line.text_spans" title="Link to this definition"></a></dt>
+<dd><p>List of text spans in the line.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference internal" href="#manuscript.data.Word" title="manuscript.data.Word">Word</a>]</p>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#manuscript.data.TextSpan" title="manuscript.data.TextSpan">TextSpan</a>]</p>
 </dd>
 </dl>
 </dd></dl>
@@ -848,13 +880,19 @@ detection was performed.</p>
 </dd></dl>
 
 <p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">line</span> <span class="o">=</span> <span class="n">Line</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="p">[</span>
-<span class="gp">... </span>    <span class="n">Word</span><span class="p">(</span><span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
-<span class="gp">... </span>         <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Hello&quot;</span><span class="p">),</span>
-<span class="gp">... </span>    <span class="n">Word</span><span class="p">(</span><span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">110</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">110</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
-<span class="gp">... </span>         <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.97</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;World&quot;</span><span class="p">),</span>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">line</span> <span class="o">=</span> <span class="n">Line</span><span class="p">(</span><span class="n">text_spans</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>    <span class="n">TextSpan</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
+<span class="gp">... </span>        <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">),</span>
+<span class="gp">... </span>    <span class="n">TextSpan</span><span class="p">(</span>
+<span class="gp">... </span>        <span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">110</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">110</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">60</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
+<span class="gp">... </span>        <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.97</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="n">text</span><span class="o">=</span><span class="s2">&quot;World&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="p">),</span>
 <span class="gp">... </span><span class="p">])</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">words</span><span class="p">))</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">line</span><span class="o">.</span><span class="n">text_spans</span><span class="p">))</span>
 <span class="go">2</span>
 </pre></div>
 </div>
@@ -868,26 +906,27 @@ detection was performed.</p>
 </table>
 <table class="docutils align-default">
 <tbody>
-<tr class="row-odd"><td><p><strong>order</strong></p></td>
+<tr class="row-odd"><td><p><strong>model_config</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>order</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-odd"><td><p><strong>text_spans</strong></p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
 <dl class="py attribute">
 <dt class="sig sig-object py" id="id5">
-<span class="sig-name descname"><span class="pre">words</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#manuscript.data.Word" title="manuscript.data.structures.Word"><span class="pre">Word</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id6">
-<span class="sig-name descname"><span class="pre">order</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
+<span class="sig-name descname"><span class="pre">order</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id5" title="Link to this definition"></a></dt>
 <dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="manuscript.data.Block">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">manuscript.data.</span></span><span class="sig-name descname"><span class="pre">Block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/data/structures.html#Block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.data.Block" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manuscript.data.</span></span><span class="sig-name descname"><span class="pre">Block</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/data/structures.html#Block"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.data.Block" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <p>A logical text block (e.g., paragraph, column).</p>
 <dl class="py attribute">
@@ -902,14 +941,14 @@ detection was performed.</p>
 </dd></dl>
 
 <dl class="py attribute">
-<dt class="sig sig-object py" id="manuscript.data.Block.words">
-<span class="sig-name descname"><span class="pre">words</span></span><a class="headerlink" href="#manuscript.data.Block.words" title="Link to this definition"></a></dt>
-<dd><p>Legacy: Direct list of words without line structure. Used for backward
-compatibility. If both <cite>lines</cite> and <cite>words</cite> are empty, creates a single
-line from words.</p>
+<dt class="sig sig-object py" id="manuscript.data.Block.text_spans">
+<span class="sig-name descname"><span class="pre">text_spans</span></span><a class="headerlink" href="#manuscript.data.Block.text_spans" title="Link to this definition"></a></dt>
+<dd><p>Optional flat list of text spans used as a shorthand input. If <code class="docutils literal notranslate"><span class="pre">lines</span></code>
+is empty and <code class="docutils literal notranslate"><span class="pre">text_spans</span></code> are provided, they are wrapped into a
+single line.</p>
 <dl class="field-list simple">
 <dt class="field-odd">Type<span class="colon">:</span></dt>
-<dd class="field-odd"><p>List[<a class="reference internal" href="#manuscript.data.Word" title="manuscript.data.Word">Word</a>], optional</p>
+<dd class="field-odd"><p>List[<a class="reference internal" href="#manuscript.data.TextSpan" title="manuscript.data.TextSpan">TextSpan</a>], optional</p>
 </dd>
 </dl>
 </dd></dl>
@@ -927,10 +966,20 @@ line from words.</p>
 
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">block</span> <span class="o">=</span> <span class="n">Block</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="p">[</span>
-<span class="gp">... </span>    <span class="n">Line</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="p">[</span><span class="n">Word</span><span class="p">(</span><span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
-<span class="gp">... </span>                     <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Line 1&quot;</span><span class="p">)]),</span>
-<span class="gp">... </span>    <span class="n">Line</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="p">[</span><span class="n">Word</span><span class="p">(</span><span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">70</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">70</span><span class="p">)],</span>
-<span class="gp">... </span>                     <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.97</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Line 2&quot;</span><span class="p">)]),</span>
+<span class="gp">... </span>    <span class="n">Line</span><span class="p">(</span><span class="n">text_spans</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>        <span class="n">TextSpan</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
+<span class="gp">... </span>            <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Line 1&quot;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="p">)</span>
+<span class="gp">... </span>    <span class="p">]),</span>
+<span class="gp">... </span>    <span class="n">Line</span><span class="p">(</span><span class="n">text_spans</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>        <span class="n">TextSpan</span><span class="p">(</span>
+<span class="gp">... </span>            <span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">50</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">70</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">70</span><span class="p">)],</span>
+<span class="gp">... </span>            <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.97</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Line 2&quot;</span><span class="p">,</span>
+<span class="gp">... </span>        <span class="p">)</span>
+<span class="gp">... </span>    <span class="p">]),</span>
 <span class="gp">... </span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">block</span><span class="o">.</span><span class="n">lines</span><span class="p">))</span>
 <span class="go">2</span>
@@ -949,30 +998,33 @@ line from words.</p>
 <tr class="row-odd"><td><p><strong>lines</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-even"><td><p><strong>order</strong></p></td>
+<tr class="row-even"><td><p><strong>model_config</strong></p></td>
 <td></td>
 </tr>
-<tr class="row-odd"><td><p><strong>words</strong></p></td>
+<tr class="row-odd"><td><p><strong>order</strong></p></td>
+<td></td>
+</tr>
+<tr class="row-even"><td><p><strong>text_spans</strong></p></td>
 <td></td>
 </tr>
 </tbody>
 </table>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id7">
-<span class="sig-name descname"><span class="pre">order</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></span><span class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></span><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
-<dd></dd></dl>
-
 <dl class="py method">
 <dt class="sig sig-object py" id="manuscript.data.Block.__init__">
 <span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/data/structures.html#Block.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.data.Block.__init__" title="Link to this definition"></a></dt>
-<dd><p>Initialize Block with backward compatibility for words-only input.</p>
+<dd><p>Initialize Block, normalizing flat <code class="docutils literal notranslate"><span class="pre">text_spans</span></code> into one line.</p>
 </dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id6">
+<span class="sig-name descname"><span class="pre">order</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><span class="pre">int</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">None</span></em><a class="headerlink" href="#id6" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
 <dl class="py class">
 <dt class="sig sig-object py" id="manuscript.data.Page">
-<span class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></span><span class="sig-prename descclassname"><span class="pre">manuscript.data.</span></span><span class="sig-name descname"><span class="pre">Page</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/data/structures.html#Page"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.data.Page" title="Link to this definition"></a></dt>
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manuscript.data.</span></span><span class="sig-name descname"><span class="pre">Page</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">args</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/data/structures.html#Page"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.data.Page" title="Link to this definition"></a></dt>
 <dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
 <p>A document page containing blocks of text.</p>
 <p>For a full visual diagram of the data model, see:
@@ -1002,8 +1054,13 @@ line from words.</p>
 <p class="rubric">Examples</p>
 <div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="p">(</span><span class="n">blocks</span><span class="o">=</span><span class="p">[</span>
 <span class="gp">... </span>    <span class="n">Block</span><span class="p">(</span><span class="n">lines</span><span class="o">=</span><span class="p">[</span>
-<span class="gp">... </span>        <span class="n">Line</span><span class="p">(</span><span class="n">words</span><span class="o">=</span><span class="p">[</span><span class="n">Word</span><span class="p">(</span><span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
-<span class="gp">... </span>                         <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span> <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Hello&quot;</span><span class="p">)])</span>
+<span class="gp">... </span>        <span class="n">Line</span><span class="p">(</span><span class="n">text_spans</span><span class="o">=</span><span class="p">[</span>
+<span class="gp">... </span>            <span class="n">TextSpan</span><span class="p">(</span>
+<span class="gp">... </span>                <span class="n">polygon</span><span class="o">=</span><span class="p">[(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">20</span><span class="p">),</span> <span class="p">(</span><span class="mi">50</span><span class="p">,</span> <span class="mi">40</span><span class="p">),</span> <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">40</span><span class="p">)],</span>
+<span class="gp">... </span>                <span class="n">detection_confidence</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>
+<span class="gp">... </span>                <span class="n">text</span><span class="o">=</span><span class="s2">&quot;Hello&quot;</span><span class="p">,</span>
+<span class="gp">... </span>            <span class="p">)</span>
+<span class="gp">... </span>        <span class="p">])</span>
 <span class="gp">... </span>    <span class="p">])</span>
 <span class="gp">... </span><span class="p">])</span>
 <span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">page</span><span class="o">.</span><span class="n">blocks</span><span class="p">))</span>
@@ -1024,10 +1081,34 @@ line from words.</p>
 </tr>
 </tbody>
 </table>
-<dl class="py attribute">
-<dt class="sig sig-object py" id="id8">
-<span class="sig-name descname"><span class="pre">blocks</span></span><span class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#manuscript.data.Block" title="manuscript.data.structures.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></span><a class="headerlink" href="#id8" title="Link to this definition"></a></dt>
-<dd></dd></dl>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>model_config</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.data.Page.from_json">
+<em class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/data/structures.html#Page.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.data.Page.from_json" title="Link to this definition"></a></dt>
+<dd><p>Load Page from JSON file or string.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>source</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>Path</em>) – Path to JSON file or JSON string.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Loaded Page object.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#manuscript.data.Page" title="manuscript.data.Page">Page</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s2">&quot;result.json&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s1">&#39;{&quot;blocks&quot;: [...]}&#39;</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
 
 <dl class="py method">
 <dt class="sig sig-object py" id="manuscript.data.Page.to_json">
@@ -1054,27 +1135,10 @@ line from words.</p>
 </div>
 </dd></dl>
 
-<dl class="py method">
-<dt class="sig sig-object py" id="manuscript.data.Page.from_json">
-<span class="property"><span class="k"><span class="pre">classmethod</span></span><span class="w"> </span></span><span class="sig-name descname"><span class="pre">from_json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">source</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/data/structures.html#Page.from_json"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.data.Page.from_json" title="Link to this definition"></a></dt>
-<dd><p>Load Page from JSON file or string.</p>
-<dl class="field-list simple">
-<dt class="field-odd">Parameters<span class="colon">:</span></dt>
-<dd class="field-odd"><p><strong>source</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>Path</em>) – Path to JSON file or JSON string.</p>
-</dd>
-<dt class="field-even">Returns<span class="colon">:</span></dt>
-<dd class="field-even"><p>Loaded Page object.</p>
-</dd>
-<dt class="field-odd">Return type<span class="colon">:</span></dt>
-<dd class="field-odd"><p><a class="reference internal" href="#manuscript.data.Page" title="manuscript.data.Page">Page</a></p>
-</dd>
-</dl>
-<p class="rubric">Examples</p>
-<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s2">&quot;result.json&quot;</span><span class="p">)</span>
-<span class="gp">&gt;&gt;&gt; </span><span class="n">page</span> <span class="o">=</span> <span class="n">Page</span><span class="o">.</span><span class="n">from_json</span><span class="p">(</span><span class="s1">&#39;{&quot;blocks&quot;: [...]}&#39;</span><span class="p">)</span>
-</pre></div>
-</div>
-</dd></dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="id7">
+<span class="sig-name descname"><span class="pre">blocks</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(in Python v3.14)"><span class="pre">List</span></a><span class="p"><span class="pre">[</span></span><a class="reference internal" href="#manuscript.data.Block" title="manuscript.data.structures.Block"><span class="pre">Block</span></a><span class="p"><span class="pre">]</span></span></em><a class="headerlink" href="#id7" title="Link to this definition"></a></dt>
+<dd></dd></dl>
 
 </dd></dl>
 
