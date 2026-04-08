@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "manuscript-ocr"
-version = "0.1.11"
+version = "0.1.12"
 description = "Detects and recognizes text in historical, archival and handwritten documents. Optimized for fast inference with ONNX Runtime (CPU/GPU/CoreML) and optional training with PyTorch. Supports plugging custom models via a simple API."
 readme = "README.md"
 requires-python = ">=3.8"
@@ -70,10 +70,11 @@ dev = [
     
     # ONNX export tools
     "onnx>=1.12",
+    "onnxscript",
     "onnxsim>=0.4",
-    "ultralytics>=8.4.30",
     
     # Training utilities
+    "Levenshtein",
     "torch-optimizer>=0.1",
     "evaluate>=0.4",
     "jiwer>=2.2",
@@ -101,7 +102,6 @@ dev = [
     "build>=0.8",
     "twine>=4",
 ]
-
 
 [tool.setuptools]
 include-package-data = true

@@ -1,0 +1,7 @@
+Changes in v_0_1_12 relative to 0.1.11
+======================================
+
+- `pyproject.toml`: version changed from `0.1.11` to `0.1.12`;
+- `pyproject.toml`: `onnxscript` added to `dev` dependencies;
+- `pyproject.toml`: `Levenshtein` added to `dev` dependencies;
+- `pyproject.toml`: `ultralytics` removed from `dev` dependencies.
