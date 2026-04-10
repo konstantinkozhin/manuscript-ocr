@@ -162,7 +162,7 @@ class Pipeline:
             recognizer_kwargs = filter_predict_kwargs(
                 self.recognizer,
                 {
-                    "batch_size": 32,
+                    "batch_size": getattr(self.recognizer, "batch_size", 32),
                 },
             )
             if accepts_predict_kwarg(self.recognizer, "image"):

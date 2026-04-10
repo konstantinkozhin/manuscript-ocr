@@ -100,6 +100,9 @@ class TRBA(BaseRecognizer):
     min_text_size : int, optional
         Minimum crop width/height in pixels to run recognition for a text span.
         Text spans below this threshold are skipped. Default is ``5``.
+    batch_size : int, optional
+        Default inference batch size used when ``predict(..., batch_size=...)``
+        is not provided. Default is ``128``.
     **kwargs
         Additional configuration options (reserved for future use).
 
@@ -176,6 +179,7 @@ class TRBA(BaseRecognizer):
         region_preparer: Union[str, Callable[..., Sequence[Any]]] = "bbox",
         region_preparer_options: Optional[Dict[str, Any]] = None,
         min_text_size: int = 5,
+        batch_size: int = 128,
         **kwargs,
     ):
         if "region_predictor" in kwargs:
@@ -244,6 +248,7 @@ class TRBA(BaseRecognizer):
         self.region_preparer = self._validate_region_preparer(region_preparer)
         self.region_preparer_options = dict(region_preparer_options or {})
         self.min_text_size = min_text_size
+        self.batch_size = max(1, int(batch_size))
         self.default_debug_save_dir = (
             None
             if default_debug_save_dir is None
@@ -611,7 +616,7 @@ class TRBA(BaseRecognizer):
     def _predict_text_images(
         self,
         regions: Sequence[PreparedRegion],
-        batch_size: int = 32,
+        batch_size: Optional[int] = None,
     ) -> List[RecognitionPrediction]:
         """
         Run ONNX inference on prepared text regions.
@@ -623,6 +628,8 @@ class TRBA(BaseRecognizer):
             return []
 
         results: List[RecognitionPrediction] = []
+        if batch_size is None:
+            batch_size = self.batch_size
         effective_batch_size = self._effective_inference_batch_size(batch_size)
         input_name = self.onnx_session.get_inputs()[0].name
         output_name = self.onnx_session.get_outputs()[0].name
@@ -657,7 +664,7 @@ class TRBA(BaseRecognizer):
     def _predict_word_images(
         self,
         images: List[Union[np.ndarray, str, Path, Image.Image]],
-        batch_size: int = 32,
+        batch_size: Optional[int] = None,
     ) -> List[Dict[str, Any]]:
         """
         Backward-compatible wrapper for raw image list inference.
@@ -671,6 +678,8 @@ class TRBA(BaseRecognizer):
             )
             for image in images
         ]
+        if batch_size is None:
+            batch_size = self.batch_size
         predictions = self._predict_text_images(regions, batch_size=batch_size)
         return [
             {"text": prediction.text, "confidence": prediction.confidence, "meta": dict(prediction.meta)}
@@ -710,7 +719,7 @@ class TRBA(BaseRecognizer):
         self,
         page: Page,
         image: Optional[Union[np.ndarray, str, Path, Image.Image]] = None,
-        batch_size: int = 32,
+        batch_size: Optional[int] = None,
         debug_save_dir: Optional[Union[str, Path]] = None,
     ) -> Page:
         """
@@ -723,8 +732,9 @@ class TRBA(BaseRecognizer):
         image : str, Path, numpy.ndarray, or PIL.Image, optional
             Source page image used to extract text regions. If ``None``,
             recognition is skipped and a deep copy of ``page`` is returned.
-        batch_size : int, optional
-            Number of prepared text regions to process simultaneously.
+        batch_size : int or None, optional
+            Number of prepared text regions to process simultaneously. If
+            ``None``, uses ``batch_size`` provided to the constructor.
         debug_save_dir : str or Path, optional
             If provided, saves the prepared recognition crops to this
             directory as ``*.png`` files together with ``index.json``.
@@ -743,6 +753,8 @@ class TRBA(BaseRecognizer):
 
         if debug_save_dir is None:
             debug_save_dir = self.default_debug_save_dir
+        if batch_size is None:
+            batch_size = self.batch_size
 
         image_array = read_image(image)
         regions = self._call_region_preparer(result_page, image_array)

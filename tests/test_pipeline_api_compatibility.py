@@ -70,10 +70,12 @@ class DummyRecognizer:
         self.events = events
         self.call_count = 0
         self.last_image = None
+        self.last_batch_size = None
         self.last_min_text_size = None
         self.last_orders = None
         self.last_debug_save_dir = None
         self.min_text_size = min_text_size
+        self.batch_size = 32
 
     def predict(
         self,
@@ -86,6 +88,7 @@ class DummyRecognizer:
             self.events.append("recognizer")
         self.call_count += 1
         self.last_image = image
+        self.last_batch_size = batch_size
         self.last_debug_save_dir = debug_save_dir
         self.last_min_text_size = self.min_text_size
 
@@ -174,6 +177,19 @@ class TestPipelineAPICompatibility:
         assert [w.text for w in words] == ["word1", "word2", "word3"]
         assert [w.order for w in words] == [0, 1, 2]
         assert recognizer.last_orders == [0, 1, 2]
+
+    def test_pipeline_uses_recognizer_batch_size_attribute(self):
+        recognizer = DummyRecognizer()
+        recognizer.batch_size = 64
+        pipeline = Pipeline(
+            detector=DummyDetector(),
+            layout=DummyLayout(),
+            recognizer=recognizer,
+        )
+
+        pipeline.predict(np.zeros((100, 400, 3), dtype=np.uint8))
+
+        assert recognizer.last_batch_size == 64
 
     def test_pipeline_returns_dict_structure(self):
         pipeline = Pipeline(

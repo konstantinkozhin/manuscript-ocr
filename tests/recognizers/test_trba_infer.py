@@ -400,7 +400,47 @@ class TestTRBAPredictPageInterface:
         assert result.blocks[0].lines[0].text_spans[1].text == "word2"
         assert result.blocks[0].lines[0].text_spans[0].recognition_confidence == 0.9
         assert result.blocks[0].lines[0].text_spans[1].recognition_confidence == 0.85
-        assert calls == {"count": 2, "batch_size": 32}
+        assert calls == {"count": 2, "batch_size": 128}
+
+    def test_predict_uses_constructor_batch_size_by_default(self, tmp_path, monkeypatch):
+        calls = {}
+
+        def fake_predict_text_images(regions, batch_size=32):
+            calls["count"] = len(regions)
+            calls["batch_size"] = batch_size
+            return [
+                {"text": "word1", "confidence": 0.9},
+                {"text": "word2", "confidence": 0.85},
+            ]
+
+        recognizer = self._create_recognizer(tmp_path, batch_size=64)
+        monkeypatch.setattr(recognizer, "_predict_text_images", fake_predict_text_images)
+        page = self._create_page()
+        image = np.zeros((64, 180, 3), dtype=np.uint8)
+
+        recognizer.predict(page, image=image)
+
+        assert calls == {"count": 2, "batch_size": 64}
+
+    def test_predict_batch_size_argument_overrides_constructor_value(self, tmp_path, monkeypatch):
+        calls = {}
+
+        def fake_predict_text_images(regions, batch_size=32):
+            calls["count"] = len(regions)
+            calls["batch_size"] = batch_size
+            return [
+                {"text": "word1", "confidence": 0.9},
+                {"text": "word2", "confidence": 0.85},
+            ]
+
+        recognizer = self._create_recognizer(tmp_path, batch_size=64)
+        monkeypatch.setattr(recognizer, "_predict_text_images", fake_predict_text_images)
+        page = self._create_page()
+        image = np.zeros((64, 180, 3), dtype=np.uint8)
+
+        recognizer.predict(page, image=image, batch_size=8)
+
+        assert calls == {"count": 2, "batch_size": 8}
 
     def test_predict_without_image_returns_copy(self, tmp_path):
         recognizer = self._create_recognizer(tmp_path)
@@ -649,7 +689,7 @@ class TestTRBAPredictPageInterface:
 
         result = recognizer.predict(page, image=image)
 
-        assert captured["batch_size"] == 32
+        assert captured["batch_size"] == 128
         assert captured["metas"][0]["source"] == "custom"
         assert result.blocks[0].lines[0].text_spans[0].text == "custom1"
         assert result.blocks[0].lines[0].text_spans[1].text == "custom2"

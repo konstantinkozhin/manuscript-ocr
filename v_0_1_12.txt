@@ -4,4 +4,17 @@ Changes in v_0_1_12 relative to 0.1.11
 - `pyproject.toml`: version changed from `0.1.11` to `0.1.12`;
 - `pyproject.toml`: `onnxscript` added to `dev` dependencies;
 - `pyproject.toml`: `Levenshtein` added to `dev` dependencies;
-- `pyproject.toml`: `ultralytics` removed from `dev` dependencies.
+- `pyproject.toml`: `ultralytics` removed from `dev` dependencies;
+- `src/manuscript/correctors/_charlm/__init__.py`: `CharLM.train()` now attempts
+  automatic ONNX export after training and saves the exported model as
+  `charlm_epoch_<epochs>.onnx` in `exp_dir`;
+- `src/manuscript/recognizers/_trba/__init__.py`: `TRBA` now accepts
+  `batch_size` in the constructor; `predict(..., batch_size=...)` still
+  overrides the constructor value when provided; default inference batch size
+  increased to `128`;
+- `src/manuscript/_pipeline.py`: recognition stage now respects
+  `recognizer.batch_size` instead of always forcing `batch_size=32`;
+- `src/manuscript/utils/io.py`: new public helper `create_page_from_image(...)`
+  added for wrapping one image or a sequence of images into a `Page`;
+- `src/manuscript/utils/__init__.py` and `src/manuscript/__init__.py`:
+  `create_page_from_image(...)` re-exported as part of the public API.
