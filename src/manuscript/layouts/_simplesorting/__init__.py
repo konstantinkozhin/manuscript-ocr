@@ -9,14 +9,15 @@ from ...data import Block, Line, Page, TextSpan
 
 class SimpleSorting(BaseLayout):
     """
-    Layout model that groups detected text spans into columns and lines.
+    Layout-модель, которая группирует обнаруженные текстовые области по колонкам и строкам.
 
-    Parameters
+    Параметры
     ----------
     max_splits : int, optional
-        Maximum number of column split attempts. Default is 10.
+        Максимальное число попыток разбиения на колонки. По умолчанию 10.
     use_columns : bool, optional
-        If True, segment into columns before line grouping. Default is True.
+        Если ``True``, перед группировкой строк выполняется сегментация на колонки.
+        По умолчанию ``True``.
     """
 
     def __init__(self, max_splits: int = 10, use_columns: bool = True):
@@ -236,19 +237,20 @@ class SimpleSorting(BaseLayout):
 
     def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
         """
-        Organize text spans in a page into blocks/lines and assign reading order.
+        Упорядочивает текстовые области на странице по блокам и строкам и назначает
+        порядок чтения.
 
-        Parameters
+        Параметры
         ----------
         page : Page
-            Input page with detected text spans.
+            Входная страница с обнаруженными текстовыми областями.
         image : numpy.ndarray, optional
-            Optional source image (unused by this layout model).
+            Исходное изображение страницы (не используется данной layout-моделью).
 
-        Returns
+        Возвращает
         -------
         Page
-            Organized page.
+            Упорядоченная страница.
         """
         _ = image
 

@@ -49,101 +49,99 @@ except ImportError as exc:
 
 class TRBA(BaseRecognizer):
     """
-    Initialize TRBA text recognition model with ONNX Runtime.
+    Инициализация модели распознавания текста TRBA с использованием ONNX Runtime.
 
-    Parameters
+    Параметры
     ----------
     weights : str or Path, optional
-        Path or identifier for ONNX model weights. Supports:
+        Путь или идентификатор для весов ONNX-модели. Поддерживаются:
 
-        - Local file path: ``"path/to/model.onnx"``
+        - Локальный путь к файлу: ``"path/to/model.onnx"``
         - HTTP/HTTPS URL: ``"https://example.com/model.onnx"``
-        - GitHub release: ``"github://owner/repo/tag/file.onnx"``
+        - GitHub-релиз: ``"github://owner/repo/tag/file.onnx"``
         - Google Drive: ``"gdrive:FILE_ID"``
-        - Preset name: ``"trba_lite_g1"`` or ``"trba_base_g1"`` (from pretrained_registry)
-        - ``None``: auto-downloads default preset (trba_lite_g1)
+        - Предустановленное имя: ``"trba_lite_g1"`` или ``"trba_base_g1"`` (из pretrained_registry)
+        - ``None``: автоматически загружает пресет по умолчанию (trba_lite_g1)
 
     config : str or Path, optional
-        Path or identifier for model configuration JSON. Same URL schemes
-        as ``weights``. If ``None``, attempts to infer from weights location
-        or uses default config for preset models.
+        Путь или идентификатор для конфигурационного файла JSON модели. Поддерживаются
+        те же схемы URL, что и для ``weights``. Если ``None``, конфигурация определяется
+        автоматически по расположению весов или используется конфигурация пресета по умолчанию.
     charset : str or Path, optional
-        Path or identifier for character set file. If ``None``, attempts to
-        find charset near weights or falls back to package default.
+        Путь или идентификатор для файла набора символов. Если ``None``, выполняется поиск
+        набора символов рядом с весами или используется набор символов пакета по умолчанию.
     device : {"cuda", "coreml", "cpu"}, optional
-        Compute device. If ``None``, automatically selects CPU.
-        For GPU/CoreML acceleration:
+        Устройство для вычислений. Если ``None``, автоматически выбирается CPU.
+        Для ускорения на GPU/CoreML:
 
         - CUDA (NVIDIA): ``pip install onnxruntime-gpu``
         - CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``
 
-        Default is ``None`` (CPU).
+        По умолчанию ``None`` (CPU).
     rotate_threshold : float or None, optional
-        Aspect-ratio threshold for rotating vertical text-span crops before
-        recognition. If ``height > width * rotate_threshold``, crop is
-        rotated 90 degrees clockwise. Set to ``0`` or ``None`` to disable.
-        Default is ``1.5``.
+        Порог соотношения сторон для поворота вертикальных кропов текстовых областей
+        перед распознаванием. Если ``height > width * rotate_threshold``, кроп
+        поворачивается на 90 градусов по часовой стрелке. Установите ``0`` или ``None``
+        для отключения. По умолчанию ``1.5``.
     region_preparer : {"bbox", "polygon_mask", "quad_warp"} or callable, optional
-        Strategy used to convert ``Page`` polygons into recognition crops.
-        ``"bbox"`` extracts axis-aligned bounding boxes for arbitrary polygons.
-        ``"polygon_mask"`` masks pixels outside the polygon inside a tight crop
-        and also supports arbitrary polygons. ``"quad_warp"`` rectifies only
-        4-point polygons with a perspective transform before recognition. A
-        custom callable may also be provided and should return a list of
-        prepared text regions. Default is ``"bbox"``.
+        Стратегия преобразования полигонов ``Page`` в кропы для распознавания.
+        ``"bbox"`` извлекает выровненные по осям ограничивающие прямоугольники для
+        произвольных полигонов. ``"polygon_mask"`` маскирует пиксели за пределами полигона
+        внутри плотного кропа и также поддерживает произвольные полигоны. ``"quad_warp"``
+        выпрямляет только 4-точечные полигоны с помощью перспективного преобразования перед
+        распознаванием. Можно также передать пользовательский callable, который должен
+        возвращать список подготовленных текстовых областей. По умолчанию ``"bbox"``.
     region_preparer_options : dict or None, optional
-        Optional configuration for built-in region preparers. Defaults to
-        ``None``. Typical options are ``pad`` for ``"bbox"`` and
-        ``"polygon_mask"``, or ``output_size=(width, height)`` for
-        ``"quad_warp"``. Non-quad polygons passed to ``"quad_warp"`` fall back
-        to bbox crops by default.
+        Опциональная конфигурация для встроенных preparers. По умолчанию ``None``.
+        Типичные параметры: ``pad`` для ``"bbox"`` и ``"polygon_mask"``, или
+        ``output_size=(width, height)`` для ``"quad_warp"``. Полигоны без 4-х точек,
+        переданные в ``"quad_warp"``, по умолчанию возвращаются к bbox-кропам.
     min_text_size : int, optional
-        Minimum crop width/height in pixels to run recognition for a text span.
-        Text spans below this threshold are skipped. Default is ``5``.
+        Минимальная ширина/высота кропа в пикселях для запуска распознавания текстовой
+        области. Текстовые области ниже этого порога пропускаются. По умолчанию ``5``.
     batch_size : int, optional
-        Default inference batch size used when ``predict(..., batch_size=...)``
-        is not provided. Default is ``128``.
+        Размер батча для инференса по умолчанию, используемый когда
+        ``predict(..., batch_size=...)`` не задан. По умолчанию ``128``.
     **kwargs
-        Additional configuration options (reserved for future use).
+        Дополнительные параметры конфигурации (зарезервированы для будущего использования).
 
     Raises
     ------
     FileNotFoundError
-        If specified files do not exist.
+        Если указанные файлы не существуют.
     ValueError
-        If weights format is invalid.
+        Если формат весов недопустим.
 
     Notes
     -----
-    The class provides three main public methods:
+    Класс предоставляет три основных публичных метода:
 
-    - ``predict`` - run recognition over text spans in a ``Page`` object.
-    - ``train`` - high-level training entrypoint to train a TRBA model
-      on custom datasets.
-    - ``export`` - static method to export PyTorch model to ONNX format.
+    - ``predict`` — запуск распознавания текстовых областей в объекте ``Page``.
+    - ``train`` — высокоуровневая точка входа для обучения модели TRBA на пользовательских наборах данных.
+    - ``export`` — статический метод для экспорта модели PyTorch в формат ONNX.
 
-    Model uses ONNX Runtime for fast inference on CPU and GPU.
-    For GPU acceleration, install: ``pip install onnxruntime-gpu``
+    Модель использует ONNX Runtime для быстрого инференса на CPU и GPU.
+    Для ускорения на GPU установите: ``pip install onnxruntime-gpu``
 
     Examples
     --------
-    Create recognizer with default preset (auto-downloads):
+    Создание распознавателя с пресетом по умолчанию (автозагрузка):
 
     >>> from manuscript.recognizers import TRBA
     >>> recognizer = TRBA()
 
-    Load from local ONNX file:
+    Загрузка из локального ONNX-файла:
 
     >>> recognizer = TRBA(weights="path/to/model.onnx")
 
-    Load from GitHub release:
+    Загрузка из GitHub-релиза:
 
     >>> recognizer = TRBA(
     ...     weights="github://owner/repo/v1.0/model.onnx",
     ...     config="github://owner/repo/v1.0/config.json"
     ... )
 
-    Force CPU execution:
+    Принудительное использование CPU:
 
     >>> recognizer = TRBA(weights="model.onnx", device="cpu")
     """
@@ -723,29 +721,29 @@ class TRBA(BaseRecognizer):
         debug_save_dir: Optional[Union[str, Path]] = None,
     ) -> Page:
         """
-        Recognize text for text spans in a ``Page`` and return updated ``Page``.
+        Распознаёт текст для текстовых областей на ``Page`` и возвращает обновлённый ``Page``.
 
-        Parameters
+        Параметры
         ----------
         page : Page
-            Page object with detected text-span polygons.
+            Объект страницы с обнаруженными полигонами текстовых областей.
         image : str, Path, numpy.ndarray, or PIL.Image, optional
-            Source page image used to extract text regions. If ``None``,
-            recognition is skipped and a deep copy of ``page`` is returned.
+            Исходное изображение страницы для извлечения текстовых регионов. Если ``None``,
+            распознавание пропускается и возвращается глубокая копия ``page``.
         batch_size : int or None, optional
-            Number of prepared text regions to process simultaneously. If
-            ``None``, uses ``batch_size`` provided to the constructor.
+            Количество подготовленных текстовых регионов для одновременной обработки. Если
+            ``None``, используется ``batch_size``, переданный в конструктор.
         debug_save_dir : str or Path, optional
-            If provided, saves the prepared recognition crops to this
-            directory as ``*.png`` files together with ``index.json``.
-            Crops are saved after ``region_preparer`` and auto-rotation, i.e.
-            in the same orientation that goes into recognizer inference.
+            Если указан, сохраняет подготовленные кропы для распознавания в эту директорию
+            в виде файлов ``*.png`` вместе с ``index.json``. Кропы сохраняются после
+            ``region_preparer`` и авторотации, то есть в той же ориентации, в которой
+            поступают на вход инференса распознавателя.
 
-        Returns
+        Возвращает
         -------
         Page
-            New Page object with recognized ``text`` and
-            ``recognition_confidence`` filled for processed text spans.
+            Новый объект ``Page`` с заполненными ``text`` и ``recognition_confidence``
+            для обработанных текстовых областей.
         """
         result_page = page.model_copy(deep=True)
         if image is None:
@@ -834,124 +832,127 @@ class TRBA(BaseRecognizer):
         **extra_config: Any,
     ):
         """
-        Train TRBA text recognition model on custom datasets.
+        Обучение модели распознавания текста TRBA на пользовательских наборах данных.
 
-        Parameters
+        Параметры
         ----------
         train_csvs : str, Path or sequence of paths
-            Path(s) to training CSV files. Each CSV should have columns:
-            ``image_path`` (relative to ``train_roots``) and ``text`` (ground
-            truth transcription).
+            Путь(и) к обучающим CSV-файлам. Каждый CSV должен содержать столбцы:
+            ``image_path`` (относительно ``train_roots``) и ``text`` (эталонная транскрипция).
         train_roots : str, Path or sequence of paths
-            Root directory/directories containing training images. Must have
-            same length as ``train_csvs``.
+            Корневая директория/директории с обучающими изображениями. Должны совпадать по
+            длине с ``train_csvs``.
         val_csvs : str, Path, sequence of paths, or None, optional
-            Path(s) to validation CSV files with same format as ``train_csvs``.
-            If ``None``, no validation is performed. Default is ``None``.
+            Путь(и) к валидационным CSV-файлам в том же формате, что и ``train_csvs``.
+            Если ``None``, валидация не выполняется. По умолчанию ``None``.
         val_roots : str, Path, sequence of paths, or None, optional
-            Root directory/directories for validation images. Must match length
-            of ``val_csvs`` if provided. Default is ``None``.
+            Корневая директория/директории для валидационных изображений. Должны совпадать
+            по длине с ``val_csvs``, если указаны. По умолчанию ``None``.
         exp_dir : str or Path, optional
-            Experiment directory where checkpoints and logs will be saved.
-            If ``None``, auto-generated based on timestamp. Default is ``None``.
+            Директория эксперимента для сохранения чекпоинтов и логов.
+            Если ``None``, генерируется автоматически на основе метки времени.
+            По умолчанию ``None``.
         charset_path : str or Path, optional
-            Path to character set file. If ``None``, uses default charset from
-            package. Default is ``None``.
+            Путь к файлу набора символов. Если ``None``, используется набор символов
+            пакета по умолчанию. По умолчанию ``None``.
         encoding : str, optional
-            Text encoding for reading CSV files. Default is ``"utf-8"``.
+            Кодировка текста для чтения CSV-файлов. По умолчанию ``"utf-8"``.
         img_h : int, optional
-            Target height for input images (pixels). Default is 64.
+            Целевая высота входных изображений (пиксели). По умолчанию 64.
         img_w : int, optional
-            Target width for input images (pixels). Default is 256.
+            Целевая ширина входных изображений (пиксели). По умолчанию 256.
         max_len : int, optional
-            Maximum sequence length for text recognition. Default is 25.
+            Максимальная длина последовательности для распознавания текста. По умолчанию 25.
         hidden_size : int, optional
-            Hidden dimension size for RNN encoder/decoder. Default is 256.
+            Размер скрытого измерения для RNN-энкодера/декодера. По умолчанию 256.
         num_encoder_layers : int, optional
-            Number of Bidirectional LSTM layers in the encoder. Default is 2.
+            Количество двунаправленных LSTM-слоёв в энкодере. По умолчанию 2.
         cnn_in_channels : int, optional
-            Number of input channels for CNN backbone (3 for RGB, 1 for grayscale). Default is 3.
+            Количество входных каналов CNN-бэкбона (3 для RGB, 1 для оттенков серого).
+            По умолчанию 3.
         cnn_out_channels : int, optional
-            Number of output channels from CNN backbone. Default is 512.
+            Количество выходных каналов CNN-бэкбона. По умолчанию 512.
         cnn_backbone : {"seresnet31", "seresnet31-lite"}, optional
-            CNN backbone variant. ``"seresnet31"`` keeps the standard SE-ResNet-31,
-            while ``"seresnet31-lite"`` enables a depthwise-lite version. Default is ``"seresnet31"``.
+            Вариант CNN-бэкбона. ``"seresnet31"`` — стандартный SE-ResNet-31,
+            ``"seresnet31-lite"`` — облегчённая версия с depthwise-свёртками.
+            По умолчанию ``"seresnet31"``.
         ctc_weight : float, optional
-            Initial weight for CTC loss during training (CTC always used for stability):
+            Начальный вес CTC-лосса при обучении (CTC всегда используется для стабильности):
             ``loss = attn_loss * (1 - ctc_weight) + ctc_loss * ctc_weight``.
-            CTC weight decays over epochs. Default is 0.3.
+            Вес CTC убывает с эпохами. По умолчанию 0.3.
         ctc_weight_decay_epochs : int, optional
-            Number of epochs for CTC weight to decay to minimum. Default is 50.
+            Число эпох, за которое вес CTC убывает до минимального значения.
+            По умолчанию 50.
         ctc_weight_min : float, optional
-            Minimum value for CTC weight after decay. Default is 0.0.
+            Минимальное значение веса CTC после затухания. По умолчанию 0.0.
         max_grad_norm : float, optional
-            Maximum gradient norm for clipping (prevents gradient explosion/NaN).
-            Default is 5.0.
+            Максимальная норма градиента для клиппинга (предотвращает взрывной
+            рост градиентов/NaN). По умолчанию 5.0.
         batch_size : int, optional
-            Training batch size. Default is 32.
+            Размер батча при обучении. По умолчанию 32.
         epochs : int, optional
-            Number of training epochs. Default is 20.
+            Количество эпох обучения. По умолчанию 20.
         lr : float, optional
-            Learning rate. Default is 1e-3.
+            Скорость обучения. По умолчанию 1e-3.
         optimizer : {"Adam", "SGD", "AdamW"}, optional
-            Optimizer type. Default is ``"AdamW"``.
+            Тип оптимизатора. По умолчанию ``"AdamW"``.
         scheduler : {"ReduceLROnPlateau", "CosineAnnealingLR", "OneCycleLR", "None"}, optional
-            Learning rate scheduler type:
+            Тип планировщика скорости обучения:
 
-            - ``"OneCycleLR"`` - one-cycle policy with cosine annealing (default, recommended)
-            - ``"ReduceLROnPlateau"`` - reduce LR on validation loss plateau
-            - ``"CosineAnnealingLR"`` - cosine annealing over epochs
-            - ``"None"`` or ``None`` - constant learning rate
+            - ``"OneCycleLR"`` — one-cycle политика с косинусным отжигом (по умолчанию, рекомендуется)
+            - ``"ReduceLROnPlateau"`` — снижение LR при плато валидационного лосса
+            - ``"CosineAnnealingLR"`` — косинусный отжиг по эпохам
+            - ``"None"`` или ``None`` — постоянная скорость обучения
 
-            Default is ``"OneCycleLR"``.
+            По умолчанию ``"OneCycleLR"``.
         weight_decay : float, optional
-            L2 weight decay coefficient. Default is 0.0.
+            Коэффициент L2-регуляризации весов. По умолчанию 0.0.
         momentum : float, optional
-            Momentum for SGD optimizer. Default is 0.9.
+            Моментум для оптимизатора SGD. По умолчанию 0.9.
         val_interval : int, optional
-            Perform validation every N epochs. Default is 1.
+            Выполнять валидацию каждые N эпох. По умолчанию 1.
         val_size : int, optional
-            Maximum number of validation samples to use. Default is 3000.
+            Максимальное количество валидационных примеров. По умолчанию 3000.
         train_proportions : sequence of float, optional
-            Sampling proportions for multiple training datasets. Must sum to 1.0
-            and match length of ``train_csvs``. If ``None``, datasets are
-            concatenated equally. Default is ``None``.
+            Пропорции выборки для нескольких обучающих наборов данных. Должны давать
+            сумму 1.0 и совпадать по длине с ``train_csvs``. Если ``None``, наборы данных
+            конкатенируются равномерно. По умолчанию ``None``.
         num_workers : int, optional
-            Number of data loading workers. Default is 0.
+            Количество воркеров для загрузки данных. По умолчанию 0.
         seed : int, optional
-            Random seed for reproducibility. Default is 42.
+            Случайное зерно для воспроизводимости. По умолчанию 42.
         resume_from : str or Path, optional
-            Path to checkpoint file to resume training from. Default is ``None``.
+            Путь к файлу чекпоинта для возобновления обучения. По умолчанию ``None``.
         save_interval : int, optional
-            Save checkpoint every N epochs. If ``None``, only saves best model.
-            Default is ``None``.
+            Сохранять чекпоинт каждые N эпох. Если ``None``, сохраняется только лучшая
+            модель. По умолчанию ``None``.
         device : {"cuda", "cpu"}, optional
-            Training device. Default is ``"cuda"``.
+            Устройство для обучения. По умолчанию ``"cuda"``.
         freeze_cnn : {"none", "all", "first", "last"}, optional
-            CNN freezing policy. Default is ``"none"``.
+            Политика заморозки CNN. По умолчанию ``"none"``.
         freeze_enc_rnn : {"none", "all", "first", "last"}, optional
-            Encoder RNN freezing policy. Default is ``"none"``.
+            Политика заморозки энкодерной RNN. По умолчанию ``"none"``.
         freeze_attention : {"none", "all"}, optional
-            Attention module freezing policy. Default is ``"none"``.
+            Политика заморозки модуля внимания. По умолчанию ``"none"``.
         pretrain_weights : str, Path, bool, or None, optional
-            Pretrained weights to initialize from:
+            Предобученные веса для инициализации:
 
-            - ``"default"`` or ``True`` - use release weights
-            - ``None`` or ``False`` - train from scratch
-            - str/Path - path or URL to custom weights file
+            - ``"default"`` или ``True`` — использовать веса релиза
+            - ``None`` или ``False`` — обучение с нуля
+            - str/Path — путь или URL к пользовательскому файлу весов
 
-            Default is ``"default"``.
+            По умолчанию ``"default"``.
         **extra_config : dict, optional
-            Additional configuration parameters passed to training config.
+            Дополнительные параметры конфигурации, передаваемые в конфиг обучения.
 
-        Returns
+        Возвращает
         -------
         str
-            Path to the best model checkpoint saved during training.
+            Путь к чекпоинту лучшей модели, сохранённой во время обучения.
 
         Examples
         --------
-        Train on single dataset with validation:
+        Обучение на одном наборе данных с валидацией:
 
         >>> from manuscript.recognizers import TRBA
         >>>
@@ -968,11 +969,11 @@ class TRBA(BaseRecognizer):
         ... )
         >>> print(f"Best model saved at: {best_model}")
 
-        Train on multiple datasets with custom proportions:
+        Обучение на нескольких наборах данных с пользовательскими пропорциями:
 
         >>> train_csvs = ["data/dataset1/train.csv", "data/dataset2/train.csv"]
         >>> train_roots = ["data/dataset1/images", "data/dataset2/images"]
-        >>> train_proportions = [0.7, 0.3]  # 70% from dataset1, 30% from dataset2
+        >>> train_proportions = [0.7, 0.3]  # 70% из dataset1, 30% из dataset2
         >>>
         >>> best_model = TRBA.train(
         ...     train_csvs=train_csvs,
@@ -986,7 +987,7 @@ class TRBA(BaseRecognizer):
         ...     weight_decay=1e-4,
         ... )
 
-        Resume training from checkpoint:
+        Возобновление обучения с чекпоинта:
 
         >>> best_model = TRBA.train(
         ...     train_csvs="data/train.csv",
@@ -995,7 +996,7 @@ class TRBA(BaseRecognizer):
         ...     epochs=100,
         ... )
 
-        Fine-tune from pretrained weights with frozen CNN:
+        Дообучение на предобученных весах с заморозкой CNN:
 
         >>> best_model = TRBA.train(
         ...     train_csvs="data/finetune.csv",
@@ -1006,7 +1007,7 @@ class TRBA(BaseRecognizer):
         ...     lr=1e-4,
         ... )
 
-        Train with CTC for stability (always enabled):
+        Обучение с CTC для стабильности (всегда включён):
 
         >>> best_model = TRBA.train(
         ...     train_csvs="data/train.csv",
@@ -1164,64 +1165,64 @@ class TRBA(BaseRecognizer):
         simplify: bool = True,
     ) -> None:
         """
-        Export TRBA PyTorch model to ONNX format.
+        Экспорт модели TRBA PyTorch в формат ONNX.
 
-        This method converts a trained TRBA model from PyTorch to ONNX format,
-        which can be used for faster inference with ONNX Runtime. The exported
-        model can be loaded using ``TRBA(weights="model.onnx")``.
+        Метод конвертирует обученную модель TRBA из PyTorch в формат ONNX,
+        который может использоваться для более быстрого инференса с ONNX Runtime.
+        Экспортированную модель можно загрузить через ``TRBA(weights="model.onnx")``.
 
-        Parameters
+        Параметры
         ----------
         weights_path : str or Path
-            Path to the PyTorch model weights file (.pth).
+            Путь к файлу весов модели PyTorch (.pth).
         config_path : str or Path
-            Path to the model configuration JSON file. Used to determine
-            model architecture (img_h, img_w, max_len, hidden_size, etc.).
+            Путь к конфигурационному JSON-файлу модели. Используется для определения
+            архитектуры модели (img_h, img_w, max_len, hidden_size и др.).
         charset_path : str or Path
-            Path to the charset file (charset.txt). Used to determine
-            num_classes for the model.
+            Путь к файлу набора символов (charset.txt). Используется для определения
+            num_classes модели.
         output_path : str or Path
-            Path where the ONNX model will be saved (.onnx).
+            Путь, по которому будет сохранена ONNX-модель (.onnx).
         opset_version : int, optional
-            ONNX opset version to use for export. Default is 14.
+            Версия ONNX opset для экспорта. По умолчанию 14.
         simplify : bool, optional
-            If True, applies ONNX graph simplification using onnx-simplifier
-            to optimize the model. Requires ``onnx-simplifier`` package.
-            Default is True.
+            Если ``True``, применяет упрощение графа ONNX с помощью onnx-simplifier
+            для оптимизации модели. Требует пакет ``onnx-simplifier``.
+            По умолчанию ``True``.
 
-        Returns
+        Возвращает
         -------
         None
-            The ONNX model is saved to ``output_path``.
+            ONNX-модель сохраняется по пути ``output_path``.
 
         Raises
         ------
         ImportError
-            If required packages (torch, onnx) are not installed.
+            Если необходимые пакеты (torch, onnx) не установлены.
         FileNotFoundError
-            If ``weights_path`` or ``config_path`` do not exist.
+            Если ``weights_path`` или ``config_path`` не существуют.
 
         Notes
         -----
-        The exported ONNX model has one output:
+        Экспортированная ONNX-модель имеет один выход:
 
-        - ``logits``: Character predictions with shape ``(batch, max_length+1, num_classes)``
+        - ``logits``: предсказания символов с формой ``(batch, max_length+1, num_classes)``
 
-        The model uses greedy decoding (argmax) and supports dynamic batch size.
-        The sequence length is fixed to ``max_length + 1`` from the config (same as PyTorch
-        inference mode for compatibility).
+        Модель использует жадное декодирование (argmax) и поддерживает динамический размер батча.
+        Длина последовательности фиксирована равной ``max_length + 1`` из конфига (аналогично
+        режиму инференса PyTorch для совместимости).
 
-        Architecture exported:
-        - CNN backbone (SE-ResNet-31 or SE-ResNet-31-Lite)
-        - Bidirectional LSTM encoder
-        - Attention decoder (greedy decoding)
+        Экспортируемая архитектура:
+        - CNN-бэкбон (SE-ResNet-31 или SE-ResNet-31-Lite)
+        - Двунаправленный LSTM-энкодер
+        - Attention-декодер (жадное декодирование)
 
-        Note: Only the attention decoder is exported. CTC head is used only
-        during training and is not included in the ONNX model.
+        Примечание: экспортируется только attention-декодер. CTC-голова используется
+        только при обучении и не включается в ONNX-модель.
 
         Examples
         --------
-        Export TRBA model to ONNX:
+        Экспорт модели TRBA в ONNX:
 
         >>> from manuscript.recognizers import TRBA
         >>> TRBA.export(
@@ -1236,7 +1237,7 @@ class TRBA(BaseRecognizer):
         Input size: 64x256
         [OK] ONNX model saved to: trba_model.onnx
 
-        Export with custom opset:
+        Экспорт с пользовательским opset:
 
         >>> TRBA.export(
         ...     weights_path="model.pth",
@@ -1247,7 +1248,7 @@ class TRBA(BaseRecognizer):
         ...     simplify=False
         ... )
 
-        Use the exported model for inference:
+        Использование экспортированной модели для инференса:
 
         >>> from manuscript.detectors import EAST
         >>> recognizer = TRBA(weights="trba_model.onnx")
@@ -1257,7 +1258,7 @@ class TRBA(BaseRecognizer):
 
         See Also
         --------
-        TRBA.__init__ : Initialize TRBA recognizer with ONNX model.
+        TRBA.__init__ : Инициализация распознавателя TRBA с ONNX-моделью.
         """
         import torch
         from .model.model import TRBAModel, TRBAONNXWrapper

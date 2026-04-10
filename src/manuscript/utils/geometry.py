@@ -9,7 +9,8 @@ def _box_iou(
     box2: Union[Tuple[float, float, float, float], np.ndarray]
 ) -> float:
     """
-    Calculate Intersection over Union (IoU) for two axis-aligned bounding boxes.
+    Вычисляет Intersection over Union (IoU) для двух ограничивающих прямоугольников,
+    выровненных по осям.
     """
     x1_min, y1_min, x1_max, y1_max = box1
     x2_min, y2_min, x2_max, y2_max = box2
@@ -39,22 +40,23 @@ def polygon_to_bbox(
     pad: float = 0.0,
 ) -> Optional[Tuple[int, int, int, int]]:
     """
-    Convert a polygon with any number of vertices to a clipped axis-aligned
-    bounding box.
+    Преобразует полигон с произвольным числом вершин в обрезанный ограничивающий
+    прямоугольник, выровненный по осям.
 
-    Parameters
+    Параметры
     ----------
     polygon : array-like of shape (N, 2)
-        Polygon vertices in image coordinates.
+        Вершины полигона в координатах изображения.
     image_shape : tuple, optional
-        Source image shape used for clipping.
+        Форма исходного изображения для обрезки.
     pad : float, optional
-        Extra padding in pixels around the polygon. Default is ``0``.
+        Дополнительный отступ в пикселях вокруг полигона. По умолчанию ``0``.
 
-    Returns
+    Возвращает
     -------
     tuple or None
-        Bounding box as ``(x1, y1, x2, y2)`` or ``None`` if invalid.
+        Ограничивающий прямоугольник в виде ``(x1, y1, x2, y2)`` или ``None``,
+        если результат недопустим.
     """
     pts = np.asarray(polygon, dtype=np.float32)
     if pts.ndim != 2 or pts.shape[1] != 2 or pts.size == 0:
@@ -94,7 +96,21 @@ def crop_axis_aligned(
     pad: float = 0.0,
 ) -> Optional[np.ndarray]:
     """
-    Crop an axis-aligned rectangle covering the polygon.
+    Вырезает выровненный по осям прямоугольник, охватывающий полигон.
+
+    Параметры
+    ----------
+    image : numpy.ndarray
+        Исходное изображение.
+    polygon : array-like of shape (N, 2)
+        Вершины полигона в координатах изображения.
+    pad : float, optional
+        Дополнительный отступ в пикселях. По умолчанию ``0``.
+
+    Возвращает
+    -------
+    numpy.ndarray or None
+        Вырезанный фрагмент изображения или ``None``, если bbox недопустим.
     """
     bbox = polygon_to_bbox(polygon, image_shape=image.shape, pad=pad)
     if bbox is None:
@@ -114,9 +130,27 @@ def crop_polygon_mask(
     background: int = 255,
 ) -> Optional[np.ndarray]:
     """
-    Crop the polygon bounding box and mask pixels outside the polygon.
+    Вырезает ограничивающий прямоугольник полигона и маскирует пиксели за
+    пределами полигона.
 
-    Works with arbitrary polygons of shape ``(N, 2)``.
+    Работает с произвольными полигонами формы ``(N, 2)``.
+
+    Параметры
+    ----------
+    image : numpy.ndarray
+        Исходное изображение.
+    polygon : array-like of shape (N, 2)
+        Вершины полигона в координатах изображения.
+    pad : float, optional
+        Дополнительный отступ в пикселях. По умолчанию ``0``.
+    background : int, optional
+        Значение пикселей фона вне полигона. По умолчанию ``255``.
+
+    Возвращает
+    -------
+    numpy.ndarray or None
+        Вырезанный фрагмент с замаскированными пикселями или ``None``,
+        если bbox недопустим.
     """
     pts = np.asarray(polygon, dtype=np.float32)
     bbox = polygon_to_bbox(pts, image_shape=image.shape, pad=pad)
@@ -147,8 +181,23 @@ def order_quad_points(
     points: Union[np.ndarray, Tuple[Tuple[float, float], ...]]
 ) -> np.ndarray:
     """
-    Order exactly 4 polygon points as top-left, top-right, bottom-right,
-    bottom-left.
+    Упорядочивает ровно 4 точки полигона в порядке: верхний левый, верхний правый,
+    нижний правый, нижний левый.
+
+    Параметры
+    ----------
+    points : array-like of shape (4, 2)
+        Четыре точки полигона в произвольном порядке.
+
+    Возвращает
+    -------
+    numpy.ndarray of shape (4, 2)
+        Точки, упорядоченные по часовой стрелке, начиная с верхнего левого угла.
+
+    Raises
+    ------
+    ValueError
+        Если передано не ровно 4 точки.
     """
     pts = np.asarray(points, dtype=np.float32)
     if pts.shape != (4, 2):
@@ -172,10 +221,30 @@ def warp_quad(
     background: int = 255,
 ) -> Optional[np.ndarray]:
     """
-    Perspective-warp a quadrilateral polygon into a rectified crop.
+    Применяет перспективное преобразование к четырёхугольному полигону и возвращает
+    выпрямленный кроп.
 
-    This helper is intentionally quad-specific. For non-quad polygons it
-    returns ``None`` so callers may choose a fallback strategy.
+    Функция намеренно предназначена только для четырёхугольников. Для полигонов с
+    другим числом вершин возвращает ``None``, чтобы вызывающий код мог выбрать
+    запасную стратегию.
+
+    Параметры
+    ----------
+    image : numpy.ndarray
+        Исходное изображение.
+    polygon : array-like of shape (4, 2)
+        Четыре вершины четырёхугольника.
+    output_size : tuple of (int, int), optional
+        Целевой размер выходного кропа ``(ширина, высота)``. Если ``None``,
+        размер вычисляется автоматически на основе длин сторон полигона.
+    background : int, optional
+        Значение пикселей фона. По умолчанию ``255``.
+
+    Возвращает
+    -------
+    numpy.ndarray or None
+        Выпрямленный кроп или ``None``, если полигон не является четырёхугольником
+        или результат пустой.
     """
     pts = np.asarray(polygon, dtype=np.float32)
     if pts.shape != (4, 2):
@@ -218,20 +287,26 @@ def merge_polygons(
     method: str = "bbox",
 ) -> Optional[List[Tuple[float, float]]]:
     """
-    Merge multiple polygons into a single polygon.
+    Объединяет несколько полигонов в один.
 
-    Parameters
+    Параметры
     ----------
     polygons : sequence of array-like polygons
-        Input polygons with shape ``(N, 2)``.
+        Входные полигоны формы ``(N, 2)``.
     method : {"bbox", "convex_hull"}, optional
-        Merge strategy. ``"bbox"`` returns an axis-aligned rectangle covering
-        all points. ``"convex_hull"`` returns a convex hull over all points.
+        Стратегия объединения. ``"bbox"`` возвращает выровненный по осям прямоугольник,
+        охватывающий все точки. ``"convex_hull"`` возвращает выпуклую оболочку над всеми
+        точками.
 
-    Returns
+    Возвращает
     -------
     list of tuple or None
-        Merged polygon, or ``None`` when ``polygons`` is empty.
+        Объединённый полигон или ``None``, если ``polygons`` пустой.
+
+    Raises
+    ------
+    ValueError
+        Если какой-либо полигон имеет недопустимую форму или передан неизвестный метод.
     """
     if not polygons:
         return None
