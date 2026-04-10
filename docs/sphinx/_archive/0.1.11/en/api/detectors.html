@@ -1,0 +1,887 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="en" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Detectors &mdash; manuscript-ocr 0.1.11 documentation</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/language_switcher.css?v=d768f156" />
+      <link rel="stylesheet" type="text/css" href="../_static/model_zoo.css?v=2d297567" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=1e825a29"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/language_switcher.js?v=db730534"></script>
+      <script src="../_static/version_sidebar.js?v=50cbed02"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Index" href="../genindex.html" />
+    <link rel="search" title="Search" href="../search.html" />
+    <link rel="next" title="Layouts" href="layouts.html" />
+    <link rel="prev" title="Data Structures" href="data.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            manuscript-ocr
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Search docs" aria-label="Search docs" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contents:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Getting Started</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#installation">Installation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#quick-start">Quick Start</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#example-notebooks">Example Notebooks</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#main-components">Main Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#model-zoo">Model Zoo</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#related-work">Related Work</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../model_zoo.html">Model Zoo</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#detection">Detection</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#layout">Layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#recognition">Recognition</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#correction">Correction</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#architecture-sources">Architecture Sources</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pipeline_usage.html">Pipeline Usage Guide</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#stage-contracts">Stage Contracts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#detector">Detector</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#recognizer">Recognizer</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#layout">Layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#corrector">Corrector</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#disable-stages">Disable Stages</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#layout-placement">Layout Placement</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#built-in-components">Built-in Components</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#trba-region-preparation">TRBA Region Preparation</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#collapsing-text-spans">Collapsing Text Spans</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#visualization-and-profiling">Visualization and Profiling</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#intermediate-results">Intermediate Results</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">Library Structure</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../structure.html#overview">Overview</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">API Reference</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html">Pipeline</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_layout_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_layout_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">Data Structures</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data.html#data-model">Data Model</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#module-manuscript.data">Module Reference</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.TextSpan"><code class="docutils literal notranslate"><span class="pre">TextSpan</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Page"><code class="docutils literal notranslate"><span class="pre">Page</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Detectors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#manuscript.detectors.YOLO"><code class="docutils literal notranslate"><span class="pre">YOLO</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.YOLO.__init__"><code class="docutils literal notranslate"><span class="pre">YOLO.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.YOLO.config_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.YOLO.default_target_size"><code class="docutils literal notranslate"><span class="pre">YOLO.default_target_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.YOLO.default_weights_name"><code class="docutils literal notranslate"><span class="pre">YOLO.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.YOLO.predict"><code class="docutils literal notranslate"><span class="pre">YOLO.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.detectors.YOLO.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.pretrained_registry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#east-training-quads">EAST Training Quads</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="layouts.html">Layouts</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="recognizers.html">Recognizers</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="correctors.html">Correctors</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="correctors.html#charlm"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#manuscript.correctors.CharLM"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#overview">Overview</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#available-presets">Available Presets</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#quick-example">Quick Example</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#basic-usage">Basic Usage</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#advanced-configuration">Advanced Configuration</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#using-custom-lexicon">Using Custom Lexicon</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#training-custom-model">Training Custom Model</a></li>
+<li class="toctree-l4"><a class="reference internal" href="correctors.html#export-to-onnx">Export to ONNX</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Utilities</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.read_image"><code class="docutils literal notranslate"><span class="pre">read_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.crop_axis_aligned"><code class="docutils literal notranslate"><span class="pre">crop_axis_aligned()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.crop_polygon_mask"><code class="docutils literal notranslate"><span class="pre">crop_polygon_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.merge_polygons"><code class="docutils literal notranslate"><span class="pre">merge_polygons()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.order_quad_points"><code class="docutils literal notranslate"><span class="pre">order_quad_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.polygon_to_bbox"><code class="docutils literal notranslate"><span class="pre">polygon_to_bbox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.warp_quad"><code class="docutils literal notranslate"><span class="pre">warp_quad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.merge_text_spans"><code class="docutils literal notranslate"><span class="pre">merge_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.collapse_line_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_line_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.collapse_block_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_block_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.collapse_page_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_page_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../related_work.html">Related Work</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">manuscript-ocr</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">API Reference</a></li>
+      <li class="breadcrumb-item active">Detectors</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/detectors.rst.txt" rel="nofollow"> View page source</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="detectors">
+<h1>Detectors<a class="headerlink" href="#detectors" title="Link to this heading"></a></h1>
+<p>Text detection models.</p>
+<span class="target" id="module-manuscript.detectors"></span><dl class="py class">
+<dt class="sig sig-object py" id="manuscript.detectors.EAST">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manuscript.detectors.</span></span><span class="sig-name descname"><span class="pre">EAST</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1280</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_ratio_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_ratio_h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iou_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iou_threshold_standard</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_geo_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_aligned_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_area_anomalies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anomaly_sigma_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anomaly_min_box_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tta_iou_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_east.html#EAST"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.detectors.EAST" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseDetector</span></code></p>
+<p>Initialize EAST text detector with ONNX Runtime.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>Path</em><em>, </em><em>optional</em>) – <p>Path or identifier for ONNX model weights. Supports:</p>
+<ul>
+<li><p>Local file path: <code class="docutils literal notranslate"><span class="pre">&quot;path/to/model.onnx&quot;</span></code></p></li>
+<li><p>HTTP/HTTPS URL: <code class="docutils literal notranslate"><span class="pre">&quot;https://example.com/model.onnx&quot;</span></code></p></li>
+<li><p>GitHub release: <code class="docutils literal notranslate"><span class="pre">&quot;github://owner/repo/tag/file.onnx&quot;</span></code></p></li>
+<li><p>Google Drive: <code class="docutils literal notranslate"><span class="pre">&quot;gdrive:FILE_ID&quot;</span></code></p></li>
+<li><p>Preset name: <code class="docutils literal notranslate"><span class="pre">&quot;east_50_g1&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: auto-downloads default preset (east_50_g1)</p></li>
+</ul>
+</p></li>
+<li><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Compute device: <code class="docutils literal notranslate"><span class="pre">&quot;cuda&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;coreml&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;cpu&quot;</span></code>. If None,
+automatically selects CPU. For GPU/CoreML acceleration:</p>
+<ul>
+<li><p>CUDA (NVIDIA): <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">onnxruntime-gpu</span></code></p></li>
+<li><p>CoreML (Apple Silicon M1/M2/M3): <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">onnxruntime-silicon</span></code></p></li>
+</ul>
+<p>Default is <code class="docutils literal notranslate"><span class="pre">None</span></code> (CPU).</p>
+</p></li>
+<li><p><strong>target_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Input image size for inference. Images are resized to
+<code class="docutils literal notranslate"><span class="pre">(target_size,</span> <span class="pre">target_size)</span></code>. Default is 1280.</p></li>
+<li><p><strong>expand_ratio_w</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Horizontal expansion factor applied to detected boxes after NMS.
+Default is 0.7.</p></li>
+<li><p><strong>expand_ratio_h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Vertical expansion factor applied to detected boxes after NMS.
+Default is 0.7.</p></li>
+<li><p><strong>expand_power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Power for non-linear box expansion. Controls how expansion scales with box size.
+- 1.0 = linear (small and large boxes expand equally)
+- &lt;1.0 = small boxes expand more (e.g., 0.5, recommended for character-level detection)
+- &gt;1.0 = large boxes expand more
+Default is 0.5.</p></li>
+<li><p><strong>score_thresh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Confidence threshold for selecting candidate detections before NMS.
+Default is 0.7.</p></li>
+<li><p><strong>iou_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – IoU threshold for locality-aware NMS merging phase. Default is 0.2.</p></li>
+<li><p><strong>iou_threshold_standard</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – IoU threshold for standard NMS after locality-aware merging.
+If None, uses the same value as iou_threshold. Default is None.</p></li>
+<li><p><strong>score_geo_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Scale factor for decoding geometry/score maps. Default is 0.25.</p></li>
+<li><p><strong>quantization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Quantization resolution for point coordinates during decoding.
+Default is 2.</p></li>
+<li><p><strong>axis_aligned_output</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, outputs axis-aligned rectangles instead of original quads.
+Default is True.</p></li>
+<li><p><strong>remove_area_anomalies</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, removes quads with extremely large area relative to the
+distribution. Default is False.</p></li>
+<li><p><strong>anomaly_sigma_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Sigma threshold for anomaly area filtering. Default is 5.0.</p></li>
+<li><p><strong>anomaly_min_box_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Minimum number of boxes required before anomaly filtering.
+Default is 30.</p></li>
+<li><p><strong>use_tta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Enable Test-Time Augmentation (TTA). When enabled, inference is run
+on both the original and horizontally flipped image, and results are
+merged. This can improve detection of partially visible or edge text.
+Default is False.</p></li>
+<li><p><strong>tta_iou_thresh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – IoU threshold for merging boxes from original and flipped images
+during TTA. Boxes with IoU &gt; threshold are considered matches and
+merged. Default is 0.1.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The class provides two main public methods:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">predict</span></code> — run inference on a single image and return detections.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">train</span></code> — high-level training entrypoint to train an EAST model on custom datasets.</p></li>
+</ul>
+<p>The detector uses ONNX Runtime for fast inference on CPU and GPU.
+For GPU acceleration, install: <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">onnxruntime-gpu</span></code></p>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code>(*args, **kwargs)</p></td>
+<td><p>Call self as a function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#manuscript.detectors.EAST.export" title="manuscript.detectors.EAST.export"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export</span></code></a>(weights_path, output_path[, ...])</p></td>
+<td><p>Export EAST PyTorch model to ONNX format.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#manuscript.detectors.EAST.predict" title="manuscript.detectors.EAST.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(img_or_path)</p></td>
+<td><p>Run EAST inference and return detected page structure.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">runtime_providers</span></code>()</p></td>
+<td><p>Get ONNX Runtime execution providers based on device.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#manuscript.detectors.EAST.train" title="manuscript.detectors.EAST.train"><code class="xref py py-obj docutils literal notranslate"><span class="pre">train</span></code></a>(train_images, train_anns, val_images, ...)</p></td>
+<td><p>Train EAST model on custom datasets.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.detectors.EAST.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1280</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_ratio_w</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_ratio_h</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">expand_power</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iou_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">iou_threshold_standard</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_geo_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.25</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">quantization</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_aligned_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">remove_area_anomalies</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anomaly_sigma_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">anomaly_min_box_count</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">30</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_tta</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">tta_iou_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_east.html#EAST.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.detectors.EAST.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>target_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>expand_ratio_w</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>expand_ratio_h</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>expand_power</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>score_thresh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>iou_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>iou_threshold_standard</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>score_geo_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>quantization</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>axis_aligned_output</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>remove_area_anomalies</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>anomaly_sigma_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>anomaly_min_box_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>use_tta</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>tta_iou_thresh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manuscript.detectors.EAST.default_weights_name">
+<span class="sig-name descname"><span class="pre">default_weights_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'east_50_g1'</span></em><a class="headerlink" href="#manuscript.detectors.EAST.default_weights_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.detectors.EAST.export">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backbone_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">input_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1280</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opset_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_east.html#EAST.export"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.detectors.EAST.export" title="Link to this definition"></a></dt>
+<dd><p>Export EAST PyTorch model to ONNX format.</p>
+<p>This method converts a trained EAST model from PyTorch to ONNX format,
+which can be used for faster inference with ONNX Runtime. The exported
+model can be loaded using <code class="docutils literal notranslate"><span class="pre">EAST(weights_path=&quot;model.onnx&quot;,</span> <span class="pre">use_onnx=True)</span></code>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>Path</em>) – Path to the PyTorch model weights file (.pth).</p></li>
+<li><p><strong>output_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>Path</em>) – Path where the ONNX model will be saved (.onnx).</p></li>
+<li><p><strong>backbone_name</strong> (<em>{&quot;resnet50&quot;</em><em>, </em><em>&quot;resnet101&quot;}</em><em>, </em><em>optional</em>) – Backbone architecture of the model. If None, will be automatically
+detected from the checkpoint. Must match the architecture used during
+training. Default is None (auto-detect).</p></li>
+<li><p><strong>input_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Input image size (height and width). The model will accept
+images of shape <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">3,</span> <span class="pre">input_size,</span> <span class="pre">input_size)</span></code>.
+Default is 1280.</p></li>
+<li><p><strong>opset_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – ONNX opset version to use for export. Default is 14.</p></li>
+<li><p><strong>simplify</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If True, applies ONNX graph simplification using onnx-simplifier
+to optimize the model. Requires <code class="docutils literal notranslate"><span class="pre">onnx-simplifier</span></code> package.
+Default is True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>The ONNX model is saved to <code class="docutils literal notranslate"><span class="pre">output_path</span></code>.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+<dt class="field-even">Raises<span class="colon">:</span></dt>
+<dd class="field-even"><ul class="simple">
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ImportError" title="(in Python v3.14)"><strong>ImportError</strong></a> – If required packages (torch, onnx) are not installed.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#FileNotFoundError" title="(in Python v3.14)"><strong>FileNotFoundError</strong></a> – If <code class="docutils literal notranslate"><span class="pre">weights_path</span></code> does not exist.</p></li>
+<li><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(in Python v3.14)"><strong>ValueError</strong></a> – If backbone_name doesn’t match the checkpoint architecture.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The exported ONNX model has two outputs:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">score_map</span></code>: Text confidence map with shape <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">1,</span> <span class="pre">H,</span> <span class="pre">W)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">geo_map</span></code>: Geometry map with shape <code class="docutils literal notranslate"><span class="pre">(batch,</span> <span class="pre">8,</span> <span class="pre">H,</span> <span class="pre">W)</span></code></p></li>
+</ul>
+<p>The model supports dynamic batch size and image dimensions through
+dynamic axes configuration.</p>
+<p><strong>Automatic Backbone Detection:</strong></p>
+<p>The method automatically detects the backbone architecture from the checkpoint
+by analyzing the number of parameters in layer4. This prevents mismatches between
+checkpoint and architecture that could lead to incorrect exports.</p>
+<p class="rubric">Examples</p>
+<p>Export with automatic backbone detection:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">EAST</span><span class="o">.</span><span class="n">export</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">weights_path</span><span class="o">=</span><span class="s2">&quot;east_resnet50.pth&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;east_model.onnx&quot;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="go">Auto-detected backbone: resnet50</span>
+<span class="go">Exporting to ONNX (opset 14)...</span>
+<span class="go">[OK] ONNX model saved to: east_model.onnx</span>
+</pre></div>
+</div>
+<p>Export with explicit backbone:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">EAST</span><span class="o">.</span><span class="n">export</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">weights_path</span><span class="o">=</span><span class="s2">&quot;custom_weights.pth&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;custom_model.onnx&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">backbone_name</span><span class="o">=</span><span class="s2">&quot;resnet101&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">input_size</span><span class="o">=</span><span class="mi">1024</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">simplify</span><span class="o">=</span><span class="kc">False</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Use the exported model for inference:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">detector</span> <span class="o">=</span> <span class="n">EAST</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">weights_path</span><span class="o">=</span><span class="s2">&quot;east_model.onnx&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">use_onnx</span><span class="o">=</span><span class="kc">True</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">result</span> <span class="o">=</span> <span class="n">detector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;image.jpg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<div class="admonition seealso">
+<p class="admonition-title">See also</p>
+<dl class="simple">
+<dt><a class="reference internal" href="#manuscript.detectors.EAST.__init__" title="manuscript.detectors.EAST.__init__"><code class="xref py py-obj docutils literal notranslate"><span class="pre">EAST.__init__</span></code></a></dt><dd><p>Initialize EAST detector with ONNX support using <code class="docutils literal notranslate"><span class="pre">use_onnx=True</span></code>.</p>
+</dd>
+</dl>
+</div>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.detectors.EAST.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_or_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_east.html#EAST.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.detectors.EAST.predict" title="Link to this definition"></a></dt>
+<dd><p>Run EAST inference and return detected page structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>img_or_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a>) – Path to an image file or an RGB image provided as a NumPy array
+with shape <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W,</span> <span class="pre">3)</span></code> in <code class="docutils literal notranslate"><span class="pre">uint8</span></code> format.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parsed detection result as a Page object containing a single
+Block with a single Line of TextSpan objects. Each TextSpan has polygon
+coordinates, confidence score, and sequential <code class="docutils literal notranslate"><span class="pre">order</span></code> index.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page">Page</a></p>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The method performs:
+(1) image loading, (2) resizing and normalization, (3) model inference,
+(4) quad decoding, (5) NMS, (6) box expansion, (7) scaling coordinates
+back to original size.</p>
+<p><strong>Test-Time Augmentation (TTA):</strong></p>
+<p>When <code class="docutils literal notranslate"><span class="pre">use_tta=True</span></code> is set during initialization, the method runs
+inference on both the original and horizontally flipped image, then
+merges results. Boxes from both views are matched by IoU and merged
+by taking the union of coordinates with averaged scores. This can
+improve detection of text near image edges or partially visible text.</p>
+<p>For visualization, use the external <code class="docutils literal notranslate"><span class="pre">visualize_page</span></code> utility:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualize_page</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">page</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vis_img</span> <span class="o">=</span> <span class="n">visualize_page</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Examples</p>
+<p>Perform inference and get structured output:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">EAST</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img_path</span> <span class="o">=</span> <span class="sa">r</span><span class="s2">&quot;example/ocr_example_image.jpg&quot;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">page</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="c1"># Access first line&#39;s first text span</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">first_text_span</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text_spans</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Confidence: </span><span class="si">{</span><span class="n">first_text_span</span><span class="o">.</span><span class="n">detection_confidence</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Visualize results separately:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">visualize_page</span><span class="p">,</span> <span class="n">read_image</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">page</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">img</span> <span class="o">=</span> <span class="n">read_image</span><span class="p">(</span><span class="n">img_path</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vis_img</span> <span class="o">=</span> <span class="n">visualize_page</span><span class="p">(</span><span class="n">img</span><span class="p">,</span> <span class="n">page</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">vis_img</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manuscript.detectors.EAST.pretrained_registry">
+<span class="sig-name descname"><span class="pre">pretrained_registry</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'east_50_g1':</span> <span class="pre">'github://konstantinkozhin/manuscript-ocr/v0.1.0/east_50_g1.onnx'}</span></em><a class="headerlink" href="#manuscript.detectors.EAST.pretrained_registry" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.detectors.EAST.train">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">train_images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">train_anns</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_images</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_anns</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">experiment_root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'./experiments'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">model_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'resnet_quad'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">backbone_name</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'resnet50'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pretrained_backbone</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">freeze_first</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_geo_scale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_map_shrink_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">500</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulation_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.0001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_scheduler</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'cosine_restart'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr_scheduler_params</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">augmentation_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">5.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">early_stop</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">100</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_sam</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">sam_type</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'asam'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_lookahead</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ema</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_multiscale</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_ohem</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ohem_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.5</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_focal_geo</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">focal_gamma</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">resume_from</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">val_interval</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">num_workers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">log_collage</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_east.html#EAST.train"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.detectors.EAST.train" title="Link to this definition"></a></dt>
+<dd><p>Train EAST model on custom datasets.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>train_images</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em> or </em><em>sequence</em><em> of </em><em>paths</em>) – Path(s) to training image folders.</p></li>
+<li><p><strong>train_anns</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em> or </em><em>sequence</em><em> of </em><em>paths</em>) – Path(s) to COCO-format JSON annotation files corresponding to
+<code class="docutils literal notranslate"><span class="pre">train_images</span></code>.</p></li>
+<li><p><strong>val_images</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em> or </em><em>sequence</em><em> of </em><em>paths</em>) – Path(s) to validation image folders.</p></li>
+<li><p><strong>val_anns</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em> or </em><em>sequence</em><em> of </em><em>paths</em>) – Path(s) to COCO-format JSON annotation files corresponding to
+<code class="docutils literal notranslate"><span class="pre">val_images</span></code>.</p></li>
+<li><p><strong>experiment_root</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Base directory where experiment folders will be created.
+Default is <code class="docutils literal notranslate"><span class="pre">&quot;./experiments&quot;</span></code>.</p></li>
+<li><p><strong>model_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Folder name inside <code class="docutils literal notranslate"><span class="pre">experiment_root</span></code> for logs and checkpoints.
+Default is <code class="docutils literal notranslate"><span class="pre">&quot;resnet_quad&quot;</span></code>.</p></li>
+<li><p><strong>backbone_name</strong> (<em>{&quot;resnet50&quot;</em><em>, </em><em>&quot;resnet101&quot;}</em><em>, </em><em>optional</em>) – <p>Backbone architecture to use. Options:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;resnet50&quot;</span></code> — ResNet-50 (faster, less parameters)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;resnet101&quot;</span></code> — ResNet-101 (slower, more capacity)</p></li>
+</ul>
+<p>Default is <code class="docutils literal notranslate"><span class="pre">&quot;resnet50&quot;</span></code>.</p>
+</p></li>
+<li><p><strong>pretrained_backbone</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Use ImageNet-pretrained backbone weights. Default <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>freeze_first</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Freeze lowest layers of the backbone. Default <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>target_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Resize shorter side of images to this size. Default <code class="docutils literal notranslate"><span class="pre">1024</span></code>.</p></li>
+<li><p><strong>score_geo_scale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Multiplier to recover original coordinates from score/geo maps.
+If None, automatically taken from the model. Default <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>score_map_shrink_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Shrink ratio for score map. Default <code class="docutils literal notranslate"><span class="pre">0.3</span></code>.</p></li>
+<li><p><strong>epochs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Number of training epochs. Default <code class="docutils literal notranslate"><span class="pre">500</span></code>.</p></li>
+<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Batch size per GPU. Default <code class="docutils literal notranslate"><span class="pre">3</span></code>.</p></li>
+<li><p><strong>accumulation_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – <p>Number of gradient accumulation steps. Effective batch size will be
+<code class="docutils literal notranslate"><span class="pre">batch_size</span> <span class="pre">*</span> <span class="pre">accumulation_steps</span></code>. Use this to train with larger
+effective batch sizes when GPU memory is limited. For example:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">batch_size=2,</span> <span class="pre">accumulation_steps=4</span></code> → effective batch size = 8</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">batch_size=1,</span> <span class="pre">accumulation_steps=8</span></code> → effective batch size = 8</p></li>
+</ul>
+<p>Default is <code class="docutils literal notranslate"><span class="pre">1</span></code> (no accumulation).</p>
+</p></li>
+<li><p><strong>lr</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Learning rate. Default <code class="docutils literal notranslate"><span class="pre">1e-3</span></code>.</p></li>
+<li><p><strong>lr_scheduler</strong> (<em>{&quot;cosine_restart&quot;</em><em>, </em><em>&quot;cosine&quot;</em><em>, </em><em>&quot;linear&quot;</em><em>, </em><em>&quot;step&quot;</em><em>, </em><em>&quot;exponential&quot;</em><em>, </em><em>&quot;plateau&quot;</em><em>, </em><em>&quot;none&quot;}</em><em>, </em><em>optional</em>) – Learning rate scheduler type. Default <code class="docutils literal notranslate"><span class="pre">&quot;cosine_restart&quot;</span></code>.</p></li>
+<li><p><strong>lr_scheduler_params</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – <p>Extra scheduler parameters (depends on scheduler type). Common keys:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">cosine_restart</span></code>: <code class="docutils literal notranslate"><span class="pre">t0</span></code>, <code class="docutils literal notranslate"><span class="pre">t_mult</span></code>, <code class="docutils literal notranslate"><span class="pre">eta_min</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">cosine</span></code>: <code class="docutils literal notranslate"><span class="pre">t_max</span></code>, <code class="docutils literal notranslate"><span class="pre">eta_min</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">linear</span></code>: <code class="docutils literal notranslate"><span class="pre">final_factor</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">step</span></code>: <code class="docutils literal notranslate"><span class="pre">step_size</span></code>, <code class="docutils literal notranslate"><span class="pre">gamma</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">exponential</span></code>: <code class="docutils literal notranslate"><span class="pre">gamma</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">plateau</span></code>: <code class="docutils literal notranslate"><span class="pre">factor</span></code>, <code class="docutils literal notranslate"><span class="pre">patience</span></code>, <code class="docutils literal notranslate"><span class="pre">min_lr</span></code></p></li>
+</ul>
+</p></li>
+<li><p><strong>augmentation_config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(in Python v3.14)"><em>dict</em></a><em>, </em><em>optional</em>) – <p>Full augmentation configuration passed to <code class="docutils literal notranslate"><span class="pre">EASTDataset</span></code>. This is the
+preferred place for all augmentation settings. Any keys here override the
+corresponding defaults. Supported keys include:</p>
+<ul>
+<li><p><code class="docutils literal notranslate"><span class="pre">quad_source</span></code> for COCO polygon-to-quad conversion:
+<code class="docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code> preserves 4-point polygons and falls back to
+<code class="docutils literal notranslate"><span class="pre">&quot;min_area_rect&quot;</span></code> for longer polygons, <code class="docutils literal notranslate"><span class="pre">&quot;as_is&quot;</span></code> accepts only
+4-point polygons, and <code class="docutils literal notranslate"><span class="pre">&quot;min_area_rect&quot;</span></code> always fits the minimum-area
+rectangle</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">flip_prob</span></code>, <code class="docutils literal notranslate"><span class="pre">color_jitter</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">small_rotate_prob</span></code>, <code class="docutils literal notranslate"><span class="pre">small_rotate_deg</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">perspective_prob</span></code>, <code class="docutils literal notranslate"><span class="pre">perspective_scale</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">blur_prob</span></code>, <code class="docutils literal notranslate"><span class="pre">blur_ksize_range</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">noise_prob</span></code>, <code class="docutils literal notranslate"><span class="pre">noise_std</span></code>, <code class="docutils literal notranslate"><span class="pre">salt_pepper_prob</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">jpeg_prob</span></code>, <code class="docutils literal notranslate"><span class="pre">jpeg_quality_range</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">shading_prob</span></code>, <code class="docutils literal notranslate"><span class="pre">shading_strength</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">gamma_prob</span></code>, <code class="docutils literal notranslate"><span class="pre">gamma_range</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">downscale_prob</span></code>, <code class="docutils literal notranslate"><span class="pre">downscale_range</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">negative_prob</span></code></p></li>
+</ul>
+</p></li>
+<li><p><strong>grad_clip</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Gradient clipping value (L2 norm). Default <code class="docutils literal notranslate"><span class="pre">5.0</span></code>.</p></li>
+<li><p><strong>early_stop</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Patience (epochs without improvement) for early stopping.
+Default <code class="docutils literal notranslate"><span class="pre">100</span></code>.</p></li>
+<li><p><strong>use_sam</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Enable SAM optimizer. Default <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>sam_type</strong> (<em>{&quot;sam&quot;</em><em>, </em><em>&quot;asam&quot;}</em><em>, </em><em>optional</em>) – Variant of SAM to use. Default <code class="docutils literal notranslate"><span class="pre">&quot;asam&quot;</span></code>.</p></li>
+<li><p><strong>use_lookahead</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Wrap optimizer with Lookahead. Default <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>use_ema</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Maintain EMA version of model weights. Default <code class="docutils literal notranslate"><span class="pre">False</span></code>.</p></li>
+<li><p><strong>use_multiscale</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Random multi-scale training. Default <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>use_ohem</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Online Hard Example Mining. Default <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>ohem_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Ratio of hard negatives for OHEM. Default <code class="docutils literal notranslate"><span class="pre">0.5</span></code>.</p></li>
+<li><p><strong>use_focal_geo</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Apply focal loss to geometry channels. Default <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>focal_gamma</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Gamma for focal geometry loss. Default <code class="docutils literal notranslate"><span class="pre">2.0</span></code>.</p></li>
+<li><p><strong>resume_from</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Resume training from a previous experiment or initialize from local weights:
+a) experiment directory,
+b) <cite>…/checkpoints/</cite>,
+c) direct path to full-state checkpoint (<cite>last_state.pt</cite>).
+If a weights-only file is provided (e.g. <cite>best.pth</cite>), model weights
+are loaded, but training starts in the current
+<code class="docutils literal notranslate"><span class="pre">experiment_root/model_name</span></code> directory.
+Default <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>val_interval</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Run validation every N epochs. Default <code class="docutils literal notranslate"><span class="pre">1</span></code>.</p></li>
+<li><p><strong>num_workers</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Number of worker processes for data loading. Set to 0 for single-process
+loading (safer on Windows). Default <code class="docutils literal notranslate"><span class="pre">0</span></code>.</p></li>
+<li><p><strong>log_collage</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Whether to generate and log validation collage images to TensorBoard.
+Disable to save memory on GPUs with limited VRAM. Default <code class="docutils literal notranslate"><span class="pre">True</span></code>.</p></li>
+<li><p><strong>device</strong> (<em>torch.device</em><em>, </em><em>optional</em>) – CUDA or CPU device. Auto-selects if None.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Best model weights (EMA if enabled, otherwise base model).</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p>torch.nn.Module</p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Train on two datasets with validation:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">train_images</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/archive/train_images&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/ddi/train_images&quot;</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">train_anns</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/archive/train.json&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/ddi/train.json&quot;</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">val_images</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/archive/test_images&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/ddi/test_images&quot;</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">val_anns</span> <span class="o">=</span> <span class="p">[</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/archive/test.json&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;/data/ddi/test.json&quot;</span>
+<span class="gp">... </span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt;</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">best_model</span> <span class="o">=</span> <span class="n">EAST</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">train_images</span><span class="o">=</span><span class="n">train_images</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">train_anns</span><span class="o">=</span><span class="n">train_anns</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">val_images</span><span class="o">=</span><span class="n">val_images</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">val_anns</span><span class="o">=</span><span class="n">val_anns</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">backbone_name</span><span class="o">=</span><span class="s2">&quot;resnet50&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">target_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">epochs</span><span class="o">=</span><span class="mi">20</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">batch_size</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">use_sam</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">freeze_first</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">val_interval</span><span class="o">=</span><span class="mi">3</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Best checkpoint loaded:&quot;</span><span class="p">,</span> <span class="n">best_model</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Configure augmentations via <code class="docutils literal notranslate"><span class="pre">augmentation_config</span></code>:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="n">aug_cfg</span> <span class="o">=</span> <span class="p">{</span>
+<span class="gp">... </span>    <span class="s2">&quot;quad_source&quot;</span><span class="p">:</span> <span class="s2">&quot;auto&quot;</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;flip_prob&quot;</span><span class="p">:</span> <span class="mf">0.02</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;color_jitter&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.1</span><span class="p">,</span> <span class="mf">0.05</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="s2">&quot;small_rotate_prob&quot;</span><span class="p">:</span> <span class="mf">0.15</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;small_rotate_deg&quot;</span><span class="p">:</span> <span class="mf">1.5</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;perspective_prob&quot;</span><span class="p">:</span> <span class="mf">0.08</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;perspective_scale&quot;</span><span class="p">:</span> <span class="mf">0.015</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;blur_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;blur_ksize_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">5</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="s2">&quot;noise_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;noise_std&quot;</span><span class="p">:</span> <span class="mf">0.008</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;salt_pepper_prob&quot;</span><span class="p">:</span> <span class="mf">0.0005</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;jpeg_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;jpeg_quality_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mi">75</span><span class="p">,</span> <span class="mi">95</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="s2">&quot;shading_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;shading_strength&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;gamma_prob&quot;</span><span class="p">:</span> <span class="mf">0.2</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;gamma_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.95</span><span class="p">,</span> <span class="mf">1.05</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="s2">&quot;downscale_prob&quot;</span><span class="p">:</span> <span class="mf">0.1</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="s2">&quot;downscale_range&quot;</span><span class="p">:</span> <span class="p">(</span><span class="mf">0.7</span><span class="p">,</span> <span class="mf">0.95</span><span class="p">),</span>
+<span class="gp">... </span>    <span class="s2">&quot;negative_prob&quot;</span><span class="p">:</span> <span class="mf">0.05</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">}</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">best_model</span> <span class="o">=</span> <span class="n">EAST</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
+<span class="gp">... </span>    <span class="n">train_images</span><span class="o">=</span><span class="n">train_images</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">train_anns</span><span class="o">=</span><span class="n">train_anns</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">val_images</span><span class="o">=</span><span class="n">val_images</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">val_anns</span><span class="o">=</span><span class="n">val_anns</span><span class="p">,</span>
+<span class="gp">... </span>    <span class="n">augmentation_config</span><span class="o">=</span><span class="n">aug_cfg</span><span class="p">,</span>
+<span class="gp">... </span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="manuscript.detectors.YOLO">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manuscript.detectors.</span></span><span class="sig-name descname"><span class="pre">YOLO</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_aligned_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">containment_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_yolo.html#YOLO"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.detectors.YOLO" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseDetector</span></code></p>
+<p>Initialize YOLO text detector with ONNX Runtime.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>Path</em><em>, </em><em>optional</em>) – <p>Path or identifier for ONNX model weights. Supports:</p>
+<ul>
+<li><p>Local file path: <code class="docutils literal notranslate"><span class="pre">&quot;path/to/model.onnx&quot;</span></code></p></li>
+<li><p>HTTP/HTTPS URL: <code class="docutils literal notranslate"><span class="pre">&quot;https://example.com/model.onnx&quot;</span></code></p></li>
+<li><p>GitHub release: <code class="docutils literal notranslate"><span class="pre">&quot;github://owner/repo/tag/file.onnx&quot;</span></code></p></li>
+<li><p>Google Drive: <code class="docutils literal notranslate"><span class="pre">&quot;gdrive:FILE_ID&quot;</span></code></p></li>
+<li><p>Preset name: <code class="docutils literal notranslate"><span class="pre">&quot;yolo26s_obb_text_g1&quot;</span></code> or <code class="docutils literal notranslate"><span class="pre">&quot;yolo26x_obb_text_g1&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">None</span></code>: auto-downloads default preset (<code class="docutils literal notranslate"><span class="pre">yolo26x_obb_text_g1</span></code>)</p></li>
+</ul>
+<p>The ONNX model may return either standard detections in
+<code class="docutils literal notranslate"><span class="pre">xyxy,</span> <span class="pre">score,</span> <span class="pre">class_id</span></code> format with shape <code class="docutils literal notranslate"><span class="pre">[N,</span> <span class="pre">6]</span></code> / <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">N,</span> <span class="pre">6]</span></code>
+or oriented detections in <code class="docutils literal notranslate"><span class="pre">cx,</span> <span class="pre">cy,</span> <span class="pre">w,</span> <span class="pre">h,</span> <span class="pre">score,</span> <span class="pre">class_id,</span> <span class="pre">angle</span></code>
+format with shape <code class="docutils literal notranslate"><span class="pre">[N,</span> <span class="pre">7]</span></code> / <code class="docutils literal notranslate"><span class="pre">[1,</span> <span class="pre">N,</span> <span class="pre">7]</span></code>.</p>
+</p></li>
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Path or identifier for model configuration YAML. Same URL schemes
+as <code class="docutils literal notranslate"><span class="pre">weights</span></code>. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, attempts to infer a YAML file next to
+the weights or uses the preset config from <code class="docutils literal notranslate"><span class="pre">config_registry</span></code>.</p></li>
+<li><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – <p>Compute device: <code class="docutils literal notranslate"><span class="pre">&quot;cuda&quot;</span></code>, <code class="docutils literal notranslate"><span class="pre">&quot;coreml&quot;</span></code>, or <code class="docutils literal notranslate"><span class="pre">&quot;cpu&quot;</span></code>. If None,
+automatically selects CPU. For GPU/CoreML acceleration:</p>
+<ul>
+<li><p>CUDA (NVIDIA): <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">onnxruntime-gpu</span></code></p></li>
+<li><p>CoreML (Apple Silicon M1/M2/M3): <code class="docutils literal notranslate"><span class="pre">pip</span> <span class="pre">install</span> <span class="pre">onnxruntime-silicon</span></code></p></li>
+</ul>
+<p>Default is <code class="docutils literal notranslate"><span class="pre">None</span></code> (CPU).</p>
+</p></li>
+<li><p><strong>score_thresh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Confidence threshold applied to model outputs after ONNX inference and
+before the additional containment cleanup pass. Default is <code class="docutils literal notranslate"><span class="pre">0.1</span></code>.</p></li>
+<li><p><strong>class_ids</strong> (<em>sequence</em><em> of </em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Optional whitelist of class IDs to keep. If <code class="docutils literal notranslate"><span class="pre">None</span></code>, all classes are
+kept. Default is <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p></li>
+<li><p><strong>target_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Square inference size used for letterbox preprocessing. Images are
+resized into <code class="docutils literal notranslate"><span class="pre">(target_size,</span> <span class="pre">target_size)</span></code> before ONNX inference.
+If <code class="docutils literal notranslate"><span class="pre">None</span></code>, the detector tries to read <code class="docutils literal notranslate"><span class="pre">imgsz</span></code> from a YAML config
+located next to the weights or downloaded from the preset registry.
+Unknown/custom weights without YAML fall back to <code class="docutils literal notranslate"><span class="pre">1280</span></code>.</p></li>
+<li><p><strong>axis_aligned_output</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – If <code class="docutils literal notranslate"><span class="pre">True</span></code> (default), OBB detections are converted to standard
+axis-aligned rectangles. If <code class="docutils literal notranslate"><span class="pre">False</span></code>, OBB detections are returned as
+rotated polygons via <code class="docutils literal notranslate"><span class="pre">page</span></code> / <code class="docutils literal notranslate"><span class="pre">polygons</span></code> and as
+<code class="docutils literal notranslate"><span class="pre">cx,</span> <span class="pre">cy,</span> <span class="pre">w,</span> <span class="pre">h,</span> <span class="pre">score,</span> <span class="pre">class_id,</span> <span class="pre">angle</span></code> rows in <code class="docutils literal notranslate"><span class="pre">boxes</span></code>.
+For non-OBB models this flag has no effect.</p></li>
+<li><p><strong>containment_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> or </em><em>None</em><em>, </em><em>optional</em>) – Removes a smaller box when at least this fraction of its area is
+covered by a larger box. For example, <code class="docutils literal notranslate"><span class="pre">0.9</span></code> removes boxes that are
+contained by <code class="docutils literal notranslate"><span class="pre">90%</span></code> or more. Set to <code class="docutils literal notranslate"><span class="pre">None</span></code> to disable this extra
+cleanup. Default is <code class="docutils literal notranslate"><span class="pre">0.9</span></code>.</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Notes</p>
+<p>The class provides one main public method:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">predict</span></code> - run inference on a single image and return detections.</p></li>
+</ul>
+<p>Available presets:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;yolo26s_obb_text_g1&quot;</span></code> - YOLO26-S OBB text detector</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;yolo26x_obb_text_g1&quot;</span></code> - YOLO26-X OBB text detector</p></li>
+</ul>
+<p class="rubric">Methods</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code>(*args, **kwargs)</p></td>
+<td><p>Call self as a function.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#manuscript.detectors.YOLO.predict" title="manuscript.detectors.YOLO.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(img_or_path)</p></td>
+<td><p>Run YOLO ONNX inference on a single image and return detected page structure.</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">runtime_providers</span></code>()</p></td>
+<td><p>Get ONNX Runtime execution providers based on device.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">train</span></code>(*args, **kwargs)</p></td>
+<td><p></p></td>
+</tr>
+</tbody>
+</table>
+<table class="docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><strong>export</strong></p></td>
+<td></td>
+</tr>
+</tbody>
+</table>
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.detectors.YOLO.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">score_thresh</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">class_ids</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">target_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">axis_aligned_output</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">containment_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.9</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_yolo.html#YOLO.__init__"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.detectors.YOLO.__init__" title="Link to this definition"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>config</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>Path</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>score_thresh</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>class_ids</strong> (<a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Sequence" title="(in Python v3.14)"><em>Sequence</em></a><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em>] </em><em>| </em><em>None</em>)</p></li>
+<li><p><strong>target_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(in Python v3.14)"><em>int</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>axis_aligned_output</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(in Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>containment_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(in Python v3.14)"><em>float</em></a><em> | </em><em>None</em>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manuscript.detectors.YOLO.config_registry">
+<span class="sig-name descname"><span class="pre">config_registry</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'yolo26s_obb_text_g1':</span> <span class="pre">'https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.yaml',</span> <span class="pre">'yolo26x_obb_text_g1':</span> <span class="pre">'https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.yaml'}</span></em><a class="headerlink" href="#manuscript.detectors.YOLO.config_registry" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manuscript.detectors.YOLO.default_target_size">
+<span class="sig-name descname"><span class="pre">default_target_size</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1280</span></em><a class="headerlink" href="#manuscript.detectors.YOLO.default_target_size" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manuscript.detectors.YOLO.default_weights_name">
+<span class="sig-name descname"><span class="pre">default_weights_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(in Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'yolo26x_obb_text_g1'</span></em><a class="headerlink" href="#manuscript.detectors.YOLO.default_weights_name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.detectors.YOLO.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">img_or_path</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/detectors/_yolo.html#YOLO.predict"><span class="viewcode-link"><span class="pre">[source]</span></span></a><a class="headerlink" href="#manuscript.detectors.YOLO.predict" title="Link to this definition"></a></dt>
+<dd><p>Run YOLO ONNX inference on a single image and return detected page structure.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parameters<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>img_or_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><em>str</em></a><em> or </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(in Python v3.14)"><em>pathlib.Path</em></a><em> or </em><a class="reference external" href="https://numpy.org/doc/stable/reference/generated/numpy.ndarray.html#numpy.ndarray" title="(in NumPy v2.4)"><em>numpy.ndarray</em></a>) – Path to an image file or an RGB image provided as a NumPy array
+with shape <code class="docutils literal notranslate"><span class="pre">(H,</span> <span class="pre">W,</span> <span class="pre">3)</span></code> in <code class="docutils literal notranslate"><span class="pre">uint8</span></code> format.</p>
+</dd>
+<dt class="field-even">Returns<span class="colon">:</span></dt>
+<dd class="field-even"><p>Parsed detection result as a Page object containing a single
+Block with a single Line of TextSpan objects.</p>
+</dd>
+<dt class="field-odd">Return type<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page">Page</a></p>
+</dd>
+</dl>
+<p class="rubric">Examples</p>
+<p>Run inference and get structured output:</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">YOLO</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">model</span> <span class="o">=</span> <span class="n">YOLO</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;yolo26x_obb_text_g1&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">page</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;page.jpg&quot;</span><span class="p">)</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">first_text_span</span> <span class="o">=</span> <span class="n">page</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lines</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">text_spans</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="nb">print</span><span class="p">(</span><span class="n">first_text_span</span><span class="o">.</span><span class="n">detection_confidence</span><span class="p">)</span>
+</pre></div>
+</div>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manuscript.detectors.YOLO.pretrained_registry">
+<span class="sig-name descname"><span class="pre">pretrained_registry</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(in Python v3.14)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(in Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'yolo26s_obb_text_g1':</span> <span class="pre">'https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx',</span> <span class="pre">'yolo26x_obb_text_g1':</span> <span class="pre">'https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.onnx'}</span></em><a class="headerlink" href="#manuscript.detectors.YOLO.pretrained_registry" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<section id="east-training-quads">
+<h2>EAST Training Quads<a class="headerlink" href="#east-training-quads" title="Link to this heading"></a></h2>
+<p>EAST training expects quadrilateral targets. When loading COCO
+<code class="docutils literal notranslate"><span class="pre">segmentation</span></code> polygons, use <code class="docutils literal notranslate"><span class="pre">augmentation_config[&quot;quad_source&quot;]</span></code> in
+<code class="docutils literal notranslate"><span class="pre">EAST.train(...)</span></code> to control how polygons are converted into 4-point
+training quads:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;auto&quot;</span></code> keeps existing 4-point polygons as-is and falls back to
+<code class="docutils literal notranslate"><span class="pre">minAreaRect</span></code> for longer polygons.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;as_is&quot;</span></code> accepts only 4-point polygons and skips polygons with a
+different number of vertices.</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;min_area_rect&quot;</span></code> always fits the minimum-area rectangle and matches
+the legacy conversion path.</p></li>
+</ul>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Footer">
+        <a href="data.html" class="btn btn-neutral float-left" title="Data Structures" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Previous</a>
+        <a href="layouts.html" class="btn btn-neutral float-right" title="Layouts" accesskey="n" rel="next">Next <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Copyright 2026, Konstantin Kozhin.</p>
+  </div>
+
+  Built with <a href="https://www.sphinx-doc.org/">Sphinx</a> using a
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">theme</a>
+    provided by <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

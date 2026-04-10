@@ -25,10 +25,52 @@ This installs additional dependencies for model training:
 
 **GPU acceleration** (NVIDIA CUDA):
 
+If you are switching an existing installation from CPU to GPU:
+
+1. Remove the CPU version of ONNX Runtime and install the GPU version:
+
 .. code-block:: bash
 
-    pip install manuscript-ocr
+    pip uninstall onnxruntime
     pip install onnxruntime-gpu
+
+2. If you are working in Jupyter Notebook, JupyterLab, VS Code notebooks, or
+   Google Colab, restart the kernel or runtime after installation.
+
+Reinstalling ``manuscript-ocr`` is not required.
+
+Diagnostics
+^^^^^^^^^^^
+
+If the pipeline still does not switch to GPU, first run:
+
+.. code-block:: python
+
+    import onnxruntime as ort
+
+    print(ort.get_available_providers())
+
+Case 1. ``"CUDAExecutionProvider"`` is missing
+
+Install additional CUDA/cuDNN runtime packages:
+
+.. code-block:: bash
+
+    pip install nvidia-cudnn-cu12 nvidia-cublas-cu12 nvidia-cuda-runtime-cu12
+
+Then restart the kernel or runtime and create the ``Pipeline`` again.
+
+Case 2. ``"CUDAExecutionProvider"`` is present, but the models still fall back to CPU
+
+In some notebook environments, ONNX Runtime may require an explicit preload
+step before importing ``manuscript``:
+
+.. code-block:: python
+
+    import onnxruntime as ort
+    ort.preload_dlls(directory="")
+
+After that, import ``manuscript`` and create the ``Pipeline`` again.
 
 **Apple Silicon acceleration** (CoreML):
 

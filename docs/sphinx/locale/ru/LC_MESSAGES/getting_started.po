@@ -1,6 +1,6 @@
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr 0.1.11\n"
+"Project-Id-Version: manuscript-ocr 0.1.12\n"
 "PO-Revision-Date: 2026-04-05 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
@@ -40,6 +40,65 @@ msgstr "Инструменты разработки (pytest, black, flake8 и д
 
 msgid "**GPU acceleration** (NVIDIA CUDA):"
 msgstr "**Аппаратное ускорение GPU** (NVIDIA CUDA):"
+
+msgid ""
+"If you are switching an existing installation from CPU to GPU:"
+msgstr ""
+"Если вы переводите уже существующую установку с CPU на GPU:"
+
+msgid ""
+"1. Remove the CPU version of ONNX Runtime and install the GPU version:"
+msgstr ""
+"1. Удалите CPU-версию ONNX Runtime и установите GPU-версию:"
+
+msgid ""
+"2. If you are working in Jupyter Notebook, JupyterLab, VS Code notebooks, or "
+"Google Colab, restart the kernel or runtime after installation."
+msgstr ""
+"2. Если вы работаете в Jupyter Notebook, JupyterLab, ноутбуках VS Code или "
+"Google Colab, после установки перезапустите kernel или runtime."
+
+msgid "Reinstalling ``manuscript-ocr`` is not required."
+msgstr "Переустанавливать ``manuscript-ocr`` не требуется."
+
+msgid "Diagnostics"
+msgstr "Диагностика"
+
+msgid ""
+"If the pipeline still does not switch to GPU, first run:"
+msgstr ""
+"Если pipeline по-прежнему не переключается на GPU, сначала выполните:"
+
+msgid ""
+"Case 1. ``\"CUDAExecutionProvider\"`` is missing"
+msgstr ""
+"Случай 1. ``\"CUDAExecutionProvider\"`` отсутствует"
+
+msgid "Install additional CUDA/cuDNN runtime packages:"
+msgstr "Установите дополнительные runtime-пакеты CUDA/cuDNN:"
+
+msgid "Then restart the kernel or runtime and create the ``Pipeline`` again."
+msgstr "После этого перезапустите kernel или runtime и заново создайте ``Pipeline``."
+
+msgid ""
+"Case 2. ``\"CUDAExecutionProvider\"`` is present, but the models still fall "
+"back to CPU"
+msgstr ""
+"Случай 2. ``\"CUDAExecutionProvider\"`` присутствует, но модели все равно "
+"переходят на CPU"
+
+msgid ""
+"In some notebook environments, ONNX Runtime may require an explicit preload "
+"step before importing ``manuscript``:"
+msgstr ""
+"В некоторых notebook-средах ONNX Runtime может требовать явной предварительной "
+"загрузки runtime-библиотек перед импортом ``manuscript``:"
+
+msgid ""
+"After that, import ``manuscript`` and create the ``Pipeline`` again."
+msgstr ""
+"После этого импортируйте ``manuscript`` и заново создайте ``Pipeline``."
+
 
 msgid "**Apple Silicon acceleration** (CoreML):"
 msgstr "**Ускорение на Apple Silicon** (CoreML):"

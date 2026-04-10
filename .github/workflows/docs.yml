@@ -24,8 +24,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      LATEST_DOCS_VERSION: "0.1.11"
-      LEGACY_DOCS_VERSION: "0.1.10"
+      LATEST_DOCS_VERSION: "0.1.12"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -55,11 +54,14 @@ jobs:
           sphinx-build -b html -D language=en -D release=${LATEST_DOCS_VERSION} -D version=${LATEST_DOCS_VERSION} . _site/${LATEST_DOCS_VERSION}/en
           sphinx-build -b html -D language=ru -D release=${LATEST_DOCS_VERSION} -D version=${LATEST_DOCS_VERSION} . _site/${LATEST_DOCS_VERSION}/ru
 
-      - name: Copy archived legacy docs
+      - name: Copy archived docs
         run: |
-          test -d docs/sphinx/_archive/${LEGACY_DOCS_VERSION}
-          rm -rf docs/sphinx/_site/${LEGACY_DOCS_VERSION}
-          cp -a docs/sphinx/_archive/${LEGACY_DOCS_VERSION} docs/sphinx/_site/${LEGACY_DOCS_VERSION}
+          for version_dir in docs/sphinx/_archive/*; do
+            test -d "${version_dir}" || continue
+            version_name="$(basename "${version_dir}")"
+            rm -rf "docs/sphinx/_site/${version_name}"
+            cp -a "${version_dir}" "docs/sphinx/_site/${version_name}"
+          done
 
       - name: Create site index and version metadata
         run: |
@@ -69,13 +71,14 @@ jobs:
           <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-            <meta http-equiv="refresh" content="0; url=0.1.11/en/index.html">
+            <meta http-equiv="refresh" content="0; url=0.1.12/en/index.html">
             <title>manuscript-ocr docs</title>
           </head>
           <body>
-            <p>Redirecting to <a href="0.1.11/en/index.html">latest docs (0.1.11)</a>...</p>
+            <p>Redirecting to <a href="0.1.12/en/index.html">latest docs (0.1.12)</a>...</p>
             <p>Available versions:</p>
             <ul>
+              <li><a href="0.1.12/en/index.html">0.1.12 (EN)</a> | <a href="0.1.12/ru/index.html">0.1.12 (RU)</a></li>
               <li><a href="0.1.11/en/index.html">0.1.11 (EN)</a> | <a href="0.1.11/ru/index.html">0.1.11 (RU)</a></li>
               <li><a href="0.1.10/en/index.html">0.1.10 (EN)</a> | <a href="0.1.10/ru/index.html">0.1.10 (RU)</a></li>
             </ul>
@@ -84,8 +87,8 @@ jobs:
           HTML
           cat > docs/sphinx/_site/versions.json <<'JSON'
           {
-            "latest": "0.1.11",
-            "versions": ["0.1.11", "0.1.10"]
+            "latest": "0.1.12",
+            "versions": ["0.1.12", "0.1.11", "0.1.10"]
           }
           JSON
           touch docs/sphinx/_site/.nojekyll

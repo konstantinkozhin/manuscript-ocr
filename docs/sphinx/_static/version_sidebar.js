@@ -1,9 +1,9 @@
 // Add "Versions" section into the left Sphinx sidebar (Contents area).
-// Supports both deployed docs (/0.1.11/en/...) and local preview:
+// Supports both deployed docs (/0.1.12/en/...) and local preview:
 // - _build/html/en/...
-// - _archive/0.1.10/en/...
+// - _archive/0.1.11/en/...
 (function () {
-  var versions = ["0.1.11", "0.1.10"];
+  var versions = ["0.1.12", "0.1.11", "0.1.10"];
   var latestVersion = versions[0];
 
   function parseDocLocation(pathname) {

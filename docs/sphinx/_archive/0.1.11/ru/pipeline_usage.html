@@ -1,0 +1,469 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ru" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Руководство по использованию Pipeline &mdash; документация manuscript-ocr 0.1.11</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="_static/language_switcher.css?v=d768f156" />
+      <link rel="stylesheet" type="text/css" href="_static/model_zoo.css?v=2d297567" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=708478e6"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=cd1d70c9"></script>
+      <script src="_static/language_switcher.js?v=db730534"></script>
+      <script src="_static/version_sidebar.js?v=50cbed02"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Алфавитный указатель" href="genindex.html" />
+    <link rel="search" title="Поиск" href="search.html" />
+    <link rel="next" title="Структура библиотеки" href="structure.html" />
+    <link rel="prev" title="Зоопарк моделей" href="model_zoo.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            manuscript-ocr
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Поиск в документации" aria-label="Поиск в документации" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Меню навигации">
+              <p class="caption" role="heading"><span class="caption-text">Содержание:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="getting_started.html">Начало работы</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#installation">Установка</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#quick-start">Быстрый старт</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#example-notebooks">Примеры ноутбуков</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#main-components">Основные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#model-zoo">Зоопарк моделей</a></li>
+<li class="toctree-l2"><a class="reference internal" href="getting_started.html#related-work">Связанные работы</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="model_zoo.html">Зоопарк моделей</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#detection">Детекция</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#layout">Layout-анализ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#recognition">Распознавание</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#correction">Посткоррекция</a></li>
+<li class="toctree-l2"><a class="reference internal" href="model_zoo.html#architecture-sources">Источники архитектур</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Руководство по использованию Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#stage-contracts">Контракты этапов</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#detector">Детектор</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#recognizer">Распознаватель</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#layout">Layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="#corrector">Корректор</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#basic-usage">Базовое использование</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#disable-stages">Отключение этапов</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#layout-placement">Положение этапа layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#built-in-components">Встроенные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#trba-region-preparation">Подготовка регионов в TRBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#collapsing-text-spans">Объединение TextSpan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#visualization-and-profiling">Визуализация и профилирование</a></li>
+<li class="toctree-l2"><a class="reference internal" href="#intermediate-results">Промежуточные результаты</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="structure.html">Структура библиотеки</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="structure.html#overview">Обзор</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="api/index.html">Справочник API</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="api/pipeline.html">Конвейер</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_layout_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_layout_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/data.html">Структуры данных</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#data-model">Модель данных</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#compatibility">Совместимость</a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/data.html#module-manuscript.data">Справочник модуля</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.TextSpan"><code class="docutils literal notranslate"><span class="pre">TextSpan</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/data.html#manuscript.data.Page"><code class="docutils literal notranslate"><span class="pre">Page</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/detectors.html">Детекторы</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO"><code class="docutils literal notranslate"><span class="pre">YOLO</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.__init__"><code class="docutils literal notranslate"><span class="pre">YOLO.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.config_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.default_target_size"><code class="docutils literal notranslate"><span class="pre">YOLO.default_target_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.default_weights_name"><code class="docutils literal notranslate"><span class="pre">YOLO.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.predict"><code class="docutils literal notranslate"><span class="pre">YOLO.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/detectors.html#manuscript.detectors.YOLO.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.pretrained_registry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="api/detectors.html#east-training-quads">Четырёхугольные области для обучения EAST</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/layouts.html">Layout-модели</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/recognizers.html">Распознаватели</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/correctors.html">Корректоры</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/correctors.html#charlm"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#manuscript.correctors.CharLM"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#overview">Обзор</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#available-presets">Доступные пресеты</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#quick-example">Быстрый пример</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#basic-usage">Базовое использование</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#advanced-configuration">Расширенная конфигурация</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#using-custom-lexicon">Использование пользовательского лексикона</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#training-custom-model">Обучение пользовательской модели</a></li>
+<li class="toctree-l4"><a class="reference internal" href="api/correctors.html#export-to-onnx">Экспорт в ONNX</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="api/utils.html">Утилиты</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.read_image"><code class="docutils literal notranslate"><span class="pre">read_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.crop_axis_aligned"><code class="docutils literal notranslate"><span class="pre">crop_axis_aligned()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.crop_polygon_mask"><code class="docutils literal notranslate"><span class="pre">crop_polygon_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.merge_polygons"><code class="docutils literal notranslate"><span class="pre">merge_polygons()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.order_quad_points"><code class="docutils literal notranslate"><span class="pre">order_quad_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.polygon_to_bbox"><code class="docutils literal notranslate"><span class="pre">polygon_to_bbox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.warp_quad"><code class="docutils literal notranslate"><span class="pre">warp_quad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.merge_text_spans"><code class="docutils literal notranslate"><span class="pre">merge_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.collapse_line_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_line_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.collapse_block_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_block_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.collapse_page_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_page_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="api/utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="related_work.html">Связанные работы</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Меню навигации для мобильных устройств" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">manuscript-ocr</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Навигация по страницам">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Руководство по использованию Pipeline</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/pipeline_usage.rst.txt" rel="nofollow"> Просмотреть исходный код страницы</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="pipeline-usage-guide">
+<h1>Руководство по использованию Pipeline<a class="headerlink" href="#pipeline-usage-guide" title="Ссылка на этот заголовок"></a></h1>
+<p>Pipeline построен из этапов и передаёт один объект <code class="docutils literal notranslate"><span class="pre">Page</span></code> через все этапы:</p>
+<p><code class="docutils literal notranslate"><span class="pre">detector</span> <span class="pre">-&gt;</span> <span class="pre">layout</span> <span class="pre">-&gt;</span> <span class="pre">recognizer</span> <span class="pre">-&gt;</span> <span class="pre">corrector</span></code></p>
+<p>По умолчанию <code class="docutils literal notranslate"><span class="pre">Pipeline()</span></code> создаёт:</p>
+<ul class="simple">
+<li><p>детектор: <code class="docutils literal notranslate"><span class="pre">YOLO(weights=&quot;yolo26x_obb_text_g1&quot;)</span></code></p></li>
+<li><p>layout: <code class="docutils literal notranslate"><span class="pre">SimpleSorting()</span></code></p></li>
+<li><p>распознаватель: <code class="docutils literal notranslate"><span class="pre">TRBA(weights=&quot;trba_lite_g2&quot;)</span></code></p></li>
+<li><p>корректор: <code class="docutils literal notranslate"><span class="pre">None</span></code></p></li>
+</ul>
+<section id="stage-contracts">
+<h2>Контракты этапов<a class="headerlink" href="#stage-contracts" title="Ссылка на этот заголовок"></a></h2>
+<section id="detector">
+<h3>Детектор<a class="headerlink" href="#detector" title="Ссылка на этот заголовок"></a></h3>
+<p>Детектор должен реализовывать:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">image</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="recognizer">
+<h3>Распознаватель<a class="headerlink" href="#recognizer" title="Ссылка на этот заголовок"></a></h3>
+<p>Распознаватель должен реализовывать:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="layout">
+<h3>Layout<a class="headerlink" href="#layout" title="Ссылка на этот заголовок"></a></h3>
+<p>Layout-модель должна реализовывать:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+</section>
+<section id="corrector">
+<h3>Корректор<a class="headerlink" href="#corrector" title="Ссылка на этот заголовок"></a></h3>
+<p>Корректор должен реализовывать:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">predict</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">page</span><span class="p">:</span> <span class="n">Page</span><span class="p">,</span> <span class="n">image</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Page</span><span class="p">:</span>
+    <span class="o">...</span>
+</pre></div>
+</div>
+</section>
+</section>
+<section id="basic-usage">
+<h2>Базовое использование<a class="headerlink" href="#basic-usage" title="Ссылка на этот заголовок"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">()</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">)</span>
+<span class="n">text</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">get_text</span><span class="p">(</span><span class="n">result</span><span class="p">[</span><span class="s2">&quot;page&quot;</span><span class="p">])</span>
+<span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="disable-stages">
+<h2>Отключение этапов<a class="headerlink" href="#disable-stages" title="Ссылка на этот заголовок"></a></h2>
+<p>Необязательные этапы можно отключать через <code class="docutils literal notranslate"><span class="pre">None</span></code>:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="c1"># Detection + layout only</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">recognizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">corrector</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># Detection + recognition only</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">layout</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">corrector</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<span class="c1"># Detection + layout + recognition (no correction)</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">corrector</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="layout-placement">
+<h2>Положение этапа layout<a class="headerlink" href="#layout-placement" title="Ссылка на этот заголовок"></a></h2>
+<p>Используйте <code class="docutils literal notranslate"><span class="pre">layout_after</span></code>, чтобы выбрать, после какого этапа запускать layout:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;detector&quot;</span></code> (по умолчанию)</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;recognizer&quot;</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;corrector&quot;</span></code></p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.layouts</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleSorting</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">layout</span><span class="o">=</span><span class="n">SimpleSorting</span><span class="p">(),</span>
+    <span class="n">layout_after</span><span class="o">=</span><span class="s2">&quot;recognizer&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p>Если опорный этап отключён, например <code class="docutils literal notranslate"><span class="pre">recognizer=None</span></code> при <code class="docutils literal notranslate"><span class="pre">layout_after=&quot;recognizer&quot;</span></code>, layout всё равно выполнится в этой позиции.</p>
+</section>
+<section id="built-in-components">
+<h2>Встроенные компоненты<a class="headerlink" href="#built-in-components" title="Ссылка на этот заголовок"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.detectors</span><span class="w"> </span><span class="kn">import</span> <span class="n">EAST</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.layouts</span><span class="w"> </span><span class="kn">import</span> <span class="n">SimpleSorting</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.recognizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRBA</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharLM</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+
+<span class="n">detector</span> <span class="o">=</span> <span class="n">EAST</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;east_50_g1&quot;</span><span class="p">,</span> <span class="n">score_thresh</span><span class="o">=</span><span class="mf">0.8</span><span class="p">,</span> <span class="n">iou_threshold</span><span class="o">=</span><span class="mf">0.2</span><span class="p">)</span>
+<span class="n">layout</span> <span class="o">=</span> <span class="n">SimpleSorting</span><span class="p">(</span><span class="n">max_splits</span><span class="o">=</span><span class="mi">10</span><span class="p">,</span> <span class="n">use_columns</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;trba_lite_g1&quot;</span><span class="p">,</span> <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span><span class="p">,</span> <span class="n">min_text_size</span><span class="o">=</span><span class="mi">5</span><span class="p">)</span>
+<span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">()</span>
+
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span>
+    <span class="n">detector</span><span class="o">=</span><span class="n">detector</span><span class="p">,</span>
+    <span class="n">layout</span><span class="o">=</span><span class="n">layout</span><span class="p">,</span>
+    <span class="n">recognizer</span><span class="o">=</span><span class="n">recognizer</span><span class="p">,</span>
+    <span class="n">corrector</span><span class="o">=</span><span class="n">corrector</span><span class="p">,</span>
+    <span class="n">layout_after</span><span class="o">=</span><span class="s2">&quot;detector&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="trba-region-preparation">
+<h2>Подготовка регионов в TRBA<a class="headerlink" href="#trba-region-preparation" title="Ссылка на этот заголовок"></a></h2>
+<p><code class="docutils literal notranslate"><span class="pre">TRBA</span></code> поддерживает настраиваемую подготовку кропов перед распознаванием.</p>
+<p>Настройки по умолчанию:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">region_preparer=&quot;bbox&quot;</span></code> вырезает осеориентированные bounding box</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">rotate_threshold=1.5</span></code> автоматически поворачивает высокие кропы перед распознаванием</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">min_text_size=5</span></code> пропускает слишком маленькие детекции</p></li>
+</ul>
+<p>Встроенные пресеты preparer:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;bbox&quot;</span></code>: осеориентированный кроп</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;polygon_mask&quot;</span></code>: плотный кроп с маскированием пикселей вне полигона в белый цвет</p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;quad_warp&quot;</span></code>: перспективное выравнивание для 4-точечных полигонов с переходом на bbox при необходимости</p></li>
+</ul>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.recognizers</span><span class="w"> </span><span class="kn">import</span> <span class="n">TRBA</span>
+
+<span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">(</span><span class="n">region_preparer</span><span class="o">=</span><span class="s2">&quot;bbox&quot;</span><span class="p">)</span>
+<span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">(</span><span class="n">region_preparer</span><span class="o">=</span><span class="s2">&quot;polygon_mask&quot;</span><span class="p">)</span>
+<span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">(</span><span class="n">region_preparer</span><span class="o">=</span><span class="s2">&quot;quad_warp&quot;</span><span class="p">)</span>
+<span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">(</span>
+    <span class="n">region_preparer</span><span class="o">=</span><span class="s2">&quot;bbox&quot;</span><span class="p">,</span>
+    <span class="n">region_preparer_options</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;pad&quot;</span><span class="p">:</span> <span class="mi">2</span><span class="p">},</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">region_preparer_options</span></code> зарезервирован для настройки встроенных пресетов:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;bbox&quot;</span></code> / <code class="docutils literal notranslate"><span class="pre">&quot;polygon_mask&quot;</span></code>: <code class="docutils literal notranslate"><span class="pre">pad</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;polygon_mask&quot;</span></code>: <code class="docutils literal notranslate"><span class="pre">background</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">&quot;quad_warp&quot;</span></code>: <code class="docutils literal notranslate"><span class="pre">output_size=(width,</span> <span class="pre">height)</span></code>, <code class="docutils literal notranslate"><span class="pre">fallback_to_bbox</span></code></p></li>
+</ul>
+<p>Для более сложных сценариев можно внедрить хуки в <code class="docutils literal notranslate"><span class="pre">TRBA</span></code> вместо того, чтобы писать полностью собственный распознаватель:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">numpy</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">np</span>
+
+<span class="k">def</span><span class="w"> </span><span class="nf">my_preparer</span><span class="p">(</span><span class="n">page</span><span class="p">,</span> <span class="n">image</span><span class="p">,</span> <span class="n">recognizer</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">options</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+    <span class="n">regions</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">block</span> <span class="ow">in</span> <span class="n">page</span><span class="o">.</span><span class="n">blocks</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">block</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
+            <span class="k">for</span> <span class="n">text_span</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">text_spans</span><span class="p">:</span>
+                <span class="n">poly</span> <span class="o">=</span> <span class="n">np</span><span class="o">.</span><span class="n">asarray</span><span class="p">(</span><span class="n">text_span</span><span class="o">.</span><span class="n">polygon</span><span class="p">,</span> <span class="n">dtype</span><span class="o">=</span><span class="n">np</span><span class="o">.</span><span class="n">float32</span><span class="p">)</span>
+                <span class="n">crop</span> <span class="o">=</span> <span class="n">image</span><span class="p">[</span><span class="mi">10</span><span class="p">:</span><span class="mi">40</span><span class="p">,</span> <span class="mi">10</span><span class="p">:</span><span class="mi">80</span><span class="p">]</span>
+                <span class="n">regions</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+                    <span class="p">{</span><span class="s2">&quot;text_span&quot;</span><span class="p">:</span> <span class="n">text_span</span><span class="p">,</span> <span class="s2">&quot;image&quot;</span><span class="p">:</span> <span class="n">crop</span><span class="p">,</span> <span class="s2">&quot;polygon&quot;</span><span class="p">:</span> <span class="n">poly</span><span class="p">}</span>
+                <span class="p">)</span>
+    <span class="k">return</span> <span class="n">regions</span>
+
+<span class="n">recognizer</span> <span class="o">=</span> <span class="n">TRBA</span><span class="p">(</span><span class="n">region_preparer</span><span class="o">=</span><span class="n">my_preparer</span><span class="p">)</span>
+</pre></div>
+</div>
+<p>Если нужен полный контроль над логикой распознавания, самым простым вариантом по-прежнему остаётся собственный класс распознавателя с <code class="docutils literal notranslate"><span class="pre">predict(page,</span> <span class="pre">image)</span> <span class="pre">-&gt;</span> <span class="pre">Page</span></code>.</p>
+</section>
+<section id="collapsing-text-spans">
+<h2>Объединение TextSpan<a class="headerlink" href="#collapsing-text-spans" title="Ссылка на этот заголовок"></a></h2>
+<p>Некоторые распознаватели работают с целыми строками или блоками, а не с кропами отдельных text span. Используйте <code class="docutils literal notranslate"><span class="pre">collapse_page_text_spans</span></code>, чтобы перед распознаванием преобразовать узкую структуру страницы в более широкую.</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">collapse_page_text_spans</span>
+
+<span class="n">line_level_page</span> <span class="o">=</span> <span class="n">collapse_page_text_spans</span><span class="p">(</span>
+    <span class="n">page</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="s2">&quot;line&quot;</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;bbox&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="n">block_level_page</span> <span class="o">=</span> <span class="n">collapse_page_text_spans</span><span class="p">(</span>
+    <span class="n">page</span><span class="p">,</span>
+    <span class="n">level</span><span class="o">=</span><span class="s2">&quot;block&quot;</span><span class="p">,</span>
+    <span class="n">method</span><span class="o">=</span><span class="s2">&quot;convex_hull&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+<p><code class="docutils literal notranslate"><span class="pre">&quot;line&quot;</span></code> сохраняет те же блоки и строки, но заменяет каждую строку одним объединённым <code class="docutils literal notranslate"><span class="pre">TextSpan</span></code>. <code class="docutils literal notranslate"><span class="pre">&quot;block&quot;</span></code> заменяет каждый блок одной строкой, содержащей один объединённый <code class="docutils literal notranslate"><span class="pre">TextSpan</span></code>.</p>
+<p>Также доступны низкоуровневые вспомогательные функции:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">merge_text_spans(text_spans,</span> <span class="pre">method=&quot;bbox&quot;)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">collapse_line_text_spans(line,</span> <span class="pre">method=&quot;bbox&quot;)</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">collapse_block_text_spans(block,</span> <span class="pre">method=&quot;bbox&quot;)</span></code></p></li>
+</ul>
+</section>
+<section id="visualization-and-profiling">
+<h2>Визуализация и профилирование<a class="headerlink" href="#visualization-and-profiling" title="Ссылка на этот заголовок"></a></h2>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="n">result</span><span class="p">,</span> <span class="n">vis_img</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">,</span> <span class="n">vis</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+<span class="n">vis_img</span><span class="o">.</span><span class="n">save</span><span class="p">(</span><span class="s2">&quot;output_visualization.jpg&quot;</span><span class="p">)</span>
+
+<span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">,</span> <span class="n">profile</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="intermediate-results">
+<h2>Промежуточные результаты<a class="headerlink" href="#intermediate-results" title="Ссылка на этот заголовок"></a></h2>
+<p>После каждого запуска pipeline сохраняет снимки промежуточных результатов:</p>
+<ul class="simple">
+<li><p><code class="docutils literal notranslate"><span class="pre">pipeline.last_detection_page</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pipeline.last_layout_page</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pipeline.last_recognition_page</span></code></p></li>
+<li><p><code class="docutils literal notranslate"><span class="pre">pipeline.last_correction_page</span></code></p></li>
+</ul>
+<p>Для пропущенных этапов соответствующее значение <code class="docutils literal notranslate"><span class="pre">last_*</span></code> остаётся <code class="docutils literal notranslate"><span class="pre">None</span></code>.</p>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Нижняя область">
+        <a href="model_zoo.html" class="btn btn-neutral float-left" title="Зоопарк моделей" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Предыдущая</a>
+        <a href="structure.html" class="btn btn-neutral float-right" title="Структура библиотеки" accesskey="n" rel="next">Следующая <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Авторские права 2026, Konstantin Kozhin. </p>
+  </div>
+
+  Собрано при помощи <a href="https://www.sphinx-doc.org/">Sphinx</a> с использованием
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">темы,</a>
+    предоставленной <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

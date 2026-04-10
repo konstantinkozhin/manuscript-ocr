@@ -1,0 +1,611 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="ru" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Корректоры &mdash; документация manuscript-ocr 0.1.11</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+      <link rel="stylesheet" type="text/css" href="../_static/language_switcher.css?v=d768f156" />
+      <link rel="stylesheet" type="text/css" href="../_static/model_zoo.css?v=2d297567" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=708478e6"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/translations.js?v=cd1d70c9"></script>
+      <script src="../_static/language_switcher.js?v=db730534"></script>
+      <script src="../_static/version_sidebar.js?v=50cbed02"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Алфавитный указатель" href="../genindex.html" />
+    <link rel="search" title="Поиск" href="../search.html" />
+    <link rel="next" title="Утилиты" href="utils.html" />
+    <link rel="prev" title="Распознаватели" href="recognizers.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            manuscript-ocr
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Поиск в документации" aria-label="Поиск в документации" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Меню навигации">
+              <p class="caption" role="heading"><span class="caption-text">Содержание:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../getting_started.html">Начало работы</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#installation">Установка</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#quick-start">Быстрый старт</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#example-notebooks">Примеры ноутбуков</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#main-components">Основные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#model-zoo">Зоопарк моделей</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../getting_started.html#related-work">Связанные работы</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../model_zoo.html">Зоопарк моделей</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#detection">Детекция</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#layout">Layout-анализ</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#recognition">Распознавание</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#correction">Посткоррекция</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../model_zoo.html#architecture-sources">Источники архитектур</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../pipeline_usage.html">Руководство по использованию Pipeline</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#stage-contracts">Контракты этапов</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#detector">Детектор</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#recognizer">Распознаватель</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#layout">Layout</a></li>
+<li class="toctree-l3"><a class="reference internal" href="../pipeline_usage.html#corrector">Корректор</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#basic-usage">Базовое использование</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#disable-stages">Отключение этапов</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#layout-placement">Положение этапа layout</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#built-in-components">Встроенные компоненты</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#trba-region-preparation">Подготовка регионов в TRBA</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#collapsing-text-spans">Объединение TextSpan</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#visualization-and-profiling">Визуализация и профилирование</a></li>
+<li class="toctree-l2"><a class="reference internal" href="../pipeline_usage.html#intermediate-results">Промежуточные результаты</a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../structure.html">Структура библиотеки</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="../structure.html#overview">Обзор</a></li>
+</ul>
+</li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Справочник API</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="pipeline.html">Конвейер</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline"><code class="docutils literal notranslate"><span class="pre">Pipeline</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.__init__"><code class="docutils literal notranslate"><span class="pre">Pipeline.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.predict"><code class="docutils literal notranslate"><span class="pre">Pipeline.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.get_text"><code class="docutils literal notranslate"><span class="pre">Pipeline.get_text()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_detection_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_detection_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_layout_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_layout_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_recognition_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_recognition_page</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="pipeline.html#manuscript._pipeline.Pipeline.last_correction_page"><code class="docutils literal notranslate"><span class="pre">Pipeline.last_correction_page</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="data.html">Структуры данных</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="data.html#data-model">Модель данных</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#compatibility">Совместимость</a></li>
+<li class="toctree-l3"><a class="reference internal" href="data.html#module-manuscript.data">Справочник модуля</a><ul>
+<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.TextSpan"><code class="docutils literal notranslate"><span class="pre">TextSpan</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Line"><code class="docutils literal notranslate"><span class="pre">Line</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Block"><code class="docutils literal notranslate"><span class="pre">Block</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="data.html#manuscript.data.Page"><code class="docutils literal notranslate"><span class="pre">Page</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="detectors.html">Детекторы</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST"><code class="docutils literal notranslate"><span class="pre">EAST</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.__init__"><code class="docutils literal notranslate"><span class="pre">EAST.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.default_weights_name"><code class="docutils literal notranslate"><span class="pre">EAST.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.export"><code class="docutils literal notranslate"><span class="pre">EAST.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.predict"><code class="docutils literal notranslate"><span class="pre">EAST.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">EAST.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.EAST.train"><code class="docutils literal notranslate"><span class="pre">EAST.train()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO"><code class="docutils literal notranslate"><span class="pre">YOLO</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.__init__"><code class="docutils literal notranslate"><span class="pre">YOLO.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.config_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.default_target_size"><code class="docutils literal notranslate"><span class="pre">YOLO.default_target_size</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.default_weights_name"><code class="docutils literal notranslate"><span class="pre">YOLO.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.predict"><code class="docutils literal notranslate"><span class="pre">YOLO.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="detectors.html#manuscript.detectors.YOLO.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">YOLO.pretrained_registry</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="detectors.html#east-training-quads">Четырёхугольные области для обучения EAST</a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="layouts.html">Layout-модели</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting"><code class="docutils literal notranslate"><span class="pre">SimpleSorting</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting.__init__"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="layouts.html#manuscript.layouts.SimpleSorting.predict"><code class="docutils literal notranslate"><span class="pre">SimpleSorting.predict()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="recognizers.html">Распознаватели</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA"><code class="docutils literal notranslate"><span class="pre">TRBA</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.__init__"><code class="docutils literal notranslate"><span class="pre">TRBA.__init__()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.charset_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.charset_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.config_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.config_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.default_weights_name"><code class="docutils literal notranslate"><span class="pre">TRBA.default_weights_name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.export"><code class="docutils literal notranslate"><span class="pre">TRBA.export()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.predict"><code class="docutils literal notranslate"><span class="pre">TRBA.predict()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.pretrained_registry"><code class="docutils literal notranslate"><span class="pre">TRBA.pretrained_registry</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="recognizers.html#manuscript.recognizers.TRBA.train"><code class="docutils literal notranslate"><span class="pre">TRBA.train()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Корректоры</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#charlm"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#manuscript.correctors.CharLM"><code class="docutils literal notranslate"><span class="pre">CharLM</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#overview">Обзор</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#available-presets">Доступные пресеты</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#quick-example">Быстрый пример</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#basic-usage">Базовое использование</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#advanced-configuration">Расширенная конфигурация</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#using-custom-lexicon">Использование пользовательского лексикона</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#training-custom-model">Обучение пользовательской модели</a></li>
+<li class="toctree-l4"><a class="reference internal" href="#export-to-onnx">Экспорт в ONNX</a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="utils.html">Утилиты</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.read_image"><code class="docutils literal notranslate"><span class="pre">read_image()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.create_page_from_text"><code class="docutils literal notranslate"><span class="pre">create_page_from_text()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.visualize_page"><code class="docutils literal notranslate"><span class="pre">visualize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.organize_page"><code class="docutils literal notranslate"><span class="pre">organize_page()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.crop_axis_aligned"><code class="docutils literal notranslate"><span class="pre">crop_axis_aligned()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.crop_polygon_mask"><code class="docutils literal notranslate"><span class="pre">crop_polygon_mask()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.merge_polygons"><code class="docutils literal notranslate"><span class="pre">merge_polygons()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.order_quad_points"><code class="docutils literal notranslate"><span class="pre">order_quad_points()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.polygon_to_bbox"><code class="docutils literal notranslate"><span class="pre">polygon_to_bbox()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.warp_quad"><code class="docutils literal notranslate"><span class="pre">warp_quad()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.merge_text_spans"><code class="docutils literal notranslate"><span class="pre">merge_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.collapse_line_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_line_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.collapse_block_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_block_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.collapse_page_text_spans"><code class="docutils literal notranslate"><span class="pre">collapse_page_text_spans()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="utils.html#manuscript.utils.set_seed"><code class="docutils literal notranslate"><span class="pre">set_seed()</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="../related_work.html">Связанные работы</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Меню навигации для мобильных устройств" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">manuscript-ocr</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Навигация по страницам">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Справочник API</a></li>
+      <li class="breadcrumb-item active">Корректоры</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/api/correctors.rst.txt" rel="nofollow"> Просмотреть исходный код страницы</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="correctors">
+<h1>Корректоры<a class="headerlink" href="#correctors" title="Ссылка на этот заголовок"></a></h1>
+<p>Символьный корректор текста для постобработки результатов OCR.</p>
+<section id="charlm">
+<h2><code class="docutils literal notranslate"><span class="pre">CharLM</span></code><a class="headerlink" href="#charlm" title="Ссылка на этот заголовок"></a></h2>
+<dl class="py class">
+<dt class="sig sig-object py" id="manuscript.correctors.CharLM">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">manuscript.correctors.</span></span><span class="sig-name descname"><span class="pre">CharLM</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vocab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lexicon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_edits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_word_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/correctors/_charlm.html#CharLM"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.correctors.CharLM" title="Ссылка на это определение"></a></dt>
+<dd><p>Базовые классы: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseCorrector</span></code></p>
+<p>Символьная языковая модель-корректор на базе ONNX Runtime.</p>
+<p>CharLM использует маскированную языковую модель на основе Transformer для исправления OCR-ошибок на уровне символов. Анализирует уверенность в символах и применяет исправления на основе выученных шаблонов замен.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Путь или идентификатор для весов модели ONNX. Поддерживает: локальный путь, HTTP/HTTPS URL, GitHub release, Google Drive, имя пресета (<code class="docutils literal notranslate"><span class="pre">&quot;prereform_charlm_g1&quot;</span></code> или <code class="docutils literal notranslate"><span class="pre">&quot;modern_charlm_g1&quot;</span></code>), <code class="docutils literal notranslate"><span class="pre">None</span></code> — автозагрузка пресета по умолчанию (prereform_charlm_g1)</p></li>
+<li><p><strong>vocab</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Путь к JSON-файлу словаря. Если None, определяется из расположения весов.</p></li>
+<li><p><strong>lexicon</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em>, </em><em>Path</em><em>, or </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(в Python v3.14)"><em>set</em></a><em>, </em><em>optional</em>) – Список слов для валидации по словарю. Поддерживает: локальный путь, имя пресета (<code class="docutils literal notranslate"><span class="pre">&quot;prereform_words&quot;</span></code> или <code class="docutils literal notranslate"><span class="pre">&quot;modern_words&quot;</span></code>), Python set, <code class="docutils literal notranslate"><span class="pre">None</span></code> — автозагрузка лексикона для пресета модели (prereform_words для prereform_charlm_g1, modern_words для modern_charlm_g1)</p></li>
+<li><p><strong>device</strong> (<em>{&quot;cuda&quot;</em><em>, </em><em>&quot;cpu&quot;}</em><em>, </em><em>optional</em>) – Вычислительное устройство. По умолчанию определяется автоматически.</p></li>
+<li><p><strong>mask_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Порог уверенности, ниже которого символы рассматриваются для исправления. По умолчанию 0.05.</p></li>
+<li><p><strong>apply_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Минимальная уверенность модели для применения исправления. По умолчанию 0.95.</p></li>
+<li><p><strong>max_edits</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Максимальное количество правок на слово. По умолчанию 2.</p></li>
+<li><p><strong>min_word_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Минимальная длина слова для попытки исправления. По умолчанию 4.</p></li>
+<li><p><strong>**kwargs</strong> – Дополнительные опции конфигурации.</p></li>
+<li><p><strong>force_download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>max_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+<p class="rubric">Примеры</p>
+<div class="doctest highlight-default notranslate"><div class="highlight"><pre><span></span><span class="gp">&gt;&gt;&gt; </span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharLM</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">()</span>
+<span class="gp">&gt;&gt;&gt; </span><span class="n">corrected_page</span> <span class="o">=</span> <span class="n">corrector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+</pre></div>
+</div>
+<p class="rubric">Методы</p>
+<table class="autosummary longtable docutils align-default">
+<tbody>
+<tr class="row-odd"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">__call__</span></code>(*args, **kwargs)</p></td>
+<td><p>Вызов объекта как функции.</p></td>
+</tr>
+<tr class="row-even"><td><p><a class="reference internal" href="#manuscript.correctors.CharLM.export" title="manuscript.correctors.CharLM.export"><code class="xref py py-obj docutils literal notranslate"><span class="pre">export</span></code></a>(weights_path, vocab_path, output_path)</p></td>
+<td><p>Экспорт модели CharLM из PyTorch в формат ONNX.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#manuscript.correctors.CharLM.predict" title="manuscript.correctors.CharLM.predict"><code class="xref py py-obj docutils literal notranslate"><span class="pre">predict</span></code></a>(page[, image])</p></td>
+<td><p>Применить символьное исправление к странице Page.</p></td>
+</tr>
+<tr class="row-even"><td><p><code class="xref py py-obj docutils literal notranslate"><span class="pre">runtime_providers</span></code>()</p></td>
+<td><p>Получить провайдеры выполнения ONNX Runtime в зависимости от устройства.</p></td>
+</tr>
+<tr class="row-odd"><td><p><a class="reference internal" href="#manuscript.correctors.CharLM.train" title="manuscript.correctors.CharLM.train"><code class="xref py py-obj docutils literal notranslate"><span class="pre">train</span></code></a>([words_path, text_path, pairs_path, ...])</p></td>
+<td><p>Обучить символьную языковую модель CharLM.</p></td>
+</tr>
+</tbody>
+</table>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manuscript.correctors.CharLM.default_weights_name">
+<span class="sig-name descname"><span class="pre">default_weights_name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(в Python v3.14)"><span class="pre">None</span></a></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'prereform_charlm_g1'</span></em><a class="headerlink" href="#manuscript.correctors.CharLM.default_weights_name" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manuscript.correctors.CharLM.pretrained_registry">
+<span class="sig-name descname"><span class="pre">pretrained_registry</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">Dict</span><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><span class="pre">str</span></a><span class="p"><span class="pre">]</span></span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'modern_charlm_g1':</span> <span class="pre">'https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.onnx',</span> <span class="pre">'prereform_charlm_g1':</span> <span class="pre">'https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.onnx'}</span></em><a class="headerlink" href="#manuscript.correctors.CharLM.pretrained_registry" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manuscript.correctors.CharLM.vocab_registry">
+<span class="sig-name descname"><span class="pre">vocab_registry</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'modern_charlm_g1':</span> <span class="pre">'https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.json',</span> <span class="pre">'prereform_charlm_g1':</span> <span class="pre">'https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.json'}</span></em><a class="headerlink" href="#manuscript.correctors.CharLM.vocab_registry" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manuscript.correctors.CharLM.lexicon_registry">
+<span class="sig-name descname"><span class="pre">lexicon_registry</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'modern_words':</span> <span class="pre">'https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_words.txt',</span> <span class="pre">'prereform_words':</span> <span class="pre">'https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt'}</span></em><a class="headerlink" href="#manuscript.correctors.CharLM.lexicon_registry" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="manuscript.correctors.CharLM.default_lexicon_for_model">
+<span class="sig-name descname"><span class="pre">default_lexicon_for_model</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'modern_charlm_g1':</span> <span class="pre">'modern_words',</span> <span class="pre">'prereform_charlm_g1':</span> <span class="pre">'prereform_words'}</span></em><a class="headerlink" href="#manuscript.correctors.CharLM.default_lexicon_for_model" title="Ссылка на это определение"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.correctors.CharLM.__init__">
+<span class="sig-name descname"><span class="pre">__init__</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vocab</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lexicon</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">device</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">force_download</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.05</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">apply_threshold</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.95</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_edits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_word_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">4</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/correctors/_charlm.html#CharLM.__init__"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.correctors.CharLM.__init__" title="Ссылка на это определение"></a></dt>
+<dd><dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(в Python v3.14)"><em>Path</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>vocab</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(в Python v3.14)"><em>Path</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>lexicon</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/pathlib.html#pathlib.Path" title="(в Python v3.14)"><em>Path</em></a><em> | </em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#set" title="(в Python v3.14)"><em>set</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>device</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> | </em><em>None</em>)</p></li>
+<li><p><strong>force_download</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a>)</p></li>
+<li><p><strong>mask_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>apply_threshold</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a>)</p></li>
+<li><p><strong>max_edits</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>min_word_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a>)</p></li>
+<li><p><strong>max_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a>)</p></li>
+</ul>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.correctors.CharLM.predict">
+<span class="sig-name descname"><span class="pre">predict</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">page</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">image</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/correctors/_charlm.html#CharLM.predict"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.correctors.CharLM.predict" title="Ссылка на это определение"></a></dt>
+<dd><p>Применить символьное исправление к странице Page.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>page</strong> (<a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page"><em>Page</em></a>) – Входной объект Page с распознанным текстом.</p></li>
+<li><p><strong>image</strong> (<em>np.ndarray</em><em>, </em><em>optional</em>) – Optional source image associated with <code class="docutils literal notranslate"><span class="pre">page</span></code>.
+Reserved for integrations that may pass the original image
+to correctors. <code class="docutils literal notranslate"><span class="pre">CharLM</span></code> does not use this argument.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Corrected Page object with updated text-span texts.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="data.html#manuscript.data.Page" title="manuscript.data.Page">Page</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.correctors.CharLM.train">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">train</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">words_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">text_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pairs_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">charset_path</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="keyword-only-separator o"><abbr title="Keyword-only parameters separator (PEP 3102)"><span class="pre">*</span></abbr></span></em>, <em class="sig-param"><span class="n"><span class="pre">exp_dir</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">'exp_charlm'</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_words</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1500000</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_pairs_edits</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emb_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">192</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_heads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ffn_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">dropout</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">batch_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">256</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">accumulation_steps</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">use_amp</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">compile_model</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">False</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">epochs</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">50</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">lr</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.001</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">weight_decay</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">grad_clip</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1.0</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">min_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">mask_prob</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">span_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">span_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">3</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spans_min</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">spans_max</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">2</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">pairs_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">eval_ratio</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">0.01</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">seed</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">42</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">checkpoint</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">None</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">extra_config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/correctors/_charlm.html#CharLM.train"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.correctors.CharLM.train" title="Ссылка на это определение"></a></dt>
+<dd><p>Обучить символьную языковую модель CharLM.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>words_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Путь к файлу слов (одно слово на строку).</p></li>
+<li><p><strong>text_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Путь к текстовому файлу для n-граммового датасета.</p></li>
+<li><p><strong>pairs_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> or </em><em>Path</em><em>, </em><em>optional</em>) – Путь к CSV-файлу с парами неправильный/правильный.</p></li>
+<li><p><strong>charset_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> or </em><em>Path</em>) – Путь к файлу набора символов (допустимые символы).</p></li>
+<li><p><strong>exp_dir</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Директория эксперимента. По умолчанию «exp_charlm».</p></li>
+<li><p><strong>max_words</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Максимальное количество слов из файла. По умолчанию 1_500_000.</p></li>
+<li><p><strong>max_pairs_edits</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Максимальное количество символьных правок в парах. По умолчанию 3.</p></li>
+<li><p><strong>max_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Максимальная длина последовательности. По умолчанию 32.</p></li>
+<li><p><strong>emb_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Размер эмбеддингов. По умолчанию 192.</p></li>
+<li><p><strong>n_layers</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Количество слоёв трансформера. По умолчанию 8.</p></li>
+<li><p><strong>n_heads</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Количество голов внимания. По умолчанию 6.</p></li>
+<li><p><strong>ffn_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Размер feed-forward сети. По умолчанию 1024.</p></li>
+<li><p><strong>dropout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Коэффициент dropout. По умолчанию 0.1.</p></li>
+<li><p><strong>batch_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Размер батча. По умолчанию 256.</p></li>
+<li><p><strong>accumulation_steps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Шаги накопления градиента. По умолчанию 2.</p></li>
+<li><p><strong>use_amp</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Использовать автоматическую смешанную точность (AMP). По умолчанию True.</p></li>
+<li><p><strong>compile_model</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Использовать torch.compile для ускорения обучения. По умолчанию False.</p></li>
+<li><p><strong>epochs</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Количество эпох. По умолчанию 50.</p></li>
+<li><p><strong>lr</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Скорость обучения. По умолчанию 1e-3.</p></li>
+<li><p><strong>weight_decay</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Затухание весов. По умолчанию 0.01.</p></li>
+<li><p><strong>grad_clip</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Отсечение градиента. По умолчанию 1.0.</p></li>
+<li><p><strong>min_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Минимальная длина слова. По умолчанию 3.</p></li>
+<li><p><strong>mask_prob</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Вероятность использования span masking. По умолчанию 0.3.</p></li>
+<li><p><strong>span_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Минимальная длина span для маскирования. По умолчанию 1.</p></li>
+<li><p><strong>span_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Максимальная длина span для маскирования. По умолчанию 3.</p></li>
+<li><p><strong>spans_min</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Минимальное количество span. По умолчанию 1.</p></li>
+<li><p><strong>spans_max</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Максимальное количество span. По умолчанию 2.</p></li>
+<li><p><strong>pairs_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Соотношение OCR-пар в смешанном датасете (0.8 = 80% пар, 20% n-грамм). По умолчанию 0.8.</p></li>
+<li><p><strong>eval_ratio</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(в Python v3.14)"><em>float</em></a><em>, </em><em>optional</em>) – Доля валидационного набора. По умолчанию 0.01.</p></li>
+<li><p><strong>seed</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Случайное зерно. По умолчанию 42.</p></li>
+<li><p><strong>checkpoint</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em>, </em><em>optional</em>) – Путь к чекпоинту для продолжения обучения.</p></li>
+<li><p><strong>**extra_config</strong> – Дополнительные опции конфигурации.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Результат<span class="colon">:</span></dt>
+<dd class="field-even"><p>Путь к финальному чекпоинту.</p>
+</dd>
+<dt class="field-odd">Тип результата<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="manuscript.correctors.CharLM.export">
+<em class="property"><span class="k"><span class="pre">static</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">export</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">weights_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">vocab_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">output_path</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">max_len</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">32</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">emb_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">192</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_layers</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">8</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">n_heads</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">6</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">ffn_size</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">1024</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">opset_version</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">14</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">simplify</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">True</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/manuscript/correctors/_charlm.html#CharLM.export"><span class="viewcode-link"><span class="pre">[исходный</span> <span class="pre">код]</span></span></a><a class="headerlink" href="#manuscript.correctors.CharLM.export" title="Ссылка на это определение"></a></dt>
+<dd><p>Экспорт модели CharLM из PyTorch в формат ONNX.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Параметры<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>weights_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> or </em><em>Path</em>) – Путь к чекпоинту PyTorch (.pt файл).</p></li>
+<li><p><strong>vocab_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> or </em><em>Path</em>) – Путь к JSON-файлу словаря.</p></li>
+<li><p><strong>output_path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(в Python v3.14)"><em>str</em></a><em> or </em><em>Path</em>) – Путь для сохранения модели ONNX.</p></li>
+<li><p><strong>max_len</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Максимальная длина последовательности. По умолчанию 32.</p></li>
+<li><p><strong>emb_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Размер эмбеддингов. По умолчанию 192.</p></li>
+<li><p><strong>n_layers</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Количество слоёв трансформера. По умолчанию 8.</p></li>
+<li><p><strong>n_heads</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Количество голов внимания. По умолчанию 6.</p></li>
+<li><p><strong>ffn_size</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Размер feed-forward сети. По умолчанию 1024.</p></li>
+<li><p><strong>opset_version</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(в Python v3.14)"><em>int</em></a><em>, </em><em>optional</em>) – Версия opset ONNX. По умолчанию 14.</p></li>
+<li><p><strong>simplify</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(в Python v3.14)"><em>bool</em></a><em>, </em><em>optional</em>) – Применить упрощение ONNX. По умолчанию True.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Тип результата<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(в Python v3.14)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<section id="overview">
+<h3>Обзор<a class="headerlink" href="#overview" title="Ссылка на этот заголовок"></a></h3>
+<p><code class="docutils literal notranslate"><span class="pre">CharLM</span></code> — это символьный корректор на основе маскированной языковой модели, использующий архитектуру Transformer для исправления OCR-ошибок. Анализирует контекст на уровне символов и применяет исправления на основе выученных паттернов.</p>
+<p><strong>Ключевые возможности:</strong></p>
+<ul class="simple">
+<li><p>Исправление на символьном уровне на основе Transformer</p></li>
+<li><p>Настраиваемые пороги уверенности</p></li>
+<li><p>Поддержка пользовательских словарей и лексиконов</p></li>
+<li><p>Инференс через ONNX Runtime для быстрого исправления</p></li>
+<li><p>Опциональная фильтрация лексиконом для сохранения известных слов</p></li>
+</ul>
+</section>
+<section id="available-presets">
+<h3>Доступные пресеты<a class="headerlink" href="#available-presets" title="Ссылка на этот заголовок"></a></h3>
+<p>Доступны следующие предобученные модели:</p>
+<table class="docutils align-default">
+<colgroup>
+<col style="width: 30.0%" />
+<col style="width: 70.0%" />
+</colgroup>
+<thead>
+<tr class="row-odd"><th class="head"><p>Имя пресета</p></th>
+<th class="head"><p>Описание</p></th>
+</tr>
+</thead>
+<tbody>
+<tr class="row-even"><td><p><code class="docutils literal notranslate"><span class="pre">prereform_charlm_g1</span></code></p></td>
+<td><p>Дореформенный русский текст (по умолчанию)</p></td>
+</tr>
+<tr class="row-odd"><td><p><code class="docutils literal notranslate"><span class="pre">modern_charlm_g1</span></code></p></td>
+<td><p>Современный русский текст</p></td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="quick-example">
+<h3>Быстрый пример<a class="headerlink" href="#quick-example" title="Ссылка на этот заголовок"></a></h3>
+<p>Используйте <code class="docutils literal notranslate"><span class="pre">create_page_from_text</span></code> для быстрой проверки исправления текста:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">create_page_from_text</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharLM</span>
+
+<span class="c1"># Create page from text with potential OCR errors</span>
+<span class="n">page</span> <span class="o">=</span> <span class="n">create_page_from_text</span><span class="p">([</span><span class="s2">&quot;Привѣтъ міръ&quot;</span><span class="p">,</span> <span class="s2">&quot;Тестовая строка&quot;</span><span class="p">])</span>
+
+<span class="c1"># Apply correction (using default prereform model)</span>
+<span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">()</span>
+<span class="n">corrected</span> <span class="o">=</span> <span class="n">corrector</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="n">page</span><span class="p">)</span>
+
+<span class="c1"># Optional: pass source image for context-aware custom correctors</span>
+<span class="c1"># (CharLM currently ignores this argument)</span>
+<span class="c1"># corrected = corrector.predict(page, image=image_array)</span>
+
+<span class="c1"># Extract corrected text</span>
+<span class="k">for</span> <span class="n">line</span> <span class="ow">in</span> <span class="n">corrected</span><span class="o">.</span><span class="n">blocks</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">lines</span><span class="p">:</span>
+    <span class="n">text</span> <span class="o">=</span> <span class="s2">&quot; &quot;</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="n">span</span><span class="o">.</span><span class="n">text</span> <span class="k">for</span> <span class="n">span</span> <span class="ow">in</span> <span class="n">line</span><span class="o">.</span><span class="n">text_spans</span> <span class="k">if</span> <span class="n">span</span><span class="o">.</span><span class="n">text</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">text</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="basic-usage">
+<h3>Базовое использование<a class="headerlink" href="#basic-usage" title="Ссылка на этот заголовок"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript</span><span class="w"> </span><span class="kn">import</span> <span class="n">Pipeline</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharLM</span>
+
+<span class="c1"># Create corrector with default preset</span>
+<span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">()</span>
+
+<span class="c1"># Create corrector with specific preset</span>
+<span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">(</span><span class="n">weights</span><span class="o">=</span><span class="s2">&quot;modern_charlm_g1&quot;</span><span class="p">)</span>
+
+<span class="c1"># Use in pipeline</span>
+<span class="n">pipeline</span> <span class="o">=</span> <span class="n">Pipeline</span><span class="p">(</span><span class="n">corrector</span><span class="o">=</span><span class="n">corrector</span><span class="p">)</span>
+<span class="n">result</span> <span class="o">=</span> <span class="n">pipeline</span><span class="o">.</span><span class="n">predict</span><span class="p">(</span><span class="s2">&quot;document.jpg&quot;</span><span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="advanced-configuration">
+<h3>Расширенная конфигурация<a class="headerlink" href="#advanced-configuration" title="Ссылка на этот заголовок"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharLM</span>
+
+<span class="c1"># Fine-tune correction behavior</span>
+<span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">(</span>
+    <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;prereform_charlm_g1&quot;</span><span class="p">,</span>
+    <span class="n">mask_threshold</span><span class="o">=</span><span class="mf">0.05</span><span class="p">,</span>      <span class="c1"># Characters with confidence below this are corrected</span>
+    <span class="n">apply_threshold</span><span class="o">=</span><span class="mf">0.95</span><span class="p">,</span>     <span class="c1"># Model must be this confident to apply correction</span>
+    <span class="n">max_edits</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span>              <span class="c1"># Maximum edits per word</span>
+    <span class="n">min_word_len</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span>           <span class="c1"># Minimum word length to attempt correction</span>
+    <span class="n">device</span><span class="o">=</span><span class="s2">&quot;cuda&quot;</span>             <span class="c1"># Use GPU for inference</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="using-custom-lexicon">
+<h3>Использование пользовательского лексикона<a class="headerlink" href="#using-custom-lexicon" title="Ссылка на этот заголовок"></a></h3>
+<p>Вы можете предоставить лексикон (список слов) для предотвращения исправления известных слов:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharLM</span>
+
+<span class="c1"># From preset</span>
+<span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">(</span>
+    <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;prereform_charlm_g1&quot;</span><span class="p">,</span>
+    <span class="n">lexicon</span><span class="o">=</span><span class="s2">&quot;prereform_words&quot;</span>  <span class="c1"># Use preset lexicon</span>
+<span class="p">)</span>
+
+<span class="c1"># From file</span>
+<span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">(</span>
+    <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;prereform_charlm_g1&quot;</span><span class="p">,</span>
+    <span class="n">lexicon</span><span class="o">=</span><span class="s2">&quot;path/to/words.txt&quot;</span>
+<span class="p">)</span>
+
+<span class="c1"># From set</span>
+<span class="n">my_words</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;слово1&quot;</span><span class="p">,</span> <span class="s2">&quot;слово2&quot;</span><span class="p">,</span> <span class="s2">&quot;слово3&quot;</span><span class="p">}</span>
+<span class="n">corrector</span> <span class="o">=</span> <span class="n">CharLM</span><span class="p">(</span>
+    <span class="n">weights</span><span class="o">=</span><span class="s2">&quot;prereform_charlm_g1&quot;</span><span class="p">,</span>
+    <span class="n">lexicon</span><span class="o">=</span><span class="n">my_words</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="training-custom-model">
+<h3>Обучение пользовательской модели<a class="headerlink" href="#training-custom-model" title="Ссылка на этот заголовок"></a></h3>
+<p>Вы можете обучить CharLM на своих данных:</p>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharLM</span>
+
+<span class="c1"># Train with OCR pairs dataset</span>
+<span class="n">checkpoint_path</span> <span class="o">=</span> <span class="n">CharLM</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
+    <span class="n">pairs_path</span><span class="o">=</span><span class="s2">&quot;ocr_pairs.csv&quot;</span><span class="p">,</span>      <span class="c1"># CSV with incorrect,correct columns</span>
+    <span class="n">charset_path</span><span class="o">=</span><span class="s2">&quot;charset.txt&quot;</span><span class="p">,</span>       <span class="c1"># Allowed characters</span>
+    <span class="n">exp_dir</span><span class="o">=</span><span class="s2">&quot;my_charlm_exp&quot;</span><span class="p">,</span>
+    <span class="n">epochs</span><span class="o">=</span><span class="mi">50</span><span class="p">,</span>
+    <span class="n">batch_size</span><span class="o">=</span><span class="mi">256</span><span class="p">,</span>
+<span class="p">)</span>
+
+<span class="c1"># Train with word list (self-supervised)</span>
+<span class="n">checkpoint_path</span> <span class="o">=</span> <span class="n">CharLM</span><span class="o">.</span><span class="n">train</span><span class="p">(</span>
+    <span class="n">words_path</span><span class="o">=</span><span class="s2">&quot;words.txt&quot;</span><span class="p">,</span>           <span class="c1"># One word per line</span>
+    <span class="n">charset_path</span><span class="o">=</span><span class="s2">&quot;charset.txt&quot;</span><span class="p">,</span>
+    <span class="n">exp_dir</span><span class="o">=</span><span class="s2">&quot;my_charlm_exp&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+<section id="export-to-onnx">
+<h3>Экспорт в ONNX<a class="headerlink" href="#export-to-onnx" title="Ссылка на этот заголовок"></a></h3>
+<div class="highlight-python notranslate"><div class="highlight"><pre><span></span><span class="kn">from</span><span class="w"> </span><span class="nn">manuscript.correctors</span><span class="w"> </span><span class="kn">import</span> <span class="n">CharLM</span>
+
+<span class="c1"># Export trained model to ONNX</span>
+<span class="n">CharLM</span><span class="o">.</span><span class="n">export</span><span class="p">(</span>
+    <span class="n">weights_path</span><span class="o">=</span><span class="s2">&quot;exp/checkpoints/charlm_epoch_50.pt&quot;</span><span class="p">,</span>
+    <span class="n">vocab_path</span><span class="o">=</span><span class="s2">&quot;exp/vocab.json&quot;</span><span class="p">,</span>
+    <span class="n">output_path</span><span class="o">=</span><span class="s2">&quot;my_model.onnx&quot;</span><span class="p">,</span>
+<span class="p">)</span>
+</pre></div>
+</div>
+</section>
+</section>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Нижняя область">
+        <a href="recognizers.html" class="btn btn-neutral float-left" title="Распознаватели" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Предыдущая</a>
+        <a href="utils.html" class="btn btn-neutral float-right" title="Утилиты" accesskey="n" rel="next">Следующая <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Авторские права 2026, Konstantin Kozhin. </p>
+  </div>
+
+  Собрано при помощи <a href="https://www.sphinx-doc.org/">Sphinx</a> с использованием
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">темы,</a>
+    предоставленной <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
