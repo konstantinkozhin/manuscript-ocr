@@ -4,7 +4,6 @@
 # package.
 # FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #
-#, fuzzy
 msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr \n"
@@ -31,7 +30,7 @@ msgstr "Модели распознавания текста."
 
 #: 3f3051c976164512881c90eab5526fa3 manuscript.recognizers._trba.TRBA:1 of
 msgid "Bases: :py:class:`~manuscript.api.base.BaseModel`"
-msgstr ""
+msgstr "Базовый класс: :py:class:`~manuscript.api.base.BaseModel`"
 
 #: afb502db8cb048c98ba0088c947c5370 manuscript.recognizers._trba.TRBA:2 of
 msgid "Initialize TRBA text recognition model with ONNX Runtime."
@@ -130,6 +129,8 @@ msgid ""
 "Compute device. If ``None``, automatically selects CPU. For GPU/CoreML "
 "acceleration:"
 msgstr ""
+"Устройство вычислений. Если ``None``, автоматически выбирается CPU. Для "
+"ускорения GPU/CoreML:"
 
 #: bbbfbd8922ef4070818fd769fc00c354 manuscript.recognizers._trba.TRBA:27 of
 msgid "CUDA (NVIDIA): ``pip install onnxruntime-gpu``"
@@ -150,6 +151,10 @@ msgid ""
 " degrees clockwise. Set to ``0`` or ``None`` to disable. Default is "
 "``1.5``."
 msgstr ""
+"Порог отношения сторон для поворота вертикальных кропов слов перед "
+"распознаванием. Если ``height > width * rotate_threshold``, кроп "
+"поворачивается на 90 градусов по часовой стрелке. Чтобы отключить поворот, "
+"установите ``0`` или ``None``. По умолчанию ``1.5``."
 
 #: bc8550cdfc7644309c0c86d693b47ad6 manuscript.recognizers._trba.TRBA:39 of
 msgid "Additional configuration options (reserved for future use)."
@@ -172,7 +177,7 @@ msgstr "Если формат весов некорректен."
 #: 5e6650e14c7b490394475adeea45ef40 manuscript.recognizers._trba.TRBA:45
 #: manuscript.recognizers._trba.TRBA.export:38 of
 msgid "Notes"
-msgstr ""
+msgstr "Примечания"
 
 #: d7d54a9a3a5a427e814ddab819db1a21 manuscript.recognizers._trba.TRBA:46 of
 msgid "The class provides three main public methods:"
@@ -235,11 +240,13 @@ msgid ""
 ":py:obj:`__call__ <manuscript.recognizers.TRBA.__call__>`\\ \\(\\*args\\,"
 " \\*\\*kwargs\\)"
 msgstr ""
+":py:obj:`__call__ <manuscript.recognizers.TRBA.__call__>`\\ \\(\\*args\\,"
+" \\*\\*kwargs\\)"
 
 #: d6763d6771a84ff2a84c1ee78b04973f
 #: manuscript.recognizers._trba.TRBA:100:<autosummary>:1 of
 msgid "Call self as a function."
-msgstr ""
+msgstr "Вызов объекта как функции."
 
 #: 79e1b1d889a84949a1b4bb96bd86e566
 #: manuscript.recognizers._trba.TRBA:100:<autosummary>:1 of
@@ -247,12 +254,13 @@ msgid ""
 ":py:obj:`export <manuscript.recognizers.TRBA.export>`\\ "
 "\\(weights\\_path\\, config\\_path\\, ...\\[\\, ...\\]\\)"
 msgstr ""
+":py:obj:`export <manuscript.recognizers.TRBA.export>`\\ "
+"\\(weights\\_path\\, config\\_path\\, ...\\[\\, ...\\]\\)"
 
 #: a6fcc08ad59f42a9a712c1540c97b36c manuscript.recognizers._trba.TRBA.export:2
 #: manuscript.recognizers._trba.TRBA:100:<autosummary>:1 of
-#, fuzzy
 msgid "Export TRBA PyTorch model to ONNX format."
-msgstr "Экспорт модели TRBA в ONNX:"
+msgstr "Экспортировать модель TRBA из PyTorch в формат ONNX."
 
 #: 29920d2212e248bfaf4a82f175e19f90
 #: manuscript.recognizers._trba.TRBA:100:<autosummary>:1 of
@@ -260,6 +268,8 @@ msgid ""
 ":py:obj:`predict <manuscript.recognizers.TRBA.predict>`\\ \\(images\\[\\,"
 " batch\\_size\\]\\)"
 msgstr ""
+":py:obj:`predict <manuscript.recognizers.TRBA.predict>`\\ \\(images\\[\\,"
+" batch\\_size\\]\\)"
 
 #: 3100eb7539bb45ddb64b6658f66489cb manuscript.recognizers._trba.TRBA.predict:2
 #: manuscript.recognizers._trba.TRBA:100:<autosummary>:1 of
@@ -272,11 +282,13 @@ msgid ""
 ":py:obj:`runtime_providers "
 "<manuscript.recognizers.TRBA.runtime_providers>`\\ \\(\\)"
 msgstr ""
+":py:obj:`runtime_providers "
+"<manuscript.recognizers.TRBA.runtime_providers>`\\ \\(\\)"
 
 #: 237f0749971c43b4b0c7955dcf4f0c7a
 #: manuscript.recognizers._trba.TRBA:100:<autosummary>:1 of
 msgid "Get ONNX Runtime execution providers based on device."
-msgstr ""
+msgstr "Получить провайдеры выполнения ONNX Runtime в зависимости от устройства."
 
 #: 60aef1429f8e4d9aac9d6566e2b13f91
 #: manuscript.recognizers._trba.TRBA:100:<autosummary>:1 of
@@ -284,14 +296,13 @@ msgid ""
 ":py:obj:`train <manuscript.recognizers.TRBA.train>`\\ \\(train\\_csvs\\, "
 "train\\_roots\\[\\, val\\_csvs\\, ...\\]\\)"
 msgstr ""
+":py:obj:`train <manuscript.recognizers.TRBA.train>`\\ \\(train\\_csvs\\, "
+"train\\_roots\\[\\, val\\_csvs\\, ...\\]\\)"
 
 #: 72d106844b144c678e14769456446c49 manuscript.recognizers._trba.TRBA.train:2
 #: manuscript.recognizers._trba.TRBA:100:<autosummary>:1 of
-#, fuzzy
 msgid "Train TRBA text recognition model on custom datasets."
-msgstr ""
-"Инициализация модели распознавания текста TRBA с использованием ONNX "
-"Runtime."
+msgstr "Обучить модель распознавания текста TRBA на пользовательских датасетах."
 
 #: 746895dbe7e44f1cb4f2d8c137b7fff8 manuscript.recognizers._trba.TRBA.predict:5
 #: of
@@ -300,26 +311,30 @@ msgid ""
 "to image file (str or Path) - RGB numpy array with shape ``(H, W, 3)`` in"
 " ``uint8`` - PIL Image object"
 msgstr ""
+"Одно изображение или список изображений для распознавания. Каждое "
+"изображение может быть:  - путем к файлу изображения (str или Path)  - "
+"RGB-массивом numpy формы ``(H, W, 3)`` в формате ``uint8``  - объектом PIL "
+"Image"
 
 #: ff1647a92af342eba4a699c233ba8244 manuscript.recognizers._trba.TRBA.predict:5
 #: of
 msgid "Single image or list of images to recognize. Each image can be:"
-msgstr ""
+msgstr "Одно изображение или список изображений для распознавания. Каждое изображение может быть:"
 
 #: d5bc3d4892bc4fa7b7d67765ccc9bdc7 manuscript.recognizers._trba.TRBA.predict:7
 #: of
 msgid "Path to image file (str or Path)"
-msgstr ""
+msgstr "Путь к файлу изображения (str или Path)"
 
 #: 5eefec848c164313bcdc71efd19e4c12 manuscript.recognizers._trba.TRBA.predict:8
 #: of
 msgid "RGB numpy array with shape ``(H, W, 3)`` in ``uint8``"
-msgstr ""
+msgstr "RGB-массив numpy формы ``(H, W, 3)`` в формате ``uint8``"
 
 #: 4c63f09787904284a42e704753095fce manuscript.recognizers._trba.TRBA.predict:9
 #: of
 msgid "PIL Image object"
-msgstr ""
+msgstr "Объект PIL Image"
 
 #: 8598eed10a8d4ad5b951c3ac828fb405
 #: manuscript.recognizers._trba.TRBA.predict:12 of
@@ -331,9 +346,8 @@ msgstr ""
 "работают быстрее, но требуют больше памяти. По умолчанию 32."
 
 #: ../../api/recognizers.rst 50e89b902ebb4b84b7375a5a177c38dd
-#, fuzzy
 msgid "Returns"
-msgstr "Тип возвращаемого значения"
+msgstr "Возвращает"
 
 #: 3111f762caeb4408907469617972fb58
 #: manuscript.recognizers._trba.TRBA.predict:16 of
@@ -352,22 +366,22 @@ msgstr ""
 #: 27664f8ab5db4243aaa7d3a99c86d0cd
 #: manuscript.recognizers._trba.TRBA.predict:16 of
 msgid "Recognition results as list of dictionaries, each containing:"
-msgstr ""
+msgstr "Результаты распознавания в виде списка словарей, каждый из которых содержит:"
 
 #: 82f90593391d45878eaefd3606610917
 #: manuscript.recognizers._trba.TRBA.predict:18 of
 msgid "``\"text\"`` : str — recognized text"
-msgstr ""
+msgstr "``\"text\"`` : str — распознанный текст"
 
 #: 2f1b6bb26ed5475fa605e62b2e99d140
 #: manuscript.recognizers._trba.TRBA.predict:19 of
 msgid "``\"confidence\"`` : float — recognition confidence in [0, 1]"
-msgstr ""
+msgstr "``\"confidence\"`` : float — уверенность распознавания в диапазоне [0, 1]"
 
 #: 60598501ca8143058a1cbb12087ac1ce
 #: manuscript.recognizers._trba.TRBA.predict:21 of
 msgid "If input is a single image, returns a list with one element."
-msgstr ""
+msgstr "Если на вход подается одно изображение, возвращается список из одного элемента."
 
 #: ../../api/recognizers.rst b1742a6ac7df45f3b9dc49de00c679a2
 msgid "Return type"
@@ -882,9 +896,8 @@ msgstr "Использование экспортированной модели
 
 #: a7c253256dfe4f208c7a6d2e96d569fb manuscript.recognizers._trba.TRBA.export:90
 #: of
-#, fuzzy
 msgid ":obj:`TRBA.__init__`"
-msgstr ":py:obj:`TRBA.__init__`"
+msgstr ":obj:`TRBA.__init__`"
 
 #: 118269f136504e25ab8a675c1f57ff9b manuscript.recognizers._trba.TRBA.export:91
 #: of

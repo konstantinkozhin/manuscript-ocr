@@ -94,7 +94,7 @@ class BaseArtifactModel(ABC):
         messages = []
 
         if os.name == "nt" and hasattr(os, "add_dll_directory"):
-            nvidia_root = Path(sys.prefix) / "Lib" / "site-packages" / "nvidia"
+            nvidia_root = os.path.join(sys.prefix, "Lib", "site-packages", "nvidia")
             dll_dirs = []
             for package_name in (
                 "cudnn",
@@ -103,17 +103,17 @@ class BaseArtifactModel(ABC):
                 "cufft",
                 "nvjitlink",
             ):
-                candidate = nvidia_root / package_name / "bin"
-                if candidate.exists():
+                candidate = os.path.join(nvidia_root, package_name, "bin")
+                if os.path.exists(candidate):
                     dll_dirs.append(candidate)
 
             added_dirs = []
             add_errors = []
             for dll_dir in dll_dirs:
                 try:
-                    handle = os.add_dll_directory(str(dll_dir))
+                    handle = os.add_dll_directory(dll_dir)
                     self._runtime_dll_dir_handles.append(handle)
-                    added_dirs.append(str(dll_dir))
+                    added_dirs.append(dll_dir)
                 except Exception as exc:
                     add_errors.append(f"{dll_dir}: {exc}")
 

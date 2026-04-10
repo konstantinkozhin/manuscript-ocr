@@ -34,7 +34,7 @@ msgstr "``CharLM``"
 
 #: c60bd8ee50024611989dc924d840bb56 manuscript.correctors._charlm.CharLM:1 of
 msgid "Bases: :py:class:`~manuscript.api.base.BaseModel`"
-msgstr ""
+msgstr "Базовый класс: :py:class:`~manuscript.api.base.BaseModel`"
 
 #: c5de954811364ccdbb8b45bfcf80dafe manuscript.correctors._charlm.CharLM:2 of
 msgid "Character-level language model corrector using ONNX Runtime."
