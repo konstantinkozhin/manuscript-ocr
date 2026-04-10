@@ -262,11 +262,25 @@ msgstr "Обучить символьную языковую модель CharLM
 msgid "Input Page object with recognized text."
 msgstr "Входной объект Page с распознанным текстом."
 
+#: manuscript.correctors._charlm.CharLM.predict:8 of
+msgid ""
+"Optional source image associated with ``page``. Reserved for integrations"
+" that may pass the original image to correctors. ``CharLM`` does not use "
+"this argument."
+msgstr ""
+"Необязательное исходное изображение, связанное с ``page``. Зарезервировано"
+" для интеграций, которые могут передавать оригинальное изображение "
+"корректорам. ``CharLM`` не использует этот аргумент."
+
 #: ../../api/correctors.rst 764855ffbf7f448f9660b78b14d92868
 msgid "Returns"
 msgstr "Возвращает"
 
 #: 7ab08ea443f3421bb20123f68487042e
+#: manuscript.correctors._charlm.CharLM.predict:11 of
+msgid "Corrected Page object with updated text-span texts."
+msgstr "Исправленный объект Page с обновлёнными текстами text span-ов."
+
 #: manuscript.correctors._charlm.CharLM.predict:8 of
 msgid "Corrected Page object with updated word texts."
 msgstr "Исправленный объект Page с обновлёнными текстами слов."
@@ -448,6 +462,14 @@ msgstr "Дополнительные опции конфигурации."
 #: manuscript.correctors._charlm.CharLM.train:100 of
 msgid "Path to the final checkpoint."
 msgstr "Путь к финальному чекпоинту."
+
+#: manuscript.correctors._charlm.CharLM.train:100 of
+msgid ""
+"Path to the final checkpoint. After training, CharLM also attempts to "
+"export the final checkpoint to ONNX in ``exp_dir``."
+msgstr ""
+"Путь к финальному чекпоинту. После обучения CharLM также пытается "
+"экспортировать финальный чекпоинт в ONNX в директорию ``exp_dir``."
 
 #: aebe7443feaf4020b37d57f1b8a9df7c
 #: manuscript.correctors._charlm.CharLM.export:5 of

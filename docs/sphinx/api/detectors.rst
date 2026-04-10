@@ -8,14 +8,15 @@ Text detection models.
    :undoc-members:
    :show-inheritance:
 
-EAST
-----
+EAST: Training Notes
+--------------------
 
-Детектор ``EAST`` в manuscript-ocr основан на архитектуре, предложенной в
+The ``EAST`` detector in manuscript-ocr is based on the architecture proposed in
 `EAST: An Efficient and Accurate Scene Text Detector <https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_
-(Zhou et al., CVPR 2017). Процедура обучения существенно переработана по сравнению с оригиналом:
-изменены схема взвешивания потерь, пайплайн аугментаций, обработка четырёхугольных разметок и
-поддержка смешанных аннотаций. Предобученные веса получены авторами проекта.
+(Zhou et al., CVPR 2017). The training procedure has been significantly reworked
+compared to the original: the loss weighting scheme, augmentation pipeline,
+quadrilateral annotation handling, and support for mixed annotations have all
+been modified. Pretrained weights were produced by the project authors.
 
 EAST Training Quads
 ~~~~~~~~~~~~~~~~~~~

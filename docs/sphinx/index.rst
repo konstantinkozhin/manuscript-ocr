@@ -22,6 +22,7 @@ computational efficiency under limited resources.
    structure
    api/index
    related_work
+   acknowledgements
 
 Indices and tables
 ==================

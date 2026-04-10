@@ -1,0 +1,48 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: manuscript-ocr 0.1.11\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-04-11 00:00+0700\n"
+"PO-Revision-Date: 2026-04-11 00:00+0700\n"
+"Last-Translator: \n"
+"Language-Team: ru\n"
+"Language: ru\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Generated-By: Babel 2.18.0\n"
+
+#: ../../acknowledgements.rst:2
+msgid "Acknowledgements"
+msgstr "Благодарности"
+
+#: ../../acknowledgements.rst:4
+msgid ""
+"This project was implemented with the support of a grant from the "
+"`Foundation for Assistance to Small Innovative Enterprises (FASIE) "
+"<https://fasie.ru/>`_, competition **\"Kod-II\"** (VII stage)."
+msgstr ""
+"Проект реализован при поддержке гранта "
+"`Фонда содействия инновациям <https://fasie.ru/>`_, "
+"конкурс «Код-ИИ», VII очередь."
+
+#: ../../acknowledgements.rst:9
+msgid "Благодарности"
+msgstr "Благодарности"
+
+#: ../../acknowledgements.rst:11
+msgid ""
+"Проект реализован при поддержке гранта "
+"`Фонда содействия инновациям <https://fasie.ru/>`_, "
+"конкурс «Код-ИИ», VII очередь."
+msgstr ""
+"Проект реализован при поддержке гранта "
+"`Фонда содействия инновациям <https://fasie.ru/>`_, "
+"конкурс «Код-ИИ», VII очередь."
