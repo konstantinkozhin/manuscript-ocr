@@ -110,7 +110,7 @@ class TestBaseArtifactModelRuntimeEdges:
                     side_effect=fake_add_dll_directory,
                     create=True,
                 ):
-                    with patch.object(base_module.ort, "preload_dlls") as mock_preload:
+                    with patch.object(base_module.ort, "preload_dlls", create=True) as mock_preload:
                         model._prepare_runtime_dependencies()
 
         assert added_dirs == [str(cudnn_dir), str(cublas_dir)]
