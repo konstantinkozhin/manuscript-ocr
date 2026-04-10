@@ -1,7 +1,9 @@
 from abc import ABC, abstractmethod
 import contextlib
 import io
+import os
 from pathlib import Path
+import sys
 from typing import Dict, Optional
 import shutil
 import tempfile
@@ -47,6 +49,7 @@ class BaseArtifactModel(ABC):
         self.session = None
         self._runtime_deps_preloaded = False
         self._runtime_preload_message: Optional[str] = None
+        self._runtime_dll_dir_handles = []
 
     # -------------------------------------------------------------------------
     # DEVICE
@@ -88,19 +91,59 @@ class BaseArtifactModel(ABC):
             return
 
         self._runtime_deps_preloaded = True
+        messages = []
+
+        if os.name == "nt" and hasattr(os, "add_dll_directory"):
+            nvidia_root = Path(sys.prefix) / "Lib" / "site-packages" / "nvidia"
+            dll_dirs = []
+            for package_name in (
+                "cudnn",
+                "cublas",
+                "cuda_runtime",
+                "cufft",
+                "nvjitlink",
+            ):
+                candidate = nvidia_root / package_name / "bin"
+                if candidate.exists():
+                    dll_dirs.append(candidate)
+
+            added_dirs = []
+            add_errors = []
+            for dll_dir in dll_dirs:
+                try:
+                    handle = os.add_dll_directory(str(dll_dir))
+                    self._runtime_dll_dir_handles.append(handle)
+                    added_dirs.append(str(dll_dir))
+                except Exception as exc:
+                    add_errors.append(f"{dll_dir}: {exc}")
+
+            if added_dirs:
+                messages.append("Added Windows DLL directories:")
+                messages.extend(f"  {path}" for path in added_dirs)
+            if add_errors:
+                messages.append("Failed to add some Windows DLL directories:")
+                messages.extend(f"  {item}" for item in add_errors)
+
         if not hasattr(ort, "preload_dlls"):
+            if messages:
+                self._runtime_preload_message = "\n".join(messages)
             return
 
         stdout_buffer = io.StringIO()
         stderr_buffer = io.StringIO()
         try:
             with contextlib.redirect_stdout(stdout_buffer), contextlib.redirect_stderr(stderr_buffer):
-                ort.preload_dlls()
+                ort.preload_dlls(directory="")
         except Exception as exc:
-            self._runtime_preload_message = f"onnxruntime.preload_dlls failed: {exc}"
+            preload_message = f"onnxruntime.preload_dlls failed: {exc}"
+            if messages:
+                messages.append(preload_message)
+                self._runtime_preload_message = "\n".join(messages)
+            else:
+                self._runtime_preload_message = preload_message
             return
 
-        captured = []
+        captured = list(messages)
         stdout_text = stdout_buffer.getvalue().strip()
         stderr_text = stderr_buffer.getvalue().strip()
         if stdout_text:

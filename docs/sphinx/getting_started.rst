@@ -4,6 +4,20 @@ Getting Started
 Installation
 ------------
 
+Minimum System Requirements
+^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+- Linux (Ubuntu 20.04+), Windows 10+, or macOS 11+
+- at least 2 CPU cores
+- at least 8 GB RAM
+- 16 GB RAM or more is recommended for model training
+- NVIDIA GPU with CUDA support is recommended for acceleration
+- at least 4 GB VRAM is recommended for GPU execution
+
+CPU-only execution is supported, but performance may be significantly lower
+than on GPU. Model training currently targets CUDA-capable NVIDIA GPUs and
+falls back to CPU when CUDA is unavailable.
+
 **Basic installation** (inference only):
 
 .. code-block:: bash
@@ -73,6 +87,17 @@ Install additional CUDA/cuDNN runtime packages:
     pip install nvidia-cudnn-cu12 nvidia-cublas-cu12 nvidia-cuda-runtime-cu12 nvidia-cufft-cu12
 
 Then restart the kernel or runtime and create the ``Pipeline`` again.
+
+If ONNX Runtime appears to be installed but still behaves incorrectly in a
+notebook environment, perform a clean GPU reinstall:
+
+.. code-block:: bash
+
+    pip uninstall -y onnxruntime
+    pip install --no-cache-dir --force-reinstall onnxruntime-gpu==1.24.4
+    pip install --no-cache-dir nvidia-cudnn-cu12 nvidia-cublas-cu12 nvidia-cuda-runtime-cu12 nvidia-cufft-cu12
+
+After that, restart the kernel or runtime again and re-import ``manuscript``.
 
 Case 2. ``"CUDAExecutionProvider"`` is present, but the models still fall back to CPU
 

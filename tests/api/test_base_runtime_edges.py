@@ -85,6 +85,40 @@ class TestBaseArtifactModelRuntimeEdges:
         assert "CoreML requested but not available" in captured
         assert "onnxruntime-silicon" in captured
 
+    def test_prepare_runtime_dependencies_adds_windows_nvidia_dirs_and_preloads(
+        self, tmp_path
+    ):
+        model = _make_model(tmp_path, device="cuda")
+
+        cudnn_dir = tmp_path / "Lib" / "site-packages" / "nvidia" / "cudnn" / "bin"
+        cublas_dir = tmp_path / "Lib" / "site-packages" / "nvidia" / "cublas" / "bin"
+        cudnn_dir.mkdir(parents=True)
+        cublas_dir.mkdir(parents=True)
+
+        added_dirs = []
+        handles = [object(), object()]
+
+        def fake_add_dll_directory(path):
+            added_dirs.append(path)
+            return handles[len(added_dirs) - 1]
+
+        with patch.object(base_module.sys, "prefix", str(tmp_path)):
+            with patch.object(base_module.os, "name", "nt"):
+                with patch.object(
+                    base_module.os,
+                    "add_dll_directory",
+                    side_effect=fake_add_dll_directory,
+                    create=True,
+                ):
+                    with patch.object(base_module.ort, "preload_dlls") as mock_preload:
+                        model._prepare_runtime_dependencies()
+
+        assert added_dirs == [str(cudnn_dir), str(cublas_dir)]
+        assert model._runtime_dll_dir_handles == handles
+        assert model._runtime_deps_preloaded is True
+        assert "Added Windows DLL directories:" in model._runtime_preload_message
+        mock_preload.assert_called_once_with(directory="")
+
     def test_download_http_uses_progress_bar_when_tqdm_available(self, tmp_path):
         model = _make_model(tmp_path)
         cache_root = tmp_path / "cache_home"
