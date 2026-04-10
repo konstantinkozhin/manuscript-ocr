@@ -39,6 +39,20 @@ If you are switching an existing installation from CPU to GPU:
 
 Reinstalling ``manuscript-ocr`` is not required.
 
+You can switch models and pipeline components explicitly with the ``device``
+parameter, for example ``device="cuda"`` for NVIDIA GPU or ``device="cpu"``
+for CPU:
+
+.. code-block:: python
+
+    from manuscript.detectors import EAST
+    from manuscript.recognizers import TRBA
+    from manuscript.correctors import CharLM
+
+    detector = EAST(device="cuda")
+    recognizer = TRBA(device="cuda")
+    corrector = CharLM(device="cuda")
+
 Diagnostics
 ^^^^^^^^^^^
 
@@ -56,7 +70,7 @@ Install additional CUDA/cuDNN runtime packages:
 
 .. code-block:: bash
 
-    pip install nvidia-cudnn-cu12 nvidia-cublas-cu12 nvidia-cuda-runtime-cu12
+    pip install nvidia-cudnn-cu12 nvidia-cublas-cu12 nvidia-cuda-runtime-cu12 nvidia-cufft-cu12
 
 Then restart the kernel or runtime and create the ``Pipeline`` again.
 
@@ -78,6 +92,8 @@ After that, import ``manuscript`` and create the ``Pipeline`` again.
 
     pip install manuscript-ocr
     pip install onnxruntime-silicon
+
+Then use ``device="coreml"`` for the relevant models or pipeline components.
 
 Quick Start
 -----------

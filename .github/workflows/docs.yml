@@ -61,6 +61,12 @@ jobs:
             version_name="$(basename "${version_dir}")"
             rm -rf "docs/sphinx/_site/${version_name}"
             cp -a "${version_dir}" "docs/sphinx/_site/${version_name}"
+            for lang in en ru; do
+              static_dir="docs/sphinx/_site/${version_name}/${lang}/_static"
+              if [ -d "${static_dir}" ]; then
+                cp docs/sphinx/_static/version_sidebar.js "${static_dir}/version_sidebar.js"
+              fi
+            done
           done
 
       - name: Create site index and version metadata
