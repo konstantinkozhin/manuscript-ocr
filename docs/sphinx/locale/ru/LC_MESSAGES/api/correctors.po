@@ -588,7 +588,20 @@ msgstr "Обучение пользовательской модели"
 msgid "You can train CharLM on your own data:"
 msgstr "Вы можете обучить CharLM на своих данных:"
 
-#: ../../api/correctors.rst:156 e878bed651464f128a497fca51644feb
+#: ../../api/correctors.rst:156
+msgid ""
+"After training, ``CharLM.train()`` also attempts to export the final "
+"checkpoint to ONNX automatically and saves it as ``<exp_dir>/"
+"charlm_epoch_<epochs>.onnx``. You can still export manually to customize "
+"the output path or export settings:"
+msgstr ""
+"После обучения ``CharLM.train()`` также пытается автоматически "
+"экспортировать финальный чекпойнт в ONNX и сохраняет его как "
+"``<exp_dir>/charlm_epoch_<epochs>.onnx``. При необходимости модель можно "
+"экспортировать вручную, чтобы задать собственный путь сохранения или "
+"параметры экспорта:"
+
+#: ../../api/correctors.rst:159 e878bed651464f128a497fca51644feb
 msgid "Export to ONNX"
 msgstr "Экспорт в ONNX"
 

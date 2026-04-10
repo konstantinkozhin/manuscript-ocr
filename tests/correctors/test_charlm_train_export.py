@@ -37,16 +37,17 @@ class TestCharLMTrain:
                 "manuscript.correctors._charlm.config": fake_config_module,
             },
         ):
-            result = CharLM.train(
-                words_path="words.txt",
-                text_path="text.txt",
-                pairs_path="pairs.csv",
-                charset_path="charset.txt",
-                exp_dir="exp_charlm_test",
-                epochs=3,
-                checkpoint="resume.pt",
-                custom_flag=True,
-            )
+            with patch.object(CharLM, "export") as mock_export:
+                result = CharLM.train(
+                    words_path="words.txt",
+                    text_path="text.txt",
+                    pairs_path="pairs.csv",
+                    charset_path="charset.txt",
+                    exp_dir="exp_charlm_test",
+                    epochs=3,
+                    checkpoint="resume.pt",
+                    custom_flag=True,
+                )
 
         config = captured["config"]
         assert config["default_only"] == 123
@@ -58,8 +59,50 @@ class TestCharLMTrain:
         assert config["epochs"] == 3
         assert config["checkpoint"] == "resume.pt"
         assert config["custom_flag"] is True
+        mock_export.assert_called_once_with(
+            weights_path=os.path.join(
+                "exp_charlm_test", "checkpoints", "charlm_epoch_3.pt"
+            ),
+            vocab_path=os.path.join("exp_charlm_test", "vocab.json"),
+            output_path=os.path.join("exp_charlm_test", "charlm_epoch_3.onnx"),
+            max_len=config["max_len"],
+            emb_size=config["emb_size"],
+            n_layers=config["n_layers"],
+            n_heads=config["n_heads"],
+            ffn_size=config["ffn_size"],
+            opset_version=14,
+            simplify=True,
+        )
         assert result == os.path.join(
             "exp_charlm_test", "checkpoints", "charlm_epoch_3.pt"
+        )
+
+    def test_train_ignores_export_failures(self):
+        fake_train_module = ModuleType("manuscript.correctors._charlm.train")
+        fake_config_module = ModuleType("manuscript.correctors._charlm.config")
+        fake_config_module.DEFAULT_CONFIG = {}
+
+        def fake_run_training(config):
+            return None
+
+        fake_train_module.train = fake_run_training
+
+        with patch.dict(
+            sys.modules,
+            {
+                "manuscript.correctors._charlm.train": fake_train_module,
+                "manuscript.correctors._charlm.config": fake_config_module,
+            },
+        ):
+            with patch.object(CharLM, "export", side_effect=RuntimeError("boom")):
+                result = CharLM.train(
+                    charset_path="charset.txt",
+                    exp_dir="exp_charlm_test",
+                    epochs=1,
+                )
+
+        assert result == os.path.join(
+            "exp_charlm_test", "checkpoints", "charlm_epoch_1.pt"
         )
 
 

@@ -533,7 +533,8 @@ class CharLM(BaseCorrector):
         Returns
         -------
         str
-            Path to the final checkpoint.
+            Path to the final checkpoint. After training, CharLM also attempts
+            to export the final checkpoint to ONNX in ``exp_dir``.
         """
         from .train import train as run_training
         from .config import DEFAULT_CONFIG
@@ -576,7 +577,31 @@ class CharLM(BaseCorrector):
 
         run_training(config)
 
-        return os.path.join(exp_dir, "checkpoints", f"charlm_epoch_{epochs}.pt")
+        final_checkpoint_path = os.path.join(
+            exp_dir, "checkpoints", f"charlm_epoch_{epochs}.pt"
+        )
+
+        try:
+            print("Attempting to export final model to ONNX...")
+            onnx_path = os.path.join(exp_dir, f"charlm_epoch_{epochs}.onnx")
+
+            CharLM.export(
+                weights_path=final_checkpoint_path,
+                vocab_path=os.path.join(exp_dir, "vocab.json"),
+                output_path=onnx_path,
+                max_len=config["max_len"],
+                emb_size=config["emb_size"],
+                n_layers=config["n_layers"],
+                n_heads=config["n_heads"],
+                ffn_size=config["ffn_size"],
+                opset_version=14,
+                simplify=True,
+            )
+            print(f"ONNX model exported successfully: {onnx_path}")
+        except Exception as e:
+            print(f"Failed to export ONNX model: {e}")
+
+        return final_checkpoint_path
 
     @staticmethod
     def export(

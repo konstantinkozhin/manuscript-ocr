@@ -156,6 +156,10 @@ You can train CharLM on your own data:
         exp_dir="my_charlm_exp",
     )
 
+After training, ``CharLM.train()`` also attempts to export the final checkpoint
+to ONNX automatically and saves it as ``<exp_dir>/charlm_epoch_<epochs>.onnx``.
+You can still export manually to customize the output path or export settings:
+
 Export to ONNX
 ~~~~~~~~~~~~~~
 
