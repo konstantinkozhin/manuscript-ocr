@@ -3,8 +3,7 @@ Data Structures
 
 Core data structures for representing OCR results.
 
-Data Model
-----------
+.. rubric:: Data Model
 
 The following diagram shows the relationships between data structures:
 
@@ -37,8 +36,7 @@ The following diagram shows the relationships between data structures:
         Block --> BlockOrder["order: Optional[int]<br>assigned after sorting"]
         Block --> FlatInput["text_spans: List[TextSpan]<br>optional flat input"]
 
-Compatibility
--------------
+.. rubric:: Compatibility
 
 The canonical names in ``v0_1_11`` are ``TextSpan`` and ``text_spans``. For
 code and services that still target ``v0_1_10``, ``Word`` and ``words``
@@ -55,8 +53,7 @@ When exporting OCR results, choose the schema explicitly:
 Use ``"v0_1_10"`` only for legacy JSON consumers. New integrations should
 prefer ``"v0_1_11"``.
 
-Module Reference
-----------------
+.. rubric:: Module Reference
 
 .. automodule:: manuscript.data
    :members:

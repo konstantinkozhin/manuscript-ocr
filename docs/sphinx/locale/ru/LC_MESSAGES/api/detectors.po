@@ -1383,11 +1383,11 @@ msgstr ""
 "разметок и поддержка смешанных аннотаций. Предобученные веса получены "
 "авторами проекта."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:22
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:21
 msgid "EAST Training Quads"
 msgstr "Четырёхугольные области для обучения EAST"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:24
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:23
 msgid ""
 "EAST training expects quadrilateral targets. When loading COCO "
 "``segmentation`` polygons, use ``augmentation_config[\"quad_source\"]`` in "
@@ -1399,7 +1399,7 @@ msgstr ""
 "``EAST.train(...)``, чтобы управлять преобразованием полигонов в 4-точечные "
 "обучающие квады:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:29
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:25
 msgid ""
 "``\"auto\"`` keeps existing 4-point polygons as-is and falls back to "
 "``minAreaRect`` for longer polygons."
@@ -1407,7 +1407,7 @@ msgstr ""
 "``\"auto\"`` сохраняет готовые 4-точечные полигоны как есть и использует "
 "``minAreaRect`` только для полигонов с большим числом вершин."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:31
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:27
 msgid ""
 "``\"as_is\"`` accepts only 4-point polygons and skips polygons with a "
 "different number of vertices."
@@ -1415,7 +1415,7 @@ msgstr ""
 "``\"as_is\"`` принимает только 4-точечные полигоны и пропускает полигоны с "
 "другим числом вершин."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:33
+#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/detectors.rst:29
 msgid ""
 "``\"min_area_rect\"`` always fits the minimum-area rectangle and matches "
 "the legacy conversion path."
@@ -1425,6 +1425,12 @@ msgstr ""
 
 #~ msgid "EAST"
 #~ msgstr "EAST"
+
+#~ msgid "EAST: Training Notes"
+#~ msgstr "EAST: примечания по обучению"
+
+#~ msgid "EAST Training Quads"
+#~ msgstr "Четырёхугольные области для обучения EAST"
 
 
 #~ "If True, returns raw model score and geometry maps under keys "

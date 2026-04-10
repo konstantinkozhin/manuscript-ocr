@@ -8,8 +8,7 @@ Text detection models.
    :undoc-members:
    :show-inheritance:
 
-EAST: Training Notes
---------------------
+.. rubric:: EAST: Training Notes
 
 The ``EAST`` detector in manuscript-ocr is based on the architecture proposed in
 `EAST: An Efficient and Accurate Scene Text Detector <https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_
@@ -18,8 +17,7 @@ compared to the original: the loss weighting scheme, augmentation pipeline,
 quadrilateral annotation handling, and support for mixed annotations have all
 been modified. Pretrained weights were produced by the project authors.
 
-EAST Training Quads
-~~~~~~~~~~~~~~~~~~~
+.. rubric:: EAST Training Quads
 
 EAST training expects quadrilateral targets. When loading COCO
 ``segmentation`` polygons, use ``augmentation_config["quad_source"]`` in
