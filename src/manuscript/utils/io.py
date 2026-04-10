@@ -1,5 +1,5 @@
 from pathlib import Path
-from typing import Union, List
+from typing import Sequence, Tuple, Union, List
 
 import cv2
 import numpy as np
@@ -275,3 +275,145 @@ def create_page_from_text(
     
     block = Block(lines=result_lines)
     return Page(blocks=[block])
+
+
+def create_page_from_image(
+    image: Union[
+        str,
+        Path,
+        bytes,
+        np.ndarray,
+        Image.Image,
+        Sequence[Union[str, Path, bytes, np.ndarray, Image.Image]],
+    ],
+    confidence: float = 1.0,
+    gap: int = 8,
+    return_image: bool = False,
+) -> Union[Page, Tuple[Page, np.ndarray]]:
+    """
+    Create a ``Page`` object that wraps one or more images or text crops.
+
+    This utility is useful when a recognizer expects the ``0.1.11+`` stage API
+    (``predict(page, image=...) -> Page``), but you want to run inference on
+    one or more pre-cropped images without a detector. For a single image, the
+    function creates one block, one line, and one ``TextSpan`` covering the
+    full image extent. For multiple images, the crops are stacked vertically
+    into a synthetic page, and each crop becomes a separate line with one
+    ``TextSpan``.
+
+    Parameters
+    ----------
+    image : str, Path, bytes, numpy.ndarray, PIL.Image, or sequence thereof
+        Image source accepted by :func:`read_image`, or a sequence of such
+        sources.
+    confidence : float, optional
+        Detection confidence assigned to the created text span.
+        Default is ``1.0``.
+    gap : int, optional
+        Vertical gap in pixels between crops when a sequence of images is
+        provided. Default is ``8``.
+    return_image : bool, optional
+        If ``True``, also returns the normalized RGB image that corresponds to
+        the created ``Page``. This is especially useful when ``image`` is a
+        sequence and a synthetic page image is constructed. Default is
+        ``False``.
+
+    Returns
+    -------
+    Page or tuple of (Page, numpy.ndarray)
+        ``Page`` object describing the input image(s). If ``return_image=True``,
+        also returns the RGB image used to create the page.
+
+    Examples
+    --------
+    >>> from manuscript.utils import create_page_from_image
+    >>> page = create_page_from_image("crop1.png")
+    >>> span = page.blocks[0].lines[0].text_spans[0]
+    >>> span.polygon
+    [(0.0, 0.0), (120.0, 0.0), (120.0, 32.0), (0.0, 32.0)]
+
+    Use with a recognizer:
+
+    >>> from manuscript.recognizers import TRBA
+    >>> page = create_page_from_image("crop1.png")
+    >>> recognizer = TRBA()
+    >>> result_page = recognizer.predict(page, image="crop1.png")
+    >>> result_page.blocks[0].lines[0].text_spans[0].text
+    'example'
+
+    Use with multiple crops:
+
+    >>> page, composed_image = create_page_from_image(
+    ...     ["crop1.png", "crop2.png"],
+    ...     return_image=True,
+    ... )
+    >>> recognizer = TRBA()
+    >>> result_page = recognizer.predict(page, image=composed_image)
+    """
+    def _is_sequence_input(value) -> bool:
+        return isinstance(value, Sequence) and not isinstance(
+            value, (str, Path, bytes, np.ndarray, Image.Image)
+        )
+
+    def _full_image_span(width: int, height: int, order: int) -> TextSpan:
+        return TextSpan(
+            polygon=[
+                (0.0, 0.0),
+                (float(width), 0.0),
+                (float(width), float(height)),
+                (0.0, float(height)),
+            ],
+            detection_confidence=confidence,
+            order=order,
+        )
+
+    if not _is_sequence_input(image):
+        img = read_image(image)
+        h, w = img.shape[:2]
+        page = Page(
+            blocks=[
+                Block(
+                    lines=[
+                        Line(
+                            text_spans=[_full_image_span(w, h, order=0)],
+                            order=0,
+                        )
+                    ],
+                    order=0,
+                )
+            ]
+        )
+        if return_image:
+            return page, img
+        return page
+
+    images = [read_image(item) for item in image]
+    if not images:
+        raise ValueError("image sequence must not be empty")
+
+    max_width = max(img.shape[1] for img in images)
+    total_height = sum(img.shape[0] for img in images) + gap * (len(images) - 1)
+    canvas = np.full((total_height, max_width, 3), 255, dtype=np.uint8)
+
+    lines = []
+    y_offset = 0
+    for order, img in enumerate(images):
+        h, w = img.shape[:2]
+        canvas[y_offset : y_offset + h, 0:w] = img
+        text_span = TextSpan(
+            polygon=[
+                (0.0, float(y_offset)),
+                (float(w), float(y_offset)),
+                (float(w), float(y_offset + h)),
+                (0.0, float(y_offset + h)),
+            ],
+            detection_confidence=confidence,
+            order=0,
+        )
+        lines.append(Line(text_spans=[text_span], order=order))
+        y_offset += h + gap
+
+    page = Page(blocks=[Block(lines=lines, order=0)])
+    if return_image:
+        return page, canvas
+    return page

@@ -1,7 +1,7 @@
 """Common utilities for manuscript-ocr."""
 
 # I/O utilities
-from .io import read_image, create_page_from_text
+from .io import read_image, create_page_from_text, create_page_from_image
 
 # Visualization utilities
 from .visualization import visualize_page
@@ -33,6 +33,7 @@ __all__ = [
     # I/O
     "read_image",
     "create_page_from_text",
+    "create_page_from_image",
     # Visualization
     "visualize_page",
     # Sorting/Postprocessing
