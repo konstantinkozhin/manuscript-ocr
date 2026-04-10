@@ -1,8 +1,3 @@
-# Docs Build Notes
-
-For maintainers, contributors, and future automation agents working in this
-repository.
-
 This file describes the build flow that is known to work locally for the
 versioned Sphinx site and the Russian PDF.
 
