@@ -11,14 +11,11 @@ Text detection models.
 EAST
 ----
 
-The ``EAST`` detector in manuscript-ocr is based on the architecture introduced in
+Детектор ``EAST`` в manuscript-ocr основан на архитектуре, предложенной в
 `EAST: An Efficient and Accurate Scene Text Detector <https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_
-(Zhou et al., CVPR 2017). The core design — multi-scale feature fusion with a shared
-convolutional head predicting text score maps, rotation angles, and bounding-box geometry —
-follows the original paper. The training procedure has been substantially revised for this
-project: loss weighting, the augmentation pipeline, quadrilateral target handling, and support
-for mixed rotated/axis-aligned annotations have all been modified. Pretrained weights were
-produced by the authors and are not a reproduction of the original EAST checkpoints.
+(Zhou et al., CVPR 2017). Процедура обучения существенно переработана по сравнению с оригиналом:
+изменены схема взвешивания потерь, пайплайн аугментаций, обработка четырёхугольных разметок и
+поддержка смешанных аннотаций. Предобученные веса получены авторами проекта.
 
 EAST Training Quads
 ~~~~~~~~~~~~~~~~~~~

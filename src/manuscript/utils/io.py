@@ -10,47 +10,43 @@ from manuscript.data import TextSpan, Line, Block, Page
 
 def read_image(img_or_path: Union[str, Path, bytes, np.ndarray, Image.Image]) -> np.ndarray:
     """
-    Универсальное чтение изображения с поддержкой нескольких форматов входных данных.
+    Universal image reading with support for multiple input types.
 
-    Параметры
+    Parameters
     ----------
     img_or_path : str, Path, bytes, np.ndarray, or PIL.Image
-        Источник изображения в одном из следующих форматов:
-        - Путь к файлу (str или Path) — поддерживает пути с Unicode (например, кириллица)
-        - Байтовый буфер (например, из HTTP-ответа)
-        - Массив NumPy (уже загруженное изображение)
-        - Объект PIL Image
+        Image source in one of the following formats:
+        - File path (str or Path) - supports Unicode paths (e.g., Cyrillic)
+        - Bytes buffer (e.g., from HTTP response)
+        - NumPy array (already loaded image)
+        - PIL Image object
 
-    Возвращает
+    Returns
     -------
     np.ndarray
-        RGB-изображение в виде массива numpy с формой (H, W, 3) и типом данных uint8.
+        RGB image as numpy array with shape (H, W, 3) and dtype uint8.
 
     Raises
     ------
     FileNotFoundError
-        Если файл изображения не удаётся прочитать ни через OpenCV, ни через PIL.
+        If the image file cannot be read with either OpenCV or PIL.
     TypeError
-        Если тип входных данных не поддерживается.
+        If the input type is not supported.
     ValueError
-        Если байты не удаётся декодировать в изображение.
+        If bytes cannot be decoded into an image.
 
     Examples
     --------
-    >>> # Чтение из пути к файлу (с поддержкой Unicode)
-    >>> img = read_image("путь/к/изображению.jpg")
+    >>> img = read_image("path/to/image.jpg")
     >>> img.shape
     (480, 640, 3)
 
-    >>> # Чтение из байтов
     >>> with open("image.jpg", "rb") as f:
     ...     img = read_image(f.read())
 
-    >>> # Чтение из PIL Image
     >>> pil_img = Image.open("image.jpg")
     >>> img = read_image(pil_img)
 
-    >>> # Передача готового массива numpy
     >>> img = read_image(existing_array)
     """
     # File path (str or Path) - TRBA method with Unicode support
@@ -103,44 +99,41 @@ def _tensor_to_image(
     to_uint8: bool = True,
 ) -> np.ndarray:
     """
-    Конвертирует тензор PyTorch в массив numpy с изображением.
+    Convert a PyTorch tensor to a numpy image array.
 
-    Параметры
+    Parameters
     ----------
     tensor : torch.Tensor
-        Входной тензор с формой (C, H, W) для одного изображения или (N, C, H, W) для батча.
-        Значения должны быть в диапазоне [0, 1] или нормализованы с mean/std.
+        Input tensor with shape (C, H, W) for a single image or (N, C, H, W)
+        for a batch. Values should be in [0, 1] or normalised with mean/std.
     denormalize : dict, optional
-        Словарь с ключами ``'mean'`` и ``'std'`` для денормализации.
-        Пример: ``{'mean': [0.485, 0.456, 0.406], 'std': [0.229, 0.224, 0.225]}``
+        Dict with keys ``'mean'`` and ``'std'`` for de-normalisation.
+        Example: ``{'mean': [0.485, 0.456, 0.406], 'std': [0.229, 0.224, 0.225]}``
     to_uint8 : bool, default=True
-        Если ``True``, конвертирует в uint8 в диапазоне [0, 255].
-        Если ``False``, возвращает float32 в диапазоне [0, 1].
+        If ``True``, convert to uint8 in range [0, 255].
+        If ``False``, return float32 in range [0, 1].
 
-    Возвращает
+    Returns
     -------
     np.ndarray
-        Изображение(я) в виде массива numpy:
-        - Одно изображение: форма (H, W, C)
-        - Батч: форма (N, H, W, C)
-        - dtype: uint8 если to_uint8=True, иначе float32
+        Image(s) as numpy array:
+        - Single image: shape (H, W, C)
+        - Batch: shape (N, H, W, C)
+        - dtype: uint8 if to_uint8=True, else float32
 
     Examples
     --------
     >>> import torch
-    >>> # Одно изображение
     >>> tensor = torch.rand(3, 224, 224)
     >>> img = tensor_to_image(tensor)
     >>> img.shape
     (224, 224, 3)
 
-    >>> # Батч изображений
     >>> batch = torch.rand(8, 3, 224, 224)
     >>> imgs = tensor_to_image(batch)
     >>> imgs.shape
     (8, 224, 224, 3)
 
-    >>> # С денормализацией
     >>> normalized = torch.rand(3, 224, 224)
     >>> img = tensor_to_image(
     ...     normalized,
@@ -193,27 +186,27 @@ def create_page_from_text(
     confidence: float = 1.0,
 ) -> Page:
     """
-    Создаёт объект ``Page`` из списка текстовых строк.
+    Create a Page object from a list of text lines.
 
-    Вспомогательная функция создаёт простую структуру ``Page`` из «сырого» текста,
-    полезна для тестирования корректоров и других компонентов обработки текста
-    без необходимости реального OCR (детекции/распознавания).
+    This utility function creates a simple Page structure from raw text,
+    useful for testing correctors or other text processing components without
+    requiring actual OCR detection/recognition.
 
-    Каждая строка становится объектом ``Line`` с текстовыми областями, разбитыми
-    по пробелам. Текстовым областям назначаются фиктивные координаты полигона для
-    совместимости со структурами данных.
+    Each line becomes a Line object with text spans split by whitespace. Text
+    spans are assigned dummy polygon coordinates for compatibility with the
+    data structures.
 
-    Параметры
+    Parameters
     ----------
     lines : List[str]
-        Список текстовых строк. Каждая строка будет разбита на текстовые области.
+        List of text lines. Each line will be split into text spans.
     confidence : float, optional
-        Оценка уверенности, назначаемая всем текстовым областям. По умолчанию ``1.0``.
+        Confidence score to assign to all text spans (default 1.0).
 
-    Возвращает
+    Returns
     -------
     Page
-        Объект ``Page`` с одним блоком, содержащим переданные строки.
+        Page object with one Block containing the provided lines.
 
     Examples
     --------
@@ -224,19 +217,14 @@ def create_page_from_text(
     >>> len(page.blocks[0].lines)
     2
 
-    Использование с корректором:
+    Use with corrector:
 
     >>> from manuscript.correctors import CharLM
     >>> from manuscript.utils import create_page_from_text
     >>>
-    >>> # Создаём страницу из текста с возможными ошибками OCR
     >>> page = create_page_from_text(["Привѣтъ міръ"])
-    >>>
-    >>> # Применяем корректор
     >>> corrector = CharLM()
     >>> corrected = corrector.predict(page)
-    >>>
-    >>> # Получаем исправленный текст
     >>> for line in corrected.blocks[0].lines:
     ...     print(" ".join(span.text for span in line.text_spans))
     """
@@ -291,40 +279,36 @@ def create_page_from_image(
     return_image: bool = False,
 ) -> Union[Page, Tuple[Page, np.ndarray]]:
     """
-    Создаёт объект ``Page``, оборачивающий одно или несколько изображений или текстовых
-    кропов.
+    Create a ``Page`` object that wraps one or more images or text crops.
 
-    Вспомогательная функция полезна, когда распознаватель ожидает API стадии ``0.1.11+``
-    (``predict(page, image=...) -> Page``), но вы хотите запустить инференс на одном или
-    нескольких заранее вырезанных изображениях без детектора. Для одного изображения
-    функция создаёт один блок, одну строку и одну ``TextSpan``, охватывающую всё
-    изображение. Для нескольких изображений кропы складываются вертикально в
-    синтетическую страницу, и каждый кроп становится отдельной строкой с одной
+    This utility is useful when a recognizer expects the ``0.1.11+`` stage API
+    (``predict(page, image=...) -> Page``), but you want to run inference on
+    one or more pre-cropped images without a detector. For a single image, the
+    function creates one block, one line, and one ``TextSpan`` covering the
+    full image extent. For multiple images, the crops are stacked vertically
+    into a synthetic page, and each crop becomes a separate line with one
     ``TextSpan``.
 
-    Параметры
+    Parameters
     ----------
     image : str, Path, bytes, numpy.ndarray, PIL.Image, or sequence thereof
-        Источник изображения, принимаемый :func:`read_image`, или последовательность
-        таких источников.
+        Image source accepted by :func:`read_image`.
     confidence : float, optional
-        Уверенность детекции, назначаемая созданной текстовой области.
-        По умолчанию ``1.0``.
+        Detection confidence assigned to the created text span. Default is ``1.0``.
     gap : int, optional
-        Вертикальный промежуток в пикселях между кропами, когда передаётся
-        последовательность изображений. По умолчанию ``8``.
+        Vertical gap in pixels between crops when a sequence of images is
+        passed. Default is ``8``.
     return_image : bool, optional
-        Если ``True``, дополнительно возвращает нормализованное RGB-изображение,
-        соответствующее созданному ``Page``. Особенно полезно, когда ``image`` является
-        последовательностью и строится синтетическое изображение страницы.
-        По умолчанию ``False``.
+        If ``True``, also return the normalised RGB image that corresponds to
+        the created ``Page``. Especially useful when ``image`` is a sequence
+        and a synthetic page image is built. Default is ``False``.
 
-    Возвращает
+    Returns
     -------
     Page or tuple of (Page, numpy.ndarray)
-        Объект ``Page``, описывающий входное изображение (или изображения). Если
-        ``return_image=True``, дополнительно возвращается RGB-изображение, использованное
-        для создания страницы.
+        Page object with one block, one line, and one text span covering the
+        whole image. If ``return_image=True``, also returns the RGB image used
+        to build the page.
 
     Examples
     --------
@@ -334,7 +318,7 @@ def create_page_from_image(
     >>> span.polygon
     [(0.0, 0.0), (120.0, 0.0), (120.0, 32.0), (0.0, 32.0)]
 
-    Использование с распознавателем:
+    Use with a recognizer:
 
     >>> from manuscript.recognizers import TRBA
     >>> page = create_page_from_image("crop1.png")
@@ -343,7 +327,7 @@ def create_page_from_image(
     >>> result_page.blocks[0].lines[0].text_spans[0].text
     'example'
 
-    Использование с несколькими кропами:
+    Use with multiple crops:
 
     >>> page, composed_image = create_page_from_image(
     ...     ["crop1.png", "crop2.png"],

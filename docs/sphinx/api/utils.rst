@@ -18,4 +18,3 @@ The utilities module also includes helpers for creating lightweight
    :members:
    :undoc-members:
    :show-inheritance:
-
