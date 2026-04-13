@@ -1,0 +1,12 @@
+Changes in v_0_1_13 relative to 0.1.12
+======================================
+
+- `src/manuscript/recognizers/_trba/__init__.py`: fixed a CUDA/ONNX Runtime
+  inference bug in `TRBA` where the final incomplete batch shape could trigger
+  severe recognition slowdowns on page-scale runs; the last partial batch is
+  now padded to the effective batch size before ONNX inference and decoded
+  back only for the original number of regions;
+- `tests/recognizers/test_trba_infer.py`: added regression coverage for the
+  padded last-batch inference path to ensure partial tail batches are executed
+  as full effective-size ONNX runs while preserving the original number of
+  returned predictions.

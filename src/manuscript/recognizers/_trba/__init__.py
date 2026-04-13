@@ -616,30 +616,52 @@ class TRBA(BaseRecognizer):
         regions: Sequence[PreparedRegion],
         batch_size: Optional[int] = None,
     ) -> List[RecognitionPrediction]:
+        return self._run_inference_batches(
+            regions=regions,
+            batch_size=batch_size,
+        )
+
+    def _run_inference_batches(
+        self,
+        regions: Sequence[PreparedRegion],
+        batch_size: Optional[int] = None,
+    ) -> List[RecognitionPrediction]:
         """
         Run ONNX inference on prepared text regions.
         """
         if self.onnx_session is None:
             self._initialize_session()
 
+        if batch_size is None:
+            batch_size = self.batch_size
+        requested_batch_size = max(1, int(batch_size))
+        effective_batch_size = self._effective_inference_batch_size(requested_batch_size)
+
         if not regions:
             return []
 
         results: List[RecognitionPrediction] = []
-        if batch_size is None:
-            batch_size = self.batch_size
-        effective_batch_size = self._effective_inference_batch_size(batch_size)
         input_name = self.onnx_session.get_inputs()[0].name
         output_name = self.onnx_session.get_outputs()[0].name
 
         for i in range(0, len(regions), effective_batch_size):
             batch_regions = regions[i : i + effective_batch_size]
+            original_batch_size = len(batch_regions)
+
             batch_tensors = [self._preprocess_image(region.image)[0] for region in batch_regions]
-            batch_input = np.stack(batch_tensors, axis=0)
+            inference_tensors = batch_tensors
+            if 0 < original_batch_size < effective_batch_size:
+                pad_tensor = batch_tensors[-1]
+                inference_tensors = batch_tensors + [pad_tensor] * (
+                    effective_batch_size - original_batch_size
+                )
+
+            batch_input = np.stack(inference_tensors, axis=0)
+
             try:
                 logits = self.onnx_session.run([output_name], {input_name: batch_input})[0]
             except Exception as exc:
-                if len(batch_regions) > 1 and self._is_batch_shape_error(exc):
+                if batch_input.shape[0] > 1 and self._is_batch_shape_error(exc):
                     self._supports_multi_batch_inference = False
                     self._warn_single_batch_only()
                     for batch_tensor in batch_tensors:
@@ -654,6 +676,9 @@ class TRBA(BaseRecognizer):
 
             if len(batch_regions) > 1 and self._supports_multi_batch_inference is None:
                 self._supports_multi_batch_inference = True
+
+            if len(logits) != original_batch_size:
+                logits = logits[:original_batch_size]
 
             results.extend(self._decode_recognition_logits(logits))
 
@@ -719,6 +744,7 @@ class TRBA(BaseRecognizer):
         image: Optional[Union[np.ndarray, str, Path, Image.Image]] = None,
         batch_size: Optional[int] = None,
         debug_save_dir: Optional[Union[str, Path]] = None,
+        profile: bool = False,
     ) -> Page:
         """
         Распознаёт текст для текстовых областей на ``Page`` и возвращает обновлённый ``Page``.
@@ -755,6 +781,7 @@ class TRBA(BaseRecognizer):
             batch_size = self.batch_size
 
         image_array = read_image(image)
+
         regions = self._call_region_preparer(result_page, image_array)
         if not regions:
             return result_page

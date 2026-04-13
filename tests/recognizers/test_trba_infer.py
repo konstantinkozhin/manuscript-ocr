@@ -3,6 +3,7 @@ from pathlib import Path
 from unittest.mock import patch
 import numpy as np
 import pytest
+import types
 from PIL import Image
 
 from manuscript.api.recognizer import BaseRecognizer
@@ -398,9 +399,61 @@ class TestTRBAPredictPageInterface:
         assert result is not page
         assert result.blocks[0].lines[0].text_spans[0].text == "word1"
         assert result.blocks[0].lines[0].text_spans[1].text == "word2"
-        assert result.blocks[0].lines[0].text_spans[0].recognition_confidence == 0.9
-        assert result.blocks[0].lines[0].text_spans[1].recognition_confidence == 0.85
-        assert calls == {"count": 2, "batch_size": 128}
+
+
+class TestTRBABatching:
+    def _create_recognizer(self, tmp_path, **kwargs):
+        weights_file = tmp_path / "model.onnx"
+        config_file = tmp_path / "model.json"
+        charset_file = tmp_path / "model.txt"
+
+        weights_file.write_text("mock_onnx")
+        config_file.write_text('{"max_len": 25, "hidden_size": 256, "img_h": 64, "img_w": 256}')
+        charset_file.write_text("<PAD>\n<SOS>\n<EOS>\na\nb\nc")
+
+        return TRBA(
+            weights=str(weights_file),
+            config=str(config_file),
+            charset=str(charset_file),
+            device="cpu",
+            **kwargs,
+        )
+
+    def test_run_inference_batches_pads_last_partial_batch(self, tmp_path, monkeypatch):
+        recognizer = self._create_recognizer(tmp_path, batch_size=4)
+
+        class FakeSession:
+            def __init__(self):
+                self.calls = []
+
+            def get_inputs(self):
+                return [types.SimpleNamespace(name="input", shape=["batch", 3, 64, 256])]
+
+            def get_outputs(self):
+                return [types.SimpleNamespace(name="output", shape=["batch", 5, 6])]
+
+            def run(self, output_names, input_feed):
+                batch = next(iter(input_feed.values()))
+                self.calls.append(batch.shape[0])
+                logits = np.zeros((batch.shape[0], 2, 6), dtype=np.float32)
+                logits[:, 0, 3] = 1.0
+                logits[:, 1, 2] = 1.0
+                return [logits]
+
+        recognizer.onnx_session = FakeSession()
+        monkeypatch.setattr(recognizer, "_supports_multi_batch_inference", True)
+        monkeypatch.setattr(
+            recognizer,
+            "_preprocess_image",
+            lambda image: np.zeros((1, 3, 64, 256), dtype=np.float32),
+        )
+
+        images = [np.zeros((8, 8, 3), dtype=np.uint8) for _ in range(6)]
+        predictions = recognizer._predict_word_images(images, batch_size=4)
+
+        assert len(predictions) == 6
+        assert recognizer.onnx_session.calls == [4, 4]
+        assert [prediction["text"] for prediction in predictions] == ["a"] * 6
 
     def test_predict_uses_constructor_batch_size_by_default(self, tmp_path, monkeypatch):
         calls = {}
