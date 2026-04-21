@@ -1,5 +1,5 @@
 
-<img width="2028" height="496" alt="Frame 8" src="docs\logo.png" />
+<img width="2028" height="496" alt="logo" src="https://github.com/user-attachments/assets/89e895cd-c30c-49c7-8922-9e3fc2393066" />
 
 # Manuscript OCR
 
