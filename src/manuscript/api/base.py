@@ -1,5 +1,6 @@
 from abc import ABC, abstractmethod
 import contextlib
+import ctypes
 import io
 import os
 from pathlib import Path
@@ -50,6 +51,7 @@ class BaseArtifactModel(ABC):
         self._runtime_deps_preloaded = False
         self._runtime_preload_message: Optional[str] = None
         self._runtime_dll_dir_handles = []
+        self._runtime_dll_handles = []
 
     # -------------------------------------------------------------------------
     # DEVICE
@@ -100,7 +102,9 @@ class BaseArtifactModel(ABC):
                 "cudnn",
                 "cublas",
                 "cuda_runtime",
+                "cuda_nvrtc",
                 "cufft",
+                "curand",
                 "nvjitlink",
             ):
                 candidate = os.path.join(nvidia_root, package_name, "bin")
@@ -123,6 +127,18 @@ class BaseArtifactModel(ABC):
             if add_errors:
                 messages.append("Failed to add some Windows DLL directories:")
                 messages.extend(f"  {item}" for item in add_errors)
+
+            dll_load_errors = []
+            for dll_dir in added_dirs:
+                for dll_path in sorted(Path(dll_dir).glob("*.dll")):
+                    try:
+                        self._runtime_dll_handles.append(ctypes.WinDLL(str(dll_path)))
+                    except Exception as exc:
+                        dll_load_errors.append(f"{dll_path}: {exc}")
+
+            if dll_load_errors:
+                messages.append("Failed to preload some NVIDIA DLLs:")
+                messages.extend(f"  {item}" for item in dll_load_errors)
 
         if not hasattr(ort, "preload_dlls"):
             if messages:

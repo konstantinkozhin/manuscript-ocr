@@ -16,22 +16,52 @@ from .utils import (
     expand_boxes,
 )
 
-# Optional imports for training (not needed for inference)
-try:
-    import torch
-    from torch.utils.data import ConcatDataset
-    from .dataset import EASTDataset
-    from .east import EASTModel
-    from .train_utils import _run_training
+torch = None
+ConcatDataset = None
+EASTDataset = None
+EASTModel = None
+_run_training = None
+_TORCH_AVAILABLE = None
+_EAST_TRAINING_AVAILABLE = None
 
-    _TORCH_AVAILABLE = True
-except ImportError:
-    torch = None
-    ConcatDataset = None
-    EASTDataset = None
-    EASTModel = None
-    _run_training = None
-    _TORCH_AVAILABLE = False
+
+def _ensure_torch_dependencies(*, training: bool = False) -> None:
+    global torch, ConcatDataset, EASTDataset, EASTModel, _run_training
+    global _TORCH_AVAILABLE, _EAST_TRAINING_AVAILABLE
+
+    if _TORCH_AVAILABLE is not True:
+        try:
+            import torch as torch_module
+            from .east import EASTModel as east_model_cls
+        except ImportError as exc:
+            _TORCH_AVAILABLE = False
+            raise ImportError(
+                "PyTorch is required for training/exporting EAST models. "
+                "Install with: pip install manuscript-ocr[dev]"
+            ) from exc
+
+        torch = torch_module
+        EASTModel = east_model_cls
+        _TORCH_AVAILABLE = True
+
+    if not training or _EAST_TRAINING_AVAILABLE is True:
+        return
+
+    try:
+        from torch.utils.data import ConcatDataset as concat_dataset_cls
+        from .dataset import EASTDataset as east_dataset_cls
+        from .train_utils import _run_training as run_training_fn
+    except ImportError as exc:
+        _EAST_TRAINING_AVAILABLE = False
+        raise ImportError(
+            "PyTorch training dependencies are required for EAST training. "
+            "Install with: pip install manuscript-ocr[dev]"
+        ) from exc
+
+    ConcatDataset = concat_dataset_cls
+    EASTDataset = east_dataset_cls
+    _run_training = run_training_fn
+    _EAST_TRAINING_AVAILABLE = True
 
 
 class EAST(BaseDetector):
@@ -825,11 +855,7 @@ class EAST(BaseDetector):
         ...     augmentation_config=aug_cfg,
         ... )
         """
-        if not _TORCH_AVAILABLE:
-            raise ImportError(
-                "PyTorch is required for training. "
-                "Install with: pip install manuscript-ocr[dev]"
-            )
+        _ensure_torch_dependencies(training=True)
 
         if device is None:
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -1190,11 +1216,7 @@ class EAST(BaseDetector):
         --------
         EAST.__init__ : Initialize EAST detector with ONNX support using ``use_onnx=True``.
         """
-        if not _TORCH_AVAILABLE:
-            raise ImportError(
-                "PyTorch is required for exporting models. "
-                "Install with: pip install manuscript-ocr[dev]"
-            )
+        _ensure_torch_dependencies()
 
         class EASTWrapper(torch.nn.Module):
             def __init__(self, east_model):

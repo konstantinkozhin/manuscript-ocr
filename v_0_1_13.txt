@@ -9,4 +9,19 @@ Changes in v_0_1_13 relative to 0.1.12
 - `tests/recognizers/test_trba_infer.py`: added regression coverage for the
   padded last-batch inference path to ensure partial tail batches are executed
   as full effective-size ONNX runs while preserving the original number of
-  returned predictions.
+  returned predictions;
+- `src/manuscript/api/base.py`: fixed CUDA DLL preload for ONNX Runtime on
+  Windows by loading NVIDIA runtime DLLs from `site-packages/nvidia` and keeping
+  DLL handles alive; this prevents ONNX Runtime from falling back to PyTorch
+  DLLs and fixes cuDNN frontend sublibrary loading during CUDA inference;
+- `src/manuscript/detectors/_east/__init__.py` and
+  `src/manuscript/detectors/_east/utils.py`: made EAST PyTorch/training imports
+  lazy so ONNX inference and CUDA session initialization do not import `torch`;
+- `src/manuscript/recognizers/_trba/__init__.py` and
+  `src/manuscript/recognizers/_trba/data/charset.py`: moved charset loading to
+  a lightweight module and made TRBA training imports lazy so recognizer
+  inference does not import `torch`;
+- `src/manuscript/__init__.py`, package `__init__.py` files, and
+  `src/manuscript/utils/__init__.py`: made heavy public exports lazy to keep
+  `import manuscript`, detector/recognizer/corrector package imports, and
+  visualization utilities free of unnecessary PyTorch imports.

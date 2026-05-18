@@ -8,11 +8,6 @@ from PIL import Image, ImageDraw
 from ..data import Page
 from .io import read_image
 
-try:
-    import torch
-except ImportError:
-    torch = None
-
 
 def _draw_quads(
     image: Union[str, Path, np.ndarray, Image.Image],

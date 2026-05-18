@@ -1,6 +1,5 @@
 import os
 import json
-import traceback
 from pathlib import Path
 from typing import Callable, List, Union, Optional, Sequence, Dict, Any
 
@@ -31,21 +30,37 @@ from .._common.region_types import (
     normalize_prepared_regions,
     normalize_recognition_predictions,
 )
-from .data.transforms import load_charset
+from .data.charset import load_charset
 
-# Optional imports for training (not needed for inference)
-try:
-    from .training.train import Config, run_training
+Config = None
+run_training = None
+_TRAINING_AVAILABLE = None
+_TRAINING_IMPORT_ERROR = None
 
+
+def _ensure_training_dependencies() -> None:
+    global Config, run_training, _TRAINING_AVAILABLE, _TRAINING_IMPORT_ERROR
+
+    if _TRAINING_AVAILABLE is True:
+        return
+
+    try:
+        from .training.train import Config as config_cls
+        from .training.train import run_training as run_training_fn
+    except ImportError as exc:
+        Config = None
+        run_training = None
+        _TRAINING_AVAILABLE = False
+        _TRAINING_IMPORT_ERROR = exc
+        raise ImportError(
+            "Training dependencies not available. "
+            "Install with: pip install manuscript-ocr[dev]"
+        ) from exc
+
+    Config = config_cls
+    run_training = run_training_fn
     _TRAINING_AVAILABLE = True
     _TRAINING_IMPORT_ERROR = None
-    _TRAINING_IMPORT_TRACEBACK = None
-except ImportError as exc:
-    Config = None
-    run_training = None
-    _TRAINING_AVAILABLE = False
-    _TRAINING_IMPORT_ERROR = exc
-    _TRAINING_IMPORT_TRACEBACK = traceback.format_exc()
 
 class TRBA(BaseRecognizer):
     """
@@ -1048,20 +1063,7 @@ class TRBA(BaseRecognizer):
         ...     epochs=100,
         ... )
         """
-        if not _TRAINING_AVAILABLE:
-            details = ""
-            if _TRAINING_IMPORT_TRACEBACK:
-                details = (
-                    "\nOriginal import error traceback:\n"
-                    f"{_TRAINING_IMPORT_TRACEBACK.rstrip()}"
-                )
-            elif _TRAINING_IMPORT_ERROR is not None:
-                details = f"\nOriginal import error: {_TRAINING_IMPORT_ERROR!r}"
-            raise ImportError(
-                "Training dependencies not available. "
-                "Install with: pip install manuscript-ocr[dev]"
-                f"{details}"
-            ) from _TRAINING_IMPORT_ERROR
+        _ensure_training_dependencies()
 
         def _ensure_path_list(
             value: Optional[Union[str, Sequence[Optional[str]]]],
