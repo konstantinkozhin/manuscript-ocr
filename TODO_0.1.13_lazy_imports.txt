@@ -1,0 +1,76 @@
+TODO for 0.1.13: reduce eager imports in runtime inference paths
+===============================================================
+
+Context
+-------
+While investigating TRBA ONNX quantization and peak memory, we found that
+some public package imports eagerly load training/development dependencies.
+This matters even when the actual inference backend is ONNX Runtime and does
+not need PyTorch.
+
+The production package does not install torch/albumentations by default
+because they are only in the dev extra. Therefore this is not primarily a
+"clean runtime install crashes without torch" issue. The important case is a
+dev or mixed environment where torch/torchvision/tensorboard are installed:
+then a harmless import can reserve hundreds of MB before inference starts.
+
+Confirmed measurements in the current dev environment
+-----------------------------------------------------
+Approximate RSS after importing in a fresh Python process:
+
+- import manuscript: ~17 MB, torch not loaded
+- import manuscript.recognizers: ~17 MB, torch not loaded
+- import manuscript.correctors: ~58 MB, torch not loaded
+- import manuscript.utils + manuscript.layouts + manuscript.data: ~58 MB, torch not loaded
+- import manuscript.detectors: ~491 MB, torch loaded
+- import manuscript.detectors._east: ~491 MB, torch/torchvision/tensorboard loaded
+- import manuscript._pipeline: ~492 MB, torch loaded
+
+Why this is important
+---------------------
+1. Peak memory numbers for ONNX inference become misleading in dev
+   environments if imports pull in PyTorch before the model is even created.
+2. Users often run inference from notebooks or services where dev/training
+   packages are already installed globally. In that case eager imports become
+   a real runtime memory cost.
+3. Pipeline-level imports amplify the effect: importing Pipeline can load
+   detector modules, and detector modules can load training stacks.
+4. This can hide the real effect of quantization, batch size, and ONNX Runtime
+   SessionOptions, because the baseline process is already inflated.
+
+Known candidates for 0.1.13 fixes
+---------------------------------
+1. Make manuscript.detectors.__init__ lazy, like recognizers.__init__.
+   Do not import EAST/YOLO classes until the attribute is requested.
+
+2. Make EAST training dependencies lazy.
+   EAST inference uses ONNX Runtime, cv2, numpy, geometry utilities and LANMS.
+   Training-only imports should not run at module import time:
+   torch, torch.utils.data.ConcatDataset, EASTDataset, EASTModel, train_utils.
+
+3. Review manuscript._pipeline imports.
+   Pipeline should not force heavy detector/training stacks at import time.
+   It can resolve default detector/recognizer classes lazily when constructing
+   a default Pipeline instance.
+
+4. Keep inference helpers separated from training helpers.
+   Lightweight modules for charset/config/geometry/ONNX preprocessing are good.
+   Training modules may depend on torch/albumentations/tensorboard, but public
+   inference imports should not import those modules unless training/export is
+   explicitly requested.
+
+5. Add regression tests.
+   Suggested tests in a dev environment:
+   - import manuscript does not load torch
+   - import manuscript.recognizers does not load torch
+   - import manuscript.detectors does not load torch
+   - import manuscript.recognizers._trba does not load torch/albumentations
+   - import manuscript.detectors._east does not load torch/torchvision/tensorboard
+
+Related TRBA finding
+--------------------
+TRBA had the same class of issue through training and utility imports. The
+local investigation showed that making inference imports lazy can reduce a dev
+process baseline by hundreds of MB without changing model accuracy. Treat this
+as a library architecture issue, not a quantization trick.
+
