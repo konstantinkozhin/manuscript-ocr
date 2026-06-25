@@ -24,10 +24,17 @@ class EASTV2OutputHead(nn.Module):
         self.boundary_map = make_head()
         self.center_map = make_head()
 
+    def forward_logits(self, x):
+        score_logits = self.score_map(x)
+        boundary_logits = self.boundary_map(x)
+        center_logits = self.center_map(x)
+        return score_logits, boundary_logits, center_logits
+
     def forward(self, x):
-        score = torch.sigmoid(self.score_map(x))
-        boundary = torch.sigmoid(self.boundary_map(x))
-        center = torch.sigmoid(self.center_map(x))
+        score_logits, boundary_logits, center_logits = self.forward_logits(x)
+        score = torch.sigmoid(score_logits)
+        boundary = torch.sigmoid(boundary_logits)
+        center = torch.sigmoid(center_logits)
         return score, boundary, center
 
 
@@ -71,9 +78,17 @@ class EASTV2Model(nn.Module):
     def forward(self, x):
         feats = self.backbone(x)
         merged = self.decoder(feats)
-        score, boundary, center = self.output_head(merged)
+        score_logits, boundary_logits, center_logits = self.output_head.forward_logits(
+            merged
+        )
+        score = torch.sigmoid(score_logits)
+        boundary = torch.sigmoid(boundary_logits)
+        center = torch.sigmoid(center_logits)
         return {
             "score": score,
             "boundary": boundary,
             "center": center,
+            "score_logits": score_logits,
+            "boundary_logits": boundary_logits,
+            "center_logits": center_logits,
         }

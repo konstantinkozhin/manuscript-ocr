@@ -10,7 +10,7 @@ val_images = r"C:\shared\data02065\school_notebooks_RU\test_images"
 val_annotations = r"C:\shared\data02065\school_notebooks_RU\test.json"
 
 experiment_root = "experiments"
-model_name = "resnet_quad_v2"
+model_name = "resnet_eastv2_logits"
 resume_checkpoint = (
     Path(experiment_root) / model_name / "checkpoints" / "last_state.pt"
 )

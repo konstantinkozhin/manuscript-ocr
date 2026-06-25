@@ -132,10 +132,11 @@ def test_eastv2_model_forward_shapes():
 
     out = model(x)
 
-    assert set(out.keys()) == {"score", "boundary", "center"}
+    assert {"score", "boundary", "center"}.issubset(out.keys())
     assert out["score"].shape == (1, 1, 64, 64)
     assert out["boundary"].shape == (1, 1, 64, 64)
     assert out["center"].shape == (1, 1, 64, 64)
+    assert out["score_logits"].shape == (1, 1, 64, 64)
 
 
 @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
@@ -162,6 +163,7 @@ def test_eastv2_loss_backward():
     assert pred_score.grad is not None
     assert pred_boundary.grad is not None
     assert pred_center.grad is not None
+    assert "score" in loss_fn.last_losses
 
 
 @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")

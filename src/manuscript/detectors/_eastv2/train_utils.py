@@ -39,7 +39,7 @@ def _custom_collate_fn(batch):
 
 
 def _resize_outputs(out: Dict[str, torch.Tensor], target_hw: Tuple[int, int]):
-    return {
+    resized = {
         "score": F.interpolate(
             out["score"], size=target_hw, mode="bilinear", align_corners=False
         ),
@@ -50,6 +50,12 @@ def _resize_outputs(out: Dict[str, torch.Tensor], target_hw: Tuple[int, int]):
             out["center"], size=target_hw, mode="bilinear", align_corners=False
         ),
     }
+    for key in ("score_logits", "boundary_logits", "center_logits"):
+        if key in out:
+            resized[key] = F.interpolate(
+                out[key], size=target_hw, mode="bilinear", align_corners=False
+            )
+    return resized
 
 
 def _loss_from_batch(criterion, target, pred):
@@ -60,6 +66,8 @@ def _loss_from_batch(criterion, target, pred):
         pred["boundary"],
         target["center_map"],
         pred["center"],
+        pred.get("score_logits"),
+        pred.get("boundary_logits"),
     )
 
 
@@ -568,6 +576,8 @@ def _run_training(
             train_loss += float(loss.item())
             current_step = global_step + batch_idx
             writer.add_scalar("Loss/Train_Step", float(loss.item()), current_step)
+            for part_name, part_value in getattr(criterion, "last_losses", {}).items():
+                writer.add_scalar(f"LossParts/Train/{part_name}", part_value, current_step)
             current_lr = (
                 scheduler.get_last_lr()[0]
                 if scheduler is not None
@@ -622,6 +632,14 @@ def _run_training(
                         out = eval_model(imgs)
                         pred = _resize_outputs(out, tgt["score_map"].shape[-2:])
                         batch_loss = _loss_from_batch(criterion, tgt, pred).item()
+                        for part_name, part_value in getattr(
+                            criterion, "last_losses", {}
+                        ).items():
+                            writer.add_scalar(
+                                f"LossParts/Val/{part_name}",
+                                part_value,
+                                epoch,
+                            )
                         dataset_loss += batch_loss
                         total_val_loss += batch_loss
                         dataset_batches += 1

@@ -24,6 +24,24 @@ def dice_loss(gt: torch.Tensor, pred: torch.Tensor, eps: float = 1e-5) -> torch.
     return torch.mean(1.0 - (2.0 * inter + eps) / (union + eps))
 
 
+def balanced_bce_with_logits(
+    logits: torch.Tensor,
+    target: torch.Tensor,
+    max_pos_weight: float = 20.0,
+) -> torch.Tensor:
+    positives = torch.sum(target)
+    negatives = target.numel() - positives
+    if positives < 1:
+        pos_weight = torch.ones((), device=logits.device, dtype=logits.dtype)
+    else:
+        pos_weight = torch.clamp(
+            negatives / (positives + 1e-6),
+            min=1.0,
+            max=max_pos_weight,
+        ).to(device=logits.device, dtype=logits.dtype)
+    return F.binary_cross_entropy_with_logits(logits, target, pos_weight=pos_weight)
+
+
 class EASTV2Loss(nn.Module):
     """Loss for score, boundary and center maps."""
 
@@ -48,6 +66,8 @@ class EASTV2Loss(nn.Module):
         pred_boundary: torch.Tensor,
         gt_center: torch.Tensor,
         pred_center: torch.Tensor,
+        pred_score_logits: torch.Tensor = None,
+        pred_boundary_logits: torch.Tensor = None,
     ) -> torch.Tensor:
         device_type = pred_score.device.type
         with _autocast_disabled(device_type):
@@ -58,14 +78,36 @@ class EASTV2Loss(nn.Module):
             gt_center = gt_center.float()
             pred_center = pred_center.float()
 
-            score_loss = F.binary_cross_entropy(pred_score, gt_score)
-            boundary_bce = F.binary_cross_entropy(pred_boundary, gt_boundary)
+            if pred_score_logits is not None:
+                pred_score_logits = pred_score_logits.float()
+                score_loss = balanced_bce_with_logits(pred_score_logits, gt_score)
+            else:
+                score_loss = F.binary_cross_entropy(pred_score, gt_score)
+
+            if pred_boundary_logits is not None:
+                pred_boundary_logits = pred_boundary_logits.float()
+                boundary_bce = balanced_bce_with_logits(
+                    pred_boundary_logits,
+                    gt_boundary,
+                    max_pos_weight=10.0,
+                )
+            else:
+                boundary_bce = F.binary_cross_entropy(pred_boundary, gt_boundary)
+
             boundary_dice = dice_loss(gt_boundary, pred_boundary)
             center_loss = F.mse_loss(pred_center, gt_center)
 
-        return (
+        total = (
             self.score_weight * score_loss
             + self.boundary_weight
             * (boundary_bce + self.boundary_dice_weight * boundary_dice)
             + self.center_weight * center_loss
         )
+        self.last_losses = {
+            "score": float(score_loss.detach().cpu()),
+            "boundary_bce": float(boundary_bce.detach().cpu()),
+            "boundary_dice": float(boundary_dice.detach().cpu()),
+            "center": float(center_loss.detach().cpu()),
+            "total": float(total.detach().cpu()),
+        }
+        return total
