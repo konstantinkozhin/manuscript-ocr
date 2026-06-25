@@ -215,10 +215,10 @@ def _run_training(
     )
 
     try:
-        scaler = torch.amp.GradScaler(device_type="cuda")
+        scaler = torch.amp.GradScaler("cuda")
 
         def autocast_ctx():
-            return torch.amp.autocast(device_type="cuda")
+            return torch.amp.autocast("cuda")
 
     except (AttributeError, TypeError):
         scaler = torch.cuda.amp.GradScaler()

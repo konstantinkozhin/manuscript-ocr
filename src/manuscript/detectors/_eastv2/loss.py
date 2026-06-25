@@ -1,6 +1,19 @@
+import contextlib
+
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+
+
+def _autocast_disabled(device_type: str):
+    if hasattr(torch, "amp"):
+        try:
+            return torch.amp.autocast(device_type, enabled=False)
+        except TypeError:
+            return torch.amp.autocast(device_type=device_type, enabled=False)
+    if device_type == "cuda" and hasattr(torch, "cuda"):
+        return torch.cuda.amp.autocast(enabled=False)
+    return contextlib.nullcontext()
 
 
 def dice_loss(gt: torch.Tensor, pred: torch.Tensor, eps: float = 1e-5) -> torch.Tensor:
@@ -36,10 +49,19 @@ class EASTV2Loss(nn.Module):
         gt_center: torch.Tensor,
         pred_center: torch.Tensor,
     ) -> torch.Tensor:
-        score_loss = F.binary_cross_entropy(pred_score, gt_score)
-        boundary_bce = F.binary_cross_entropy(pred_boundary, gt_boundary)
-        boundary_dice = dice_loss(gt_boundary, pred_boundary)
-        center_loss = F.mse_loss(pred_center, gt_center)
+        device_type = pred_score.device.type
+        with _autocast_disabled(device_type):
+            gt_score = gt_score.float()
+            pred_score = pred_score.float()
+            gt_boundary = gt_boundary.float()
+            pred_boundary = pred_boundary.float()
+            gt_center = gt_center.float()
+            pred_center = pred_center.float()
+
+            score_loss = F.binary_cross_entropy(pred_score, gt_score)
+            boundary_bce = F.binary_cross_entropy(pred_boundary, gt_boundary)
+            boundary_dice = dice_loss(gt_boundary, pred_boundary)
+            center_loss = F.mse_loss(pred_center, gt_center)
 
         return (
             self.score_weight * score_loss

@@ -165,6 +165,42 @@ def test_eastv2_loss_backward():
 
 
 @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
+def test_eastv2_loss_is_safe_inside_autocast():
+    loss_fn = EASTV2Loss()
+    gt_score = torch.ones(1, 1, 8, 8)
+    gt_boundary = torch.zeros(1, 1, 8, 8)
+    gt_center = torch.zeros(1, 1, 8, 8)
+    pred_score = torch.full((1, 1, 8, 8), 0.8, requires_grad=True)
+    pred_boundary = torch.full((1, 1, 8, 8), 0.2, requires_grad=True)
+    pred_center = torch.full((1, 1, 8, 8), 0.1, requires_grad=True)
+
+    if hasattr(torch, "amp"):
+        with torch.amp.autocast("cpu"):
+            loss = loss_fn(
+                gt_score,
+                pred_score,
+                gt_boundary,
+                pred_boundary,
+                gt_center,
+                pred_center,
+            )
+    else:
+        loss = loss_fn(
+            gt_score,
+            pred_score,
+            gt_boundary,
+            pred_boundary,
+            gt_center,
+            pred_center,
+        )
+
+    loss.backward()
+
+    assert torch.isfinite(loss)
+    assert pred_score.grad is not None
+
+
+@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_eastv2_dataset_targets(tmp_path):
     annotations = {
         "images": [{"id": 1, "file_name": "test.jpg", "width": 128, "height": 128}],
