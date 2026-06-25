@@ -4,6 +4,8 @@ import os
 from collections import OrderedDict
 from typing import Any, Dict, Optional, Sequence, Tuple
 
+import cv2
+import numpy as np
 import torch
 import torch.nn.functional as F
 import torch_optimizer as toptim
@@ -19,7 +21,9 @@ from .._east.train_utils import (
     _is_full_state_checkpoint,
     dice_coefficient,
 )
+from ...utils.io import _tensor_to_image
 from .loss import EASTV2Loss
+from .utils import decode_instance_maps, labels_to_polygons
 
 
 def _custom_collate_fn(batch):
@@ -59,6 +63,196 @@ def _loss_from_batch(criterion, target, pred):
     )
 
 
+def _sanitize_tag(name: str) -> str:
+    return name.replace("\\", "_").replace("/", "_").replace(" ", "_")
+
+
+def _to_heatmap(prob_map: np.ndarray, cell_size: int) -> np.ndarray:
+    arr = np.asarray(prob_map, dtype=np.float32).squeeze()
+    arr = np.nan_to_num(arr, nan=0.0, posinf=1.0, neginf=0.0)
+    arr = np.clip(arr, 0.0, 1.0)
+    vis = cv2.applyColorMap((arr * 255).astype(np.uint8), cv2.COLORMAP_JET)
+    vis = cv2.cvtColor(vis, cv2.COLOR_BGR2RGB)
+    return cv2.resize(vis, (cell_size, cell_size), interpolation=cv2.INTER_NEAREST)
+
+
+def _labels_to_vis(labels: np.ndarray, cell_size: int) -> np.ndarray:
+    labels = np.asarray(labels, dtype=np.int32)
+    vis = np.zeros((*labels.shape, 3), dtype=np.uint8)
+    for label_id in range(1, int(labels.max()) + 1):
+        color = np.array(
+            [
+                (37 * label_id) % 255,
+                (97 * label_id) % 255,
+                (173 * label_id) % 255,
+            ],
+            dtype=np.uint8,
+        )
+        vis[labels == label_id] = color
+    return cv2.resize(vis, (cell_size, cell_size), interpolation=cv2.INTER_NEAREST)
+
+
+def _draw_polygons(
+    image: np.ndarray,
+    polygons,
+    *,
+    color: Tuple[int, int, int],
+    thickness: int = 2,
+) -> np.ndarray:
+    vis = image.copy()
+    for polygon in polygons:
+        if isinstance(polygon, tuple) and len(polygon) == 2:
+            polygon = polygon[0]
+        if torch.is_tensor(polygon):
+            polygon = polygon.detach().cpu().numpy()
+        pts = np.asarray(polygon, dtype=np.float32).reshape(-1, 2)
+        if pts.shape[0] < 2:
+            continue
+        cv2.polylines(
+            vis,
+            [pts.astype(np.int32)],
+            isClosed=True,
+            color=color,
+            thickness=thickness,
+        )
+    return vis
+
+
+def create_collage(
+    img_tensor: torch.Tensor,
+    gt_score_map: torch.Tensor,
+    gt_boundary_map: torch.Tensor,
+    gt_center_map: torch.Tensor,
+    gt_instance_map: torch.Tensor,
+    gt_polygons,
+    pred_score_map: np.ndarray,
+    pred_boundary_map: np.ndarray,
+    pred_center_map: np.ndarray,
+    pred_instance_map: np.ndarray,
+    pred_polygons,
+    *,
+    cell_size: int = 480,
+) -> np.ndarray:
+    image = _tensor_to_image(
+        img_tensor,
+        denormalize={"mean": [0.5, 0.5, 0.5], "std": [0.5, 0.5, 0.5]},
+    )
+    image_cell = cv2.resize(image, (cell_size, cell_size), interpolation=cv2.INTER_AREA)
+
+    gt_image = _draw_polygons(image, gt_polygons, color=(0, 255, 0))
+    gt_image = cv2.resize(gt_image, (cell_size, cell_size), interpolation=cv2.INTER_AREA)
+    pred_image = _draw_polygons(image, pred_polygons, color=(255, 0, 0))
+    pred_image = cv2.resize(
+        pred_image, (cell_size, cell_size), interpolation=cv2.INTER_AREA
+    )
+
+    gt_score = gt_score_map.detach().cpu().numpy()
+    gt_boundary = gt_boundary_map.detach().cpu().numpy()
+    gt_center = gt_center_map.detach().cpu().numpy()
+    gt_instance = gt_instance_map.detach().cpu().numpy()
+
+    gt_cells = [
+        gt_image,
+        _to_heatmap(gt_score, cell_size),
+        _to_heatmap(gt_boundary, cell_size),
+        _to_heatmap(gt_center, cell_size),
+        _labels_to_vis(gt_instance, cell_size),
+    ]
+    pred_cells = [
+        pred_image,
+        _to_heatmap(pred_score_map, cell_size),
+        _to_heatmap(pred_boundary_map, cell_size),
+        _to_heatmap(pred_center_map, cell_size),
+        _labels_to_vis(pred_instance_map, cell_size),
+    ]
+
+    collage = np.full((cell_size * 2, cell_size * 5, 3), 255, dtype=np.uint8)
+    for col, cell in enumerate(gt_cells):
+        collage[0:cell_size, col * cell_size : (col + 1) * cell_size] = cell
+    for col, cell in enumerate(pred_cells):
+        collage[cell_size : 2 * cell_size, col * cell_size : (col + 1) * cell_size] = cell
+
+    # Small visual anchor: original image in top-left corner of both image cells.
+    thumb = cv2.resize(image_cell, (cell_size // 4, cell_size // 4))
+    collage[0 : thumb.shape[0], 0 : thumb.shape[1]] = thumb
+    collage[cell_size : cell_size + thumb.shape[0], 0 : thumb.shape[1]] = thumb
+    return collage
+
+
+def _collage_batch(
+    model,
+    dataset,
+    device,
+    num: int = 4,
+    cell_size: int = 480,
+) -> Optional[np.ndarray]:
+    if len(dataset) == 0:
+        return None
+
+    model.eval()
+    collages = []
+    sample_count = min(num, len(dataset))
+    indices = np.random.choice(len(dataset), size=sample_count, replace=False)
+    for idx in indices:
+        img_t, target = dataset[int(idx)]
+        gt_hw = target["score_map"].shape[-2:]
+        with torch.no_grad():
+            out = model(img_t.unsqueeze(0).to(device))
+            pred = _resize_outputs(out, gt_hw)
+
+        pred_score = pred["score"][0, 0].detach().cpu().numpy()
+        pred_boundary = pred["boundary"][0, 0].detach().cpu().numpy()
+        pred_center = pred["center"][0, 0].detach().cpu().numpy()
+        pred_instances = decode_instance_maps(
+            pred_score,
+            pred_boundary,
+            pred_center,
+            score_thresh=0.5,
+            boundary_thresh=0.5,
+            center_thresh=0.35,
+            min_area=4,
+        )
+
+        image_h, image_w = img_t.shape[-2:]
+        scale_x = image_w / pred_instances.shape[1]
+        scale_y = image_h / pred_instances.shape[0]
+        pred_polygons = labels_to_polygons(
+            pred_instances,
+            score_map=pred_score,
+            scale_x=scale_x,
+            scale_y=scale_y,
+        )
+
+        collages.append(
+            create_collage(
+                img_tensor=img_t,
+                gt_score_map=target["score_map"],
+                gt_boundary_map=target["boundary_map"],
+                gt_center_map=target["center_map"],
+                gt_instance_map=target["instance_map"],
+                gt_polygons=target.get("polygons", []),
+                pred_score_map=pred_score,
+                pred_boundary_map=pred_boundary,
+                pred_center_map=pred_center,
+                pred_instance_map=pred_instances,
+                pred_polygons=pred_polygons,
+                cell_size=cell_size,
+            )
+        )
+
+    if len(collages) == 1:
+        return collages[0]
+    top = np.hstack(collages[:2])
+    if len(collages) > 2:
+        bottom = np.hstack(collages[2:4])
+        if bottom.shape[1] < top.shape[1]:
+            pad = np.zeros((bottom.shape[0], top.shape[1] - bottom.shape[1], 3), dtype=np.uint8)
+            bottom = np.hstack([bottom, pad])
+    else:
+        bottom = np.zeros_like(top)
+    return np.vstack([top, bottom])
+
+
 def _run_training(
     experiment_dir: str,
     model: torch.nn.Module,
@@ -96,7 +290,7 @@ def _run_training(
     augmentation_config: Optional[Dict[str, Any]] = None,
     log_collage: bool = True,
 ):
-    del use_ohem, ohem_ratio, use_focal_geo, focal_gamma, log_collage
+    del use_ohem, ohem_ratio, use_focal_geo, focal_gamma
 
     experiment_dir = os.path.abspath(os.fspath(experiment_dir))
     log_dir = os.path.join(experiment_dir, "logs")
@@ -276,6 +470,45 @@ def _run_training(
 
     writer = SummaryWriter(log_dir, purge_step=start_epoch if resume else None)
 
+    collage_cell_size = 480
+    collage_samples = 4
+
+    def make_collage(epoch: int):
+        if not log_collage:
+            return
+        device_type = getattr(device, "type", str(device))
+        if device_type == "cuda":
+            torch.cuda.empty_cache()
+        vis_model = ema_model if use_ema else model
+        sources = (
+            list(zip(val_dataset_names, val_datasets))
+            if val_datasets
+            else [("val", val_dataset)]
+        )
+        for ds_name, dataset in sources:
+            if len(dataset) == 0:
+                continue
+            collage = _collage_batch(
+                vis_model,
+                dataset,
+                device,
+                num=collage_samples,
+                cell_size=collage_cell_size,
+            )
+            if collage is None:
+                continue
+            writer.add_image(
+                f"Validation/{_sanitize_tag(ds_name)}",
+                collage,
+                epoch,
+                dataformats="HWC",
+            )
+
+    try:
+        make_collage(max(start_epoch - 1, 0))
+    except Exception as exc:  # noqa: BLE001
+        print(f"[WARNING] EASTV2 collage creation failed (start): {exc}")
+
     if start_epoch > num_epochs:
         writer.close()
         return ema_model if use_ema else model
@@ -448,6 +681,11 @@ def _run_training(
 
             if patience_loss >= early_stop and patience_dice >= early_stop:
                 should_stop = True
+
+            try:
+                make_collage(epoch)
+            except Exception as exc:  # noqa: BLE001
+                print(f"[WARNING] EASTV2 collage creation failed at epoch {epoch}: {exc}")
 
         torch.save(
             (ema_model if use_ema else model).state_dict(),
