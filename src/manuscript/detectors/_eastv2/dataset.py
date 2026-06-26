@@ -55,6 +55,15 @@ def _draw_gaussian(target: np.ndarray, center_x: float, center_y: float, sigma: 
     target[y0:y1, x0:x1] = np.maximum(target[y0:y1, x0:x1], gaussian)
 
 
+def _distance_center_region(inst_mask: np.ndarray) -> np.ndarray:
+    """Dense center target: normalized distance to the word boundary."""
+    dist = cv2.distanceTransform(inst_mask.astype(np.uint8), cv2.DIST_L2, 3)
+    max_dist = float(dist.max())
+    if max_dist <= 1e-6:
+        return inst_mask.astype(np.float32)
+    return (dist / max_dist).astype(np.float32)
+
+
 class EASTV2Dataset(EASTDataset):
     """
     COCO polygon dataset for EASTV2 instance targets.
@@ -71,6 +80,7 @@ class EASTV2Dataset(EASTDataset):
         map_scale: float = 0.25,
         boundary_width: int = 2,
         center_sigma_ratio: float = 0.15,
+        center_mode: str = "distance",
         flip_prob: float = 0.0,
         rotate_prob: float = 0.0,
         rotate_deg: float = 2.0,
@@ -86,6 +96,7 @@ class EASTV2Dataset(EASTDataset):
         self.map_scale = float(map_scale)
         self.boundary_width = int(boundary_width)
         self.center_sigma_ratio = float(center_sigma_ratio)
+        self.center_mode = str(center_mode)
         self.flip_prob = float(flip_prob)
         self.rotate_prob = float(rotate_prob if small_rotate_prob is None else small_rotate_prob)
         self.rotate_deg = float(rotate_deg if small_rotate_deg is None else small_rotate_deg)
@@ -136,6 +147,8 @@ class EASTV2Dataset(EASTDataset):
             raise ValueError("map_scale must be in (0, 0.5]")
         if self.boundary_width < 1:
             raise ValueError("boundary_width must be >= 1")
+        if self.center_mode not in {"distance", "gaussian"}:
+            raise ValueError("center_mode must be one of {'distance', 'gaussian'}")
 
         if transform is None:
             if color_jitter:
@@ -279,17 +292,20 @@ class EASTV2Dataset(EASTDataset):
             eroded = cv2.erode(inst_mask, kernel, iterations=1)
             boundary = np.maximum(boundary, (dilated - eroded).astype(np.float32))
 
-            m = cv2.moments(inst_mask, binaryImage=True)
-            if m["m00"] > 0:
-                cx = m["m10"] / m["m00"]
-                cy = m["m01"] / m["m00"]
+            if self.center_mode == "distance":
+                center = np.maximum(center, _distance_center_region(inst_mask))
             else:
-                cx = float(coords[:, 0].mean())
-                cy = float(coords[:, 1].mean())
-            x0, y0 = coords.min(axis=0)
-            x1, y1 = coords.max(axis=0)
-            sigma = max(1.0, min(x1 - x0, y1 - y0) * self.center_sigma_ratio)
-            _draw_gaussian(center, cx, cy, sigma)
+                m = cv2.moments(inst_mask, binaryImage=True)
+                if m["m00"] > 0:
+                    cx = m["m10"] / m["m00"]
+                    cy = m["m01"] / m["m00"]
+                else:
+                    cx = float(coords[:, 0].mean())
+                    cy = float(coords[:, 1].mean())
+                x0, y0 = coords.min(axis=0)
+                x1, y1 = coords.max(axis=0)
+                sigma = max(1.0, min(x1 - x0, y1 - y0) * self.center_sigma_ratio)
+                _draw_gaussian(center, cx, cy, sigma)
 
         return {
             "score_map": torch.from_numpy(score).unsqueeze(0),

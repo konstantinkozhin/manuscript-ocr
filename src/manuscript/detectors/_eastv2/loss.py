@@ -51,12 +51,14 @@ class EASTV2Loss(nn.Module):
         boundary_weight: float = 1.0,
         center_weight: float = 1.0,
         boundary_dice_weight: float = 1.0,
+        center_dice_weight: float = 0.5,
     ):
         super().__init__()
         self.score_weight = float(score_weight)
         self.boundary_weight = float(boundary_weight)
         self.center_weight = float(center_weight)
         self.boundary_dice_weight = float(boundary_dice_weight)
+        self.center_dice_weight = float(center_dice_weight)
 
     def forward(
         self,
@@ -95,7 +97,9 @@ class EASTV2Loss(nn.Module):
                 boundary_bce = F.binary_cross_entropy(pred_boundary, gt_boundary)
 
             boundary_dice = dice_loss(gt_boundary, pred_boundary)
-            center_loss = F.mse_loss(pred_center, gt_center)
+            center_mse = F.mse_loss(pred_center, gt_center)
+            center_dice = dice_loss(gt_center, pred_center)
+            center_loss = center_mse + self.center_dice_weight * center_dice
 
         total = (
             self.score_weight * score_loss
@@ -107,6 +111,8 @@ class EASTV2Loss(nn.Module):
             "score": float(score_loss.detach().cpu()),
             "boundary_bce": float(boundary_bce.detach().cpu()),
             "boundary_dice": float(boundary_dice.detach().cpu()),
+            "center_mse": float(center_mse.detach().cpu()),
+            "center_dice": float(center_dice.detach().cpu()),
             "center": float(center_loss.detach().cpu()),
             "total": float(total.detach().cpu()),
         }

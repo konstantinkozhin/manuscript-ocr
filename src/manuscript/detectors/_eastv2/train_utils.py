@@ -217,7 +217,7 @@ def _collage_batch(
             pred_center,
             score_thresh=0.5,
             boundary_thresh=0.5,
-            center_thresh=0.35,
+            center_thresh=0.45,
             min_area=4,
         )
 

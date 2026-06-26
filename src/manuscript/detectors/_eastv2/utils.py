@@ -21,7 +21,7 @@ def decode_instance_maps(
     *,
     score_thresh: float = 0.5,
     boundary_thresh: float = 0.5,
-    center_thresh: float = 0.35,
+    center_thresh: float = 0.45,
     min_area: int = 4,
 ) -> np.ndarray:
     """

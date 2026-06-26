@@ -71,7 +71,7 @@ class EASTV2(BaseDetector):
         map_scale: float = 0.25,
         score_thresh: float = 0.5,
         boundary_thresh: float = 0.5,
-        center_thresh: float = 0.35,
+        center_thresh: float = 0.45,
         min_area: int = 4,
     ):
         self.weights = str(Path(weights).expanduser().absolute()) if weights else None
@@ -175,7 +175,7 @@ class EASTV2(BaseDetector):
         batch_size: int = 3,
         accumulation_steps: int = 1,
         lr: float = 1e-4,
-        lr_scheduler: str = "cosine_restart",
+        lr_scheduler: str = "none",
         lr_scheduler_params: Optional[Dict[str, Any]] = None,
         augmentation_config: Optional[Dict[str, Any]] = None,
         grad_clip: float = 5.0,
@@ -215,6 +215,7 @@ class EASTV2(BaseDetector):
             "color_jitter": (0.1, 0.1, 0.1, 0.05),
             "boundary_width": 2,
             "center_sigma_ratio": 0.15,
+            "center_mode": "distance",
             # Accepted for config parity with EAST. EASTV2 currently applies
             # flip/rotation/color jitter and stores the remaining values.
             "quad_source": "auto",

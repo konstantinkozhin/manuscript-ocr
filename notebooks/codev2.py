@@ -10,7 +10,7 @@ val_images = r"C:\shared\data02065\school_notebooks_RU\test_images"
 val_annotations = r"C:\shared\data02065\school_notebooks_RU\test.json"
 
 experiment_root = "experiments"
-model_name = "resnet_eastv2_logits"
+model_name = "resnet_eastv2_distance_center"
 resume_checkpoint = (
     Path(experiment_root) / model_name / "checkpoints" / "last_state.pt"
 )
@@ -26,6 +26,7 @@ EASTV2.train(
     batch_size=1,
     target_size=1440,
     val_interval=3,
+    lr_scheduler="none",
     # Continue from the last fully completed epoch when a state checkpoint exists.
     resume_from=resume_checkpoint if resume_checkpoint.exists() else None,
     device=torch.device("cuda"),
