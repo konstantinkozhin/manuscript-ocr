@@ -1,7 +1,7 @@
 import torch
 from pathlib import Path
 
-from manuscript.detectors._eastv2 import EASTV2
+from manuscript.detectors._pse import PSE
 
 # Для быстрого теста используем test split и как train, и как val
 train_images = r"C:\shared\data02065\school_notebooks_RU\train_images"
@@ -10,12 +10,12 @@ val_images = r"C:\shared\data02065\school_notebooks_RU\test_images"
 val_annotations = r"C:\shared\data02065\school_notebooks_RU\test.json"
 
 experiment_root = "experiments"
-model_name = "resnet_eastv2_distance_center"
+model_name = "resnet_pse"
 resume_checkpoint = (
     Path(experiment_root) / model_name / "checkpoints" / "last_state.pt"
 )
 
-EASTV2.train(
+PSE.train(
     train_images=train_images,
     train_anns=train_annotations,
     val_images=val_images,

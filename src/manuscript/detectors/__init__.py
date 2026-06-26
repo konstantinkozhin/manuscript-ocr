@@ -1,6 +1,7 @@
 __all__ = [
     "EAST",
     "EASTV2",
+    "PSE",
     "YOLO",
 ]
 
@@ -15,6 +16,11 @@ def __getattr__(name):
         from ._eastv2 import EASTV2
 
         return EASTV2
+
+    if name == "PSE":
+        from ._pse import PSE
+
+        return PSE
 
     if name == "YOLO":
         from ._yolo import YOLO
