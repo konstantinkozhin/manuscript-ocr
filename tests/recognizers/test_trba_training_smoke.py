@@ -62,6 +62,9 @@ class FakeScaler:
     def update(self):
         return None
 
+    def get_scale(self):
+        return 1.0
+
     def state_dict(self):
         return {"scale": 1.0}
 
@@ -152,12 +155,23 @@ class TinyTRBAModel(nn.Module):
         pad_id,
         blank_id,
         use_ctc_head,
+        transformation="none",
+        tps_num_fiducial=20,
+        **decoder_settings,
     ):
         super().__init__()
         self.cnn = nn.Sequential(nn.Conv2d(cnn_in_channels, 4, 1), nn.BatchNorm2d(4))
         self.enc_rnn = nn.Sequential(nn.Linear(4, 4), nn.Linear(4, 4))
         self.attn = TinyAttention(num_classes)
         self.proj = nn.Linear(cnn_in_channels, num_classes)
+        self.transformation = transformation
+        self.tps_num_fiducial = tps_num_fiducial
+        self.decoder_settings = decoder_settings
+        self.training_loss_calls = 0
+
+    def compute_attention_loss(self, result, targets, criterion):
+        self.training_loss_calls += 1
+        return criterion(result["attention_logits"].flatten(0, 1), targets.flatten())
 
     def forward(self, imgs, text=None, is_train=True, batch_max_length=4):
         steps = text.size(1) if text is not None else batch_max_length
@@ -238,6 +252,11 @@ def _patch_runtime(monkeypatch):
     )
 
     def _save_checkpoint(path, model, optimizer, scheduler, scaler, epoch, global_step, best_val_loss, best_val_acc, itos, stoi, config, log_dir):
+        assert config["transformation"] == model.transformation
+        assert config["tps_num_fiducial"] == model.tps_num_fiducial
+        for key, value in model.decoder_settings.items():
+            assert config[key] == value
+        assert model.training_loss_calls > 0
         checkpoint_calls.append(path)
         torch.save({"epoch": epoch, "global_step": global_step}, path)
 
@@ -260,7 +279,12 @@ def _patch_runtime(monkeypatch):
 
 
 class TestTRBARunTraining:
-    def test_run_training_smoke_split_val_writes_checkpoints_and_exports(self, monkeypatch, tmp_path):
+    @pytest.mark.parametrize("epochs", [1, 4])
+    @pytest.mark.parametrize("transformation", ["none", "tps"])
+    @pytest.mark.parametrize("decoder_settings", [
+        {"decoder_type": "attention"}, {"decoder_type": "parseq"},
+    ])
+    def test_run_training_smoke_split_val_writes_checkpoints_and_exports(self, monkeypatch, tmp_path, epochs, transformation, decoder_settings):
         runtime = _patch_runtime(monkeypatch)
         charset_path = tmp_path / "charset.txt"
         charset_path.write_text("<PAD>\n<SOS>\n<EOS>\n<BLANK>\na\n", encoding="utf-8")
@@ -273,7 +297,13 @@ class TestTRBARunTraining:
                 "val_csvs": [None],
                 "val_roots": [None],
                 "charset_path": str(charset_path),
-                "epochs": 1,
+                "epochs": epochs,
+                "transformation": transformation,
+                **decoder_settings,
+                "tps_num_fiducial": 12,
+                "ctc_weight": 0.3,
+                "ctc_weight_decay_epochs": 2,
+                "ctc_weight_min": 0.03,
                 "batch_size": 2,
                 "lr": 1e-3,
                 "optimizer": "AdamW",
@@ -304,13 +334,16 @@ class TestTRBARunTraining:
         ]
         assert writer.closed is True
         assert any(tag == "Loss/train_step" for tag, _, _ in writer.scalars)
-        assert len(runtime["validation_calls"]) == 2
+        assert len(runtime["validation_calls"]) == epochs + 1
+        assert [call["ctc_weight"] for call in runtime["validation_calls"]] == pytest.approx(
+            [0.3, 0.3, 0.165, 0.03, 0.03][:epochs + 1]
+        )
         assert (exp_dir / "config.json").exists()
         assert (exp_dir / "charset.txt").exists()
         assert metrics_csv.exists()
         with metrics_csv.open(encoding="utf-8", newline="") as f:
             rows = list(csv.reader(f))
-        assert len(rows) == 2
+        assert len(rows) == epochs + 1
         assert rows[1][0] == "1"
         assert rows[1][2] == "0.400000"
         assert any(str(path).endswith("last_ckpt.pth") for path in runtime["checkpoint_calls"])

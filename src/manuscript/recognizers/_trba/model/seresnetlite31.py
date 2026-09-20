@@ -113,4 +113,4 @@ class SEResNet31Lite(nn.Module):
         x = self.layer3(x)
         x = self.layer4(x)
         x = self.conv_out(x)
-        return x  # [B, 512, H≈1, W/4]
+        return x

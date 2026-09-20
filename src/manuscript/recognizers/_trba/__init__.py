@@ -631,7 +631,6 @@ class TRBA(BaseRecognizer):
         effective_batch_size = self._effective_inference_batch_size(batch_size)
         input_name = self.onnx_session.get_inputs()[0].name
         output_name = self.onnx_session.get_outputs()[0].name
-
         for i in range(0, len(regions), effective_batch_size):
             batch_regions = regions[i : i + effective_batch_size]
             batch_tensors = [self._preprocess_image(region.image)[0] for region in batch_regions]
@@ -644,10 +643,7 @@ class TRBA(BaseRecognizer):
                     self._warn_single_batch_only()
                     for batch_tensor in batch_tensors:
                         single_input = np.expand_dims(batch_tensor, axis=0)
-                        single_logits = self.onnx_session.run(
-                            [output_name],
-                            {input_name: single_input},
-                        )[0]
+                        single_logits = self.onnx_session.run([output_name], {input_name: single_input})[0]
                         results.extend(self._decode_recognition_logits(single_logits))
                     continue
                 raise
@@ -1289,6 +1285,12 @@ class TRBA(BaseRecognizer):
         cnn_in_channels = config.get("cnn_in_channels", 3)
         cnn_out_channels = config.get("cnn_out_channels", 512)
         cnn_backbone = config.get("cnn_backbone", "seresnet31")
+        transformation = config.get("transformation", "none")
+        tps_num_fiducial = config.get("tps_num_fiducial", 20)
+        from .model.decoder_parseq import decoder_config
+        if transformation.lower() == "tps":
+            # ONNX GridSample was introduced in opset 16.
+            opset_version = max(opset_version, 16)
 
         # Load charset to determine num_classes
         print(f"Loading charset from {charset_path}...")
@@ -1305,6 +1307,8 @@ class TRBA(BaseRecognizer):
         checkpoint = torch.load(str(weights_path), map_location="cpu")
         if isinstance(checkpoint, dict) and "model_state_dict" in checkpoint:
             state_dict = checkpoint["model_state_dict"]
+        elif isinstance(checkpoint, dict) and "model_state" in checkpoint:
+            state_dict = checkpoint["model_state"]
         else:
             state_dict = checkpoint
 
@@ -1326,6 +1330,9 @@ class TRBA(BaseRecognizer):
             cnn_in_channels=cnn_in_channels,
             cnn_out_channels=cnn_out_channels,
             cnn_backbone=cnn_backbone,
+            transformation=transformation,
+            tps_num_fiducial=tps_num_fiducial,
+            **decoder_config(config),
             sos_id=stoi["<SOS>"],
             eos_id=stoi["<EOS>"],
             pad_id=stoi["<PAD>"],
@@ -1342,7 +1349,10 @@ class TRBA(BaseRecognizer):
 
         # Load weights
         print(f"Loading weights into model...")
-        model.load_state_dict(state_dict, strict=False)
+        # A wrong transformation config must not silently drop the rectifier or
+        # export an untrained identity TPS. Only the training CTC head is omitted.
+        inference_state = {k: v for k, v in state_dict.items() if not k.startswith("ctc_head.")}
+        model.load_state_dict(inference_state, strict=True)
         model.eval()
 
         print("[OK] Model loaded")

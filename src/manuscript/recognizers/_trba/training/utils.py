@@ -1,7 +1,26 @@
+import os
 import random
+import tempfile
 from typing import Dict, Any, Tuple, Optional
 
 import torch
+
+
+def _atomic_torch_save(value, path):
+    """Keep the previous checkpoint intact if writing the new one fails."""
+    target = os.path.abspath(os.fspath(path))
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w+b", dir=os.path.dirname(target),
+                                         prefix=os.path.basename(target) + ".", suffix=".tmp", delete=False) as stream:
+            temporary = stream.name
+            torch.save(value, stream)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, target)
+    finally:
+        if temporary is not None and os.path.exists(temporary):
+            os.remove(temporary)
 
 
 def save_checkpoint(
@@ -32,12 +51,13 @@ def save_checkpoint(
         "stoi": stoi,
         "config": config,
         "log_dir": log_dir,
+        "torch_rng_state": torch.get_rng_state(),
     }
-    torch.save(ckpt, path)
+    _atomic_torch_save(ckpt, path)
 
 
 def save_weights(path, model):
-    torch.save(model.state_dict(), path)
+    _atomic_torch_save(model.state_dict(), path)
 
 
 def load_checkpoint(
@@ -79,6 +99,10 @@ def load_checkpoint(
 
         missing_keys = set(current_state.keys()) - set(filtered_state.keys())
 
+        if strict and getattr(model, "decoder_type", "attention") != "attention":
+            if shape_mismatches or skipped_keys or missing_keys:
+                raise RuntimeError("Decoder checkpoint does not match this architecture; use its saved config")
+
         result = model.load_state_dict(filtered_state, strict=False)
 
         if shape_mismatches or skipped_keys or missing_keys:
@@ -111,11 +135,16 @@ def load_checkpoint(
         scheduler.load_state_dict(metadata["scheduler_state"])
     if scaler is not None and metadata.get("scaler_state") is not None:
         scaler.load_state_dict(metadata["scaler_state"])
+    if metadata.get("torch_rng_state") is not None:
+        torch.set_rng_state(metadata["torch_rng_state"].cpu())
     return metadata
 
 
 def set_seed(seed: int = 42):
+    import numpy as np
+
     random.seed(seed)
+    np.random.seed(seed)
     torch.manual_seed(seed)
     torch.backends.cudnn.deterministic = False
     torch.backends.cudnn.benchmark = True
