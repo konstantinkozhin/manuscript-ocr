@@ -2,15 +2,12 @@
   "schema_version": 1,
   "models": {
     "east_50_g1": {
-      "model_version": null,
       "model_classes": [
         "EAST"
       ],
-      "library_version": null,
+      "library_version": "0.1.13",
       "description": null,
-      "architecture": null,
       "license": null,
-      "task": "text-detection",
       "artifacts": {
         "license": null,
         "weights": {
@@ -36,15 +33,12 @@
       }
     },
     "east_50_yenisei_gov_reports_g1": {
-      "model_version": null,
       "model_classes": [
         "EAST"
       ],
-      "library_version": null,
+      "library_version": "0.1.13",
       "description": null,
-      "architecture": null,
       "license": null,
-      "task": "text-detection",
       "artifacts": {
         "license": null,
         "weights": {
@@ -70,15 +64,12 @@
       }
     },
     "modern_charlm_g1": {
-      "model_version": null,
       "model_classes": [
         "CharLM"
       ],
-      "library_version": null,
+      "library_version": "0.1.13",
       "description": null,
-      "architecture": null,
       "license": null,
-      "task": "text-correction",
       "artifacts": {
         "license": null,
         "vocab": {
@@ -124,15 +115,12 @@
       }
     },
     "prereform_charlm_g1": {
-      "model_version": null,
       "model_classes": [
         "CharLM"
       ],
-      "library_version": null,
+      "library_version": "0.1.13",
       "description": null,
-      "architecture": null,
       "license": null,
-      "task": "text-correction",
       "artifacts": {
         "license": null,
         "vocab": {
@@ -178,15 +166,12 @@
       }
     },
     "trba_base_g0": {
-      "model_version": null,
       "model_classes": [
         "TRBA"
       ],
-      "library_version": null,
+      "library_version": "0.1.13",
       "description": null,
-      "architecture": null,
       "license": null,
-      "task": "text-recognition",
       "artifacts": {
         "license": null,
         "checkpoint": {
@@ -202,15 +187,12 @@
       }
     },
     "trba_base_g1": {
-      "model_version": null,
       "model_classes": [
         "TRBA"
       ],
-      "library_version": null,
+      "library_version": "0.1.13",
       "description": null,
-      "architecture": null,
       "license": null,
-      "task": "text-recognition",
       "artifacts": {
         "license": null,
         "config": {
@@ -256,15 +238,12 @@
       }
     },
     "trba_lite_g1": {
-      "model_version": null,
       "model_classes": [
         "TRBA"
       ],
-      "library_version": null,
+      "library_version": "0.1.13",
       "description": null,
-      "architecture": null,
       "license": null,
-      "task": "text-recognition",
       "artifacts": {
         "license": null,
         "config": {
@@ -310,15 +289,12 @@
       }
     },
     "trba_lite_g2": {
-      "model_version": null,
       "model_classes": [
         "TRBA"
       ],
-      "library_version": null,
+      "library_version": "0.1.13",
       "description": null,
-      "architecture": null,
       "license": null,
-      "task": "text-recognition",
       "artifacts": {
         "license": null,
         "config": {
@@ -364,15 +340,12 @@
       }
     },
     "yolo26s_obb_text_g1": {
-      "model_version": null,
       "model_classes": [
         "YOLO"
       ],
-      "library_version": null,
+      "library_version": "0.1.13",
       "description": null,
-      "architecture": null,
       "license": null,
-      "task": "text-detection",
       "artifacts": {
         "license": null,
         "checkpoint": {
@@ -408,15 +381,12 @@
       }
     },
     "yolo26x_obb_text_g1": {
-      "model_version": null,
       "model_classes": [
         "YOLO"
       ],
-      "library_version": null,
+      "library_version": "0.1.13",
       "description": null,
-      "architecture": null,
       "license": null,
-      "task": "text-detection",
       "artifacts": {
         "license": null,
         "checkpoint": {
