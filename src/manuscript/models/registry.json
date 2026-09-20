@@ -1,0 +1,455 @@
+{
+  "schema_version": 1,
+  "models": {
+    "east_50_g1": {
+      "model_version": null,
+      "model_classes": [
+        "EAST"
+      ],
+      "library_version": null,
+      "description": null,
+      "architecture": null,
+      "license": null,
+      "task": "text-detection",
+      "artifacts": {
+        "license": null,
+        "weights": {
+          "filename": "east_50_g1.onnx",
+          "format": "onnx",
+          "size": 112701546,
+          "sha256": "4636a1350eefb71e3edf1819879b0ef6172c8d3dc5537c94d2d408b0d069080d",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.onnx"
+          ],
+          "required": true
+        },
+        "checkpoint": {
+          "filename": "east_50_g1.pth",
+          "format": "pth",
+          "size": 121359951,
+          "sha256": "5c3e5b714ebffb9d5860cfbc4113c9b94f726f0e3a0340ede15a515b1e9329a4",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.pth"
+          ],
+          "required": false
+        }
+      }
+    },
+    "east_50_yenisei_gov_reports_g1": {
+      "model_version": null,
+      "model_classes": [
+        "EAST"
+      ],
+      "library_version": null,
+      "description": null,
+      "architecture": null,
+      "license": null,
+      "task": "text-detection",
+      "artifacts": {
+        "license": null,
+        "weights": {
+          "filename": "east_50_yenisei_gov_reports_g1.onnx",
+          "format": "onnx",
+          "size": 112701546,
+          "sha256": "08d7b07f264d52e8be14b07086b5c775967bb67ad3d90a9fadd5a90d6bc53231",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_yenisei_gov_reports_g1.onnx"
+          ],
+          "required": true
+        },
+        "checkpoint": {
+          "filename": "east_50_yenisei_gov_reports_g1.pth",
+          "format": "pth",
+          "size": 113115787,
+          "sha256": "8e083b1e6695065925f9bf53666042a6a57cbd76ec7893348f6b5778940ae070",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_yenisei_gov_reports_g1.pth"
+          ],
+          "required": false
+        }
+      }
+    },
+    "modern_charlm_g1": {
+      "model_version": null,
+      "model_classes": [
+        "CharLM"
+      ],
+      "library_version": null,
+      "description": null,
+      "architecture": null,
+      "license": null,
+      "task": "text-correction",
+      "artifacts": {
+        "license": null,
+        "vocab": {
+          "filename": "modern_charlm_g1.json",
+          "format": "json",
+          "size": 405,
+          "sha256": "43e149c81971603b63a17aa4a8faca2c21312bba887198827677a8020de72470",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.json"
+          ],
+          "required": true
+        },
+        "weights": {
+          "filename": "modern_charlm_g1.onnx",
+          "format": "onnx",
+          "size": 17655986,
+          "sha256": "7ed982bcac576a25f8b6c0f815f94330990574f9a5fb68fbaa55bc2483ed501d",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.onnx"
+          ],
+          "required": true
+        },
+        "checkpoint": {
+          "filename": "modern_charlm_g1.pt",
+          "format": "pt",
+          "size": 52671375,
+          "sha256": "f37a6647f5395c70aa2d7bb8a9f5ad190fd9839ca68ec17d60b40b5229035f56",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.pt"
+          ],
+          "required": false
+        },
+        "lexicon": {
+          "filename": "modern_words.txt",
+          "format": "txt",
+          "size": 76169082,
+          "sha256": "5a2b16a79520c8dbe2fd5baec9767e60630e7cba2f35ba46142e7e5834c4a897",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_words.txt"
+          ],
+          "required": false
+        }
+      }
+    },
+    "prereform_charlm_g1": {
+      "model_version": null,
+      "model_classes": [
+        "CharLM"
+      ],
+      "library_version": null,
+      "description": null,
+      "architecture": null,
+      "license": null,
+      "task": "text-correction",
+      "artifacts": {
+        "license": null,
+        "vocab": {
+          "filename": "prereform_charlm_g1.json",
+          "format": "json",
+          "size": 545,
+          "sha256": "980ed2b6e485f9f7aebb6f2bdf7ee9e671fcf16288e749adb2044b251e10de1c",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.json"
+          ],
+          "required": true
+        },
+        "weights": {
+          "filename": "prereform_charlm_g1.onnx",
+          "format": "onnx",
+          "size": 17696026,
+          "sha256": "10611434876194e025e0e5cbc1ccb758423efdc6e248bf2b803561ea98598a17",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.onnx"
+          ],
+          "required": true
+        },
+        "checkpoint": {
+          "filename": "prereform_charlm_g1.pt",
+          "format": "pt",
+          "size": 52791375,
+          "sha256": "f24a528b01a6292fbb1e6dd22670599d3f9dff64b626390610f110f09223adff",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.pt"
+          ],
+          "required": false
+        },
+        "lexicon": {
+          "filename": "prereform_words.txt",
+          "format": "txt",
+          "size": 36280906,
+          "sha256": "b78857bf7be701b05ebe546764cf4754e7c0626ba3a7ded52e2f066ba860d933",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt"
+          ],
+          "required": false
+        }
+      }
+    },
+    "trba_base_g0": {
+      "model_version": null,
+      "model_classes": [
+        "TRBA"
+      ],
+      "library_version": null,
+      "description": null,
+      "architecture": null,
+      "license": null,
+      "task": "text-recognition",
+      "artifacts": {
+        "license": null,
+        "checkpoint": {
+          "filename": "trba_base_g0.pth",
+          "format": "pth",
+          "size": 185203893,
+          "sha256": "321bcda2dc886a75c423bc8895b48df7b981c40117dd815a49ae02a6f7a3cd47",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g0.pth"
+          ],
+          "required": false
+        }
+      }
+    },
+    "trba_base_g1": {
+      "model_version": null,
+      "model_classes": [
+        "TRBA"
+      ],
+      "library_version": null,
+      "description": null,
+      "architecture": null,
+      "license": null,
+      "task": "text-recognition",
+      "artifacts": {
+        "license": null,
+        "config": {
+          "filename": "trba_base_g1.json",
+          "format": "json",
+          "size": 3249,
+          "sha256": "180923256c4c150ac5ea5d8a27953cc036d1ad158dc921440540de13c1967ccc",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.json"
+          ],
+          "required": true
+        },
+        "weights": {
+          "filename": "trba_base_g1.onnx",
+          "format": "onnx",
+          "size": 171127584,
+          "sha256": "b4f09014df3c3f05db9cfcd1f40672acf925a4dab4f7087168fc837f0a509dde",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.onnx"
+          ],
+          "required": true
+        },
+        "checkpoint": {
+          "filename": "trba_base_g1.pth",
+          "format": "pth",
+          "size": 180467235,
+          "sha256": "c6035b08236faf4b87f05c4b9525cdc40e79787edbc272f7610143c7876107a7",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.pth"
+          ],
+          "required": false
+        },
+        "charset": {
+          "filename": "trba_base_g1.txt",
+          "format": "txt",
+          "size": 694,
+          "sha256": "60c5a8a9ba9a73085e102ac13e0d03e33f5fac369bfd5f88f4602a15bd96f45b",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.txt"
+          ],
+          "required": true
+        }
+      }
+    },
+    "trba_lite_g1": {
+      "model_version": null,
+      "model_classes": [
+        "TRBA"
+      ],
+      "library_version": null,
+      "description": null,
+      "architecture": null,
+      "license": null,
+      "task": "text-recognition",
+      "artifacts": {
+        "license": null,
+        "config": {
+          "filename": "trba_lite_g1.json",
+          "format": "json",
+          "size": 2867,
+          "sha256": "b8ea5f087750e19951324a24c6959a79ea2c73c6953a33fd67bb3641817c31da",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.json"
+          ],
+          "required": true
+        },
+        "weights": {
+          "filename": "trba_lite_g1.onnx",
+          "format": "onnx",
+          "size": 37817698,
+          "sha256": "158148f22fb0081cc89440ed0ebf4ecec0056865f78389ef74e3ce9266f17ac6",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.onnx"
+          ],
+          "required": true
+        },
+        "checkpoint": {
+          "filename": "trba_lite_g1.pth",
+          "format": "pth",
+          "size": 37922279,
+          "sha256": "b3d6b658ef13d22cf6f6a719fc33c6df4d582362881e2bd8b89b6f7bf97cb8bc",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.pth"
+          ],
+          "required": false
+        },
+        "charset": {
+          "filename": "trba_lite_g1.txt",
+          "format": "txt",
+          "size": 694,
+          "sha256": "60c5a8a9ba9a73085e102ac13e0d03e33f5fac369bfd5f88f4602a15bd96f45b",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.txt"
+          ],
+          "required": true
+        }
+      }
+    },
+    "trba_lite_g2": {
+      "model_version": null,
+      "model_classes": [
+        "TRBA"
+      ],
+      "library_version": null,
+      "description": null,
+      "architecture": null,
+      "license": null,
+      "task": "text-recognition",
+      "artifacts": {
+        "license": null,
+        "config": {
+          "filename": "trba_lite_g2.json",
+          "format": "json",
+          "size": 4663,
+          "sha256": "f2689dd1446c3132abb8df232d6912a90bcee72494f65ce3f96f18434ac46850",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.json"
+          ],
+          "required": true
+        },
+        "weights": {
+          "filename": "trba_lite_g2.onnx",
+          "format": "onnx",
+          "size": 37817698,
+          "sha256": "c9a5b40c489e3480f98f3890a716acef8a8e5e2788c33afd8b007a98e34aed46",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.onnx"
+          ],
+          "required": true
+        },
+        "checkpoint": {
+          "filename": "trba_lite_g2.pth",
+          "format": "pth",
+          "size": 113548683,
+          "sha256": "4ebf3ed5e8024c91c00def140b9a2210dcd821d35febb7ffbe9c85b2314f1d21",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.pth"
+          ],
+          "required": false
+        },
+        "charset": {
+          "filename": "trba_lite_g2.txt",
+          "format": "txt",
+          "size": 694,
+          "sha256": "60c5a8a9ba9a73085e102ac13e0d03e33f5fac369bfd5f88f4602a15bd96f45b",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.txt"
+          ],
+          "required": true
+        }
+      }
+    },
+    "yolo26s_obb_text_g1": {
+      "model_version": null,
+      "model_classes": [
+        "YOLO"
+      ],
+      "library_version": null,
+      "description": null,
+      "architecture": null,
+      "license": null,
+      "task": "text-detection",
+      "artifacts": {
+        "license": null,
+        "checkpoint": {
+          "filename": "yolo26s_obb_text_g1.pt",
+          "format": "pt",
+          "size": 21600220,
+          "sha256": "c3a81140cf8239b02fe7932126ac1388c3d7aa88d45378da5363f9312db9ccf6",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.pt"
+          ],
+          "required": false
+        },
+        "weights": {
+          "filename": "yolo26s_obb_text_g1.raw.onnx",
+          "format": "onnx",
+          "size": 19879464,
+          "sha256": "fa232b45ad7dba048e63a06b351fd3394cd844c378ef4e9b1db48e556849718f",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx"
+          ],
+          "required": true
+        },
+        "config": {
+          "filename": "yolo26s_obb_text_g1.raw.yaml",
+          "format": "yaml",
+          "size": 1810,
+          "sha256": "08fb5df9fee8227a6a48559a6de6e56fff103c787c07d824d4b79f606135ee03",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.yaml"
+          ],
+          "required": true
+        }
+      }
+    },
+    "yolo26x_obb_text_g1": {
+      "model_version": null,
+      "model_classes": [
+        "YOLO"
+      ],
+      "library_version": null,
+      "description": null,
+      "architecture": null,
+      "license": null,
+      "task": "text-detection",
+      "artifacts": {
+        "license": null,
+        "checkpoint": {
+          "filename": "yolo26x_obb_text_g1.pt",
+          "format": "pt",
+          "size": 126096913,
+          "sha256": "713a1726f4c5658feb6b48decc00269cd080083f2072a739553ae54001e6b005",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.pt"
+          ],
+          "required": false
+        },
+        "weights": {
+          "filename": "yolo26x_obb_text_g1.raw.onnx",
+          "format": "onnx",
+          "size": 115525783,
+          "sha256": "02e10548d7b3c654c9f1569e2cd82f76378f3006d2c34c3fdb7a374629175afa",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.onnx"
+          ],
+          "required": true
+        },
+        "config": {
+          "filename": "yolo26x_obb_text_g1.raw.yaml",
+          "format": "yaml",
+          "size": 1810,
+          "sha256": "fe2a37982089e54a11979a7f8423fb2be555c499ed5f62e0dddf54cfc60deb87",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.yaml"
+          ],
+          "required": true
+        }
+      }
+    }
+  }
+}

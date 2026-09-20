@@ -64,6 +64,7 @@ class CharLM(BaseCorrector):
     """
 
     default_weights_name = "prereform_charlm_g1"
+    registry_model_class = "CharLM"
     pretrained_registry = {
         "prereform_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.onnx",
         "modern_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.onnx",
@@ -137,6 +138,14 @@ class CharLM(BaseCorrector):
                 lexicon_path = self._resolve_lexicon(lexicon)
                 if lexicon_path:
                     self._load_lexicon(lexicon_path)
+        elif getattr(self, '_resolved_model_name', None):
+            from manuscript.models import info, resolve
+
+            name = self._resolved_model_name
+            if info(name, self.registry_model_class)['artifacts'].get('lexicon'):
+                lexicon_path = resolve(name, self.registry_model_class, artifact='lexicon',
+                                       force_download=self.force_download)['lexicon']
+                self._load_lexicon(lexicon_path)
         elif (
             self._weights_preset
             and self._weights_preset in self.default_lexicon_for_model
@@ -155,15 +164,12 @@ class CharLM(BaseCorrector):
     def _resolve_vocab(self, vocab: Optional[str]) -> Optional[str]:
         """Resolve vocab path, inferring from weights location if needed."""
         if vocab is not None:
-            if Path(vocab).exists():
-                return str(Path(vocab).absolute())
-            if vocab in self.vocab_registry:
-                return self._resolve_extra_artifact(
-                    vocab,
-                    default_name=None,
-                    registry=self.vocab_registry,
-                    description="vocab",
-                )
+            return self._resolve_extra_artifact(
+                vocab, default_name=None, registry=self.vocab_registry, description="vocab"
+            )
+
+        if vocab is None and getattr(self, '_resolved_model_artifacts', None):
+            return str(self._resolved_model_artifacts['vocab'])
 
         # Use actual weights preset (if any), otherwise fall back to default
         preset_to_use = self._weights_preset or self.default_weights_name
@@ -185,16 +191,9 @@ class CharLM(BaseCorrector):
 
     def _resolve_lexicon(self, lexicon: str) -> Optional[str]:
         """Resolve lexicon path from registry or local file."""
-        if Path(lexicon).exists():
-            return str(Path(lexicon).absolute())
-        if lexicon in self.lexicon_registry:
-            return self._resolve_extra_artifact(
-                lexicon,
-                default_name=None,
-                registry=self.lexicon_registry,
-                description="lexicon",
-            )
-        return None
+        return self._resolve_extra_artifact(
+            lexicon, default_name=None, registry=self.lexicon_registry, description="lexicon"
+        )
 
     def _load_vocab(self):
         """Load vocabulary from JSON file."""

@@ -162,6 +162,7 @@ class TRBA(BaseRecognizer):
     """
 
     default_weights_name = "trba_lite_g1"
+    registry_model_class = "TRBA"
 
     pretrained_registry = {
         "trba_lite_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_lite_g1.onnx",
@@ -290,6 +291,9 @@ class TRBA(BaseRecognizer):
                 description="config",
             )
 
+        if getattr(self, '_resolved_model_artifacts', None):
+            return str(self._resolved_model_artifacts['config'])
+
         # Try to infer from weights location
         weights_path = Path(self.weights)
         weights_stem = weights_path.stem
@@ -346,6 +350,9 @@ class TRBA(BaseRecognizer):
                 registry=self.charset_registry,
                 description="charset",
             )
+
+        if getattr(self, '_resolved_model_artifacts', None):
+            return str(self._resolved_model_artifacts['charset'])
 
         # Try to infer from weights location
         weights_path = Path(self.weights)

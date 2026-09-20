@@ -1,6 +1,11 @@
 Changes in v_0_1_13 relative to 0.1.12
 ======================================
 
+- `src/manuscript/models`: added an on-demand model registry with GitHub/GitVerse
+  fallback, custom sources, class/version checks, and SHA-256 artifact validation;
+  model bundles and licenses are stored under `~/.manuscript/models`, with safe
+  reuse of the old cache. Integrated presets and TRBA pretraining with the registry.
+
 - `src/manuscript/recognizers/_trba/__init__.py`: fixed a CUDA/ONNX Runtime
   inference bug in `TRBA` where the final incomplete batch shape could trigger
   severe recognition slowdowns on page-scale runs; the last partial batch is

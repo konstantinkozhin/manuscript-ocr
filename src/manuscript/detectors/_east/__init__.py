@@ -149,6 +149,7 @@ class EAST(BaseDetector):
     """
 
     default_weights_name = "east_50_g1"
+    registry_model_class = "EAST"
 
     pretrained_registry = {
         "east_50_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/east_50_g1.onnx",

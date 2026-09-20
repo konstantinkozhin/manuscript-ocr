@@ -72,6 +72,7 @@ class PPOCRv5Rec(BaseRecognizer):
     """
 
     default_weights_name = None
+    registry_model_class = "PPOCRv5Rec"
     pretrained_registry: Dict[str, str] = {
         "custom_ppocrv5_rec_g2": _LOCAL_CUSTOM_PRESET_PATHS["weights"]
     }
@@ -175,6 +176,10 @@ class PPOCRv5Rec(BaseRecognizer):
                 description="config",
             )
 
+        if getattr(self, '_resolved_model_artifacts', None):
+            value = self._resolved_model_artifacts.get('config')
+            return str(value) if value else None
+
         if self._weights_preset and self._weights_preset in self.config_registry:
             return self._resolve_extra_artifact(
                 self.config_registry[self._weights_preset],
@@ -216,6 +221,10 @@ class PPOCRv5Rec(BaseRecognizer):
                 registry=self.charset_registry,
                 description="charset",
             )
+
+        if getattr(self, '_resolved_model_artifacts', None):
+            value = self._resolved_model_artifacts.get('charset')
+            return str(value) if value else None
 
         if self._weights_preset and self._weights_preset in self.charset_registry:
             return self._resolve_extra_artifact(

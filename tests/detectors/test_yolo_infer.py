@@ -8,17 +8,6 @@ from manuscript.data import Page
 from manuscript.detectors import YOLO
 
 
-def _mock_download_http(model_path, yaml_path):
-    def _download_http(self, url):
-        if url.endswith(".onnx"):
-            return str(model_path)
-        if url.endswith(".yaml"):
-            return str(yaml_path)
-        raise AssertionError(f"Unexpected download URL: {url}")
-
-    return _download_http
-
-
 class _FakeIO:
     def __init__(self, name, shape):
         self.name = name
@@ -113,8 +102,8 @@ def test_yolo_uses_default_preset_when_weights_missing(monkeypatch, tmp_path):
     yaml_path.write_text("imgsz: 1280\n", encoding="utf-8")
 
     monkeypatch.setattr(
-        "manuscript.api.base.BaseArtifactModel._download_http",
-        _mock_download_http(model_path, yaml_path),
+        "manuscript.models.resolve",
+        lambda *args, **kwargs: {'weights': model_path, 'config': yaml_path},
     )
 
     detector = YOLO(weights=None)
@@ -129,8 +118,8 @@ def test_yolo_default_preset_uses_1024_target_size(monkeypatch, tmp_path):
     yaml_path.write_text("imgsz: 1024\n", encoding="utf-8")
 
     monkeypatch.setattr(
-        "manuscript.api.base.BaseArtifactModel._download_http",
-        _mock_download_http(model_path, yaml_path),
+        "manuscript.models.resolve",
+        lambda *args, **kwargs: {'weights': model_path, 'config': yaml_path},
     )
 
     detector = YOLO(weights=None)
@@ -154,8 +143,8 @@ def test_yolo26x_preset_uses_1024_target_size(monkeypatch, tmp_path):
     yaml_path.write_text("imgsz: 1024\n", encoding="utf-8")
 
     monkeypatch.setattr(
-        "manuscript.api.base.BaseArtifactModel._download_http",
-        _mock_download_http(model_path, yaml_path),
+        "manuscript.models.resolve",
+        lambda *args, **kwargs: {'weights': model_path, 'config': yaml_path},
     )
 
     detector = YOLO(weights="yolo26x_obb_text_g1")

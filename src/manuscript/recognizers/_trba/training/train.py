@@ -932,18 +932,10 @@ def run_training(cfg: Config, device: str = "cuda"):
         pretrain_src = _normalize_pretrain(pretrain_src)
         if pretrain_src.lower() not in ("none", ""):
             if pretrain_src.lower() == "default":
-                pretrain_src = (
-                    "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/"
-                    "v0.1.0/trba_lite_g1.pth"
-                )
-                logger.info(
-                    "Using default pretrained weights: trba_lite_g1.pth (GitHub release)"
-                )
-                logger.info(
-                    "Default pretrain config: "
-                    "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/"
-                    "v0.1.0/trba_lite_g1.json"
-                )
+                from manuscript.models import resolve
+
+                pretrain_src = str(resolve('trba_lite_g1', 'TRBA', artifact='checkpoint')['checkpoint'])
+                logger.info('Using registry pretrained weights: %s', pretrain_src)
 
             stats = load_pretrained_weights(
                 model,

@@ -82,6 +82,7 @@ class YOLO(BaseDetector):
     """
 
     default_weights_name = "yolo26x_obb_text_g1"
+    registry_model_class = "YOLO"
     default_target_size = 1280
     pretrained_registry: Dict[str, str] = {
         "yolo26s_obb_text_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx",
@@ -173,6 +174,10 @@ class YOLO(BaseDetector):
                 registry=self.config_registry,
                 description="model config",
             )
+
+        if getattr(self, '_resolved_model_artifacts', None):
+            value = self._resolved_model_artifacts.get('config')
+            return str(value) if value else None
 
         weights_path = Path(self.weights)
         config_candidate = weights_path.with_suffix(".yaml")

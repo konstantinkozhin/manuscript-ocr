@@ -35,6 +35,7 @@ class BaseArtifactModel(ABC):
 
     default_weights_name: Optional[str] = None
     pretrained_registry: Dict[str, str] = {}
+    registry_model_class: Optional[str] = None
 
     def __init__(
         self,
@@ -241,6 +242,17 @@ class BaseArtifactModel(ABC):
             return self._download_gdrive(w)
 
         # 5. Preset registry
+        if self.registry_model_class:
+            from manuscript.models import resolve
+
+            self._resolved_model_name = w
+            self._resolved_model_artifacts = resolve(
+                w, self.registry_model_class, force_download=self.force_download
+            )
+            if 'weights' not in self._resolved_model_artifacts:
+                raise ValueError(f'Model {w!r} has no inference weights')
+            return str(self._resolved_model_artifacts['weights'])
+
         if w in self.pretrained_registry:
             return self._resolve_weights(self.pretrained_registry[w])
 
@@ -299,6 +311,15 @@ class BaseArtifactModel(ABC):
             return self._download_gdrive(v)
 
         # 5) Preset
+        if self.registry_model_class:
+            from manuscript.models import resolve
+
+            role = 'config' if description == 'model config' else description
+            if role == 'lexicon' and v in ('modern_words', 'prereform_words'):
+                v = v.replace('_words', '_charlm_g1')
+            return str(resolve(v, self.registry_model_class, artifact=role,
+                               force_download=self.force_download)[role])
+
         if v in registry:
             return self._resolve_extra_artifact(
                 registry[v],
