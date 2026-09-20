@@ -25,7 +25,7 @@ models.path("trba_lite_g2")
 models.verify("trba_lite_g2")
 models.is_installed("trba_lite_g2")
 models.list_installed()
-models.remove("trba_lite_g2")  # current registered version only
+models.remove("trba_lite_g2")  # bundle identified by this key
 ```
 
 Extra catalogs supplement the official catalog. `priority=True` allows their
@@ -46,16 +46,15 @@ Default root: `~/.manuscript`; override it with `MANUSCRIPT_HOME`.
     <source-hash>.json        # last valid catalog per source/group
   models/
     trba_lite_g2/
-      <model-version>/
-        model.json           # local copy of the model entry
-        trba_lite_g2.onnx
-        trba_lite_g2.json
-        trba_lite_g2.txt
-        LICENSE.txt          # when a license artifact becomes available
+      model.json             # local copy of the model entry
+      trba_lite_g2.onnx
+      trba_lite_g2.json
+      trba_lite_g2.txt
+      LICENSE.txt            # one license covering the complete model bundle
 ```
 
-For unknown model versions, the directory is `unversioned-<content-fingerprint>`.
-Mirror changes do not change that fingerprint. Required artifacts are downloaded
+The registry key identifies the model and its directory. Publish a new model
+under a new key; there is no separate model version. Required artifacts are downloaded
 together. Checkpoints and lexicons can be optional; CharLM requests its lexicon
 when needed. A declared license is always downloaded alongside the requested
 artifacts. `null` license artifacts are skipped until a real file is published.
@@ -73,10 +72,10 @@ its key. Each entry contains:
 
 - `model_classes`: allowed public class IDs (`TRBA`, `EAST`, `YOLO`, `CharLM`,
   `PPOCRv5Rec`). These IDs never trigger dynamic imports.
-- `model_version`: string or `null`; use a new version when changing artifacts.
-- `library_version`: a Python version specifier such as `>=0.1.13,<0.2`, or `null`
-  when compatibility has not been established.
-- `task`, `description`, `architecture`, `license`: descriptive metadata.
+- `library_version`: the exact supported library version, currently `"0.1.13"`
+  for all official entries; `null` is allowed for unknown compatibility.
+- `description`: model description.
+- `license`: the license for the complete model, not individual artifacts.
 - `artifacts`: roles such as `weights`, `config`, `charset`, `vocab`, `lexicon`,
   `checkpoint`, `license`. An unknown artifact can be `null`.
 
@@ -88,8 +87,10 @@ metadata uses JSON `null`, never `NaN` or Python `None`.
 
 All mirrors of an artifact must serve identical bytes. Changing only `urls`
 is sufficient to move hosting. Add a license as an ordinary artifact named
-`LICENSE.txt`; its legal identifier/description can also appear in the entry's
-`license` metadata. Do not infer a weights license from the library license.
+`LICENSE.txt`; this is the single license for the entire model bundle. Its legal
+identifier/description appears in the model-level `license` metadata.
+`artifacts.license` only describes where to download that common license file.
+Do not infer a weights license from the library license.
 
 The initial catalog contains all 31 assets of GitHub release `v0.1.0`, grouped
 into 10 models, including the checkpoint-only `trba_base_g0`. Request that model

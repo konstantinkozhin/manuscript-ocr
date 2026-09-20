@@ -15,7 +15,7 @@ def artifact(payload=b'weights', filename='weights.onnx', urls=None):
 
 def catalog(name='demo', **extras):
     return {'schema_version': 1, 'models': {name: {
-        'model_version': '1', 'model_classes': ['TRBA'], 'library_version': None,
+        'model_classes': ['TRBA'], 'library_version': None,
         'artifacts': {'weights': artifact(), **extras}}}}
 
 
@@ -43,7 +43,7 @@ def test_fallback_and_offline_cache(tmp_path, monkeypatch):
     r = m.Registry(tmp_path, sources=['https://github', 'https://gitverse'])
     result = r.resolve('demo', 'TRBA')
     assert calls == ['https://github', 'https://gitverse', 'https://files/weights']
-    assert result['weights'] == tmp_path / 'models/demo/1/weights.onnx'
+    assert result['weights'] == tmp_path / 'models/demo/weights.onnx'
     assert (result['weights'].parent / 'model.json').is_file()
     calls.clear()
     m.Registry(tmp_path, sources=r.sources).resolve('demo', 'TRBA')
@@ -132,21 +132,34 @@ def test_unsafe_names_rejected(tmp_path, name):
 
 def test_version_compatibility(tmp_path, monkeypatch):
     data = catalog()
-    data['models']['demo']['library_version'] = '>=99'
+    data['models']['demo']['library_version'] = '99.0'
     monkeypatch.setattr(m, 'version', lambda _: '0.1.13')
     with pytest.raises(ValueError, match='requires manuscript'):
         cached(tmp_path, data).info('demo')
 
 
-def test_unknown_version_ignores_mirror_changes(tmp_path):
+@pytest.mark.parametrize('installed,compatible', [('0.1.12', False), ('0.1.13', True), ('0.1.14', False)])
+def test_exact_library_version(tmp_path, monkeypatch, installed, compatible):
+    data = catalog()
+    data['models']['demo']['library_version'] = '0.1.13'
+    monkeypatch.setattr(m, 'version', lambda _: installed)
+    registry = cached(tmp_path, data)
+    if compatible:
+        assert registry.info('demo')['library_version'] == '0.1.13'
+    else:
+        with pytest.raises(ValueError, match='requires manuscript-ocr==0.1.13'):
+            registry.info('demo')
+
+
+def test_model_key_defines_directory(tmp_path):
     r = cached(tmp_path)
     entry = catalog()['models']['demo']
-    entry['model_version'] = None
     path = r.directory('demo', entry)
     entry['artifacts']['weights']['urls'] = ['https://new']
     assert r.directory('demo', entry) == path
     entry['artifacts']['weights']['sha256'] = '0' * 64
-    assert r.directory('demo', entry) != path
+    assert r.directory('demo', entry) == path
+    assert r.directory('demo-new', entry) != path
 
 
 def test_custom_catalog_priority_and_persistence(tmp_path, monkeypatch):
@@ -184,6 +197,9 @@ def test_new_alias_integrates_with_base(tmp_path, monkeypatch):
 def test_bundled_registry_valid():
     data = m._validate(json.loads(Path(m.__file__).with_name('registry.json').read_text()))
     assert len(data['models']) == 10
+    for entry in data['models'].values():
+        assert entry['library_version'] == '0.1.13'
+        assert not {'architecture', 'task', 'model_version'} & entry.keys()
     assert sum(a is not None for e in data['models'].values() for a in e['artifacts'].values()) == 31
 
 
@@ -214,7 +230,7 @@ def test_public_classes_resolve_new_names_and_companions(tmp_path, monkeypatch, 
         assert Path(instance._resolve_weights('demo')).read_bytes() == b'weights'
     else:
         instance = classes[class_name](weights='demo', device='cpu')
-        assert Path(instance.weights).parent == tmp_path / 'models/demo/1'
+        assert Path(instance.weights).parent == tmp_path / 'models/demo'
         if class_name == 'TRBA':
             assert Path(instance.config_path).name == 'config.json'
             assert Path(instance.charset_path).name == 'charset.txt'

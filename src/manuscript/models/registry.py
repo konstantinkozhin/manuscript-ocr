@@ -10,7 +10,7 @@ import tempfile
 import urllib.request
 from importlib.metadata import version
 
-from packaging.specifiers import SpecifierSet
+from packaging.version import Version
 
 SOURCES = (
     'https://raw.githubusercontent.com/konstantinkozhin/manuscript-ocr/main/registry.json',
@@ -46,10 +46,8 @@ def _validate(data):
             raise ValueError(f'Missing model_classes for {name}')
         if not all(isinstance(c, str) for c in entry['model_classes']):
             raise ValueError(f'Invalid model_classes for {name}')
-        if entry.get('model_version') is not None:
-            _segment(entry['model_version'])
         if entry.get('library_version') is not None:
-            SpecifierSet(entry['library_version'])
+            Version(entry['library_version'])
         if not isinstance(entry.get('artifacts'), dict):
             raise ValueError(f'Missing artifacts for {name}')
         filenames = set()
@@ -186,15 +184,12 @@ class Registry:
         if model_class and model_class not in entry['model_classes']:
             raise ValueError(f"Model {name!r} belongs to {entry['model_classes']}, not {model_class}")
         required = entry.get('library_version')
-        if required and version('manuscript-ocr') not in SpecifierSet(required):
-            raise ValueError(f'Model {name!r} requires manuscript-ocr{required}')
+        if required and Version(version('manuscript-ocr')) != Version(required):
+            raise ValueError(f'Model {name!r} requires manuscript-ocr=={required}')
         return entry
 
     def directory(self, name, entry):
-        # Unknown versions use a content fingerprint; changing only mirrors keeps the cache.
-        identity = {k: {f: a.get(f) for f in ('filename', 'sha256', 'size')} for k, a in entry['artifacts'].items() if a is not None}
-        revision = entry.get('model_version') or ('unversioned-' + hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()[:16])
-        path = self.root / 'models' / _segment(name) / _segment(revision)
+        path = self.root / 'models' / _segment(name)
         try:
             path.resolve().relative_to(self.root.resolve())
         except ValueError:
@@ -294,7 +289,7 @@ def path(name):
 def list_installed():
     """List local model manifests, including partially downloaded bundles."""
     entries = []
-    for manifest in (Registry().root / 'models').glob('*/*/model.json'):
+    for manifest in (Registry().root / 'models').glob('*/model.json'):
         try:
             entry = json.loads(manifest.read_text(encoding='utf-8'))
             _validate({'schema_version': 1, 'models': {entry['id']: entry}})
@@ -320,7 +315,7 @@ def is_installed(name):
 
 
 def remove(name):
-    """Remove the currently registered version, leaving other versions untouched."""
+    """Remove the bundle identified by its registry key."""
     directory = path(name)
     if directory.is_symlink():
         raise ValueError('Model directory must not be a symlink')
