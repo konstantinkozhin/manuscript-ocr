@@ -24,4 +24,10 @@ Changes in v_0_1_13 relative to 0.1.12
 - `src/manuscript/__init__.py`, package `__init__.py` files, and
   `src/manuscript/utils/__init__.py`: made heavy public exports lazy to keep
   `import manuscript`, detector/recognizer/corrector package imports, and
-  visualization utilities free of unnecessary PyTorch imports.
+  visualization utilities free of unnecessary PyTorch imports;
+- `src/manuscript/recognizers/_trba/model`: added the `parseq_linear` decoder,
+  `SEResNet31LiteV2` backbone, and optional TPS input rectification while
+  retaining the existing attention decoder as the default;
+- TRBA training and ONNX export now preserve PARSeq/TPS settings, use the
+  decoder-specific loss and decoding length, and include focused architecture,
+  export, training, and launcher tests.

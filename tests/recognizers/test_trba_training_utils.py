@@ -11,6 +11,21 @@ import manuscript.recognizers._trba.training.metrics as metrics_module
 import manuscript.recognizers._trba.training.utils as utils_module
 
 
+def test_failed_checkpoint_write_preserves_previous_file(tmp_path, monkeypatch):
+    path = tmp_path / "last_ckpt.pth"
+    utils_module._atomic_torch_save({"epoch": 7}, path)
+
+    def interrupted_save(value, stream):
+        stream.write(b"incomplete new checkpoint")
+        raise OSError("simulated write failure")
+
+    monkeypatch.setattr(torch, "save", interrupted_save)
+    with pytest.raises(OSError, match="simulated"):
+        utils_module._atomic_torch_save({"epoch": 8}, path)
+    assert torch.load(path, weights_only=True)["epoch"] == 7
+    assert list(tmp_path.iterdir()) == [path]
+
+
 class TinyModel(nn.Module):
     def __init__(self):
         super().__init__()
@@ -48,14 +63,25 @@ class TestTRBAMetrics:
         calls = []
         monkeypatch.setattr(metrics_module, "_cer_metric", None)
         monkeypatch.setattr(
-            metrics_module.evaluate,
-            "load",
+            metrics_module,
+            "_JiwerMetric",
             lambda name: calls.append(name) or fake_metric,
         )
 
         assert metrics_module.get_cer_metric() is fake_metric
         assert metrics_module.get_cer_metric() is fake_metric
         assert calls == ["cer"]
+
+    def test_local_metrics_are_corpus_weighted_and_preserve_case(self, monkeypatch):
+        monkeypatch.setattr(metrics_module, "_cer_metric", None)
+        monkeypatch.setattr(metrics_module, "_wer_metric", None)
+        assert metrics_module.compute_cer(["abcd", "x"], ["abc", "y"]) == pytest.approx(0.4)
+        assert metrics_module.compute_wer(["one two three", "four"], ["one two", "five"]) == pytest.approx(0.5)
+        assert metrics_module.compute_cer(["Ёж"], ["ёж"]) == pytest.approx(0.5)
+        assert metrics_module.compute_cer(["a"], ["aaaa"]) == pytest.approx(3.0)
+        assert metrics_module.compute_cer(["a"], [""]) == pytest.approx(1.0)
+        with pytest.raises(ValueError, match="equal lengths"):
+            metrics_module.compute_cer(["a", "b"], ["a"])
 
     def test_compute_cer_and_wer_replace_empty_strings(self, monkeypatch):
         fake_cer = FakeMetric(0.1)
