@@ -36,6 +36,19 @@ class TinyModel(nn.Module):
         return self.encoder(self.attention_decoder(x))
 
 
+class TinyParseqModel(nn.Module):
+    decoder_type = "parseq"
+
+    def __init__(self, decoder_out_features=3):
+        super().__init__()
+        self.encoder = nn.Linear(2, 2, bias=False)
+        self.attention_decoder = nn.Linear(2, decoder_out_features, bias=False)
+
+    def forward(self, x):
+        encoded = self.encoder(x)
+        return self.attention_decoder(encoded)
+
+
 class DummyScaler:
     def __init__(self):
         self.loaded = None
@@ -159,6 +172,27 @@ class TestTRBATrainingUtils:
         captured = capsys.readouterr().out
         assert "Shape mismatches" in captured or "Missing keys" in captured
         assert "model_state" in metadata
+
+    def test_load_checkpoint_keeps_matching_weights_for_decoder_mismatch(self, tmp_path, capsys):
+        src_model = TinyParseqModel(decoder_out_features=2)
+        dst_model = TinyParseqModel(decoder_out_features=3)
+        path = tmp_path / "parseq_mismatch.pt"
+        original_decoder = dst_model.attention_decoder.weight.detach().clone()
+        original_encoder = dst_model.encoder.weight.detach().clone()
+        torch.save({"model_state": src_model.state_dict()}, path)
+
+        metadata = utils_module.load_checkpoint(
+            str(path),
+            model=dst_model,
+            map_location="cpu",
+        )
+
+        captured = capsys.readouterr().out
+        assert metadata["model_state"]
+        assert "Shape mismatches" in captured
+        assert torch.allclose(dst_model.encoder.weight, src_model.encoder.weight)
+        assert not torch.allclose(dst_model.encoder.weight, original_encoder)
+        assert torch.allclose(dst_model.attention_decoder.weight, original_decoder)
 
     def test_save_weights_writes_state_dict(self, tmp_path):
         model = TinyModel()

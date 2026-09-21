@@ -99,11 +99,13 @@ def load_checkpoint(
 
         missing_keys = set(current_state.keys()) - set(filtered_state.keys())
 
-        if strict and getattr(model, "decoder_type", "attention") != "attention":
-            if shape_mismatches or skipped_keys or missing_keys:
-                raise RuntimeError("Decoder checkpoint does not match this architecture; use its saved config")
-
         result = model.load_state_dict(filtered_state, strict=False)
+
+        if strict and result.unexpected_keys:
+            raise RuntimeError(
+                "Checkpoint contains unexpected keys after compatibility filtering: "
+                f"{result.unexpected_keys[:5]}"
+            )
 
         if shape_mismatches or skipped_keys or missing_keys:
             if shape_mismatches:
@@ -112,6 +114,15 @@ def load_checkpoint(
                     print(f"   - {msg}")
                 if len(shape_mismatches) > 5:
                     print(f"   ... and {len(shape_mismatches) - 5} more")
+
+            if skipped_keys:
+                print(
+                    f"ℹ️  Keys absent in current model (skipped): {len(skipped_keys)}"
+                )
+                for key in skipped_keys[:3]:
+                    print(f"   - {key}")
+                if len(skipped_keys) > 3:
+                    print(f"   ... and {len(skipped_keys) - 3} more")
 
             if missing_keys:
                 print(
