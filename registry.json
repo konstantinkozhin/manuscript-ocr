@@ -63,6 +63,47 @@
         }
       }
     },
+    "mask2former_line_v0_prev": {
+      "model_classes": [
+        "Mask2Former"
+      ],
+      "library_version": "0.1.13",
+      "description": "Mask2Former text-line instance segmentation detector",
+      "license": null,
+      "artifacts": {
+        "license": null,
+        "weights": {
+          "filename": "mask2former_line_v0_prev.onnx",
+          "format": "onnx",
+          "size": 12081066,
+          "sha256": "0439da420bbf469b4d61c5b87786995c2e59b42f04f0069a4cc6bb8d7fc26981",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.onnx"
+          ],
+          "required": true
+        },
+        "external_data": {
+          "filename": "mask2former_line_v0_prev.onnx.data",
+          "format": "onnx_data",
+          "size": 288300212,
+          "sha256": "7fa05b376e8f39ec27118e83674cc9771467b5fdd07ef360a08a7cc0c9797db1",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.onnx.data"
+          ],
+          "required": true
+        },
+        "config": {
+          "filename": "mask2former_line_v0_prev.json",
+          "format": "json",
+          "size": 441,
+          "sha256": "f02afb6f28651e10f6db47cc42996e6163291850fe08c27edcbcf5860e134031",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.json"
+          ],
+          "required": true
+        }
+      }
+    },
     "modern_charlm_g1": {
       "model_classes": [
         "CharLM"
