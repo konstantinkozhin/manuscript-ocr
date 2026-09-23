@@ -2,6 +2,7 @@ import hashlib
 import io
 import json
 from pathlib import Path
+import warnings
 
 import pytest
 
@@ -134,20 +135,41 @@ def test_version_compatibility(tmp_path, monkeypatch):
     data = catalog()
     data['models']['demo']['library_version'] = '99.0'
     monkeypatch.setattr(m, 'version', lambda _: '0.1.13')
-    with pytest.raises(ValueError, match='requires manuscript'):
-        cached(tmp_path, data).info('demo')
+    with pytest.warns(RuntimeWarning, match='attempting to run it anyway'):
+        assert cached(tmp_path, data).info('demo')['library_version'] == '99.0'
 
 
 @pytest.mark.parametrize('installed,compatible', [('0.1.12', False), ('0.1.13', True), ('0.1.14', False)])
-def test_exact_library_version(tmp_path, monkeypatch, installed, compatible):
+def test_exact_library_version_warns_without_blocking(tmp_path, monkeypatch, installed, compatible):
     data = catalog()
     data['models']['demo']['library_version'] = '0.1.13'
     monkeypatch.setattr(m, 'version', lambda _: installed)
     registry = cached(tmp_path, data)
-    if compatible:
-        assert registry.info('demo')['library_version'] == '0.1.13'
+    if not compatible:
+        with pytest.warns(RuntimeWarning, match='attempting to run it anyway'):
+            assert registry.info('demo')['library_version'] == '0.1.13'
     else:
-        with pytest.raises(ValueError, match='requires manuscript-ocr==0.1.13'):
+        assert registry.info('demo')['library_version'] == '0.1.13'
+
+
+@pytest.mark.parametrize('installed,warning', [
+    ('0.1.9', True), ('0.1.10', False), ('0.1.11', False),
+    ('0.1.12', False), ('0.1.13', False), ('0.1.14', True),
+])
+def test_library_version_range_warns_only_outside_range(
+        tmp_path, monkeypatch, installed, warning):
+    data = catalog()
+    data['models']['demo']['library_version'] = None
+    data['models']['demo']['library_version_min'] = '0.1.10'
+    data['models']['demo']['library_version_max'] = '0.1.13'
+    monkeypatch.setattr(m, 'version', lambda _: installed)
+    registry = cached(tmp_path, data)
+    if warning:
+        with pytest.warns(RuntimeWarning, match='0.1.10..0.1.13'):
+            registry.info('demo')
+    else:
+        with warnings.catch_warnings():
+            warnings.simplefilter('error')
             registry.info('demo')
 
 
@@ -196,11 +218,13 @@ def test_new_alias_integrates_with_base(tmp_path, monkeypatch):
 
 def test_bundled_registry_valid():
     data = m._validate(json.loads(Path(m.__file__).with_name('registry.json').read_text()))
-    assert len(data['models']) == 10
+    assert len(data['models']) == 11
     for entry in data['models'].values():
-        assert entry['library_version'] == '0.1.13'
+        assert entry['library_version'] is None
+        assert entry['library_version_min'] == '0.1.10'
+        assert entry['library_version_max'] == '0.1.13'
         assert not {'architecture', 'task', 'model_version'} & entry.keys()
-    assert sum(a is not None for e in data['models'].values() for a in e['artifacts'].values()) == 31
+    assert sum(a is not None for e in data['models'].values() for a in e['artifacts'].values()) == 34
 
 
 @pytest.mark.parametrize('class_name', ['TRBA', 'YOLO', 'EAST', 'CharLM', 'PPOCRv5Rec'])

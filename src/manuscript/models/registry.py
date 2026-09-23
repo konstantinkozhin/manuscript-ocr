@@ -8,6 +8,7 @@ import re
 import shutil
 import tempfile
 import urllib.request
+import warnings
 from importlib.metadata import version
 
 from packaging.version import Version
@@ -48,6 +49,10 @@ def _validate(data):
             raise ValueError(f'Invalid model_classes for {name}')
         if entry.get('library_version') is not None:
             Version(entry['library_version'])
+        if entry.get('library_version_min') is not None:
+            Version(entry['library_version_min'])
+        if entry.get('library_version_max') is not None:
+            Version(entry['library_version_max'])
         if not isinstance(entry.get('artifacts'), dict):
             raise ValueError(f'Missing artifacts for {name}')
         filenames = set()
@@ -183,9 +188,24 @@ class Registry:
         entry = data['models'][name]
         if model_class and model_class not in entry['model_classes']:
             raise ValueError(f"Model {name!r} belongs to {entry['model_classes']}, not {model_class}")
+        installed = Version(version('manuscript-ocr'))
+        minimum = entry.get('library_version_min')
+        maximum = entry.get('library_version_max')
         required = entry.get('library_version')
-        if required and Version(version('manuscript-ocr')) != Version(required):
-            raise ValueError(f'Model {name!r} requires manuscript-ocr=={required}')
+        outside_range = ((minimum and installed < Version(minimum)) or
+                         (maximum and installed > Version(maximum)))
+        exact_mismatch = required and installed != Version(required)
+        if outside_range or exact_mismatch:
+            if minimum or maximum:
+                expected = f"{minimum or '*'}..{maximum or '*'}"
+            else:
+                expected = f'=={required}'
+            warnings.warn(
+                f"Model {name!r} was tested with manuscript-ocr {expected}, "
+                f"but {installed} is installed; attempting to run it anyway",
+                RuntimeWarning,
+                stacklevel=2,
+            )
         return entry
 
     def directory(self, name, entry):
