@@ -65,8 +65,13 @@ class Mask2Former(BaseDetector):
         if self.onnx_session is not None:
             return
         self._prepare_runtime_dependencies()
+        session_options = ort.SessionOptions()
+        session_options.log_severity_level = 3
         self.onnx_session = ort.InferenceSession(
-            self.weights, providers=self.runtime_providers())
+            self.weights,
+            sess_options=session_options,
+            providers=self.runtime_providers(),
+        )
         pixel_input = next(
             item for item in self.onnx_session.get_inputs()
             if item.name == self.input_pixel_values)

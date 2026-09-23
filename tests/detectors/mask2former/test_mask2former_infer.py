@@ -70,9 +70,15 @@ def test_config_defaults_and_explicit_overrides(tmp_path):
 def test_predict_returns_one_text_span_per_line(monkeypatch, tmp_path):
     weights, config = _artifacts(tmp_path)
     session = _FakeSession()
+    session_kwargs = {}
+
+    def make_session(*_args, **kwargs):
+        session_kwargs.update(kwargs)
+        return session
+
     monkeypatch.setattr(
         "manuscript.detectors._mask2former.ort.InferenceSession",
-        lambda *_args, **_kwargs: session,
+        make_session,
     )
     detector = Mask2Former(weights=weights, config=config, device="cpu")
     page = detector.predict(np.full((400, 600, 3), 255, dtype=np.uint8))
@@ -85,6 +91,7 @@ def test_predict_returns_one_text_span_per_line(monkeypatch, tmp_path):
     assert session.feed["pixel_values"].shape == (1, 3, 1024, 1024)
     assert session.feed["pixel_values"].dtype == np.float32
     assert session.feed["pixel_mask"].dtype == np.int64
+    assert session_kwargs["sess_options"].log_severity_level == 3
     assert all(len(line.text_spans[0].polygon) >= 4 for line in page.blocks[0].lines)
 
     ordered = SimpleSorting(use_columns=False).predict(page)
