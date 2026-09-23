@@ -9,6 +9,8 @@ Changes in v_0_1_13 relative to 0.1.12
   `~/.manuscript/models/<model-key>/`, with verified reuse of the old cache;
 - model presets and TRBA pretraining now use the registry; added public helpers
   for downloading, inspecting, verifying, and removing cached model bundles;
+- added the FP16 ONNX `mask2former_line_v0_prev` detector for text-line
+  segmentation; each detected line is returned as one `TextSpan`;
 - `src/manuscript/recognizers/_trba/__init__.py`: fixed a CUDA/ONNX Runtime
   inference bug in `TRBA` where the final incomplete batch shape could trigger
   severe recognition slowdowns on page-scale runs; the last partial batch is
