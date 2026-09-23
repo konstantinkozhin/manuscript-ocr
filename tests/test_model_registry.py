@@ -139,7 +139,10 @@ def test_version_compatibility(tmp_path, monkeypatch):
         assert cached(tmp_path, data).info('demo')['library_version'] == '99.0'
 
 
-@pytest.mark.parametrize('installed,compatible', [('0.1.12', False), ('0.1.13', True), ('0.1.14', False)])
+@pytest.mark.parametrize('installed,compatible', [
+    ('0.1.9', False), ('0.1.10', True), ('0.1.11', True),
+    ('0.1.12', True), ('0.1.13', True), ('0.1.14', False),
+])
 def test_exact_library_version_warns_without_blocking(tmp_path, monkeypatch, installed, compatible):
     data = catalog()
     data['models']['demo']['library_version'] = '0.1.13'

@@ -216,7 +216,11 @@ class Registry:
         required = entry.get('library_version')
         outside_range = ((minimum and installed < Version(minimum)) or
                          (maximum and installed > Version(maximum)))
-        exact_mismatch = required and installed != Version(required)
+        legacy_supported = (
+            required and Version(required) == Version('0.1.13') and
+            Version('0.1.10') <= installed <= Version('0.1.13')
+        )
+        exact_mismatch = required and installed != Version(required) and not legacy_supported
         if outside_range or exact_mismatch:
             if minimum or maximum:
                 expected = f"{minimum or '*'}..{maximum or '*'}"
