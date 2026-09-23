@@ -67,6 +67,11 @@ class Mask2Former(BaseDetector):
         self._prepare_runtime_dependencies()
         self.onnx_session = ort.InferenceSession(
             self.weights, providers=self.runtime_providers())
+        pixel_input = next(
+            item for item in self.onnx_session.get_inputs()
+            if item.name == self.input_pixel_values)
+        self.pixel_dtype = (
+            np.float16 if pixel_input.type == "tensor(float16)" else np.float32)
         self._log_device_info(self.onnx_session)
 
     @staticmethod
@@ -97,6 +102,7 @@ class Mask2Former(BaseDetector):
         canvas[top:top + resized_size[1], left:left + resized_size[0]] = resized
         pixels = canvas.astype(np.float32) / 255.0
         pixels = ((pixels - self.image_mean) / self.image_std).transpose(2, 0, 1)[None]
+        pixels = pixels.astype(self.pixel_dtype, copy=False)
         return pixels, left, top, resized_size
 
     def _postprocess(self, class_logits, mask_logits, geometry):

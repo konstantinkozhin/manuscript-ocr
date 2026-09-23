@@ -73,16 +73,16 @@
         "weights": {
           "filename": "mask2former_line_v0_prev.onnx",
           "format": "onnx",
-          "size": 12081066,
-          "sha256": "0439da420bbf469b4d61c5b87786995c2e59b42f04f0069a4cc6bb8d7fc26981",
+          "size": 12236574,
+          "sha256": "69ad4f6ef7d004d5f6988e2748756685c29bcaf213fc1cf8d192f6117cf38d50",
           "urls": ["https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.onnx"],
           "required": true
         },
         "external_data": {
           "filename": "mask2former_line_v0_prev.onnx.data",
           "format": "onnx_data",
-          "size": 288300212,
-          "sha256": "7fa05b376e8f39ec27118e83674cc9771467b5fdd07ef360a08a7cc0c9797db1",
+          "size": 144179200,
+          "sha256": "d33b1410f6b0f6dd77370a8d922c98ab410f602470612592bd30bfe400115c2c",
           "urls": ["https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.onnx.data"],
           "required": true
         },
