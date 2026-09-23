@@ -104,6 +104,28 @@ def _matches(path, artifact):
     return True
 
 
+def _download_with_progress(source, output, artifact):
+    filename = artifact['filename']
+    total = artifact.get('size')
+    size_text = f' ({total / (1024 * 1024):.1f} MiB)' if total else ''
+    print(f'[manuscript-ocr] Downloading {filename}{size_text}...', flush=True)
+    downloaded = 0
+    reported = -1
+    while True:
+        chunk = source.read(1024 * 1024)
+        if not chunk:
+            break
+        output.write(chunk)
+        downloaded += len(chunk)
+        if total:
+            percent = min(100, downloaded * 100 // total)
+            step = percent // 10
+            if step > reported:
+                reported = step
+                print(f'[manuscript-ocr] {filename}: {percent}%', flush=True)
+    print(f'[manuscript-ocr] Downloaded {filename}', flush=True)
+
+
 class Registry:
     def __init__(self, root=None, sources=None, timeout=10):
         self.root = Path(root or os.environ.get('MANUSCRIPT_HOME', Path.home() / '.manuscript')).expanduser()
@@ -237,10 +259,11 @@ class Registry:
                             shutil.copyfileobj(source, output)
                     else:
                         with urllib.request.urlopen(url, timeout=self.timeout) as source:
-                            shutil.copyfileobj(source, output, length=1024 * 1024)
+                            _download_with_progress(source, output, artifact)
                 if not _matches(Path(tmp), artifact):
                     raise ValueError('Downloaded artifact failed size/SHA-256 verification')
                 os.replace(tmp, path)
+                print(f'[manuscript-ocr] Cached at {path}', flush=True)
                 return path
             except (OSError, ValueError) as exc:
                 errors.append(f'{url}: {exc}')
