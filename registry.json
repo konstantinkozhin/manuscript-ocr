@@ -398,6 +398,59 @@
         }
       }
     },
+    "trba_lite_g3_prt": {
+      "model_classes": [
+        "TRBA"
+      ],
+      "library_version": null,
+      "library_version_min": "0.1.10",
+      "library_version_max": "0.1.13",
+      "description": "TRBA Lite recognizer fine-tuned for pre-reform Russian printed text",
+      "license": null,
+      "artifacts": {
+        "license": null,
+        "config": {
+          "filename": "trba_lite_g3_prt.json",
+          "format": "json",
+          "size": 367,
+          "sha256": "de269c9b7b0b70dafd88559f3eb02afa0cb43ceba2fcffbacb0397cd5aa18ce9",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g3_prt.json"
+          ],
+          "required": true
+        },
+        "weights": {
+          "filename": "trba_lite_g3_prt.onnx",
+          "format": "onnx",
+          "size": 46193314,
+          "sha256": "e5bc69749f1c8f19e7d63184cdc5d7c7082d2fa2570b180b1bf666d51521e502",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g3_prt.onnx"
+          ],
+          "required": true
+        },
+        "checkpoint": {
+          "filename": "trba_lite_g3_prt.pth",
+          "format": "pth",
+          "size": 129362807,
+          "sha256": "8ac83129c4af6a82f99cfd01bb621354cf340123884da24b82f4e035131c1af6",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g3_prt.pth"
+          ],
+          "required": false
+        },
+        "charset": {
+          "filename": "trba_lite_g3_prt.txt",
+          "format": "txt",
+          "size": 694,
+          "sha256": "60c5a8a9ba9a73085e102ac13e0d03e33f5fac369bfd5f88f4602a15bd96f45b",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g3_prt.txt"
+          ],
+          "required": true
+        }
+      }
+    },
     "yolo26s_obb_text_g1": {
       "model_classes": [
         "YOLO"
