@@ -1,8 +1,4 @@
-__all__ = [
-    "EAST",
-    "Mask2Former",
-    "YOLO",
-]
+__all__ = ["EAST", "YOLO"]
 
 
 def __getattr__(name):
@@ -15,10 +11,5 @@ def __getattr__(name):
         from ._yolo import YOLO
 
         return YOLO
-
-    if name == "Mask2Former":
-        from ._mask2former import Mask2Former
-
-        return Mask2Former
 
     raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

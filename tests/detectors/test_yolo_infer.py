@@ -12,6 +12,7 @@ class _FakeIO:
     def __init__(self, name, shape):
         self.name = name
         self.shape = shape
+        self.type = "tensor(float)"
 
 
 class _FakeSessionDetect:
@@ -87,12 +88,7 @@ def test_yolo_inherits_base_detector():
 
 def test_yolo_has_default_preset():
     assert YOLO.default_weights_name == "yolo26x_obb_text_g1"
-    assert YOLO.pretrained_registry["yolo26s_obb_text_g1"] == (
-        "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx"
-    )
-    assert YOLO.pretrained_registry["yolo26x_obb_text_g1"] == (
-        "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.onnx"
-    )
+    assert YOLO.registry_model_class == "YOLO"
 
 
 def test_yolo_uses_default_preset_when_weights_missing(monkeypatch, tmp_path):
@@ -363,3 +359,22 @@ def test_yolo_rejects_static_shape_mismatch(monkeypatch, tmp_path):
 
     with pytest.raises(ValueError, match="expects input size"):
         detector._initialize_session()
+
+
+def test_float16_graph_uses_float16_input(monkeypatch, tmp_path):
+    model_path = tmp_path / "model.onnx"
+    model_path.write_bytes(b"test")
+    session = _FakeSessionDetect()
+    original_inputs = session.get_inputs
+
+    def get_inputs():
+        items = original_inputs()
+        items[0].type = "tensor(float16)"
+        return items
+
+    monkeypatch.setattr(session, "get_inputs", get_inputs)
+    monkeypatch.setattr("manuscript.detectors._yolo.ort.InferenceSession", lambda *a, **k: session)
+    model = YOLO(weights=model_path)
+    model._initialize_session()
+    tensor, _, _ = model._preprocess(np.zeros((20, 30, 3), np.uint8))
+    assert tensor.dtype == np.float16

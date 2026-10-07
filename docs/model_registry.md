@@ -70,10 +70,13 @@ SHA-256, when known, are checked before atomic replacement. Old flat files under
 `schema_version` is currently `1`. The `models` mapping uses the public alias as
 its key. Each entry contains:
 
-- `model_classes`: allowed public class IDs (`TRBA`, `EAST`, `YOLO`, `CharLM`,
-  `PPOCRv5Rec`). These IDs never trigger dynamic imports.
-- `library_version`: the exact supported library version, currently `"0.1.13"`
-  for all official entries; `null` is allowed for unknown compatibility.
+- `model_classes`: allowed public class IDs (`TRBA`, `EAST`, `YOLO`, `CharLM`). These IDs never trigger dynamic imports.
+- `library_version`: an exact tested library version, or `null`.
+- `library_version_min` / `library_version_max`: optional inclusive tested bounds.
+  Older official models use `0.1.10` through `0.1.13`. A mismatch emits a
+  `RuntimeWarning` and execution continues; it is not a hard compatibility gate.
+  Legacy entries with exact `library_version="0.1.13"` also accept installed
+  versions `0.1.10` through `0.1.13`.
 - `description`: model description.
 - `license`: the license for the complete model, not individual artifacts.
 - `artifacts`: roles such as `weights`, `config`, `charset`, `vocab`, `lexicon`,

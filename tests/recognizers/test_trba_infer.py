@@ -35,9 +35,8 @@ class TestTRBAInitialization:
 
     def test_trba_lite_g2_preset_registered(self):
         """TRBA exposes trba_lite_g2 across all preset registries."""
-        assert "trba_lite_g2" in TRBA.pretrained_registry
-        assert "trba_lite_g2" in TRBA.config_registry
-        assert "trba_lite_g2" in TRBA.charset_registry
+        from manuscript.models import info
+        assert "TRBA" in info("trba_lite_g2")["model_classes"]
 
     @patch('manuscript.api.base.BaseArtifactModel._download_http')
     def test_trba_initialization_with_local_file(self, mock_download, tmp_path):
@@ -126,38 +125,18 @@ class TestTRBAConfigResolution:
         assert recognizer.config_path == str(config_file.absolute())
         assert recognizer.charset_path == str(charset_file.absolute())
 
-    def test_config_fallback_to_default_preset(self, tmp_path):
-        """Test fallback to default preset config when not found next to weights"""
-        weights_file = tmp_path / "model.onnx"
-        weights_file.write_text("mock_onnx")
-        # Do not create config file - should use default preset
-        
-        # This will download the default preset config (trba_lite_g1)
-        recognizer = TRBA(weights=str(weights_file), device="cpu")
-        
-        # Should fallback to default preset config (trba_lite_g1)
-        assert recognizer.config_path is not None
-        assert Path(recognizer.config_path).exists()
-        # Should be the default preset config
-        assert "trba_lite_g1" in recognizer.config_path
+    def test_config_missing_fails(self, tmp_path):
+        weights = tmp_path / "model.onnx"
+        weights.write_bytes(b"test")
+        with pytest.raises(FileNotFoundError, match="config"):
+            TRBA(weights=str(weights), device="cpu")
 
-    def test_charset_fallback_to_default_preset(self, tmp_path):
-        """Test fallback to default preset charset when not found next to weights"""
-        weights_file = tmp_path / "model.onnx"
-        config_file = tmp_path / "model.json"
-        
-        weights_file.write_text("mock_onnx")
-        config_file.write_text('{"max_len": 25, "hidden_size": 256, "img_h": 64, "img_w": 256}')
-        # Do not create charset file - should use default preset
-        
-        # This will download the default preset charset (trba_lite_g1)
-        recognizer = TRBA(weights=str(weights_file), config=str(config_file), device="cpu")
-        
-        # Should fallback to default preset charset (trba_lite_g1)
-        assert recognizer.charset_path is not None
-        assert Path(recognizer.charset_path).exists()
-        # Should be the default preset charset
-        assert "trba_lite_g1" in recognizer.charset_path
+    def test_charset_missing_fails(self, tmp_path):
+        weights = tmp_path / "model.onnx"
+        weights.write_bytes(b"test")
+        weights.with_suffix(".json").write_text('{"img_h":32,"img_w":256}')
+        with pytest.raises(FileNotFoundError, match="charset"):
+            TRBA(weights=str(weights), device="cpu")
 
     def test_explicit_charset_parameter(self, tmp_path):
         """Test that explicit charset parameter is used when provided"""
@@ -402,6 +381,7 @@ class TestTRBAPredictPageInterface:
 
 
 class TestTRBABatching:
+    _create_page = staticmethod(TestTRBAPredictPageInterface._create_page)
     def _create_recognizer(self, tmp_path, **kwargs):
         weights_file = tmp_path / "model.onnx"
         config_file = tmp_path / "model.json"

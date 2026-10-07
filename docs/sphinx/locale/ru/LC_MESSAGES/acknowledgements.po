@@ -1,34 +1,33 @@
-# SOME DESCRIPTIVE TITLE.
+# Russian translations for manuscript-ocr documentation.
 # Copyright (C) 2026, Konstantin Kozhin
-# This file is distributed under the same license as the manuscript-ocr package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+# This file is distributed under the same license as the manuscript-ocr
+# package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr 0.1.11\n"
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-11 00:00+0700\n"
-"PO-Revision-Date: 2026-04-11 00:00+0700\n"
-"Last-Translator: \n"
-"Language-Team: ru\n"
+"POT-Creation-Date: 2026-10-06 15:49+0700\n"
+"PO-Revision-Date: 2026-10-06 00:00+0700\n"
+"Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Language-Team: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Generated-By: Babel 2.18.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
 
-#: ../../acknowledgements.rst:2
+#: 6f9b87b2ab8f4e418148184a65b3bb36 acknowledgements.rst:2
 msgid "Acknowledgements"
 msgstr "Благодарности"
 
-#: ../../acknowledgements.rst:4
+#: 2c28691fb0224d87be2dda9e84be183c acknowledgements.rst:4
 msgid ""
 "This project was implemented with the support of a grant from the "
 "`Foundation for Assistance to Small Innovative Enterprises (FASIE) "
 "<https://fasie.ru/>`_, competition **\"Kod-II\"** (VII stage)."
 msgstr ""
-"Проект реализован при поддержке гранта "
-"`Фонда содействия инновациям <https://fasie.ru/>`_, "
-"конкурс «Код-ИИ», VII очередь."
+"Проект реализован при поддержке гранта `Фонда содействия инновациям "
+"<https://fasie.ru/>`_, конкурс «Код-ИИ», VII очередь."

@@ -1,18 +1,17 @@
-# SOME DESCRIPTIVE TITLE.
+# Russian translations for manuscript-ocr documentation.
 # Copyright (C) 2026, Konstantin Kozhin
 # This file is distributed under the same license as the manuscript-ocr
 # package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr \n"
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2025-12-22 17:48+0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"POT-Creation-Date: 2026-10-06 15:49+0700\n"
+"PO-Revision-Date: 2026-10-06 00:00+0700\n"
+"Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
-"Language-Team: ru <LL@li.org>\n"
+"Language-Team: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
@@ -20,11 +19,10 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../api/index.rst:2 e2b2295e6afb48829138b8011b51a9ba
+#: 37da3af059124ee5b7daf32d23b33b9d api/index.rst:2
 msgid "API Reference"
 msgstr "Справочник API"
 
-#: ../../api/index.rst:4 d045e39011d64fc68170cf6602c0c85f
+#: 78c603af0cbe46569f9803a1a5fbe610 api/index.rst:4
 msgid "This section contains the complete API reference for manuscript-ocr."
 msgstr "В этом разделе приведён полный справочник API для manuscript-ocr."
-

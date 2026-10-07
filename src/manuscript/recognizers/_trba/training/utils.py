@@ -99,6 +99,18 @@ def load_checkpoint(
 
         missing_keys = set(current_state.keys()) - set(filtered_state.keys())
 
+        # Full training checkpoints must match before any model or optimizer
+        # state is changed. Weight-only imports retain partial loading support.
+        if strict and "optimizer_state" in metadata and (
+            shape_mismatches or skipped_keys or missing_keys
+        ):
+            raise RuntimeError(
+                "Training checkpoint architecture does not match the model: "
+                f"{len(shape_mismatches)} shape mismatches, "
+                f"{len(skipped_keys)} unexpected keys, {len(missing_keys)} missing keys. "
+                "Use strict=False for an intentional partial weight import."
+            )
+
         result = model.load_state_dict(filtered_state, strict=False)
 
         if strict and result.unexpected_keys:

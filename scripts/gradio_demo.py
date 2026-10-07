@@ -6,7 +6,8 @@ import numpy as np
 from PIL import Image
 
 from manuscript import CharLM, Pipeline
-from manuscript.detectors import EAST, Mask2Former, YOLO
+from manuscript.detectors import EAST, YOLO
+from manuscript.detectors._mask2former import Mask2Former
 from manuscript.recognizers import TRBA
 
 

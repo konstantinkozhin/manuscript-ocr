@@ -4,7 +4,7 @@ import numpy as np
 
 from manuscript.api._page_helpers import filter_callable_kwargs
 from manuscript.data import Page, TextSpan
-from manuscript.utils import (
+from manuscript.utils.geometry import (
     crop_axis_aligned,
     crop_polygon_mask,
     polygon_to_bbox,

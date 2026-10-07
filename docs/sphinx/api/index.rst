@@ -13,3 +13,4 @@ This section contains the complete API reference for manuscript-ocr.
    recognizers
    correctors
    utils
+   models

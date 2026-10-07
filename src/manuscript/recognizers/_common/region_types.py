@@ -6,7 +6,7 @@ from typing import Any, Dict, List, Optional, Sequence
 import numpy as np
 
 from manuscript.data import TextSpan
-from manuscript.utils import read_image
+from manuscript.utils.io import read_image
 
 REGION_PREPARER_PRESETS = frozenset({"bbox", "polygon_mask", "quad_warp"})
 

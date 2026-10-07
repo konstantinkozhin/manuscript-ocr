@@ -1,13 +1,14 @@
-# SOME DESCRIPTIVE TITLE.
+# Russian translations for manuscript-ocr documentation.
 # Copyright (C) 2026, Konstantin Kozhin
 # This file is distributed under the same license as the manuscript-ocr
 # package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr 0.1.11\n"
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"PO-Revision-Date: 2026-04-04 20:45+0700\n"
+"POT-Creation-Date: 2026-10-06 15:57+0700\n"
+"PO-Revision-Date: 2026-10-06 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
 "Language-Team: ru\n"
@@ -16,238 +17,532 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Generated-By: Babel 2.18.0\n"
+"Generated-By: Babel 2.17.0\n"
 
+#: 20a4df9aec0e449a86b7346e0b3a8008 model_zoo.rst:2
 msgid "Model Zoo"
 msgstr "Зоопарк моделей"
 
-msgid "This page lists the presets and release artifacts documented for version |release|."
-msgstr "На этой странице перечислены пресеты и релизные артефакты, задокументированные для версии |release|."
+#: c233ec58d8e54100a548893386e8c8a4 model_zoo.rst:4
+msgid ""
+"This page lists the presets and release artifacts documented for version "
+"|release|."
+msgstr ""
+"На этой странице перечислены пресеты и релизные артефакты, "
+"задокументированные для версии |release|."
 
+#: 24a9c20628f94ffd93a0a8c5ad023c9f model_zoo.rst:7
 msgid "Detection"
 msgstr "Детекция"
 
-msgid "Layout"
-msgstr "Layout-анализ"
-
-msgid "Recognition"
-msgstr "Распознавание"
-
-msgid "Correction"
-msgstr "Посткоррекция"
-
+#: 2c70c75ef31c420a87a29f324a13483b c19356cb232a43698fd0eefa288ec547
+#: dd7649e2f95549f0a1f09fc8744e2504 f247e0236dbc427ea134e1baf72a8329
+#: model_zoo.rst:14 model_zoo.rst:56 model_zoo.rst:79 model_zoo.rst:125
 msgid "Preset"
 msgstr "Пресет"
 
+#: 096f2626922343b78c5333f4951dff4c 0d8c4449856545689b46712ab5510ee2
+#: 4178455f7b9549cb9b06cfc89d9e2940 bdfe3d6edf5940e19a95d560cd417c4f
+#: model_zoo.rst:15 model_zoo.rst:57 model_zoo.rst:80 model_zoo.rst:126
 msgid "Architecture"
 msgstr "Архитектура"
 
+#: 8e6450746c214e748125dd2fa2025b5d a22d0a30fcd84e6585c64b19165798c0
+#: bd2f2eb880ef4938b04f95cc24ae24cd ea0d66d674ac470084658b9ccdb268c0
+#: model_zoo.rst:16 model_zoo.rst:58 model_zoo.rst:81 model_zoo.rst:127
 msgid "Params"
 msgstr "Параметров"
 
+#: 8be9c0cb9b5d40e38553caf1c86a29e7 model_zoo.rst:17
 msgid "Rotated"
 msgstr "Поворот"
 
+#: 2c005c8220684952b50b0cac574dc885 56704440c0ee4e34926449c72bae85c2
+#: 9006286a0b2748b0829ec1ea3d6ce129 92b3ba655ec649a0a755d30062c8842f
+#: model_zoo.rst:18 model_zoo.rst:60 model_zoo.rst:83 model_zoo.rst:129
 msgid "Artifacts"
 msgstr "Артефакты"
 
+#: 2b32b665446a4ed38e931f941a7ca3f3 99ab01859f8d4f5caffb4b75419fd13e
+#: 9df5cd0e4e3e45218264aaffa67c98ab c35ab022f2164d0aa18b45e51bc0f7da
+#: model_zoo.rst:19 model_zoo.rst:61 model_zoo.rst:84 model_zoo.rst:130
 msgid "Origin"
 msgstr "Происхождение"
 
+#: 9ccf646946204fa7a2551b6ed6a50340 a7f1e6a846af42909f11595249e42734
+#: a9c735455ec64e9eab52123a06c2e7af e8a50c6400864d8c8c9400ca5450e488
+#: model_zoo.rst:20 model_zoo.rst:62 model_zoo.rst:85 model_zoo.rst:131
 msgid "License"
 msgstr "Лицензия"
 
-msgid "Supports"
-msgstr "Поддерживает"
-
-msgid "Script"
-msgstr "Письмо"
-
-msgid "Orthography"
-msgstr "Орфография"
-
-msgid "Yes"
-msgstr "Да"
-
-msgid "Manuscript"
-msgstr "Manuscript"
-
-msgid "MIT"
-msgstr "MIT"
-
+#: c0e50ab75bc54b02a777be93185ad4c9 model_zoo.rst:21
 msgid "``east_50_g1``"
 msgstr "``east_50_g1``"
 
+#: 52782f5405914abea72b0ab4ad3e8ee8 model_zoo.rst:22
 msgid "EAST (ResNet-50)"
 msgstr "EAST (ResNet-50)"
 
+#: fd16d81636ef4e9d91cce81db7cabf15 model_zoo.rst:23
 msgid "53.86M"
 msgstr "53.86M"
 
-msgid "`east_50_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.onnx>`_"
-msgstr "`east_50_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.onnx>`_"
+#: 3498a2633395464889c963de3a15fffe 38b6f08a72c944b397429e3ab818674e
+#: a0999d91b2cf424091bf9b644e4446f9 model_zoo.rst:24 model_zoo.rst:32
+#: model_zoo.rst:41
+msgid "Yes"
+msgstr "Да"
 
-msgid "`east_50_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.pth>`_"
-msgstr "`east_50_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.pth>`_"
+#: 2f5781d8a4164dd19de7f3e8b13f12eb model_zoo.rst
+msgid ""
+"`east_50_g1.onnx <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/east_50_g1.onnx>`_"
+msgstr ""
+"`east_50_g1.onnx <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/east_50_g1.onnx>`_"
 
+#: f6334af28d92449f934f106e910a32a2 model_zoo.rst
+msgid ""
+"`east_50_g1.pth <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/east_50_g1.pth>`_"
+msgstr ""
+"`east_50_g1.pth <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/east_50_g1.pth>`_"
+
+#: 33227243c80f427aa7607b80ad9ef8e0 45a463111adb4d01801ac24d415cc0ed
+#: 47a87cc3414041cab084ce138fcb1784 6ae7c8800f154158949b1fd077e85460
+#: b041e85643ba4206a55fb17ff4c80a7e b4cf5df35a674cdf8bf915995a7b8f40
+#: e7c3246e95b34f179ebb147091dcb49e model_zoo.rst:27 model_zoo.rst:68
+#: model_zoo.rst:94 model_zoo.rst:104 model_zoo.rst:114 model_zoo.rst:140
+#: model_zoo.rst:150
+msgid "Manuscript"
+msgstr "Manuscript"
+
+#: 0cf4c5555c1145028268f6e5666a1aba 3bb4fe4b321e4e8d9590bb6c13505994
+#: a706a2632e774267b0d29d5c2db2edce d9a6f6e4d89348f5a9b13038683b834a
+#: df7bbce7f0e74060b338a10d2a517501 e417c52518c14cdcb0ec2caa235a1e13
+#: eb3d8e0339884abc9f94be27902cd4a0 model_zoo.rst:28 model_zoo.rst:69
+#: model_zoo.rst:95 model_zoo.rst:105 model_zoo.rst:115 model_zoo.rst:141
+#: model_zoo.rst:151
+msgid "MIT"
+msgstr "MIT"
+
+#: 68038fabf48b44f0868de026f721050a model_zoo.rst:29
 msgid "``yolo26s_obb_text_g1``"
 msgstr "``yolo26s_obb_text_g1``"
 
+#: f069e805f63e4950960572b916a6870f model_zoo.rst:30
 msgid "YOLO26-S OBB"
 msgstr "YOLO26-S OBB"
 
+#: 9b3c2776714a432cb4705b27e9986e4f model_zoo.rst:31
 msgid "9.75M"
 msgstr "9.75M"
 
-msgid "`yolo26s_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx>`_"
-msgstr "`yolo26s_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx>`_"
+#: 09626a2a6239424fa8e7b51921a4c05d model_zoo.rst
+msgid ""
+"`yolo26s_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin"
+"/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx>`_"
+msgstr ""
+"`yolo26s_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin"
+"/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx>`_"
 
-msgid "`yolo26s_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.pt>`_"
-msgstr "`yolo26s_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.pt>`_"
+#: 31aa20092ebb4b8da753a1c84a8dd44b model_zoo.rst
+msgid ""
+"`yolo26s_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.pt>`_"
+msgstr ""
+"`yolo26s_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.pt>`_"
 
-msgid "`yolo26s_obb_text_g1.raw.yaml <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.yaml>`_"
-msgstr "`yolo26s_obb_text_g1.raw.yaml <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.yaml>`_"
+#: 900cb486116049eba627f0ea6a8167e1 model_zoo.rst
+msgid ""
+"`yolo26s_obb_text_g1.raw.yaml <https://github.com/konstantinkozhin"
+"/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.yaml>`_"
+msgstr ""
+"`yolo26s_obb_text_g1.raw.yaml <https://github.com/konstantinkozhin"
+"/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.yaml>`_"
 
+#: 505a24c797224f1aafa5bbf2e33a076f c162115cbeea41e882c9eb7635cd5612
+#: model_zoo.rst:36 model_zoo.rst:45
 msgid "Trained by the authors with Ultralytics YOLO"
 msgstr "Обучено авторами с Ultralytics YOLO"
 
-msgid "`Ultralytics license <https://github.com/ultralytics/ultralytics/blob/main/LICENSE>`_"
-msgstr "`лицензия Ultralytics <https://github.com/ultralytics/ultralytics/blob/main/LICENSE>`_"
+#: a8397e981c9c402f9e8216664ee43aa5 cfb51332391f4ad4a71eca22bf8d7063
+#: model_zoo.rst:37 model_zoo.rst:46
+msgid ""
+"`Ultralytics license "
+"<https://github.com/ultralytics/ultralytics/blob/main/LICENSE>`_"
+msgstr ""
+"`лицензия Ultralytics "
+"<https://github.com/ultralytics/ultralytics/blob/main/LICENSE>`_"
 
+#: e5cf85ef2bdb4830aa05c2cf66b666a2 model_zoo.rst:38
 msgid "``yolo26x_obb_text_g1``"
 msgstr "``yolo26x_obb_text_g1``"
 
+#: 8be3bf2da7764515be090aab4bd50ff4 model_zoo.rst:39
 msgid "YOLO26-X OBB"
 msgstr "YOLO26-X OBB"
 
+#: 926e7f560d274dfa9d042c1b24cd5c74 model_zoo.rst:40
 msgid "57.61M"
 msgstr "57.61M"
 
-msgid "`yolo26x_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.onnx>`_"
-msgstr "`yolo26x_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.onnx>`_"
+#: 7338f7f9644c4d7da0f691dbe4faf175 model_zoo.rst
+msgid ""
+"`yolo26x_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin"
+"/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.onnx>`_"
+msgstr ""
+"`yolo26x_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin"
+"/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.onnx>`_"
 
-msgid "`yolo26x_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.pt>`_"
-msgstr "`yolo26x_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.pt>`_"
+#: 7c71016155454c4ba0ef052c8fa857bd model_zoo.rst
+msgid ""
+"`yolo26x_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.pt>`_"
+msgstr ""
+"`yolo26x_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.pt>`_"
 
-msgid "`yolo26x_obb_text_g1.raw.yaml <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.yaml>`_"
-msgstr "`yolo26x_obb_text_g1.raw.yaml <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.yaml>`_"
+#: 3d83a72fe6e34d8fb31913dd406dfd0f model_zoo.rst
+msgid ""
+"`yolo26x_obb_text_g1.raw.yaml <https://github.com/konstantinkozhin"
+"/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.yaml>`_"
+msgstr ""
+"`yolo26x_obb_text_g1.raw.yaml <https://github.com/konstantinkozhin"
+"/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.yaml>`_"
 
+#: 7dddeea94cbf4a67935aa0976581744c model_zoo.rst:49
+msgid "Layout"
+msgstr "Компоновка"
+
+#: eb97e710b2e84b919054c0585364d3eb model_zoo.rst:59
+msgid "Supports"
+msgstr "Поддерживает"
+
+#: 7be231009eaf49888d45e7f83ec79e3d model_zoo.rst:63
 msgid "``SimpleSorting``"
 msgstr "``SimpleSorting``"
 
+#: cef032a682c34f5f8e281ad35d76c73b model_zoo.rst:64
 msgid "Algorithmic ordering"
 msgstr "Алгоритмическая сортировка"
 
-msgid "-"
-msgstr "-"
-
+#: e8871f7dfd2647eca9f77c7bad21532d model_zoo.rst:66
 msgid "Left-to-right, multi-column"
 msgstr "Слева направо, многоколоночно"
 
+#: 1c66e3d90f814995a2b68286846895e4 model_zoo.rst:72
+msgid "Recognition"
+msgstr "Распознавание"
+
+#: 3a568058f9f94597b5ac38c58662908d model_zoo.rst:82
+msgid "Script"
+msgstr "Письмо"
+
+#: 6ab0a17d00d54574b343dcd069c7ab5f model_zoo.rst:86
+msgid "``trba_base_g1``"
+msgstr "``trba_base_g1``"
+
+#: e22c457f9e124211a0dbffbf1ad899ae model_zoo.rst:87
 msgid "TRBA"
 msgstr "TRBA"
 
+#: 57529bbe996a4a9786c9d466d143ff8b model_zoo.rst:88
 msgid "45.10M"
 msgstr "45.10M"
 
+#: 4fb5c1ab26ed430bb192ace75299fd62 5dbe958fecb449a1811945929749e766
+#: 8ac8d87ea5e746c2bd34767b9d7e3bc9 model_zoo.rst:89 model_zoo.rst:99
+#: model_zoo.rst:109
 msgid "Modern + pre-reform Russian"
 msgstr "Современный + дореформенный русский"
 
-msgid "`trba_base_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.onnx>`_"
-msgstr "`trba_base_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.onnx>`_"
+#: 8e4ab21b3431427ca927cb201d3ec0df model_zoo.rst
+msgid ""
+"`trba_base_g1.onnx <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_base_g1.onnx>`_"
+msgstr ""
+"`trba_base_g1.onnx <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_base_g1.onnx>`_"
 
-msgid "`trba_base_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.pth>`_"
-msgstr "`trba_base_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.pth>`_"
+#: 4338dd903619478fa154aa5884aedfab model_zoo.rst
+msgid ""
+"`trba_base_g1.pth <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_base_g1.pth>`_"
+msgstr ""
+"`trba_base_g1.pth <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_base_g1.pth>`_"
 
-msgid "`trba_base_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.json>`_"
-msgstr "`trba_base_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.json>`_"
+#: 78e70f37dedd422faeba47ad1cb5f634 model_zoo.rst
+msgid ""
+"`trba_base_g1.json <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_base_g1.json>`_"
+msgstr ""
+"`trba_base_g1.json <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_base_g1.json>`_"
 
-msgid "`trba_base_g1.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.txt>`_"
-msgstr "`trba_base_g1.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.txt>`_"
+#: ab364f62aa074de499c75e0f5eac8168 model_zoo.rst
+msgid ""
+"`trba_base_g1.txt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_base_g1.txt>`_"
+msgstr ""
+"`trba_base_g1.txt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_base_g1.txt>`_"
 
+#: 6bcaeac930d245f4bf03d283850b6649 model_zoo.rst:96
 msgid "``trba_lite_g1``"
 msgstr "``trba_lite_g1``"
 
+#: 3b1ac2d5c81d490281e3a624587dd39f 94dd6bd3126b4e2c8851c0a739802f2a
+#: model_zoo.rst:97 model_zoo.rst:107
 msgid "TRBA-Lite"
 msgstr "TRBA-Lite"
 
+#: 270c8a7c991146b19b9b698c7ec2eb49 7482db31281940a1b09fe825c8b2f307
+#: model_zoo.rst:98 model_zoo.rst:108
 msgid "9.46M"
 msgstr "9.46M"
 
-msgid "`trba_lite_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.onnx>`_"
-msgstr "`trba_lite_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.onnx>`_"
+#: 139978e0fdff4fa4bf8e8c168997fbf8 model_zoo.rst
+msgid ""
+"`trba_lite_g1.onnx <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g1.onnx>`_"
+msgstr ""
+"`trba_lite_g1.onnx <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g1.onnx>`_"
 
-msgid "`trba_lite_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.pth>`_"
-msgstr "`trba_lite_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.pth>`_"
+#: db0d60893d244d7c83abc3fe037ee445 model_zoo.rst
+msgid ""
+"`trba_lite_g1.pth <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g1.pth>`_"
+msgstr ""
+"`trba_lite_g1.pth <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g1.pth>`_"
 
-msgid "`trba_lite_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.json>`_"
-msgstr "`trba_lite_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.json>`_"
+#: 51a59ce617294143aecec734ed23b9ac model_zoo.rst
+msgid ""
+"`trba_lite_g1.json <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g1.json>`_"
+msgstr ""
+"`trba_lite_g1.json <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g1.json>`_"
 
-msgid "`trba_lite_g1.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.txt>`_"
-msgstr "`trba_lite_g1.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.txt>`_"
+#: f27fe9386329408a8e69463ffc5c4c99 model_zoo.rst
+msgid ""
+"`trba_lite_g1.txt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g1.txt>`_"
+msgstr ""
+"`trba_lite_g1.txt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g1.txt>`_"
 
+#: f7788ad6c98a42c890af1fed473f7fd5 model_zoo.rst:106
 msgid "``trba_lite_g2``"
 msgstr "``trba_lite_g2``"
 
-msgid "`trba_lite_g2.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.onnx>`_"
-msgstr "`trba_lite_g2.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.onnx>`_"
+#: b403c7eb0e344f2cbf4c7126feeca3a4 model_zoo.rst
+msgid ""
+"`trba_lite_g2.onnx <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g2.onnx>`_"
+msgstr ""
+"`trba_lite_g2.onnx <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g2.onnx>`_"
 
-msgid "`trba_lite_g2.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.pth>`_"
-msgstr "`trba_lite_g2.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.pth>`_"
+#: 7176e1dbb3dd43ec886b7c1334e15845 model_zoo.rst
+msgid ""
+"`trba_lite_g2.pth <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g2.pth>`_"
+msgstr ""
+"`trba_lite_g2.pth <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g2.pth>`_"
 
-msgid "`trba_lite_g2.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.json>`_"
-msgstr "`trba_lite_g2.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.json>`_"
+#: 7b2b5e72f1524b25a2e5d24f35d0542c model_zoo.rst
+msgid ""
+"`trba_lite_g2.json <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g2.json>`_"
+msgstr ""
+"`trba_lite_g2.json <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g2.json>`_"
 
-msgid "`trba_lite_g2.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.txt>`_"
-msgstr "`trba_lite_g2.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.txt>`_"
+#: fd8c65d699bd4011bf56e1905ec422c6 model_zoo.rst
+msgid ""
+"`trba_lite_g2.txt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g2.txt>`_"
+msgstr ""
+"`trba_lite_g2.txt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/trba_lite_g2.txt>`_"
 
+#: d4cd8d90dcd3475aa60c3fcf0dc39c2f model_zoo.rst:118
+msgid "Correction"
+msgstr "Посткоррекция"
+
+#: 3a99425831f44f578043d2dca989f08d model_zoo.rst:128
+msgid "Orthography"
+msgstr "Орфография"
+
+#: 98d631a1ac104cdfaa9f081a8c6fc59f model_zoo.rst:132
+msgid "``modern_charlm_g1``"
+msgstr "``modern_charlm_g1``"
+
+#: 35682f39b99d47a899a3158ffdd53336 5d92e8d4be5f400e8adf14a9660e14c0
+#: model_zoo.rst:133 model_zoo.rst:143
 msgid "CharLM"
 msgstr "CharLM"
 
+#: e61f0293028f475eb7c644e035d81ee4 model_zoo.rst:134
 msgid "4.38M"
 msgstr "4.38M"
 
+#: 93c166e9d8914e12ad584cb5f8a7008e model_zoo.rst:135
 msgid "Modern Russian"
 msgstr "Современный русский"
 
-msgid "`modern_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.onnx>`_"
-msgstr "`modern_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.onnx>`_"
+#: eab57bfa1a7f43af816927ed3278546b model_zoo.rst
+msgid ""
+"`modern_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/modern_charlm_g1.onnx>`_"
+msgstr ""
+"`modern_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/modern_charlm_g1.onnx>`_"
 
-msgid "`modern_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.pt>`_"
-msgstr "`modern_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.pt>`_"
+#: b85f9c3a433f42889ed021bbd44d04bd model_zoo.rst
+msgid ""
+"`modern_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/modern_charlm_g1.pt>`_"
+msgstr ""
+"`modern_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/modern_charlm_g1.pt>`_"
 
-msgid "`modern_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.json>`_"
-msgstr "`modern_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.json>`_"
+#: 9644cdfc306f48658f787654b5bf8e07 model_zoo.rst
+msgid ""
+"`modern_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/modern_charlm_g1.json>`_"
+msgstr ""
+"`modern_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/modern_charlm_g1.json>`_"
 
-msgid "`modern_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_words.txt>`_"
-msgstr "`modern_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_words.txt>`_"
+#: 6b063bf3d02a47c3820f4572510399f9 model_zoo.rst
+msgid ""
+"`modern_words.txt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/modern_words.txt>`_"
+msgstr ""
+"`modern_words.txt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/modern_words.txt>`_"
 
+#: 53571b45ad404607b789cb5962ae6e76 model_zoo.rst:142
 msgid "``prereform_charlm_g1``"
 msgstr "``prereform_charlm_g1``"
 
+#: f19bb858a70e4174ac2ed101b53cd8c8 model_zoo.rst:144
 msgid "4.39M"
 msgstr "4.39M"
 
+#: a356dfbabb3f41fb977291061e719813 model_zoo.rst:145
 msgid "Pre-reform Russian"
 msgstr "Дореформенный русский"
 
-msgid "`prereform_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.onnx>`_"
-msgstr "`prereform_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.onnx>`_"
+#: a548c4a581554eae8cb23dd426bd7a83 model_zoo.rst
+msgid ""
+"`prereform_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/prereform_charlm_g1.onnx>`_"
+msgstr ""
+"`prereform_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/prereform_charlm_g1.onnx>`_"
 
-msgid "`prereform_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.pt>`_"
-msgstr "`prereform_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.pt>`_"
+#: b1628ab6832b46ae9ec925ea72d8c724 model_zoo.rst
+msgid ""
+"`prereform_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/prereform_charlm_g1.pt>`_"
+msgstr ""
+"`prereform_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/prereform_charlm_g1.pt>`_"
 
-msgid "`prereform_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.json>`_"
-msgstr "`prereform_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.json>`_"
+#: b970f79898d949e08f83349f98c36d30 model_zoo.rst
+msgid ""
+"`prereform_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/prereform_charlm_g1.json>`_"
+msgstr ""
+"`prereform_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/prereform_charlm_g1.json>`_"
 
-msgid "`prereform_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt>`_"
-msgstr "`prereform_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt>`_"
+#: f8ec84c05c5841acbb39e8a1b12acd56 model_zoo.rst
+msgid ""
+"`prereform_words.txt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/prereform_words.txt>`_"
+msgstr ""
+"`prereform_words.txt <https://github.com/konstantinkozhin/manuscript-"
+"ocr/releases/download/v0.1.0/prereform_words.txt>`_"
 
+#: bb40f9938b794da8bbc10d343e3b59dd model_zoo.rst:154
 msgid "Architecture Sources"
 msgstr "Источники архитектур"
 
-msgid "`EAST: An Efficient and Accurate Scene Text Detector <https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_ (Zhou et al., CVPR 2017) — академическая основа для семейства детекторов ``EAST``. Реализация в manuscript-ocr основана на оригинальной архитектуре, но процедура обучения существенно переработана. Предобученные веса получены авторами проекта."
-msgstr "`EAST: An Efficient and Accurate Scene Text Detector <https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_ (Zhou et al., CVPR 2017) — академическая основа для семейства детекторов ``EAST``. Реализация в manuscript-ocr основана на оригинальной архитектуре, но процедура обучения существенно переработана. Предобученные веса получены авторами проекта."
+#: 271edcba1726479db75e07f459956421 model_zoo.rst:156
+msgid ""
+"`EAST: An Efficient and Accurate Scene Text Detector "
+"<https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_"
+" (Zhou et al., CVPR 2017) is the academic basis of the ``EAST`` detector "
+"family. The implementation follows the original architecture with a "
+"substantially reworked training procedure. Pretrained weights were produced "
+"by the project authors."
+msgstr ""
+"`EAST: An Efficient and Accurate Scene Text Detector "
+"<https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_"
+" (Zhou et al., CVPR 2017) — академическая основа семейства детекторов "
+"``EAST``. Реализация следует исходной архитектуре с существенно "
+"переработанной процедурой обучения. Предобученные веса получены авторами "
+"проекта."
 
-msgid "`What Is Wrong With Scene Text Recognition Model Comparisons? Dataset and Model Analysis <https://arxiv.org/abs/1904.01906>`_ — архитектурная основа для семейства ``TRBA`` (TPS-ResNet-BiLSTM-Attn). Распознаватели в manuscript-ocr адаптированы под задачи проекта."
-msgstr "`What Is Wrong With Scene Text Recognition Model Comparisons? Dataset and Model Analysis <https://arxiv.org/abs/1904.01906>`_ — архитектурная основа для семейства ``TRBA`` (TPS-ResNet-BiLSTM-Attn). Распознаватели в manuscript-ocr адаптированы под задачи проекта."
+#: c9d620ac7eb6425ebbea5f27c2f8d069 model_zoo.rst:160
+msgid ""
+"`What Is Wrong With Scene Text Recognition Model Comparisons? Dataset and "
+"Model Analysis <https://arxiv.org/abs/1904.01906>`_ is the architectural "
+"basis of the ``TRBA`` family (TPS-ResNet-BiLSTM-Attn). Recognizers are "
+"adapted to the tasks of manuscript-ocr."
+msgstr ""
+"`What Is Wrong With Scene Text Recognition Model Comparisons? Dataset and "
+"Model Analysis <https://arxiv.org/abs/1904.01906>`_ — архитектурная основа "
+"семейства ``TRBA`` (TPS-ResNet-BiLSTM-Attn). Распознаватели адаптированы к "
+"задачам manuscript-ocr."
+
+#~ msgid "-"
+#~ msgstr "-"
+
+#~ msgid ""
+#~ "`EAST: An Efficient and Accurate Scene "
+#~ "Text Detector "
+#~ "<https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_"
+#~ " (Zhou et al., CVPR 2017) — "
+#~ "академическая основа для семейства детекторов "
+#~ "``EAST``. Реализация в manuscript-ocr "
+#~ "основана на оригинальной архитектуре, но "
+#~ "процедура обучения существенно переработана. "
+#~ "Предобученные веса получены авторами проекта."
+#~ msgstr ""
+#~ "`EAST: An Efficient and Accurate Scene "
+#~ "Text Detector "
+#~ "<https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_"
+#~ " (Zhou et al., CVPR 2017) — "
+#~ "академическая основа для семейства детекторов "
+#~ "``EAST``. Реализация в manuscript-ocr "
+#~ "основана на оригинальной архитектуре, но "
+#~ "процедура обучения существенно переработана. "
+#~ "Предобученные веса получены авторами проекта."
+
+#~ msgid ""
+#~ "`What Is Wrong With Scene Text "
+#~ "Recognition Model Comparisons? Dataset and "
+#~ "Model Analysis <https://arxiv.org/abs/1904.01906>`_ —"
+#~ " архитектурная основа для семейства ``TRBA``"
+#~ " (TPS-ResNet-BiLSTM-Attn). Распознаватели "
+#~ "в manuscript-ocr адаптированы под задачи"
+#~ " проекта."
+#~ msgstr ""
+#~ "`What Is Wrong With Scene Text "
+#~ "Recognition Model Comparisons? Dataset and "
+#~ "Model Analysis <https://arxiv.org/abs/1904.01906>`_ —"
+#~ " архитектурная основа для семейства ``TRBA``"
+#~ " (TPS-ResNet-BiLSTM-Attn). Распознаватели "
+#~ "в manuscript-ocr адаптированы под задачи"
+#~ " проекта."

@@ -1,7 +1,14 @@
+# Russian translations for manuscript-ocr documentation.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr
+# package.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr 0.1.11\n"
-"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-06 15:49+0700\n"
+"PO-Revision-Date: 2026-10-06 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
 "Language-Team: ru\n"
@@ -10,9 +17,145 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
 
+#: api/layouts.rst:2 e06585f269214e57a44233d21dda87a6
 msgid "Layouts"
 msgstr "Layout-модели"
 
+#: 2137f84b9dca4ebe896897640b723ab5 api/layouts.rst:4
 msgid "Layout models reorder and group detected words into reading order structure."
-msgstr "Layout-модели переупорядочивают и группируют обнаруженные слова в структуру порядка чтения."
+msgstr ""
+"Layout-модели переупорядочивают и группируют обнаруженные слова в структуру "
+"порядка чтения."
+
+#: afdedd91c8e34cadac549dca8c344a8b
+#: manuscript.layouts._simplesorting.SimpleSorting:1 of
+msgid "Bases: :py:class:`~manuscript.api.layout.BaseLayout`"
+msgstr "Базовые классы: :py:class:`~manuscript.api.layout.BaseLayout`"
+
+#: a4c54ec3bda04f228bac50d2acf7cb90
+#: manuscript.layouts._simplesorting.SimpleSorting:2 of
+msgid "Layout model that groups detected text spans into columns and lines."
+msgstr ""
+"Layout-модель, которая группирует обнаруженные текстовые области по колонкам"
+" и строкам."
+
+#: 1ff05d1cd2be4db7a568722b6a511d4a 2df4b17b5435489dbc88d930a3f34c43
+#: 38af357c9ec24a579ee64fd59bc1bdce api/layouts.rst
+msgid "Parameters"
+msgstr "Параметры"
+
+#: 950456d5a28d4e34abb8cf7c21ebe14a
+#: manuscript.layouts._simplesorting.SimpleSorting:5 of
+msgid "Maximum number of column split attempts. Default is 10."
+msgstr "Максимальное число попыток разбиения на колонки. По умолчанию 10."
+
+#: 1eeae7533b40432c924d7b444eac762a
+#: manuscript.layouts._simplesorting.SimpleSorting:8 of
+msgid "If True, segment into columns before line grouping. Default is True."
+msgstr ""
+"Если True, сначала выполняет разбиение на колонки, а затем группировку по "
+"строкам. По умолчанию True."
+
+#: 52fa4f5a4ce74cd79162a0dfce6e575c
+#: manuscript.layouts._simplesorting.SimpleSorting of
+msgid "Attributes"
+msgstr "Атрибуты"
+
+#: 1cd7b12ebd444422a4e92d128a22d85c
+#: manuscript.layouts._simplesorting.SimpleSorting:14 of
+msgid "**default_weights_name**"
+msgstr "**default_weights_name**"
+
+#: f49208da1b0d457f9f132a2867943266
+#: manuscript.layouts._simplesorting.SimpleSorting:17 of
+msgid "**registry_model_class**"
+msgstr "**registry_model_class**"
+
+#: 87f8d530a1784f4387bd7b9167593409
+#: manuscript.layouts._simplesorting.SimpleSorting:21 of
+msgid "Methods"
+msgstr "Методы"
+
+#: df69f23d4a60460daad2f638a37b6e6b
+#: manuscript.layouts._simplesorting.SimpleSorting:29:<autosummary>:1 of
+msgid ""
+":py:obj:`__call__ <manuscript.layouts.SimpleSorting.__call__>`\\ "
+"\\(\\*args\\, \\*\\*kwargs\\)"
+msgstr ""
+":py:obj:`__call__ <manuscript.layouts.SimpleSorting.__call__>`\\ "
+"\\(\\*args\\, \\*\\*kwargs\\)"
+
+#: fbab4fb801864aaabbf71f2cff135925
+#: manuscript.layouts._simplesorting.SimpleSorting:29:<autosummary>:1 of
+msgid "Call self as a function."
+msgstr "Вызов объекта как функции."
+
+#: 4ea7b7934274450e88c709e5fe13c7cc
+#: manuscript.layouts._simplesorting.SimpleSorting:29:<autosummary>:1 of
+msgid ""
+":py:obj:`predict <manuscript.layouts.SimpleSorting.predict>`\\ \\(page\\[\\,"
+" image\\]\\)"
+msgstr ""
+":py:obj:`predict <manuscript.layouts.SimpleSorting.predict>`\\ \\(page\\[\\,"
+" image\\]\\)"
+
+#: 35d91420971c41cc80066db4d6387f34 48545f7f1cb0438daf241030940d9069
+#: manuscript.layouts._simplesorting.SimpleSorting.predict:2
+#: manuscript.layouts._simplesorting.SimpleSorting:29:<autosummary>:1 of
+msgid "Organize text spans in a page into blocks/lines and assign reading order."
+msgstr ""
+"Упорядочивает текстовые области на странице по блокам и строкам и назначает "
+"порядок чтения."
+
+#: 7437e3d3d12a48898f4b5bd38c935f8f
+#: manuscript.layouts._simplesorting.SimpleSorting:29:<autosummary>:1 of
+msgid ""
+":py:obj:`runtime_providers "
+"<manuscript.layouts.SimpleSorting.runtime_providers>`\\ \\(\\)"
+msgstr ""
+":py:obj:`runtime_providers "
+"<manuscript.layouts.SimpleSorting.runtime_providers>`\\ \\(\\)"
+
+#: a1cec63729b342f2b3549d86c23ff913
+#: manuscript.layouts._simplesorting.SimpleSorting:29:<autosummary>:1 of
+msgid "Get ONNX Runtime execution providers based on device."
+msgstr "Получение провайдеров выполнения ONNX Runtime в зависимости от устройства."
+
+#: 63dcb1cbcc6349fa880cf0f3c9f30424
+#: manuscript.layouts._simplesorting.SimpleSorting:29:<autosummary>:1 of
+msgid ""
+":py:obj:`train <manuscript.layouts.SimpleSorting.train>`\\ \\(\\*args\\, "
+"\\*\\*kwargs\\)"
+msgstr ""
+":py:obj:`train <manuscript.layouts.SimpleSorting.train>`\\ \\(\\*args\\, "
+"\\*\\*kwargs\\)"
+
+#: 1e229a7073f04e608bb585c58676de8f
+#: manuscript.layouts._simplesorting.SimpleSorting:31 of
+msgid "**export**"
+msgstr "**export**"
+
+#: 49e1c7f014e54a4db3ed101ae07f226e
+#: manuscript.layouts._simplesorting.SimpleSorting.predict:5 of
+msgid "Input page with detected text spans."
+msgstr "Входная страница с обнаруженными text span-ами."
+
+#: f397657277fe49b5ac25ef62bc6afda0
+#: manuscript.layouts._simplesorting.SimpleSorting.predict:8 of
+msgid "Optional source image (unused by this layout model)."
+msgstr "Необязательное исходное изображение (эта layout-модель его не использует)."
+
+#: api/layouts.rst da9df5a3ea08448f92c974957de4a4d9
+msgid "Returns"
+msgstr "Возвращает"
+
+#: cf5f780312cb41ef9d6f6ca09c7d42ad
+#: manuscript.layouts._simplesorting.SimpleSorting.predict:11 of
+msgid "Organized page."
+msgstr "Организованная страница."
+
+#: api/layouts.rst edf78f0e8a804fe89b2969b8240611e4
+msgid "Return type"
+msgstr "Тип возвращаемого значения"

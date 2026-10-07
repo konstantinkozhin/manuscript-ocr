@@ -113,6 +113,10 @@ class Pipeline:
             If True, returns visualization image together with result.
         profile : bool, optional
             If True, prints timing per stage.
+
+        Compatible detectors are asked for compact raw results without masks
+        or original tensors. Layout/recognizer/corrector stages accepting
+        detector_result receive that same dictionary for this call only.
         """
         start_time = time.time()
 
@@ -138,6 +142,8 @@ class Pipeline:
 
             t0 = time.time()
             layout_kwargs: Dict[str, Any] = {}
+            if detector_result is not None:
+                layout_kwargs["detector_result"] = detector_result
             if accepts_predict_kwarg(self.layout, "image"):
                 layout_kwargs["image"] = get_image_array()
             page = call_page_stage(self.layout, page, **layout_kwargs)
@@ -148,7 +154,13 @@ class Pipeline:
 
         # Detection
         t0 = time.time()
-        page = self.detector.predict(image)
+        detection = self.detector.predict(image, **filter_predict_kwargs(self.detector, {
+            "return_raw": True, "return_masks": False, "return_outputs": False,
+        }))
+        detector_result = detection if isinstance(detection, dict) else None
+        page = detection["page"] if detector_result is not None else detection
+        if not isinstance(page, Page):
+            raise TypeError("Detector must return Page or a result dictionary containing Page")
         self._last_detection_page = page.model_copy(deep=True)
         if profile:
             print(f"Detection: {time.time() - t0:.3f}s")
@@ -163,6 +175,7 @@ class Pipeline:
                 self.recognizer,
                 {
                     "batch_size": getattr(self.recognizer, "batch_size", 32),
+                    **({"detector_result": detector_result} if detector_result is not None else {}),
                 },
             )
             if accepts_predict_kwarg(self.recognizer, "image"):
@@ -179,6 +192,8 @@ class Pipeline:
         if self.corrector is not None:
             t0 = time.time()
             corrector_kwargs: Dict[str, Any] = {}
+            if detector_result is not None:
+                corrector_kwargs["detector_result"] = detector_result
             if accepts_predict_kwarg(self.corrector, "image"):
                 corrector_kwargs["image"] = get_image_array()
             page = call_page_stage(self.corrector, page, **corrector_kwargs)
@@ -188,6 +203,8 @@ class Pipeline:
 
         # After corrector slot
         page = run_layout_slot("corrector", page)
+        # Only Page snapshots persist between calls; no detector arrays are cached.
+        detector_result = detection = None
 
         if profile:
             print(f"Pipeline total: {time.time() - start_time:.3f}s")

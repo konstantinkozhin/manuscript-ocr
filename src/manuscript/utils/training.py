@@ -8,7 +8,9 @@ except ImportError:
 
 def set_seed(seed: int = 42) -> None:
     """
-    Set random seed for reproducibility across random, numpy, and PyTorch.
+    Set the Python and PyTorch random seeds; requires PyTorch.
+
+    This helper does not seed NumPy or guarantee deterministic execution.
     """
     if torch is None:
         raise ImportError("PyTorch is required for set_seed. Install with: pip install torch")

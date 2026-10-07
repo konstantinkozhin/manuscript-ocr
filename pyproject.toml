@@ -54,6 +54,7 @@ dependencies = [
 ]
 
 [project.optional-dependencies]
+trocr = ["tokenizers>=0.15,<1"]
 
 # GPU support for ONNX Runtime (NVIDIA CUDA)
 # User installs manually: pip install onnxruntime-gpu

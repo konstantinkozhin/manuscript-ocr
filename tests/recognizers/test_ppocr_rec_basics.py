@@ -1,23 +1,27 @@
+import json
 import numpy as np
 
 from manuscript.api.recognizer import BaseRecognizer
-from manuscript.recognizers import PPOCRv5Rec
+from manuscript.recognizers import PPOCRRec
 
 
-class TestPPOCRv5RecInitialization:
+class TestPPOCRRecInitialization:
     def test_import_and_base_contract(self):
-        assert PPOCRv5Rec is not None
-        assert issubclass(PPOCRv5Rec, BaseRecognizer)
-        assert hasattr(PPOCRv5Rec, "predict")
+        assert PPOCRRec is not None
+        assert issubclass(PPOCRRec, BaseRecognizer)
+        assert hasattr(PPOCRRec, "predict")
 
     def test_initialization_with_local_files(self, tmp_path):
         weights_file = tmp_path / "model.onnx"
         charset_file = tmp_path / "custom_dict.txt"
 
         weights_file.write_text("mock_onnx")
+        weights_file.with_suffix(".json").write_text(json.dumps({
+            "rec_image_shape": [3, 48, 320], "PreProcess": {},
+        }))
         charset_file.write_text("a\nb\nc\n")
 
-        recognizer = PPOCRv5Rec(
+        recognizer = PPOCRRec(
             weights=str(weights_file),
             charset=str(charset_file),
             device="cpu",
@@ -33,6 +37,9 @@ class TestPPOCRv5RecInitialization:
         config_file = tmp_path / "inference.yml"
 
         weights_file.write_text("mock_onnx")
+        weights_file.with_suffix(".json").write_text(json.dumps({
+            "rec_image_shape": [3, 48, 320], "PreProcess": {},
+        }))
         config_file.write_text(
             "\n".join(
                 [
@@ -55,7 +62,7 @@ class TestPPOCRv5RecInitialization:
             encoding="utf-8",
         )
 
-        recognizer = PPOCRv5Rec(
+        recognizer = PPOCRRec(
             weights=str(weights_file),
             config=str(config_file),
             device="cpu",
@@ -63,18 +70,21 @@ class TestPPOCRv5RecInitialization:
 
         assert recognizer.config_path == str(config_file.absolute())
         assert recognizer.use_space_char is True
-        assert recognizer.characters == ["blank", "a", "b"]
+        assert recognizer.characters == ["blank", "a", "b", " "]
 
 
-class TestPPOCRv5RecPreprocessing:
+class TestPPOCRRecPreprocessing:
     def test_preprocess_image(self, tmp_path):
         weights_file = tmp_path / "model.onnx"
         charset_file = tmp_path / "custom_dict.txt"
 
         weights_file.write_text("mock_onnx")
+        weights_file.with_suffix(".json").write_text(json.dumps({
+            "rec_image_shape": [3, 48, 320], "PreProcess": {},
+        }))
         charset_file.write_text("a\nb\nc\n")
 
-        recognizer = PPOCRv5Rec(
+        recognizer = PPOCRRec(
             weights=str(weights_file),
             charset=str(charset_file),
             device="cpu",
@@ -89,15 +99,18 @@ class TestPPOCRv5RecPreprocessing:
         assert preprocessed.max() <= 1.0
 
 
-class TestPPOCRv5RecDecode:
+class TestPPOCRRecDecode:
     def test_ctc_decode(self, tmp_path):
         weights_file = tmp_path / "model.onnx"
         charset_file = tmp_path / "custom_dict.txt"
 
         weights_file.write_text("mock_onnx")
+        weights_file.with_suffix(".json").write_text(json.dumps({
+            "rec_image_shape": [3, 48, 320], "PreProcess": {},
+        }))
         charset_file.write_text("a\nb\n")
 
-        recognizer = PPOCRv5Rec(
+        recognizer = PPOCRRec(
             weights=str(weights_file),
             charset=str(charset_file),
             device="cpu",

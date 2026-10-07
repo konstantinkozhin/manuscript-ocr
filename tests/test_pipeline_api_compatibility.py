@@ -514,3 +514,43 @@ class TestPipelineInitialization:
         assert pipeline2.detector.weights == "yolo26x_obb_text_g1"
         assert isinstance(pipeline2.layout, FakeLayout)
         assert pipeline2.recognizer is custom_recognizer
+
+
+@pytest.mark.parametrize('layout_after', ['detector', 'recognizer', 'corrector'])
+def test_compact_detector_result_reaches_stages_without_copy_or_retention(layout_after):
+    import weakref
+
+    class Result(dict):
+        pass
+
+    observations = []
+
+    class Detector:
+        calls = 0
+        result_ref = None
+
+        def predict(self, image, return_raw=False, *, return_masks=False, return_outputs=False):
+            self.calls += 1
+            assert (return_raw, return_masks, return_outputs) == (True, False, False)
+            result = Result(page=_make_test_page(), detections=[{'class_name': 'text_region'}],
+                            image_size={'height': 100, 'width': 300}, metadata={})
+            self.result_ref = weakref.ref(result)
+            return result
+
+    class Consumer:
+        def predict(self, page, detector_result=None):
+            assert detector_result['detections'][0]['class_name'] == 'text_region'
+            assert 'outputs' not in detector_result
+            observations.append(id(detector_result))
+            return page.model_copy(deep=True)
+
+    detector = Detector()
+    pipeline = Pipeline(detector=detector, layout=Consumer(), recognizer=Consumer(),
+                        corrector=Consumer(), layout_after=layout_after)
+    result = pipeline.predict(np.zeros((100, 300, 3), np.uint8))
+    assert isinstance(result['page'], Page)
+    assert detector.calls == 1
+    assert len(observations) == 3 and len(set(observations)) == 1
+    assert detector.result_ref() is None
+    assert all(isinstance(p, Page) for p in (pipeline.last_detection_page, pipeline.last_layout_page,
+                                           pipeline.last_recognition_page, pipeline.last_correction_page))

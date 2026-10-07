@@ -4,13 +4,11 @@ Changes in v_0_1_13 relative to 0.1.12
 - `src/manuscript/models`: added a shared `registry.json` hosted on `main`, with
   GitHub/GitVerse fallback and prioritized custom sources. The cached registry
   refreshes when missing, when a model key is unknown, or when all mirrors fail;
-- model resolution now checks the model class, exact library version, file size,
-  and SHA-256. Each model's artifacts and shared license are stored together in
+- model resolution now checks the model class, file size and SHA-256, and warns
+  when the installed library is outside the tested compatibility range. Each model's artifacts and shared license are stored together in
   `~/.manuscript/models/<model-key>/`, with verified reuse of the old cache;
 - model presets and TRBA pretraining now use the registry; added public helpers
   for downloading, inspecting, verifying, and removing cached model bundles;
-- added the FP16 ONNX `mask2former_line_v0_prev` detector for text-line
-  segmentation; each detected line is returned as one `TextSpan`;
 - `src/manuscript/recognizers/_trba/__init__.py`: fixed a CUDA/ONNX Runtime
   inference bug in `TRBA` where the final incomplete batch shape could trigger
   severe recognition slowdowns on page-scale runs; the last partial batch is
@@ -35,9 +33,33 @@ Changes in v_0_1_13 relative to 0.1.12
   `src/manuscript/utils/__init__.py`: made heavy public exports lazy to keep
   `import manuscript`, detector/recognizer/corrector package imports, and
   visualization utilities free of unnecessary PyTorch imports;
-- `src/manuscript/recognizers/_trba/model`: added the `parseq_linear` decoder,
+- `src/manuscript/recognizers/_trba/model`: added the PARSeq decoder
+  (`decoder_type="parseq"`; `parseq_linear` is an experiment configuration),
   `SEResNet31LiteV2` backbone, and optional TPS input rectification while
   retaining the existing attention decoder as the default;
 - TRBA training and ONNX export now preserve PARSeq/TPS settings, use the
   decoder-specific loss and decoding length, and include focused architecture,
-  export, training, and launcher tests.
+  export, training, and launcher tests;
+- artifact downloads now show progress; incompatible model versions produce a
+  warning while still allowing execution;
+- checkpoint loading reports filtered keys; checkpoint and weight writes are
+  atomic, CPU Torch RNG state is saved/restored, and TRBA training seeds NumPy;
+- Pipeline uses the recognizer configured `batch_size` instead of hardcoding 32.
+
+- recognizers now share validated Page/raw prediction handling and ONNX session
+  creation; TRBA requires its own config/charset and supports float16 inputs;
+- PPOCRRec normalizes native Paddle configs into an explicit CTC schema and
+  requires declared units for optional length inputs; TrOCR validates generation
+  settings and supports batched full-prefix/KV-cache decoding;
+- added recognizer regression coverage and local-weight inference checks.
+- TrOCR export now creates a dynamic-batch encoder and initial/cached decoders;
+  runtime reorders KV-cache for beam search and supports legacy bundles;
+- TrOCR export imports torch/transformers only when called, preserves the image
+  processor resize backend, and supports use_cache/fp16 export options.
+- TrOCR FP16 bundles keep image/state/cache IO in FP16; native uint8 antialias
+  resizing reproduces the source processor's coefficient quantization and
+  per-axis clipping/rounding without importing torchvision during inference.
+- detector return_raw now returns compact geometry/classes/metadata; optional
+  return_masks and return_outputs expose heavy data independently; Pipeline
+  forwards the compact result as detector_result to compatible stages without
+  retaining detector arrays in last_* snapshots.

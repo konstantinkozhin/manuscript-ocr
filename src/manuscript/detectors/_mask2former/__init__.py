@@ -1,4 +1,3 @@
-import json
 from pathlib import Path
 from typing import Dict, Optional, Union
 
@@ -7,7 +6,6 @@ import numpy as np
 import onnxruntime as ort
 
 from manuscript.api.detector import BaseDetector
-from ...data import Block, Line, Page, TextSpan
 from ...utils import read_image
 
 
@@ -29,9 +27,7 @@ class Mask2Former(BaseDetector):
         super().__init__(weights=weights, device=device,
                          force_download=force_download, **kwargs)
         self.onnx_session = None
-        self.config_path = self._resolve_model_config(config)
-        with open(self.config_path, "r", encoding="utf-8") as stream:
-            values = json.load(stream)
+        values, self.config_path = self._load_detector_config(config)
         if values.get("schema_version") != 1:
             raise ValueError("Unsupported Mask2Former config schema")
         self.image_size = int(values["image_size"])
@@ -47,37 +43,22 @@ class Mask2Former(BaseDetector):
         self.output_class_logits = values.get("output_class_logits", "class_queries_logits")
         self.output_mask_logits = values.get("output_mask_logits", "masks_queries_logits")
 
-    def _resolve_model_config(self, config):
-        if config is not None:
-            return self._resolve_extra_artifact(
-                str(config), default_name=None, registry=self.config_registry,
-                description="model config")
-        artifacts = getattr(self, "_resolved_model_artifacts", None)
-        if artifacts and artifacts.get("config"):
-            return str(artifacts["config"])
-        candidate = Path(self.weights).with_suffix(".json")
-        if candidate.exists():
-            return str(candidate.resolve())
-        raise FileNotFoundError(
-            f"Mask2Former config not found next to {self.weights}; pass config explicitly")
-
     def _initialize_session(self):
         if self.onnx_session is not None:
             return
-        self._prepare_runtime_dependencies()
         session_options = ort.SessionOptions()
         session_options.log_severity_level = 3
-        self.onnx_session = ort.InferenceSession(
-            self.weights,
-            sess_options=session_options,
-            providers=self.runtime_providers(),
-        )
-        pixel_input = next(
-            item for item in self.onnx_session.get_inputs()
-            if item.name == self.input_pixel_values)
-        self.pixel_dtype = (
-            np.float16 if pixel_input.type == "tensor(float16)" else np.float32)
-        self._log_device_info(self.onnx_session)
+        session = self._create_onnx_session(sess_options=session_options)
+        inputs = {item.name: item for item in session.get_inputs()}
+        if set(inputs) != {self.input_pixel_values, self.input_pixel_mask}:
+            raise ValueError("Mask2Former requires configured image and pixel-mask inputs")
+        pixel_input = inputs[self.input_pixel_values]
+        if pixel_input.type not in ("tensor(float)", "tensor(float16)"):
+            raise ValueError("Mask2Former image input must be float32 or float16")
+        if inputs[self.input_pixel_mask].type != "tensor(int64)":
+            raise ValueError("Mask2Former pixel mask must be int64")
+        self.pixel_dtype = np.float16 if pixel_input.type == "tensor(float16)" else np.float32
+        self.onnx_session = session
 
     @staticmethod
     def _softmax(values):
@@ -112,9 +93,15 @@ class Mask2Former(BaseDetector):
 
     def _postprocess(self, class_logits, mask_logits, geometry):
         original_height, original_width, left, top, resized_width, resized_height = geometry
+        if (class_logits.ndim != 2 or class_logits.shape[1] < 2 or mask_logits.ndim != 3
+                or class_logits.shape[0] != mask_logits.shape[0]
+                or not np.isfinite(class_logits).all() or not np.isfinite(mask_logits).all()):
+            raise ValueError("Invalid Mask2Former class or mask outputs")
         class_scores = self._softmax(class_logits.astype(np.float32))[:, :-1].max(axis=-1)
         candidates = []
         for query, class_score in enumerate(class_scores):
+            if class_score < self.score_threshold:
+                continue
             logits = cv2.resize(mask_logits[query].astype(np.float32),
                                 (self.mask_interpolation_size,) * 2,
                                 interpolation=cv2.INTER_LINEAR)
@@ -150,21 +137,17 @@ class Mask2Former(BaseDetector):
         if not contours:
             return None
         contour = max(contours, key=cv2.contourArea)
-        polygon = cv2.approxPolyDP(
-            contour, 0.002 * cv2.arcLength(contour, True), True)[:, 0, :]
+        polygon = contour[:, 0, :]
         if len(polygon) < 4:
             polygon = cv2.boxPoints(cv2.minAreaRect(contour))
         return [(float(x), float(y)) for x, y in polygon]
 
-    def predict(self, image) -> Page:
+    def predict(self, image, return_raw=False, *, return_masks=False, return_outputs=False):
         if self.onnx_session is None:
             self._initialize_session()
         source = read_image(image)
         original_height, original_width = source.shape[:2]
         pixels, left, top, resized_size = self._preprocess(source)
-        input_type = self.onnx_session.get_inputs()[0].type
-        pixels = pixels.astype(
-            np.float16 if input_type == "tensor(float16)" else np.float32)
         pixel_mask = np.ones((1, self.image_size, self.image_size), dtype=np.int64)
         class_logits, mask_logits = self.onnx_session.run(
             [self.output_class_logits, self.output_mask_logits],
@@ -178,12 +161,16 @@ class Mask2Former(BaseDetector):
             polygon = self._mask_polygon(mask)
             if polygon:
                 rows.append((polygon, score))
-        lines = [
-            Line(text_spans=[TextSpan(polygon=polygon,
-                                      detection_confidence=score)])
-            for polygon, score in rows
-        ]
-        return Page(blocks=[Block(lines=lines)])
+        page = self._page_from_regions([polygon for polygon, _ in rows],
+                                       [score for _, score in rows], one_per_line=True)
+        if return_raw or return_masks or return_outputs:
+            details = [{"confidence": score, "polygon": self._mask_polygon(mask),
+                        **self._mask_details(mask, include_mask=return_masks)} for mask, score in detections]
+            return self._raw_result(page, {self.output_class_logits: class_logits,
+                                          self.output_mask_logits: mask_logits} if return_outputs else None,
+                                    details, source.shape[:2],
+                                    padding=[left, top], resized_size=resized_size)
+        return page
 
 
 __all__ = ["Mask2Former"]

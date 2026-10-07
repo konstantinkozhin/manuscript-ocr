@@ -1,7 +1,14 @@
+# Russian translations for manuscript-ocr documentation.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr
+# package.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr 0.1.12\n"
-"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-06 15:49+0700\n"
+"PO-Revision-Date: 2026-10-06 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
 "Language-Team: ru\n"
@@ -10,287 +17,138 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
 
+#: 86164c8fe477475bbd857a1f5a80158d getting_started.rst:2
 msgid "Getting Started"
 msgstr "Начало работы"
 
+#: b23d6b7a41d14d38a807da2db4c898ae getting_started.rst:5
 msgid "Installation"
 msgstr "Установка"
 
+#: a5e50527a18c450eafefba2b6e6b6f69 getting_started.rst:8
 msgid "Minimum System Requirements"
 msgstr "Минимальные системные требования"
 
+#: a9e572cc2934428f9fa5db9d6543040f getting_started.rst:10
 msgid "Linux (Ubuntu 20.04+), Windows 10+, or macOS 11+"
 msgstr "Linux (Ubuntu 20.04+), Windows 10+ или macOS 11+"
 
+#: 56391c8772324783a7f61409fc187048 getting_started.rst:11
 msgid "at least 2 CPU cores"
 msgstr "не менее 2 ядер CPU"
 
+#: 9fa3562a0e4e4c6981fff2ecc0f47230 getting_started.rst:12
 msgid "at least 8 GB RAM"
 msgstr "не менее 8 ГБ оперативной памяти"
 
+#: b967b653b80240d988c500db89b4d713 getting_started.rst:13
 msgid "16 GB RAM or more is recommended for model training"
 msgstr "для обучения моделей рекомендуется 16 ГБ оперативной памяти или больше"
 
+#: 69140e48a1334e1eac8006789cc3c479 getting_started.rst:14
 msgid "NVIDIA GPU with CUDA support is recommended for acceleration"
 msgstr "для ускорения вычислений рекомендуется NVIDIA GPU с поддержкой CUDA"
 
+#: 7f2159ebb94e45d0b49cacf12b934ab6 getting_started.rst:15
 msgid "at least 4 GB VRAM is recommended for GPU execution"
 msgstr "для запуска на GPU рекомендуется не менее 4 ГБ видеопамяти"
 
+#: bc9da5a908c2411dbcc09bf59ca6de99 getting_started.rst:17
 msgid ""
 "CPU-only execution is supported, but performance may be significantly lower "
 "than on GPU. Model training currently targets CUDA-capable NVIDIA GPUs and "
 "falls back to CPU when CUDA is unavailable."
 msgstr ""
-"Поддерживается запуск только на CPU, однако в этом режиме производительность "
-"может быть значительно ниже, чем на GPU. В текущей реализации обучение "
+"Поддерживается запуск только на CPU, однако в этом режиме производительность"
+" может быть значительно ниже, чем на GPU. В текущей реализации обучение "
 "ориентировано на NVIDIA GPU с поддержкой CUDA и переходит на CPU при "
 "недоступности CUDA."
 
+#: 9f15790280aa4411bced9995d7d63ac1 getting_started.rst:21
 msgid "**Basic installation** (inference only):"
 msgstr "**Базовая установка** (только инференс):"
 
+#: 52baf46007b04271af04138795e6cd4a getting_started.rst:27
 msgid "**Installation with training support** (includes PyTorch):"
 msgstr "**Установка с поддержкой обучения** (включает PyTorch):"
 
+#: 64896a78cf294e058f2762e5710b7a40 getting_started.rst:33
 msgid "This installs additional dependencies for model training:"
 msgstr "Будут установлены дополнительные зависимости для обучения моделей:"
 
+#: c5c3f03be77547538a119572b34aac98 getting_started.rst:35
 msgid "PyTorch and TorchVision"
 msgstr "PyTorch и TorchVision"
 
+#: a92c7e079f3b4667b0e8a7392e46221e getting_started.rst:36
 msgid "ONNX export tools"
 msgstr "Инструменты экспорта ONNX"
 
+#: f33d324b28be4fbbbd7cfde9a7712db9 getting_started.rst:37
 msgid "Training utilities (albumentations, tensorboard, etc.)"
 msgstr "Утилиты для обучения (albumentations, TensorBoard и др.)"
 
+#: f2ffced15fb94ad4ac6a7f54fc92a22d getting_started.rst:38
 msgid "Development tools (pytest, black, flake8, etc.)"
 msgstr "Инструменты разработки (pytest, black, flake8 и др.)"
 
+#: 5cf3d9fc99114cc099a3af270c740cff getting_started.rst:40
 msgid "**GPU acceleration** (NVIDIA CUDA):"
 msgstr "**Аппаратное ускорение GPU** (NVIDIA CUDA):"
 
-msgid ""
-"If you are switching an existing installation from CPU to GPU:"
-msgstr ""
-"Если вы переводите уже существующую установку с CPU на GPU:"
+#: 8d51594376b14f6ca732c6891144bdcf getting_started.rst:42
+msgid "If you are switching an existing installation from CPU to GPU:"
+msgstr "Если вы переводите уже существующую установку с CPU на GPU:"
 
-msgid ""
-"1. Remove the CPU version of ONNX Runtime and install the GPU version:"
-msgstr ""
-"1. Удалите CPU-версию ONNX Runtime и установите GPU-версию:"
+#: 9c99ce2c31054a33b249c2a5c2f6f1bf getting_started.rst:44
+msgid "Remove the CPU version of ONNX Runtime and install the GPU version:"
+msgstr "Удалите CPU-версию ONNX Runtime и установите GPU-версию:"
 
+#: 911e6c189e7a4bc0b2e786fc7a2ce196 getting_started.rst:51
 msgid ""
-"2. If you are working in Jupyter Notebook, JupyterLab, VS Code notebooks, or "
+"If you are working in Jupyter Notebook, JupyterLab, VS Code notebooks, or "
 "Google Colab, restart the kernel or runtime after installation."
 msgstr ""
-"2. Если вы работаете в Jupyter Notebook, JupyterLab, ноутбуках VS Code или "
-"Google Colab, после установки перезапустите kernel или runtime."
+"Если вы работаете в Jupyter Notebook, JupyterLab, блокнотах VS Code или "
+"Google Colab, после установки перезапустите ядро или среду выполнения."
 
+#: 5d18eecbee0e44b2935f4df7b9cbba8a getting_started.rst:54
 msgid "Reinstalling ``manuscript-ocr`` is not required."
 msgstr "Переустанавливать ``manuscript-ocr`` не требуется."
 
-msgid "Diagnostics"
-msgstr "Диагностика"
-
+#: 7f165bf83e9043d3ad6f50b5ebf34d6b getting_started.rst:56
 msgid ""
-"If the pipeline still does not switch to GPU, first run:"
-msgstr ""
-"Если pipeline по-прежнему не переключается на GPU, сначала выполните:"
-
-msgid ""
-"Case 1. ``\"CUDAExecutionProvider\"`` is missing"
-msgstr ""
-"Случай 1. ``\"CUDAExecutionProvider\"`` отсутствует"
-
-msgid "Install additional CUDA/cuDNN runtime packages:"
-msgstr "Установите дополнительные runtime-пакеты CUDA/cuDNN:"
-
-msgid "Then restart the kernel or runtime and create the ``Pipeline`` again."
-msgstr "После этого перезапустите kernel или runtime и заново создайте ``Pipeline``."
-
-msgid ""
-"Case 2. ``\"CUDAExecutionProvider\"`` is present, but the models still fall "
-"back to CPU"
-msgstr ""
-"Случай 2. ``\"CUDAExecutionProvider\"`` присутствует, но модели все равно "
-"переходят на CPU"
-
-msgid ""
-"In some notebook environments, ONNX Runtime may require an explicit preload "
-"step before importing ``manuscript``:"
-msgstr ""
-"В некоторых notebook-средах ONNX Runtime может требовать явной предварительной "
-"загрузки runtime-библиотек перед импортом ``manuscript``:"
-
-msgid ""
-"After that, import ``manuscript`` and create the ``Pipeline`` again."
-msgstr ""
-"После этого импортируйте ``manuscript`` и заново создайте ``Pipeline``."
-
-
-msgid "**Apple Silicon acceleration** (CoreML):"
-msgstr "**Ускорение на Apple Silicon** (CoreML):"
-
-msgid "Quick Start"
-msgstr "Быстрый старт"
-
-msgid "Basic usage example:"
-msgstr "Пример базового использования:"
-
-msgid "Example Notebooks"
-msgstr "Примеры ноутбуков"
-
-msgid ""
-"Current example notebooks are available in the repository ``notebooks`` "
-"folder:"
-msgstr "Актуальные примеры ноутбуков доступны в папке ``notebooks`` репозитория:"
-
-msgid ""
-"`End-to-end inference <https://github.com/konstantinkozhin/manuscript-ocr/"
-"blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B8%D0%BD%D1%84"
-"%D0%B5%D1%80%D0%B5%D0%BD%D1%81%D0%B0_endtoend.ipynb>`_"
-msgstr ""
-"`Сквозной инференс <https://github.com/konstantinkozhin/manuscript-ocr/blob/"
-"main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B8%D0%BD%D1%84%D0%B5"
-"%D1%80%D0%B5%D0%BD%D1%81%D0%B0_endtoend.ipynb>`_"
-
-msgid ""
-"`Pipeline with YOLO detector <https://github.com/konstantinkozhin/"
-"manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%"
-"B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yolo.ipynb>`_"
-msgstr ""
-"`Pipeline с детектором YOLO <https://github.com/konstantinkozhin/manuscript-"
-"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0"
-"%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yolo.ipynb>`_"
-
-msgid ""
-"`Pipeline with TrOCR recognizer <https://github.com/konstantinkozhin/"
-"manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%"
-"B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_trocr.ipynb>`_"
-msgstr ""
-"`Pipeline с распознавателем TrOCR <https://github.com/konstantinkozhin/"
-"manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%"
-"B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_trocr.ipynb>`_"
-
-msgid ""
-"`Pipeline with Yandex Speller <https://github.com/konstantinkozhin/"
-"manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%"
-"B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yandex_speller.ipynb>`_"
-msgstr ""
-"`Pipeline с Yandex Speller <https://github.com/konstantinkozhin/manuscript-"
-"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0"
-"%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yandex_speller.ipynb>`_"
-
-msgid ""
-"`Gradio demo launch <https://github.com/konstantinkozhin/manuscript-ocr/"
-"blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF"
-"%D1%83%D1%81%D0%BA%D0%B0_%D0%B4%D0%B5%D0%BC%D0%BE.ipynb>`_"
-msgstr ""
-"`Запуск Gradio-демо <https://github.com/konstantinkozhin/manuscript-ocr/"
-"blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF"
-"%D1%83%D1%81%D0%BA%D0%B0_%D0%B4%D0%B5%D0%BC%D0%BE.ipynb>`_"
-
-msgid ""
-"`Detector training launch <https://github.com/konstantinkozhin/manuscript-"
-"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0"
-"%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F"
-"_%D0%B4%D0%B5%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
-msgstr ""
-"`Запуск обучения детектора <https://github.com/konstantinkozhin/manuscript-"
-"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0"
-"%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F"
-"_%D0%B4%D0%B5%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
-
-msgid ""
-"`Recognition training launch <https://github.com/konstantinkozhin/"
-"manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%"
-"B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD"
-"%D0%B8%D1%8F_%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D0"
-"%BD%D0%B8%D1%8F.ipynb>`_"
-msgstr ""
-"`Запуск обучения распознавания <https://github.com/konstantinkozhin/"
-"manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%"
-"B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD"
-"%D0%B8%D1%8F_%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D0"
-"%BD%D0%B8%D1%8F.ipynb>`_"
-
-msgid ""
-"`Corrector training launch <https://github.com/konstantinkozhin/manuscript-"
-"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0"
-"%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F"
-"_%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
-msgstr ""
-"`Запуск обучения корректора <https://github.com/konstantinkozhin/manuscript-"
-"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0"
-"%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F"
-"_%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
-
-msgid "Main Components"
-msgstr "Основные компоненты"
-
-msgid ":class:`~manuscript.Pipeline` - High-level OCR pipeline"
-msgstr ":class:`~manuscript.Pipeline` — высокоуровневый OCR-конвейер"
-
-msgid ":class:`~manuscript.detectors.YOLO` - ONNX text detector for YOLO-family models"
-msgstr ":class:`~manuscript.detectors.YOLO` — ONNX-детектор текста для моделей семейства YOLO"
-
-msgid ":class:`~manuscript.detectors.EAST` - Text detector"
-msgstr ":class:`~manuscript.detectors.EAST` — детектор текста"
-
-msgid ":class:`~manuscript.layouts.SimpleSorting` - Layout ordering model"
-msgstr ":class:`~manuscript.layouts.SimpleSorting` — модель упорядочивания layout"
-
-msgid ":class:`~manuscript.recognizers.TRBA` - Text recognizer"
-msgstr ":class:`~manuscript.recognizers.TRBA` — распознаватель текста"
-
-msgid ":class:`~manuscript.correctors.CharLM` - Character-level text corrector"
-msgstr ":class:`~manuscript.correctors.CharLM` — посимвольный корректор текста"
-
-msgid ":class:`~manuscript.data.Page` - Page data structure"
-msgstr ":class:`~manuscript.data.Page` — структура данных страницы"
-
-msgid ":class:`~manuscript.data.Block` - Block data structure"
-msgstr ":class:`~manuscript.data.Block` — структура данных блока"
-
-msgid ":class:`~manuscript.data.Line` - Line data structure"
-msgstr ":class:`~manuscript.data.Line` — структура данных строки"
-
-msgid ":class:`~manuscript.data.TextSpan` - Smallest OCR text region"
-msgstr ":class:`~manuscript.data.TextSpan` — минимальный текстовый регион OCR"
-
-msgid "Model Zoo"
-msgstr "Зоопарк моделей"
-
-msgid ""
-"For the list of built-in presets and release artifacts documented for this "
-"documentation version, see :doc:`model_zoo`."
-msgstr ""
-"Список встроенных пресетов и релизных артефактов, задокументированных для "
-"этой версии документации, см. в :doc:`model_zoo`."
-
-msgid "Related Work"
-msgstr "Связанные работы"
-
-msgid "For publications related to the project and its manuscript OCR experiments, see :doc:`related_work`."
-msgstr "См. :doc:`related_work`, чтобы ознакомиться с публикациями, связанными с проектом и экспериментами по OCR рукописей."
-
-msgid ""
-"You can switch models and pipeline components explicitly with the ``device`` "
-"parameter, for example ``device=\"cuda\"`` for NVIDIA GPU or ``device=\"cpu\"`` "
-"for CPU:"
+"You can switch models and pipeline components explicitly with the ``device``"
+" parameter, for example ``device=\"cuda\"`` for NVIDIA GPU or "
+"``device=\"cpu\"`` for CPU:"
 msgstr ""
 "Модели и компоненты pipeline можно явно переключать через параметр "
 "``device``, например ``device=\"cuda\"`` для NVIDIA GPU или "
 "``device=\"cpu\"`` для CPU:"
 
-msgid "Then use ``device=\"coreml\"`` for the relevant models or pipeline components."
-msgstr ""
-"Затем используйте ``device=\"coreml\"`` для соответствующих моделей или "
-"компонентов pipeline."
+#: 08a71e7fe2d940b79db59b7ef885d95a getting_started.rst:71
+msgid "Diagnostics"
+msgstr "Диагностика"
 
+#: 813702f6ecb54e718c52d5155faa2b12 getting_started.rst:73
+msgid "If the pipeline still does not switch to GPU, first run:"
+msgstr "Если pipeline по-прежнему не переключается на GPU, сначала выполните:"
+
+#: cdf6705e58754a3eba5e32ea70a4b7db getting_started.rst:81
+msgid "Case 1. ``\"CUDAExecutionProvider\"`` is missing"
+msgstr "Случай 1. ``\"CUDAExecutionProvider\"`` отсутствует"
+
+#: d5e1f745b8a4472094ae4018164b1ffe getting_started.rst:83
+msgid "Install additional CUDA/cuDNN runtime packages:"
+msgstr "Установите дополнительные runtime-пакеты CUDA/cuDNN:"
+
+#: 26343a6274b945fd9fcd119e4687cdd3 getting_started.rst:89
+msgid "Then restart the kernel or runtime and create the ``Pipeline`` again."
+msgstr "После этого перезапустите kernel или runtime и заново создайте ``Pipeline``."
+
+#: 1a43fba9b8f2409bab5cb0faa872e7de getting_started.rst:91
 msgid ""
 "If ONNX Runtime appears to be installed but still behaves incorrectly in a "
 "notebook environment, perform a clean GPU reinstall:"
@@ -298,9 +156,222 @@ msgstr ""
 "Если ONNX Runtime кажется установленным, но в notebook-среде все еще "
 "работает некорректно, выполните чистую переустановку GPU-версии:"
 
-msgid ""
-"After that, restart the kernel or runtime again and re-import ``manuscript``."
+#: 182cd3945f124b06a1655696694f042e getting_started.rst:100
+msgid "After that, restart the kernel or runtime again and re-import ``manuscript``."
 msgstr ""
 "После этого снова перезапустите kernel или runtime и повторно импортируйте "
 "``manuscript``."
 
+#: ff909b25d18245d991747a3f874b9227 getting_started.rst:102
+msgid ""
+"Case 2. ``\"CUDAExecutionProvider\"`` is present, but the models still fall "
+"back to CPU"
+msgstr ""
+"Случай 2. ``\"CUDAExecutionProvider\"`` присутствует, но модели все равно "
+"переходят на CPU"
+
+#: b775e2a89c144ac890d556f5a385696e getting_started.rst:104
+msgid ""
+"In some notebook environments, ONNX Runtime may require an explicit preload "
+"step before importing ``manuscript``:"
+msgstr ""
+"В некоторых notebook-средах ONNX Runtime может требовать явной "
+"предварительной загрузки runtime-библиотек перед импортом ``manuscript``:"
+
+#: 74c764b62b264f3e9cf980a4658c0dd5 getting_started.rst:112
+msgid "After that, import ``manuscript`` and create the ``Pipeline`` again."
+msgstr "После этого импортируйте ``manuscript`` и заново создайте ``Pipeline``."
+
+#: d5a57c67f7a748419f43177894db8e01 getting_started.rst:114
+msgid "**Apple Silicon acceleration** (CoreML):"
+msgstr "**Ускорение на Apple Silicon** (CoreML):"
+
+#: cc976049d4fd44fabed9b4a5d9d6e3f3 getting_started.rst:121
+msgid ""
+"Then use ``device=\"coreml\"`` for the relevant models or pipeline "
+"components."
+msgstr ""
+"Затем используйте ``device=\"coreml\"`` для соответствующих моделей или "
+"компонентов pipeline."
+
+#: 73b5fb74c9c24057bea4a52895ad1f35 getting_started.rst:124
+msgid "Quick Start"
+msgstr "Быстрый старт"
+
+#: 67fe8ac5413c4a289a517d24caccdb87 getting_started.rst:126
+msgid "Basic usage example:"
+msgstr "Пример базового использования:"
+
+#: 0157a55d36ee4f9ba78fed5deb37b54b getting_started.rst:143
+msgid "Example Notebooks"
+msgstr "Примеры ноутбуков"
+
+#: 08707d31a0a04cd0b8dbe0b10657e3eb getting_started.rst:145
+msgid ""
+"Current example notebooks are available in the repository ``notebooks`` "
+"folder:"
+msgstr "Актуальные примеры ноутбуков доступны в папке ``notebooks`` репозитория:"
+
+#: 854df9eba7884ee8ba9ca82c203f4d15 getting_started.rst:148
+#, python-format
+msgid ""
+"`End-to-end inference <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B8%D0%BD%D1%84%D0%B5%D1%80%D0%B5%D0%BD%D1%81%D0%B0_endtoend.ipynb>`_"
+msgstr ""
+"`Сквозной инференс <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B8%D0%BD%D1%84%D0%B5%D1%80%D0%B5%D0%BD%D1%81%D0%B0_endtoend.ipynb>`_"
+
+#: 4f527a7490fb4ddb8b5b48914b7fa2f3 getting_started.rst:149
+#, python-format
+msgid ""
+"`Pipeline with YOLO detector <https://github.com/konstantinkozhin"
+"/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yolo.ipynb>`_"
+msgstr ""
+"`Pipeline с детектором YOLO <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yolo.ipynb>`_"
+
+#: 4b8a2f474028412e924b60b5ca3e5834 getting_started.rst:150
+#, python-format
+msgid ""
+"`Pipeline with TrOCR recognizer <https://github.com/konstantinkozhin"
+"/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_trocr.ipynb>`_"
+msgstr ""
+"`Pipeline с распознавателем TrOCR <https://github.com/konstantinkozhin"
+"/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_trocr.ipynb>`_"
+
+#: 50ee57bb33a941e397f34911f1ed5096 getting_started.rst:151
+#, python-format
+msgid ""
+"`Pipeline with Yandex Speller <https://github.com/konstantinkozhin"
+"/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yandex_speller.ipynb>`_"
+msgstr ""
+"`Pipeline с Yandex Speller <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yandex_speller.ipynb>`_"
+
+#: 21959ab7a2f14b9a83190e323986e632 getting_started.rst:152
+#, python-format
+msgid ""
+"`Gradio demo launch <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%B4%D0%B5%D0%BC%D0%BE.ipynb>`_"
+msgstr ""
+"`Запуск Gradio-демо <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%B4%D0%B5%D0%BC%D0%BE.ipynb>`_"
+
+#: 6f68d738c41a49fcac5dd2f5c94f871b getting_started.rst:153
+#, python-format
+msgid ""
+"`Detector training launch <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D0%B4%D0%B5%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
+msgstr ""
+"`Запуск обучения детектора <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D0%B4%D0%B5%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
+
+#: 1d9261e7cdfd4313ae06db967f661b1c getting_started.rst:154
+#, python-format
+msgid ""
+"`Recognition training launch <https://github.com/konstantinkozhin"
+"/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F.ipynb>`_"
+msgstr ""
+"`Запуск обучения распознавания <https://github.com/konstantinkozhin"
+"/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F.ipynb>`_"
+
+#: 5280ad483fce4848a07ebf842ae0ad6e getting_started.rst:155
+#, python-format
+msgid ""
+"`Corrector training launch <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
+msgstr ""
+"`Запуск обучения корректора <https://github.com/konstantinkozhin/manuscript-"
+"ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_"
+
+#: ff069667411b477e86033ae1dcf6e690 getting_started.rst:158
+msgid "Main Components"
+msgstr "Основные компоненты"
+
+#: d417f48cbfa94b04a73c7be2734a01af getting_started.rst:160
+msgid ":class:`~manuscript.Pipeline` - High-level OCR pipeline"
+msgstr ":class:`~manuscript.Pipeline` — высокоуровневый OCR-конвейер"
+
+#: d895024b69a84fd18e1fe8c79b172755 getting_started.rst:161
+msgid ""
+":class:`~manuscript.detectors.YOLO` - ONNX text detector for YOLO-family "
+"models"
+msgstr ""
+":class:`~manuscript.detectors.YOLO` — ONNX-детектор текста для моделей "
+"семейства YOLO"
+
+#: 0da6d812fd7f483f9b5e3e15f8626c99 getting_started.rst:162
+msgid ":class:`~manuscript.detectors.EAST` - Text detector"
+msgstr ":class:`~manuscript.detectors.EAST` — детектор текста"
+
+#: 51de5aeb5d2747ae8b7e6a52e8ff50b9 getting_started.rst:163
+msgid ":class:`~manuscript.layouts.SimpleSorting` - Layout ordering model"
+msgstr ":class:`~manuscript.layouts.SimpleSorting` — модель упорядочивания layout"
+
+#: 04a4f5e7c0504e31bc510c866d43016a getting_started.rst:164
+msgid ":class:`~manuscript.recognizers.TRBA` - Text recognizer"
+msgstr ":class:`~manuscript.recognizers.TRBA` — распознаватель текста"
+
+#: d8f125b28f0a4223b5cb6422953c50e5 getting_started.rst:165
+msgid ":class:`~manuscript.correctors.CharLM` - Character-level text corrector"
+msgstr ":class:`~manuscript.correctors.CharLM` — посимвольный корректор текста"
+
+#: 0586771b42eb4666b1a8acbf5eebf04a getting_started.rst:166
+msgid ":class:`~manuscript.data.Page` - Page data structure"
+msgstr ":class:`~manuscript.data.Page` — структура данных страницы"
+
+#: fa10a0f695504b99b121d521ef338d35 getting_started.rst:167
+msgid ":class:`~manuscript.data.Block` - Block data structure"
+msgstr ":class:`~manuscript.data.Block` — структура данных блока"
+
+#: 8ccb9a47a3bb470c988bc13d971cb46f getting_started.rst:168
+msgid ":class:`~manuscript.data.Line` - Line data structure"
+msgstr ":class:`~manuscript.data.Line` — структура данных строки"
+
+#: 51c14c871e9c406590aef6eb83389e39 getting_started.rst:169
+msgid ":class:`~manuscript.data.TextSpan` - Smallest OCR text region"
+msgstr ":class:`~manuscript.data.TextSpan` — минимальный текстовый регион OCR"
+
+#: 15d63b7f8ad24e1bae3118ea8ddb97cb getting_started.rst:172
+msgid "Model Zoo"
+msgstr "Зоопарк моделей"
+
+#: 5c090841b0e54d8fa2280d0ceae18b49 getting_started.rst:174
+msgid ""
+"For the list of built-in presets and release artifacts documented for this "
+"documentation version, see :doc:`model_zoo`."
+msgstr ""
+"Список встроенных пресетов и релизных артефактов, задокументированных для "
+"этой версии документации, см. в :doc:`model_zoo`."
+
+#: a57480b127774bcfbc9841f1d4566afe getting_started.rst:178
+msgid "Related Work"
+msgstr "Связанные работы"
+
+#: 0680319787824da5ad222b46a88f5950 getting_started.rst:180
+msgid ""
+"For publications related to the project and its manuscript OCR experiments, "
+"see :doc:`related_work`."
+msgstr ""
+"См. :doc:`related_work`, чтобы ознакомиться с публикациями, связанными с "
+"проектом и экспериментами по OCR рукописей."
+
+#~ msgid "1. Remove the CPU version of ONNX Runtime and install the GPU version:"
+#~ msgstr "1. Удалите CPU-версию ONNX Runtime и установите GPU-версию:"
+
+#~ msgid ""
+#~ "2. If you are working in Jupyter "
+#~ "Notebook, JupyterLab, VS Code notebooks, or"
+#~ " Google Colab, restart the kernel or "
+#~ "runtime after installation."
+#~ msgstr ""
+#~ "2. Если вы работаете в Jupyter "
+#~ "Notebook, JupyterLab, ноутбуках VS Code или"
+#~ " Google Colab, после установки перезапустите"
+#~ " kernel или runtime."

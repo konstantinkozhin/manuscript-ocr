@@ -20,21 +20,16 @@ class TestTRBATrain:
         assert isinstance(TRBA.__dict__["train"], staticmethod)
 
     def test_train_raises_with_import_guard_details(self, monkeypatch):
-        monkeypatch.setattr(trba_module, "_TRAINING_AVAILABLE", False)
-        monkeypatch.setattr(
-            trba_module, "_TRAINING_IMPORT_ERROR", ModuleNotFoundError("tensorboard")
-        )
-        monkeypatch.setattr(
-            trba_module,
-            "_TRAINING_IMPORT_TRACEBACK",
-            "Traceback (most recent call last):\nModuleNotFoundError: tensorboard",
+        monkeypatch.setattr(trba_module, "_TRAINING_AVAILABLE", None)
+        monkeypatch.setitem(
+            sys.modules, "manuscript.recognizers._trba.training.train", None
         )
 
         with pytest.raises(ImportError, match="Training dependencies not available") as exc:
             TRBA.train(train_csvs="train.csv", train_roots="images")
 
-        assert "Original import error traceback" in str(exc.value)
-        assert "tensorboard" in str(exc.value)
+        assert isinstance(exc.value.__cause__, ModuleNotFoundError)
+        assert trba_module._TRAINING_IMPORT_ERROR is exc.value.__cause__
 
     def test_train_validates_train_input_lengths(self, monkeypatch):
         monkeypatch.setattr(trba_module, "_TRAINING_AVAILABLE", True)

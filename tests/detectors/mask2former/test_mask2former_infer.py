@@ -4,7 +4,7 @@ from pathlib import Path
 import numpy as np
 
 from manuscript.api.detector import BaseDetector
-from manuscript.detectors import Mask2Former
+from manuscript.detectors._mask2former import Mask2Former
 from manuscript.layouts import SimpleSorting
 
 
@@ -109,3 +109,44 @@ def test_default_preset_uses_registry_bundle(monkeypatch, tmp_path):
     detector = Mask2Former()
     assert Path(detector.weights) == weights
     assert Path(detector.config_path) == config
+
+
+def test_raw_preserves_model_tensors_masks_and_holes(monkeypatch, tmp_path):
+    weights, config = _artifacts(tmp_path)
+    session = _FakeSession()
+    monkeypatch.setattr("manuscript.detectors._mask2former.ort.InferenceSession",
+                        lambda *args, **kwargs: session)
+    model = Mask2Former(weights=weights, config=config)
+    image = np.zeros((128, 256, 3), np.uint8)
+    raw = model.predict(image, return_raw=True, return_masks=True, return_outputs=True)
+    assert set(raw) == {"page", "outputs", "detections", "image_size", "metadata"}
+    assert set(raw["outputs"]) == {model.output_class_logits, model.output_mask_logits}
+    for row in raw["detections"]:
+        assert row["mask"].shape == image.shape[:2]
+        assert "contours" in row and "contour_hierarchy" in row
+    compact = model.predict(image, return_raw=True)
+    assert "outputs" not in compact
+    assert all("mask" not in row for row in compact["detections"])
+    assert [row["polygon"] for row in compact["detections"]] == [row["polygon"] for row in raw["detections"]]
+    masks_only = model.predict(image, return_masks=True)
+    assert "outputs" not in masks_only and "mask" in masks_only["detections"][0]
+    outputs_only = model.predict(image, return_outputs=True)
+    assert "outputs" in outputs_only and all("mask" not in row for row in outputs_only["detections"])
+    assert raw["page"] == model.predict(image)
+
+
+def test_reordered_inputs_preserve_image_float16(monkeypatch, tmp_path):
+    weights, config = _artifacts(tmp_path)
+
+    class Session(_FakeSession):
+        def get_inputs(self):
+            return [_FakeIO("pixel_mask", "tensor(int64)"),
+                    _FakeIO("pixel_values", "tensor(float16)")]
+
+    session = Session()
+    monkeypatch.setattr("manuscript.detectors._mask2former.ort.InferenceSession",
+                        lambda *args, **kwargs: session)
+    model = Mask2Former(weights=weights, config=config)
+    model.predict(np.zeros((128, 256, 3), np.uint8))
+    assert session.feed["pixel_values"].dtype == np.float16
+    assert session.feed["pixel_mask"].dtype == np.int64

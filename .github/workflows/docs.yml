@@ -7,6 +7,7 @@ on:
       - master
       - onnyx
       - v_0_1_11
+      - v_0_1_13
   workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
@@ -24,7 +25,7 @@ jobs:
   build:
     runs-on: ubuntu-latest
     env:
-      LATEST_DOCS_VERSION: "0.1.12"
+      LATEST_DOCS_VERSION: "0.1.13"
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
@@ -48,11 +49,11 @@ jobs:
           rm -rf _site/${LATEST_DOCS_VERSION}
           mkdir -p _site/${LATEST_DOCS_VERSION}/en _site/${LATEST_DOCS_VERSION}/ru
           # Update translation templates for current docs
-          sphinx-build -b gettext . _build/gettext
+          python -m sphinx -b gettext . _build/gettext
           sphinx-intl update -p _build/gettext -l ru
           # Build latest docs (EN/RU)
-          sphinx-build -b html -D language=en -D release=${LATEST_DOCS_VERSION} -D version=${LATEST_DOCS_VERSION} . _site/${LATEST_DOCS_VERSION}/en
-          sphinx-build -b html -D language=ru -D release=${LATEST_DOCS_VERSION} -D version=${LATEST_DOCS_VERSION} . _site/${LATEST_DOCS_VERSION}/ru
+          python -m sphinx -b html -D language=en -D release=${LATEST_DOCS_VERSION} -D version=${LATEST_DOCS_VERSION} . _site/${LATEST_DOCS_VERSION}/en
+          python -m sphinx -b html -D language=ru -D release=${LATEST_DOCS_VERSION} -D version=${LATEST_DOCS_VERSION} . _site/${LATEST_DOCS_VERSION}/ru
 
       - name: Copy archived docs
         run: |
@@ -77,14 +78,14 @@ jobs:
           <head>
             <meta charset="utf-8">
             <meta name="viewport" content="width=device-width, initial-scale=1">
-            <meta http-equiv="refresh" content="0; url=0.1.12/en/index.html">
+            <meta http-equiv="refresh" content="0; url=0.1.13/en/index.html">
             <title>manuscript-ocr docs</title>
           </head>
           <body>
-            <p>Redirecting to <a href="0.1.12/en/index.html">latest docs (0.1.12)</a>...</p>
+            <p>Redirecting to <a href="0.1.13/en/index.html">latest docs (0.1.13)</a>...</p>
             <p>Available versions:</p>
             <ul>
-              <li><a href="0.1.12/en/index.html">0.1.12 (EN)</a> | <a href="0.1.12/ru/index.html">0.1.12 (RU)</a></li>
+              <li><a href="0.1.13/en/index.html">0.1.13 (EN)</a> | <a href="0.1.13/ru/index.html">0.1.13 (RU)</a></li>
               <li><a href="0.1.11/en/index.html">0.1.11 (EN)</a> | <a href="0.1.11/ru/index.html">0.1.11 (RU)</a></li>
               <li><a href="0.1.10/en/index.html">0.1.10 (EN)</a> | <a href="0.1.10/ru/index.html">0.1.10 (RU)</a></li>
             </ul>
@@ -93,8 +94,8 @@ jobs:
           HTML
           cat > docs/sphinx/_site/versions.json <<'JSON'
           {
-            "latest": "0.1.12",
-            "versions": ["0.1.12", "0.1.11", "0.1.10"]
+            "latest": "0.1.13",
+            "versions": ["0.1.13", "0.1.11", "0.1.10"]
           }
           JSON
           touch docs/sphinx/_site/.nojekyll

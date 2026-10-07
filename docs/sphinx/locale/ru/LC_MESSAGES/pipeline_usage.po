@@ -1,150 +1,129 @@
+# Russian translations for manuscript-ocr documentation.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr
+# package.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr 0.1.11\n"
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-05 19:57+0700\n"
-"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"POT-Creation-Date: 2026-10-06 15:49+0700\n"
+"PO-Revision-Date: 2026-10-06 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
-"Language-Team: ru\n"
 "Language: ru\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Language-Team: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:2
-#: b8f7cb05f54a4f87873800de750248a2
+#: e8f1079e26894d3aae9e6f32a2f9d6fe pipeline_usage.rst:2
 msgid "Pipeline Usage Guide"
 msgstr "Руководство по использованию Pipeline"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:4
-#: c368162885934bf5affb2f4c4adc942c
+#: ccb3a32f2ec44c1a9694def27d9333e0 pipeline_usage.rst:4
 msgid ""
 "The pipeline is stage-based and passes one ``Page`` object through the "
 "stages:"
-msgstr ""
-"Pipeline построен из этапов и передаёт один объект ``Page`` через все этапы:"
+msgstr "Pipeline построен из этапов и передаёт один объект ``Page`` через все этапы:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:6
-#: 9d25059b3f0a44a98da0a1da76c3489f
+#: 732cbef907a44f07b746380901a492bd pipeline_usage.rst:6
 msgid "``detector -> layout -> recognizer -> corrector``"
 msgstr "``detector -> layout -> recognizer -> corrector``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:8
-#: eb69cc10add0413b8b3cf39956908acf
+#: d7b74294008c4c13bee83303ca66735f pipeline_usage.rst:8
 msgid "By default, ``Pipeline()`` creates:"
 msgstr "По умолчанию ``Pipeline()`` создаёт:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:10
-#: 1e8e553d535c4caf8b7df78be350e215
+#: 6f18e25d2f35435fa7586ab28cf89046 pipeline_usage.rst:10
 msgid "detector: ``YOLO(weights=\"yolo26x_obb_text_g1\")``"
 msgstr "детектор: ``YOLO(weights=\"yolo26x_obb_text_g1\")``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:11
-#: 30976c5af1354e11941d0996919ef463
+#: d1e94cd9d57644e3a80716bb2678bbdd pipeline_usage.rst:11
 msgid "layout: ``SimpleSorting()``"
-msgstr "layout: ``SimpleSorting()``"
+msgstr "компоновка: ``SimpleSorting()``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:12
-#: 06d004ea9c414553b30775b274ff0a1b
+#: 0fbea60e8fae4b948f3294e0a82f18df pipeline_usage.rst:12
 msgid "recognizer: ``TRBA(weights=\"trba_lite_g2\")``"
 msgstr "распознаватель: ``TRBA(weights=\"trba_lite_g2\")``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:13
-#: 4e86bb2f174142e78eb7ac4d2fa40f3c
+#: 9e10c7cf64204478a438beedc57fd251 pipeline_usage.rst:13
 msgid "corrector: ``None``"
 msgstr "корректор: ``None``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:16
-#: ca5b57c57467456ebf4ce4801243571f
+#: 841e0967cf104e47ac00f3b4243edf5d pipeline_usage.rst:16
 msgid "Stage Contracts"
 msgstr "Контракты этапов"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:19
-#: 32013f2f01964e1d82730d7a84f4172a
+#: 38ad1ea0714b473db55e599ddd5071ca pipeline_usage.rst:19
 msgid "Detector"
 msgstr "Детектор"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:21
-#: 532556c09ef6480d89d6eb847917baf6
+#: 702c0567e01740599df1f008ddc9005a pipeline_usage.rst:21
 msgid "Detector must implement:"
 msgstr "Детектор должен реализовывать:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:29
-#: f662c1ddbd564bba90d2251e56cb9aa9
+#: a479eb7457e04457b1c9c1f214d3b4e9 pipeline_usage.rst:29
 msgid "Recognizer"
 msgstr "Распознаватель"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:31
-#: 64c36fc26c9447a8a90180c3852341eb
+#: 43a082eb0a834309a41ad8d7dc7490a1 pipeline_usage.rst:31
 msgid "Recognizer must implement:"
 msgstr "Распознаватель должен реализовывать:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:39
-#: 30f7f8b6c7e9470f8a8f986eae76125a
+#: 35d81a1be7eb4a8ab6637f84c4f1e831 pipeline_usage.rst:39
 msgid "Layout"
-msgstr "Layout"
+msgstr "Компоновка"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:41
-#: 75b3616083d64f0ab485b79b8d5a6c70
+#: 47e53711c66946c1bf9604b3378733b5 pipeline_usage.rst:41
 msgid "Layout model must implement:"
 msgstr "Layout-модель должна реализовывать:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:49
-#: 730778d484b74c1d880a16de70bc0655
+#: ccdc9754bc594a35ad53839d745dd2eb pipeline_usage.rst:49
 msgid "Corrector"
 msgstr "Корректор"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:51
-#: 05516a1f439c4d7c80158966f1e107e9
+#: a6df97bf307440778f61d98aeeab0118 pipeline_usage.rst:51
 msgid "Corrector must implement:"
 msgstr "Корректор должен реализовывать:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:59
-#: f101a7f6210d4627b33d5151e2e2e904
+#: 486b5785d229454eb6d79172503ea25c pipeline_usage.rst:59
 msgid "Basic Usage"
 msgstr "Базовое использование"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:71
-#: bbf941d494fb4f658d087b9c8fb3ce0a
+#: 479a45250ed64601945c584ccb2d8b17 pipeline_usage.rst:71
 msgid "Disable Stages"
 msgstr "Отключение этапов"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:73
-#: 359c475bf7cf43278990a43552a292eb
+#: 4d055e55cca74b5587a5c91e757f0df1 pipeline_usage.rst:73
 msgid "You can disable optional stages via ``None``:"
 msgstr "Необязательные этапы можно отключать через ``None``:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:89
-#: 7e2ce7f562834117b097109cfeed2ef6
+#: db1ae63fcc7c42d5a018e132551be6a2 pipeline_usage.rst:89
 msgid "Layout Placement"
 msgstr "Положение этапа layout"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:91
-#: cf1af80bf1754b0095f0591ab8ea841f
+#: 44a57a1a59b84cb283c1e551c42c9d5d pipeline_usage.rst:91
 msgid "Use ``layout_after`` to choose where layout runs:"
 msgstr ""
 "Используйте ``layout_after``, чтобы выбрать, после какого этапа запускать "
 "layout:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:93
-#: b9ee6d3196a84a3ca04c551d7df0d7ee
+#: 1e111b99fcc54900b9516f34143a2d63 pipeline_usage.rst:93
 msgid "``\"detector\"`` (default)"
 msgstr "``\"detector\"`` (по умолчанию)"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:94
-#: 37b92d89cd58428e9c00d7f1ecb78970
+#: ecdfb86421f348d0985f895fd3565ef1 pipeline_usage.rst:94
 msgid "``\"recognizer\"``"
 msgstr "``\"recognizer\"``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:95
-#: d0ce4431b7684144a315d374aaeef382
+#: 44b65db614f7403bad9948cc8064903e pipeline_usage.rst:95
 msgid "``\"corrector\"``"
 msgstr "``\"corrector\"``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:107
-#: 442c9ce160724ae6a31690507ca09c7f
+#: 646543ca80c648e7a7b86491fb7cdf05 pipeline_usage.rst:107
 msgid ""
 "If the anchor stage is disabled (for example, ``recognizer=None`` with "
 "``layout_after=\"recognizer\"``), layout still executes in that slot."
@@ -152,56 +131,45 @@ msgstr ""
 "Если опорный этап отключён, например ``recognizer=None`` при "
 "``layout_after=\"recognizer\"``, layout всё равно выполнится в этой позиции."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:111
-#: 7ba23328b97d43e1901ff5b2ba4f13cd
+#: 292240a3ae414038a471ac6a69b4b100 pipeline_usage.rst:111
 msgid "Built-in Components"
 msgstr "Встроенные компоненты"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:135
-#: c2fa461fea104f07bc5532dc20c5458f
+#: 5aceb4c6a8954af9af0cf0e1209331c9 pipeline_usage.rst:135
 msgid "TRBA Region Preparation"
 msgstr "Подготовка регионов в TRBA"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:137
-#: 82d958b461624562870f6e71dd014a78
+#: 8c9a287a3a4d488088dab435ec8975bb pipeline_usage.rst:137
 msgid "``TRBA`` supports configurable crop preparation before recognition."
-msgstr ""
-"``TRBA`` поддерживает настраиваемую подготовку кропов перед распознаванием."
+msgstr "``TRBA`` поддерживает настраиваемую подготовку кропов перед распознаванием."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:139
-#: 3666084579914ba2aaa0b82bf647dcf8
+#: 179a46578ccd4a19b8300a729c3f0c75 pipeline_usage.rst:139
 msgid "Default settings:"
 msgstr "Настройки по умолчанию:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:141
-#: 6cdf197c970e482892cd8cd46d60b28c
+#: 336667d4b0e94870a4330002f6aba30c pipeline_usage.rst:141
 msgid "``region_preparer=\"bbox\"`` extracts axis-aligned bounding boxes"
 msgstr "``region_preparer=\"bbox\"`` вырезает осеориентированные bounding box"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:142
-#: f16c4ac733a54da08694d6e72aa748c5
+#: 808f3279f39b42239ef2f1cf18a3fed1 pipeline_usage.rst:142
 msgid "``rotate_threshold=1.5`` auto-rotates tall crops before recognition"
 msgstr ""
 "``rotate_threshold=1.5`` автоматически поворачивает высокие кропы перед "
 "распознаванием"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:143
-#: 03c5d739618b497bb09bc2f0d4c3ba8d
+#: f1dfe2e939cb47088c65da45e5f411e7 pipeline_usage.rst:143
 msgid "``min_text_size=5`` skips tiny detections"
 msgstr "``min_text_size=5`` пропускает слишком маленькие детекции"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:145
-#: ab11e801e597435ebc273833ec1e8599
+#: ec0d26010539478295a2480295e58525 pipeline_usage.rst:145
 msgid "Built-in preparer presets:"
 msgstr "Встроенные пресеты preparer:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:147
-#: 5ab22352ae7c4ff0a564f375ff090de0
+#: faf3ec108f6743db9c044919d81b9016 pipeline_usage.rst:147
 msgid "``\"bbox\"``: axis-aligned crop"
 msgstr "``\"bbox\"``: осеориентированный кроп"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:148
-#: a7187426d3da4485b42d09af6b73cb0b
+#: a421302fa84a46948166dbc5c1a44107 pipeline_usage.rst:148
 msgid ""
 "``\"polygon_mask\"``: tight crop with pixels outside the polygon masked to "
 "white"
@@ -209,41 +177,31 @@ msgstr ""
 "``\"polygon_mask\"``: плотный кроп с маскированием пикселей вне полигона в "
 "белый цвет"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:149
-#: 6e0069bfd4474da689934ff50ae36d17
+#: 41361cc61bac42deab0a9f59d0dee50e pipeline_usage.rst:149
 msgid ""
-"``\"quad_warp\"``: perspective rectification for 4-point polygons, with bbox "
-"fallback"
+"``\"quad_warp\"``: perspective rectification for 4-point polygons, with bbox"
+" fallback"
 msgstr ""
 "``\"quad_warp\"``: перспективное выравнивание для 4-точечных полигонов с "
 "переходом на bbox при необходимости"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:163
-#: 1184bc5fbb7e44b3b0ef7a8b12ad3249
-msgid ""
-"``region_preparer_options`` is reserved for built-in preset configuration:"
-msgstr ""
-"``region_preparer_options`` зарезервирован для настройки встроенных пресетов:"
+#: 52274bff0d1c47db98028d43882563b2 pipeline_usage.rst:163
+msgid "``region_preparer_options`` is reserved for built-in preset configuration:"
+msgstr "``region_preparer_options`` зарезервирован для настройки встроенных пресетов:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:165
-#: 009ae2f4114b448d86ea47b2f4726c4a
+#: dd0d182e8dd44c0eb532988a36db8894 pipeline_usage.rst:165
 msgid "``\"bbox\"`` / ``\"polygon_mask\"``: ``pad``"
 msgstr "``\"bbox\"`` / ``\"polygon_mask\"``: ``pad``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:166
-#: 97710d6398c149b5937ecc02ef1b4d71
+#: 5e07e759e2e249d1810277812232226f pipeline_usage.rst:166
 msgid "``\"polygon_mask\"``: ``background``"
 msgstr "``\"polygon_mask\"``: ``background``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:167
-#: fa8b1cd4b22a4631a25e5ac26c884d1e
-msgid ""
-"``\"quad_warp\"``: ``output_size=(width, height)``, ``fallback_to_bbox``"
-msgstr ""
-"``\"quad_warp\"``: ``output_size=(width, height)``, ``fallback_to_bbox``"
+#: 46ca6365f53a4c96a0c30156f847859e pipeline_usage.rst:167
+msgid "``\"quad_warp\"``: ``output_size=(width, height)``, ``fallback_to_bbox``"
+msgstr "``\"quad_warp\"``: ``output_size=(width, height)``, ``fallback_to_bbox``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:169
-#: 8b0b75078ed347a69418f175d65dcf52
+#: 1aa34bb80e224089b158c5d9ea4edaa8 pipeline_usage.rst:169
 msgid ""
 "For advanced cases, you can inject hooks into ``TRBA`` instead of writing a "
 "full custom recognizer:"
@@ -251,8 +209,7 @@ msgstr ""
 "Для более сложных сценариев можно внедрить хуки в ``TRBA`` вместо того, "
 "чтобы писать полностью собственный распознаватель:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:190
-#: 0ed499e165054c21bd8d23507d2a6d17
+#: 3e14174828f047e4b820367836e43cc2 pipeline_usage.rst:190
 msgid ""
 "If you need complete control over recognition logic, the simplest route is "
 "still to provide your own recognizer class with ``predict(page, image) -> "
@@ -262,92 +219,75 @@ msgstr ""
 "вариантом по-прежнему остаётся собственный класс распознавателя с "
 "``predict(page, image) -> Page``."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:194
-#: fc02b7e1941d4178b2d65713bf1e1981
+#: b6844bdbcd3b42d19d92163d3a5cad8e pipeline_usage.rst:194
 msgid "Collapsing Text Spans"
 msgstr "Объединение TextSpan"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:196
-#: 904072a5907a47d9b06b0e9c6d064b68
+#: 6b40c272005b40879664c40bd4ec3ee7 pipeline_usage.rst:196
 msgid ""
 "Some recognizers work on whole lines or blocks rather than on individual "
 "text-span crops. Use ``collapse_page_text_spans`` to convert a narrow page "
 "structure into a wider one before recognition."
 msgstr ""
 "Некоторые распознаватели работают с целыми строками или блоками, а не с "
-"кропами отдельных text span. Используйте ``collapse_page_text_spans``, "
-"чтобы перед распознаванием преобразовать узкую структуру страницы в более "
+"кропами отдельных text span. Используйте ``collapse_page_text_spans``, чтобы"
+" перед распознаванием преобразовать узкую структуру страницы в более "
 "широкую."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:216
-#: f3b37b28306c43daa69c62fea1bb8b22
+#: 2e1ca27f58c94ed79b4d803d32d68341 pipeline_usage.rst:216
 msgid ""
 "``\"line\"`` keeps the same blocks and lines, but replaces each line with "
 "one merged ``TextSpan``. ``\"block\"`` replaces each block with one line "
 "containing one merged ``TextSpan``."
 msgstr ""
-"``\"line\"`` сохраняет те же блоки и строки, но заменяет каждую строку "
-"одним объединённым ``TextSpan``. ``\"block\"`` заменяет каждый блок одной "
+"``\"line\"`` сохраняет те же блоки и строки, но заменяет каждую строку одним"
+" объединённым ``TextSpan``. ``\"block\"`` заменяет каждый блок одной "
 "строкой, содержащей один объединённый ``TextSpan``."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:220
-#: 8af5462bc80c4ecf96cc5c69df688fdd
+#: 8a8bc9dcfce2449d82559e640912aa3c pipeline_usage.rst:220
 msgid "Lower-level helpers are also available:"
 msgstr "Также доступны низкоуровневые вспомогательные функции:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:222
-#: 1056d18a9ad1459997edb17beee3073c
+#: 20ca5c35176f424794206da7598c6029 pipeline_usage.rst:222
 msgid "``merge_text_spans(text_spans, method=\"bbox\")``"
 msgstr "``merge_text_spans(text_spans, method=\"bbox\")``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:223
-#: 9a6f27808cca4734bca50f737d292d13
+#: a857dc835d5d4dc4833fea8bbd93c8cf pipeline_usage.rst:223
 msgid "``collapse_line_text_spans(line, method=\"bbox\")``"
 msgstr "``collapse_line_text_spans(line, method=\"bbox\")``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:224
-#: 2db83dc50dd249acbdd9942d90e10ecc
+#: 4aad6e65da1445238eb27b5cee7784cb pipeline_usage.rst:224
 msgid "``collapse_block_text_spans(block, method=\"bbox\")``"
 msgstr "``collapse_block_text_spans(block, method=\"bbox\")``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:227
-#: 6674b3c0b34744519093d305b7511971
+#: e112da2b572c4bd1b98a9cb6fd47e1c6 pipeline_usage.rst:227
 msgid "Visualization and Profiling"
 msgstr "Визуализация и профилирование"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:237
-#: de801bcf4c93444ca2cd4c025a82c1df
+#: f96f084b561b414da6b2f07d3599776f pipeline_usage.rst:237
 msgid "Intermediate Results"
 msgstr "Промежуточные результаты"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:239
-#: 820578e75dc244a2ba47555de30932f8
+#: 3615843f291e4970a0880f39cf73135c pipeline_usage.rst:239
 msgid "After each run, the pipeline keeps snapshots:"
-msgstr ""
-"После каждого запуска pipeline сохраняет снимки промежуточных результатов:"
+msgstr "После каждого запуска pipeline сохраняет снимки промежуточных результатов:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:241
-#: 9e94976a13ad422fb6501e661d35c03d
+#: db76862aec7c4a7b8e58fe7ca8575def pipeline_usage.rst:241
 msgid "``pipeline.last_detection_page``"
 msgstr "``pipeline.last_detection_page``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:242
-#: 405650d769ed48dda276b83cf57e197b
+#: cc0f394e5a45447fb66c45fc71a53b43 pipeline_usage.rst:242
 msgid "``pipeline.last_layout_page``"
 msgstr "``pipeline.last_layout_page``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:243
-#: 2344710cf8804701a8d34f0c1bac55a8
+#: 970aaaa95bc8479da01151a1b56d5bff pipeline_usage.rst:243
 msgid "``pipeline.last_recognition_page``"
 msgstr "``pipeline.last_recognition_page``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:244
-#: 06ab17130cec4315b7092d28aa4e7201
+#: 5eb647bcf4a74d73a080facccf8e3522 pipeline_usage.rst:244
 msgid "``pipeline.last_correction_page``"
 msgstr "``pipeline.last_correction_page``"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/pipeline_usage.rst:246
-#: a57118d9648b4e5fb642b6a926a2fb06
+#: 0bc895a4fb0049c9b6acd097bfaa1632 pipeline_usage.rst:246
 msgid "Skipped stages keep corresponding ``last_*`` value as ``None``."
-msgstr ""
-"Для пропущенных этапов соответствующее значение ``last_*`` остаётся ``None``."
+msgstr "Для пропущенных этапов соответствующее значение ``last_*`` остаётся ``None``."

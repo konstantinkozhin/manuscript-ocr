@@ -1,40 +1,37 @@
-# Translations template for PROJECT.
-# Copyright (C) 2025 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
+# Russian translations for manuscript-ocr documentation.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr
+# package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr 0.1.11\n"
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-05 19:57+0700\n"
-"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"POT-Creation-Date: 2026-10-06 15:49+0700\n"
+"PO-Revision-Date: 2026-10-06 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
-"Language-Team: ru\n"
 "Language: ru\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Language-Team: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:15
+#: index.rst:15
 msgid "Contents:"
 msgstr "Содержание:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:2
-#: 07363bb1677346ba8e8dacc3f8828488
+#: 6bee55dbb0304562be185e89cb91ea36 index.rst:2
 msgid "manuscript-ocr Documentation"
 msgstr "Документация manuscript-ocr"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:4
-#: 1bbbd2029fb74488a1baea709177bbfc
+#: 8c31550ca1f6458e94cfb76a4f89eecd index.rst:4
 msgid "manuscript-ocr logo"
 msgstr "Логотип manuscript-ocr"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:8
-#: b4d358224c754249baab82e6f5471446
+#: 438d8d8dc07b44d8bf4ca9628bdd273a index.rst:8
 msgid ""
 "**Manuscript OCR** is an open-source Python framework for full OCR/HTR "
 "pipelines targeting pre-reform Russian manuscripts of the 18th-19th "
@@ -43,42 +40,43 @@ msgid ""
 "orthography, complex page layouts, handwriting variation, and high "
 "computational efficiency under limited resources."
 msgstr ""
-"**Manuscript OCR** – открытый Python-фреймворк полного OCR/HTR-пайплайна "
-"для распознавания дореформенных рукописей на русском языке XVIII–XIX веков "
-"и современных текстов. Проект направлен на цифровизацию и анализ "
-"исторического текстового наследия с использованием разработанных методов, "
-"учитывающих устаревшую орфографию, сложную структуру страниц и "
-"вариативность почерков, и обеспечивающих высокую вычислительную "
-"эффективность на ограниченных ресурсах."
+"**Manuscript OCR** – открытый Python-фреймворк полного OCR/HTR-пайплайна для"
+" распознавания дореформенных рукописей на русском языке XVIII–XIX веков и "
+"современных текстов. Проект направлен на цифровизацию и анализ исторического"
+" текстового наследия с использованием разработанных методов, учитывающих "
+"устаревшую орфографию, сложную структуру страниц и вариативность почерков, и"
+" обеспечивающих высокую вычислительную эффективность на ограниченных "
+"ресурсах."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:27
-#: ce07bcb0777549afa57659b43860521a
+#: 82911a3611cb42fe9aec980b2b4d952a index.rst:30
 msgid "Indices and tables"
 msgstr "Индексы и таблицы"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:29
-#: 23c4d7aa432a4e0e823d40dc533f7640
+#: b52ee457e0004c0886f23488d8624942 index.rst:32
 msgid ":ref:`genindex`"
 msgstr ":ref:`genindex`"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:30
-#: 5f5037ec1e3d45dcb447407820b849e7
+#: 3ea9c7d0890c4d2891272fa5c0dd390e index.rst:33
 msgid ":ref:`modindex`"
 msgstr ":ref:`modindex`"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/index.rst:31
-#: 15f02be3b74a4b38b6259e93e9bfcf28
+#: 4e9d4abb7ae9419a97c18ed747b2f9d4 index.rst:34
 msgid ":ref:`search`"
 msgstr ":ref:`search`"
 
 #~ msgid ""
-#~ "**manuscript-ocr** is a Python library for OCR (Optical Character "
-#~ "Recognition) of handwritten manuscripts and documents."
+#~ "**manuscript-ocr** is a Python library "
+#~ "for OCR (Optical Character Recognition) of"
+#~ " handwritten manuscripts and documents."
 #~ msgstr ""
-#~ "Manuscript OCR – открытый Python-фреймворк полного OCR/HTR-пайплайна для "
-#~ "распознавания дореформенных рукописей на русском языке XVIII–XIX веков и "
-#~ "современных текстов. Проект направлен на цифровизацию и анализ "
-#~ "исторического текстового наследия с использованием разработанных методов, "
-#~ "учитывающих устаревшую орфографию, сложную структуру страниц и "
-#~ "вариативность почерков, и обеспечивающих высокую вычислительную "
-#~ "эффективность на ограниченных ресурсах."
+#~ "Manuscript OCR – открытый Python-фреймворк "
+#~ "полного OCR/HTR-пайплайна для распознавания "
+#~ "дореформенных рукописей на русском языке "
+#~ "XVIII–XIX веков и современных текстов. "
+#~ "Проект направлен на цифровизацию и анализ"
+#~ " исторического текстового наследия с "
+#~ "использованием разработанных методов, учитывающих "
+#~ "устаревшую орфографию, сложную структуру страниц"
+#~ " и вариативность почерков, и обеспечивающих"
+#~ " высокую вычислительную эффективность на "
+#~ "ограниченных ресурсах."

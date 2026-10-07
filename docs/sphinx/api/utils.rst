@@ -15,6 +15,10 @@ The utilities module also includes helpers for creating lightweight
   inference with the ``0.1.11+`` stage API.
 
 .. automodule:: manuscript.utils
-   :members:
+   :members: read_image, create_page_from_text, create_page_from_image, organize_page, crop_axis_aligned, crop_polygon_mask, merge_polygons, order_quad_points, polygon_to_bbox, warp_quad, merge_text_spans, collapse_line_text_spans, collapse_block_text_spans, collapse_page_text_spans
    :undoc-members:
    :show-inheritance:
+
+.. autofunction:: manuscript.utils.visualize_page
+
+.. autofunction:: manuscript.utils.set_seed

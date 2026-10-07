@@ -1,42 +1,45 @@
-# Translations template for PROJECT.
-# Copyright (C) 2026 ORGANIZATION
-# This file is distributed under the same license as the PROJECT project.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+# Russian translations for manuscript-ocr documentation.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr
+# package.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PROJECT VERSION\n"
-"Report-Msgid-Bugs-To: EMAIL@ADDRESS\n"
-"POT-Creation-Date: 2026-01-23 18:42+0700\n"
-"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-06 16:02+0700\n"
+"PO-Revision-Date: 2026-10-06 00:00+0700\n"
+"Last-Translator: OpenAI Codex\n"
+"Language: ru\n"
+"Language-Team: ru\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../api/utils.rst:2
+#: 31a0afde754c4a01837f9259ccbe9f31 api/utils.rst:2
 msgid "Utilities"
 msgstr "Утилиты"
 
-#: ../../api/utils.rst:4
+#: api/utils.rst:4 b1ddfb360c7548bf8f4272e4a92b2db0
 msgid ""
 "Utility functions for image processing, visualization, page organization, "
 "text-span collapsing, and more."
 msgstr ""
-"Вспомогательные функции для обработки изображений, визуализации, "
-"организации страницы, объединения text span и других задач."
+"Вспомогательные функции для обработки изображений, визуализации, организации"
+" страницы, объединения text span и других задач."
 
-#: ../../api/utils.rst:7
+#: 4e7d2dfd33c24907a125e19e4c6e386a api/utils.rst:7
 msgid ""
-"The utilities module also includes helpers for creating lightweight "
-"``Page`` objects without running the full pipeline:"
+"The utilities module also includes helpers for creating lightweight ``Page``"
+" objects without running the full pipeline:"
 msgstr ""
 "Модуль также включает хелперы для создания объектов ``Page`` без запуска "
 "полноценного пайплайна:"
 
-#: ../../api/utils.rst:10
+#: 7b51fc623e344e6f80ac533552604195 api/utils.rst:10
 msgid ""
 "``create_page_from_text`` for testing correctors and other text-processing "
 "components from plain text."
@@ -44,133 +47,149 @@ msgstr ""
 "``create_page_from_text`` — создание ``Page`` из текста; удобно для "
 "тестирования корректоров и других компонентов обработки текста."
 
-#: ../../api/utils.rst:12
+#: 3df64dfe41794cb2ab2bd8c459a05ed0 api/utils.rst:12
 msgid ""
 "``create_page_from_image`` for wrapping a single image or crop into a "
-"``Page`` with one ``TextSpan`` covering the full image. It can also accept "
-"a sequence of crops and build a synthetic page for direct recognizer "
+"``Page`` with one ``TextSpan`` covering the full image. It can also accept a"
+" sequence of crops and build a synthetic page for direct recognizer "
 "inference with the ``0.1.11+`` stage API."
 msgstr ""
 "``create_page_from_image`` — оборачивает одно изображение или кроп в "
-"``Page`` с одним ``TextSpan``, покрывающим всё изображение. Принимает "
-"также последовательность кропов и строит синтетическую страницу для "
-"прямого инференса распознавателя через API стадии ``0.1.11+``."
+"``Page`` с одним ``TextSpan``, покрывающим всё изображение. Принимает также "
+"последовательность кропов и строит синтетическую страницу для прямого "
+"инференса распознавателя через API стадии ``0.1.11+``."
 
-#: manuscript.utils:1
+#: ec31f00343584caa8eee6ff075631bcc manuscript.utils:1 of
 msgid "Common utilities for manuscript-ocr."
 msgstr "Общие утилиты для manuscript-ocr."
 
-#: manuscript.utils.io.read_image:2
+#: 3e25921e9b074241abde05b89a066050 manuscript.utils.io.read_image:2 of
 msgid "Universal image reading with support for multiple input types."
-msgstr ""
-"Универсальное чтение изображений с поддержкой различных типов входных "
-"данных."
+msgstr "Универсальное чтение изображений с поддержкой различных типов входных данных."
 
-#: ../../api/utils.rst
+#: 0275596d9e4d434eadb7e89a471603e6 0d291196fe5c4a77997e447634aff393
+#: 1d780807d12f4a119e24aa5a7fa96cd6 1f58abc973ee434786511fdc1b774712
+#: 438dd3dd65ab4cb1b6ef0bfb58983147 569c590eac864ef381851555a907678c
+#: 59c482768004441085ded18aa9a696c5 5cf60f22e95047b19ccdbccf6fd1c4d9 api/utils.rst
+#: b4b0ee0c0b8740059847e981decbd165 d524a64a7e694afb807372c514c19160
 msgid "Parameters"
 msgstr "Параметры"
 
-#: manuscript.utils.io.read_image:5
+#: 7e2938f42a53413d81dd39787fd95e32 manuscript.utils.io.read_image:5 of
 msgid ""
-"Image source in one of the following formats: - File path (str or Path) -"
-" supports Unicode paths (e.g., Cyrillic) - Bytes buffer (e.g., from HTTP "
+"Image source in one of the following formats: - File path (str or Path) - "
+"supports Unicode paths (e.g., Cyrillic) - Bytes buffer (e.g., from HTTP "
 "response) - NumPy array (already loaded image) - PIL Image object"
 msgstr ""
-"Источник изображения в одном из следующих форматов:  - путь к файлу (str "
-"или Path) — поддерживаются Unicode-пути (например, кириллица)  - буфер "
-"байтов (например, из HTTP-ответа)  - массив NumPy (уже загруженное "
-"изображение)  - объект PIL Image"
+"Источник изображения в одном из следующих форматов:  - путь к файлу (str или"
+" Path) — поддерживаются Unicode-пути (например, кириллица)  - буфер байтов "
+"(например, из HTTP-ответа)  - массив NumPy (уже загруженное изображение)  - "
+"объект PIL Image"
 
-#: ../../api/utils.rst
+#: 131155f10474451193d09a848eb25748 3bbcab0fa3794c869326721966acb17a
+#: 85945c4022894e09bdd16f5b66cd25f0 96af965f6f49405bba2ce081d224a0a7 api/utils.rst
+#: d8e53e73a4004771990a900387d1b057 f3ef73aa40b6432aad6e72227c63894b
 msgid "Returns"
 msgstr "Возвращает"
 
-#: manuscript.utils.io.read_image:12
+#: 195651bf5faa46a19cfee10bcc184edf manuscript.utils.io.read_image:12 of
 msgid "RGB image as numpy array with shape (H, W, 3) and dtype uint8."
 msgstr "RGB-изображение в виде массива NumPy с формой (H, W, 3) и типом uint8."
 
-#: ../../api/utils.rst
+#: 134e368ce8704089ae3f9a682adddeab 142da3b39001469ca176c76cc9857035
+#: 14710007f1564ef393ce7dfc31ec83e1 74bdde1346d1444f8c3eb8cc285902a6
+#: 9b48707df9a14847b632fe04a1b35976 afff75ee84fc43f9a89da81f3ebe9520 api/utils.rst
+#: cffb89494b614e87b5557f8d9a2acfe4 d6a368f8b83c402b9f90fdbc47b60519
+#: dcad35677c7b4d6f863456fbe8bb79a1
 msgid "Return type"
 msgstr "Тип возвращаемого значения"
 
-#: ../../api/utils.rst
+#: 2aece06894374aa7a0d52de868d5b0f1 api/utils.rst b077901b17e04da38fa98d24b2b3b574
 msgid "Raises"
 msgstr "Вызывает исключения"
 
-#: manuscript.utils.io.read_image:15
+#: dceee79cd7bf457394afaf40ad5d6b43 manuscript.utils.io.read_image:15 of
 msgid "If the image file cannot be read with either OpenCV or PIL."
 msgstr ""
-"Если файл изображения не удаётся прочитать ни с помощью OpenCV, ни с "
-"помощью PIL."
+"Если файл изображения не удаётся прочитать ни с помощью OpenCV, ни с помощью"
+" PIL."
 
-#: manuscript.utils.io.read_image:16
+#: 01f6e83c0e5e42dcaa1d9a3bfdf19fe9 manuscript.utils.io.read_image:16 of
 msgid "If the input type is not supported."
 msgstr "Если тип входных данных не поддерживается."
 
-#: manuscript.utils.io.read_image:17
+#: 389b77ce4ab049b0a32f8019c434ed16 manuscript.utils.io.read_image:17 of
 msgid "If bytes cannot be decoded into an image."
 msgstr "Если байты не могут быть декодированы в изображение."
 
-#: manuscript.utils.io.read_image:20
-#: manuscript.utils.io.create_page_from_text:23
-#: manuscript.utils.sorting.organize_page:29
-#: manuscript.utils.visualization.visualize_page:56
+#: 430e841e985b40f38799f338aca29044 5b55def1514a4ef5854c7937bcf80927
+#: 659030f54c3e4560bb0b07c6935f03ab cdc6d538208041069dc64d69d6425748
+#: manuscript.utils.io.create_page_from_image:34
+#: manuscript.utils.io.create_page_from_text:23 manuscript.utils.io.read_image:20
+#: manuscript.utils.visualization.visualize_page:56 of
 msgid "Examples"
 msgstr "Примеры"
 
-#: manuscript.utils.io.create_page_from_text:2
+#: 86238b40f7eb4ecd943e2012f4262f83 manuscript.utils.io.create_page_from_text:2 of
 msgid "Create a Page object from a list of text lines."
 msgstr "Создать объект Page из списка текстовых строк."
 
-#: manuscript.utils.io.create_page_from_text:4
+#: a781befe210b4a209f81b5bcc4075a91 manuscript.utils.io.create_page_from_text:4 of
 msgid ""
-"This utility function creates a simple Page structure from raw text, "
-"useful for testing correctors or other text processing components without"
-" requiring actual OCR detection/recognition."
+"This utility function creates a simple Page structure from raw text, useful "
+"for testing correctors or other text processing components without requiring"
+" actual OCR detection/recognition."
 msgstr ""
-"Эта вспомогательная функция создаёт простую структуру Page из сырого "
-"текста, что удобно для тестирования корректоров и других компонентов "
-"обработки текста без запуска полноценной OCR-детекции и распознавания."
+"Эта вспомогательная функция создаёт простую структуру Page из сырого текста,"
+" что удобно для тестирования корректоров и других компонентов обработки "
+"текста без запуска полноценной OCR-детекции и распознавания."
 
-#: manuscript.utils.io.create_page_from_text:8
+#: 9d5b68ed8c834101873727e562b7ebd9 manuscript.utils.io.create_page_from_text:8 of
 msgid ""
 "Each line becomes a Line object with text spans split by whitespace. Text "
-"spans are assigned dummy polygon coordinates for compatibility with the "
-"data structures."
+"spans are assigned dummy polygon coordinates for compatibility with the data"
+" structures."
 msgstr ""
 "Каждая строка превращается в объект Line, где text span-ы формируются по "
-"разделению на пробельные символы. Для совместимости со структурами данных "
-"им назначаются фиктивные координаты полигона."
+"разделению на пробельные символы. Для совместимости со структурами данных им"
+" назначаются фиктивные координаты полигона."
 
-#: manuscript.utils.io.create_page_from_text:13
+#: 507f72afe4e84d67bdc114050d57ff6f manuscript.utils.io.create_page_from_text:13
+#: of
 msgid "List of text lines. Each line will be split into text spans."
 msgstr "Список текстовых строк. Каждая строка будет разделена на text span-ы."
 
-#: manuscript.utils.io.create_page_from_text:16
+#: 75749d3f4a534c4ab2a582d9c579f0e0 manuscript.utils.io.create_page_from_text:16
+#: of
 msgid "Confidence score to assign to all text spans (default 1.0)."
 msgstr "Уровень уверенности, назначаемый всем text span-ам. По умолчанию 1.0."
 
-#: manuscript.utils.io.create_page_from_text:19
+#: 9859aed4eb4b42119d4d1c1395ffe382 manuscript.utils.io.create_page_from_text:19
+#: of
 msgid "Page object with one Block containing the provided lines."
 msgstr "Объект Page с одним Block, содержащим переданные строки."
 
-#: manuscript.utils.io.create_page_from_text:31
+#: 9ee600133517455580c0822f2a47f61e manuscript.utils.io.create_page_from_text:31
+#: of
 msgid "Use with corrector:"
 msgstr "Использование с корректором:"
 
-#: manuscript.utils.io.create_page_from_image:2
+#: 059cdda18e054a29a6dcf593491ae135 manuscript.utils.io.create_page_from_image:2
+#: of
 msgid "Create a ``Page`` object that wraps one or more images or text crops."
-msgstr "Создать объект ``Page``, оборачивающий одно или несколько изображений либо текстовых кропов."
+msgstr ""
+"Создать объект ``Page``, оборачивающий одно или несколько изображений либо "
+"текстовых кропов."
 
-#: manuscript.utils.io.create_page_from_image:4
+#: 407b17301df24993acf255680b52d290 manuscript.utils.io.create_page_from_image:4
+#: of
 msgid ""
 "This utility is useful when a recognizer expects the ``0.1.11+`` stage API "
-"(``predict(page, image=...) -> Page``), but you want to run inference on "
-"one or more pre-cropped images without a detector. For a single image, the "
-"function creates one block, one line, and one ``TextSpan`` covering the "
-"full image extent. For multiple images, the crops are stacked vertically "
-"into a synthetic page, and each crop becomes a separate line with one "
-"``TextSpan``."
+"(``predict(page, image=...) -> Page``), but you want to run inference on one"
+" or more pre-cropped images without a detector. For a single image, the "
+"function creates one block, one line, and one ``TextSpan`` covering the full"
+" image extent. For multiple images, the crops are stacked vertically into a "
+"synthetic page, and each crop becomes a separate line with one ``TextSpan``."
 msgstr ""
 "Эта утилита полезна, когда распознаватель ожидает stage API версии "
 "``0.1.11+`` (``predict(page, image=...) -> Page``), но нужно выполнить "
@@ -180,18 +199,18 @@ msgstr ""
 "кропы вертикально складываются в синтетическую страницу, и каждый из них "
 "становится отдельной строкой с одним ``TextSpan``."
 
-#: manuscript.utils.io.create_page_from_image:13
+#: a1f8906dcca24243840dfe92e34e746f manuscript.utils.io.create_page_from_image:13
+#: of
 msgid "Image source accepted by :func:`read_image`."
 msgstr "Источник изображения, поддерживаемый :func:`read_image`."
 
-#: manuscript.utils.io.create_page_from_image:15
-msgid ""
-"Detection confidence assigned to the created text span. Default is ``1.0``."
-msgstr ""
-"Уверенность детекции, назначаемая созданному text span. "
-"По умолчанию ``1.0``."
+#: cb157e30b07748828aea75f06974b146 manuscript.utils.io.create_page_from_image:16
+#: of
+msgid "Detection confidence assigned to the created text span. Default is ``1.0``."
+msgstr "Уверенность детекции, назначаемая созданному text span. По умолчанию ``1.0``."
 
-#: manuscript.utils.io.create_page_from_image:17
+#: b3f0812da28d4639a2f9944582b26bab manuscript.utils.io.create_page_from_image:19
+#: of
 msgid ""
 "Vertical gap in pixels between crops when a sequence of images is passed. "
 "Default is ``8``."
@@ -199,7 +218,8 @@ msgstr ""
 "Вертикальный промежуток в пикселях между кропами при передаче "
 "последовательности изображений. По умолчанию ``8``."
 
-#: manuscript.utils.io.create_page_from_image:20
+#: 04750e80f690432cbe4da8f98a8c7374 manuscript.utils.io.create_page_from_image:23
+#: of
 msgid ""
 "If ``True``, also return the normalised RGB image that corresponds to the "
 "created ``Page``. Especially useful when ``image`` is a sequence and a "
@@ -207,266 +227,580 @@ msgid ""
 msgstr ""
 "Если ``True``, дополнительно возвращает нормализованное RGB-изображение, "
 "соответствующее созданному ``Page``. Особенно полезно, когда ``image`` — "
-"последовательность и строится синтетическое изображение страницы. "
-"По умолчанию ``False``."
+"последовательность и строится синтетическое изображение страницы. По "
+"умолчанию ``False``."
 
-#: manuscript.utils.io.create_page_from_image:26
+#: 2cab6cb9c2fd4ace8194b307005655c6 manuscript.utils.io.create_page_from_image:28
+#: of
 msgid ""
 "Page object with one block, one line, and one text span covering the whole "
 "image. If ``return_image=True``, also returns the RGB image used to build "
 "the page."
 msgstr ""
-"Объект Page с одним блоком, одной строкой и одним text span, покрывающим "
-"всё изображение. Если ``return_image=True``, дополнительно возвращается "
+"Объект Page с одним блоком, одной строкой и одним text span, покрывающим всё"
+" изображение. Если ``return_image=True``, дополнительно возвращается "
 "RGB-изображение, использованное для построения страницы."
 
-#: manuscript.utils.io.create_page_from_image:36
+#: 2628cc2110f24ac88f11cc9c975fc482 manuscript.utils.io.create_page_from_image:41
+#: of
 msgid "Use with a recognizer:"
 msgstr "Использование с распознавателем:"
 
-#: manuscript.utils.io.create_page_from_image:46
+#: 7b68300c22cd4795892cb7ca38b5decc manuscript.utils.io.create_page_from_image:50
+#: of
 msgid "Use with multiple crops:"
 msgstr "Использование с несколькими кропами:"
 
-#: manuscript.utils.page_transforms.merge_text_spans:2
+#: c0fcd95816454537a91056c1239f1d0a manuscript.utils.sorting.organize_page:2 of
+msgid "Compatibility wrapper around ``SimpleSorting`` layout model."
+msgstr "Совместимый обёртчик вокруг layout-модели ``SimpleSorting``."
+
+#: 98fa9bbed1c7448f9902c21d9c20086b manuscript.utils.sorting.organize_page:5 of
+msgid "Input page with detected text spans."
+msgstr "Входная страница с обнаруженными text span-ами."
+
+#: 9a2efe2532724df2a574be6d66cdcfec manuscript.utils.sorting.organize_page:8 of
+msgid "Maximum number of column split attempts. Default is 10."
+msgstr "Максимальное число попыток разбиения на колонки. По умолчанию 10."
+
+#: 371e6915d4fb407291d52f7886f6d671 manuscript.utils.sorting.organize_page:11 of
+msgid "If True, segment into columns before line grouping. Default is True."
+msgstr ""
+"Если True, сначала выполняет разбиение на колонки, а затем группировку по "
+"строкам. По умолчанию True."
+
+#: c19ece5197974f40bd7a03e91b739a4e manuscript.utils.sorting.organize_page:14 of
+msgid "Organized page."
+msgstr "Организованная страница."
+
+#: 21534f1fa1c34e0ea9b8c0085002a8f1 manuscript.utils.geometry.crop_axis_aligned:2
+#: of
+msgid "Crop an axis-aligned rectangle covering the polygon."
+msgstr "Вырезает выровненный по осям прямоугольник, охватывающий полигон."
+
+#: 95e9fc79ab884fb0b3b4dfb645b14608 manuscript.utils.geometry.crop_axis_aligned:5
+#: manuscript.utils.geometry.crop_polygon_mask:7
+#: manuscript.utils.geometry.warp_quad:8 of
+msgid "Source image."
+msgstr "Исходное изображение."
+
+#: 4eac2d613f894f09bb7918bb22876e17 manuscript.utils.geometry.crop_axis_aligned:8
+#: manuscript.utils.geometry.crop_polygon_mask:10
+#: manuscript.utils.geometry.polygon_to_bbox:6 of
+msgid "Polygon vertices in image coordinates."
+msgstr "Вершины полигона в координатах изображения."
+
+#: 2c81847e603c40d19b0c2241170b6e54 manuscript.utils.geometry.crop_axis_aligned:11
+#: manuscript.utils.geometry.crop_polygon_mask:13
+#: manuscript.utils.geometry.polygon_to_bbox:12 of
+msgid "Extra padding in pixels around the polygon. Default is ``0``."
+msgstr "Дополнительный отступ в пикселях вокруг полигона. По умолчанию ``0``."
+
+#: d4c0f79aa4f64b82b056c50edc6d981d manuscript.utils.geometry.crop_axis_aligned:14
+#: of
+msgid "Image crop, or ``None`` if the bounding box is invalid."
+msgstr "Кроп изображения или ``None``, если ограничивающий прямоугольник недопустим."
+
+#: 4dd6a097cb2d465e92508c89ced665f6 manuscript.utils.geometry.crop_polygon_mask:2
+#: of
+msgid "Crop the polygon bounding box and mask pixels outside the polygon."
+msgstr ""
+"Вырезает ограничивающий прямоугольник полигона и маскирует пиксели за "
+"пределами полигона."
+
+#: bd01a0e1949642bbaaaa316e30142930 manuscript.utils.geometry.crop_polygon_mask:4
+#: of
+msgid "Works with arbitrary polygons of shape ``(N, 2)``."
+msgstr "Работает с произвольными полигонами формы ``(N, 2)``."
+
+#: 2c81847e603c40d19b0c2241170b6e54 manuscript.utils.geometry.crop_polygon_mask:16
+#: of
+msgid "Background pixel value outside the polygon. Default is ``255``."
+msgstr "Значение фоновых пикселей за пределами полигона. По умолчанию ``255``."
+
+#: 085d3a6f83c348b295c7cf70ad3810b5 manuscript.utils.geometry.crop_polygon_mask:19
+#: of
+msgid "Masked image crop, or ``None`` if the bounding box is invalid."
+msgstr "Кроп с маской или ``None``, если ограничивающий прямоугольник недопустим."
+
+#: 46690940d6e34fc09d2bc3a96442139c manuscript.utils.geometry.merge_polygons:2 of
+msgid "Merge multiple polygons into a single polygon."
+msgstr "Объединяет несколько полигонов в один."
+
+#: f8c5a3025f544398a14e01d02b0e02da manuscript.utils.geometry.merge_polygons:5 of
+msgid "Input polygons with shape ``(N, 2)``."
+msgstr "Входные полигоны формы ``(N, 2)``."
+
+#: ed63273c699649f4918fbb46c149f842 manuscript.utils.geometry.merge_polygons:8 of
+msgid ""
+"Merge strategy. ``\"bbox\"`` returns an axis-aligned rectangle covering all "
+"points. ``\"convex_hull\"`` returns a convex hull over all points."
+msgstr ""
+"Способ объединения. ``\"bbox\"`` возвращает выровненный по осям "
+"прямоугольник, охватывающий все точки. ``\"convex_hull\"`` возвращает "
+"выпуклую оболочку всех точек."
+
+#: d4c0f79aa4f64b82b056c50edc6d981d manuscript.utils.geometry.merge_polygons:12 of
+msgid "Merged polygon, or ``None`` when ``polygons`` is empty."
+msgstr "Объединённый полигон или ``None``, если ``polygons`` пуст."
+
+#: da0ef4cdc47c431ea245c93329020a84 manuscript.utils.geometry.order_quad_points:2
+#: of
+msgid ""
+"Order exactly 4 polygon points as top-left, top-right, bottom-right, bottom-"
+"left."
+msgstr ""
+"Упорядочивает ровно 4 точки полигона: верхний левый, верхний правый, нижний "
+"правый, нижний левый."
+
+#: a4c37cd2ddd04a9fb9b0222ee8f33985 manuscript.utils.geometry.order_quad_points:5
+#: of
+msgid "Quadrilateral vertices."
+msgstr "Вершины четырёхугольника."
+
+#: 4eac2d613f894f09bb7918bb22876e17 manuscript.utils.geometry.order_quad_points:8
+#: of
+msgid "Ordered vertices as float32."
+msgstr "Упорядоченные вершины типа float32."
+
+#: b3b5d8fd24384c78b19fe8f207f0e0da manuscript.utils.geometry.order_quad_points:11
+#: of
+msgid "If exactly four points are not provided."
+msgstr "Если передано не ровно четыре точки."
+
+#: 8552ae99d7734b9a92ef1f0057f3280b manuscript.utils.geometry.polygon_to_bbox:2 of
+msgid ""
+"Convert a polygon with any number of vertices to a clipped axis-aligned "
+"bounding box."
+msgstr ""
+"Преобразует полигон с произвольным числом вершин в обрезанный ограничивающий"
+" прямоугольник, выровненный по осям."
+
+#: f102d86c76ab4079887aa14aa38ddb60 manuscript.utils.geometry.polygon_to_bbox:9 of
+msgid "Source image shape used for clipping."
+msgstr "Форма исходного изображения для обрезки."
+
+#: ab8de6733d474fb2968ab09a8113c732 manuscript.utils.geometry.polygon_to_bbox:15
+#: of
+msgid "Bounding box as ``(x1, y1, x2, y2)`` or ``None`` if invalid."
+msgstr ""
+"Ограничивающий прямоугольник ``(x1, y1, x2, y2)`` или ``None``, если "
+"результат недопустим."
+
+#: 2c8b0bd284ad4def9ebed35c46d3cef8 manuscript.utils.geometry.warp_quad:2 of
+msgid "Perspective-warp a quadrilateral polygon into a rectified crop."
+msgstr ""
+"Применяет перспективное преобразование к четырёхугольному полигону и "
+"возвращает выпрямленный кроп."
+
+#: 6b614cf5df2b4abfad738cad2929c623 manuscript.utils.geometry.warp_quad:4 of
+msgid ""
+"This helper is intentionally quad-specific. For non-quad polygons it returns"
+" ``None`` so callers may choose a fallback strategy."
+msgstr ""
+"Функция предназначена только для четырёхугольников. Для других полигонов "
+"возвращает ``None``, чтобы вызывающий код мог выбрать запасной способ "
+"обработки."
+
+#: 4eac2d613f894f09bb7918bb22876e17 manuscript.utils.geometry.warp_quad:11 of
+msgid "Quadrilateral vertices in image coordinates."
+msgstr "Вершины четырёхугольника в координатах изображения."
+
+#: b558828108494c1d9abb6236aaa921ee manuscript.utils.geometry.warp_quad:14 of
+msgid "Crop size ``(width, height)``. If ``None``, estimate it from polygon edges."
+msgstr ""
+"Размер кропа ``(width, height)``. При ``None`` оценивается по рёбрам "
+"полигона."
+
+#: 84ed4a61c0fd43fcb6ef7ee6ce4f7b81 manuscript.utils.geometry.warp_quad:17 of
+msgid "Rectified image crop, or ``None`` for an invalid quadrilateral."
+msgstr ""
+"Выпрямленный кроп изображения или ``None`` для недопустимого "
+"четырёхугольника."
+
+#: fc96208bc037436e8d61bd1b67fdc95c
+#: manuscript.utils.page_transforms.merge_text_spans:2 of
 msgid "Merge multiple ``TextSpan`` objects into a single wider ``TextSpan``."
 msgstr "Объединить несколько объектов ``TextSpan`` в один более широкий ``TextSpan``."
 
-#: manuscript.utils.page_transforms.merge_text_spans:5
+#: 73fc32573a554ef48fa60de8bce5d009
+#: manuscript.utils.page_transforms.merge_text_spans:5 of
 msgid "Input text spans to merge."
 msgstr "Входные text span-ы для объединения."
 
-#: manuscript.utils.page_transforms.merge_text_spans:7
+#: 26e199b84cd544ebad78c5644fea3b26
+#: manuscript.utils.page_transforms.merge_text_spans:8 of
 msgid ""
 "Polygon merge strategy. ``\"bbox\"`` creates an axis-aligned rectangle "
-"covering all span polygons. ``\"convex_hull\"`` creates a convex hull "
-"around all polygon vertices. Default is ``\"bbox\"``."
+"covering all span polygons. ``\"convex_hull\"`` creates a convex hull around"
+" all polygon vertices. Default is ``\"bbox\"``."
 msgstr ""
 "Стратегия объединения полигонов. ``\"bbox\"`` строит выровненный по осям "
-"прямоугольник, охватывающий все полигоны span-ов. ``\"convex_hull\"`` "
-"строит выпуклую оболочку вокруг всех вершин полигонов. По умолчанию "
-"``\"bbox\"``."
+"прямоугольник, охватывающий все полигоны span-ов. ``\"convex_hull\"`` строит"
+" выпуклую оболочку вокруг всех вершин полигонов. По умолчанию ``\"bbox\"``."
 
-#: manuscript.utils.page_transforms.merge_text_spans:13
+#: 085d3a6f83c348b295c7cf70ad3810b5
+#: manuscript.utils.page_transforms.merge_text_spans:13 of
 msgid "Merged text span, or ``None`` when ``text_spans`` is empty."
 msgstr "Объединённый text span или ``None``, если ``text_spans`` пустой."
 
-#: manuscript.utils.page_transforms.collapse_line_text_spans:2
+#: 24491700888845a38a615f516653ff7e
+#: manuscript.utils.page_transforms.collapse_line_text_spans:2 of
 msgid "Collapse all text spans inside a line into a single text span."
 msgstr "Свернуть все text span-ы внутри строки в один text span."
 
-#: manuscript.utils.page_transforms.collapse_line_text_spans:5
+#: 826cc3d9cbc2424a842eec27b0c1b04c
+#: manuscript.utils.page_transforms.collapse_line_text_spans:5 of
 msgid "Input line."
 msgstr "Входная строка."
 
-#: manuscript.utils.page_transforms.collapse_line_text_spans:7
+#: b6c4846cded24ae0b5bfc118078ddaad
+#: manuscript.utils.page_transforms.collapse_block_text_spans:8
+#: manuscript.utils.page_transforms.collapse_line_text_spans:8
+#: manuscript.utils.page_transforms.collapse_page_text_spans:13 of
 msgid "Polygon merge strategy. Default is ``\"bbox\"``."
 msgstr "Стратегия объединения полигонов. По умолчанию ``\"bbox\"``."
 
-#: manuscript.utils.page_transforms.collapse_line_text_spans:12
+#: d8fcd8ecd7754db693597220435150f8
+#: manuscript.utils.page_transforms.collapse_line_text_spans:11 of
 msgid "New line containing one merged text span or an empty span list."
-msgstr "Новая строка, содержащая один объединённый text span или пустой список span-ов."
+msgstr ""
+"Новая строка, содержащая один объединённый text span или пустой список "
+"span-ов."
 
-#: manuscript.utils.page_transforms.collapse_block_text_spans:2
+#: 39bcc1a12e7c4e40894238ee2084a972
+#: manuscript.utils.page_transforms.collapse_block_text_spans:2 of
 msgid "Collapse all text spans inside a block into a single line with one text span."
 msgstr "Свернуть все text span-ы внутри блока в одну строку с одним text span-ом."
 
-#: manuscript.utils.page_transforms.collapse_block_text_spans:5
+#: fe664d2858114a41946d11bb13f9e605
+#: manuscript.utils.page_transforms.collapse_block_text_spans:5 of
 msgid "Input block."
 msgstr "Входной блок."
 
-#: manuscript.utils.page_transforms.collapse_block_text_spans:12
+#: be24c25d362a466d9fdb9cbfb784a581
+#: manuscript.utils.page_transforms.collapse_block_text_spans:11 of
 msgid "New block containing a single collapsed line."
 msgstr "Новый блок, содержащий одну свёрнутую строку."
 
-#: manuscript.utils.page_transforms.collapse_page_text_spans:2
+#: 8fe2bba9b0014c8699c81275b88c704f
+#: manuscript.utils.page_transforms.collapse_page_text_spans:2 of
 msgid "Collapse narrow OCR structure into wider line-level or block-level spans."
 msgstr "Свести узкую OCR-структуру к более широким span-ам уровня строки или блока."
 
-#: manuscript.utils.page_transforms.collapse_page_text_spans:5
+#: c78fb80c9bb94dc08f6ea7ebdfd13c01
+#: manuscript.utils.page_transforms.collapse_page_text_spans:5 of
 msgid "Input page."
 msgstr "Входная страница."
 
-#: manuscript.utils.page_transforms.collapse_page_text_spans:7
+#: 55239c884a0d4c009e4513aaf9da001f
+#: manuscript.utils.page_transforms.collapse_page_text_spans:8 of
 msgid ""
 "Collapse target. ``\"line\"`` keeps the same block/line structure and "
 "replaces each line with one merged text span. ``\"block\"`` replaces each "
-"block with one line containing one merged text span. Default is ``\"line\"``."
+"block with one line containing one merged text span. Default is "
+"``\"line\"``."
 msgstr ""
-"Целевой уровень свёртки. ``\"line\"`` сохраняет исходную структуру блоков "
-"и строк, заменяя каждую строку одним объединённым text span-ом. "
-"``\"block\"`` заменяет каждый блок одной строкой с одним объединённым "
-"text span-ом. По умолчанию ``\"line\"``."
+"Целевой уровень свёртки. ``\"line\"`` сохраняет исходную структуру блоков и "
+"строк, заменяя каждую строку одним объединённым text span-ом. ``\"block\"`` "
+"заменяет каждый блок одной строкой с одним объединённым text span-ом. По "
+"умолчанию ``\"line\"``."
 
-#: manuscript.utils.page_transforms.collapse_page_text_spans:13
+#: 95e9fc79ab884fb0b3b4dfb645b14608
+#: manuscript.utils.page_transforms.collapse_page_text_spans:16 of
 msgid "Collapsed page."
 msgstr "Свёрнутая страница."
 
-#: manuscript.utils.visualization.visualize_page:2
+#: a0f9251bc8504efab6d7da3f63cfb2db
+#: manuscript.utils.visualization.visualize_page:2 of
 msgid "Visualize a Page object with detected text spans/blocks."
-msgstr "Визуализация объекта Page с обнаруженными text span-ами и блоками."
+msgstr "Визуализирует объект Page с обнаруженными текстовыми областями и блоками."
 
-#: manuscript.utils.visualization.visualize_page:4
+#: f84e8f7e2c434aba8dff9d095bf22c96
+#: manuscript.utils.visualization.visualize_page:4 of
 msgid ""
 "This function draws all text spans from the Page structure on the image, "
-"optionally showing reading order with numbered markers and connecting "
-"lines. When show_order=True, it also visualizes blocks with semi-"
-"transparent bounding boxes, each block having a distinct color."
+"optionally showing reading order with numbered markers and connecting lines."
+" When show_order=True, it also visualizes blocks with semi-transparent "
+"bounding boxes, each block having a distinct color."
 msgstr ""
-"Эта функция рисует все text span-ы из структуры Page на изображении, при "
-"необходимости отображая порядок чтения с помощью нумерованных маркеров и "
-"соединяющих линий. При show_order=True также визуализируются блоки с "
-"полупрозрачными ограничивающими рамками, при этом каждый блок имеет "
-"свой цвет."
+"Отображает все текстовые области структуры Page на изображении; при "
+"необходимости показывает порядок чтения с номерами и соединительными "
+"линиями. При show_order=True также отображает блоки полупрозрачными "
+"ограничивающими прямоугольниками, каждый своим цветом."
 
-#: manuscript.utils.visualization.visualize_page:10
+#: d814e6b38ad54e97963a4bd1c2301b08
+#: manuscript.utils.visualization.visualize_page:10 of
 msgid ""
-"Input image. Can be: - Path to image file (str or Path) - supports "
-"Unicode paths - RGB numpy array with shape (H, W, 3) - PIL Image object"
+"Input image. Can be: - Path to image file (str or Path) - supports Unicode "
+"paths - RGB numpy array with shape (H, W, 3) - PIL Image object"
 msgstr ""
-"Входное изображение. Может быть:  - путь к файлу изображения (str или "
-"Path) — поддерживаются Unicode-пути  - RGB-массив NumPy с формой (H, W, "
-"3)  - объект PIL Image"
+"Входное изображение: путь к файлу (str или Path, поддерживаются пути "
+"Unicode), RGB-массив NumPy формы (H, W, 3) или объект PIL Image."
 
-#: manuscript.utils.visualization.visualize_page:16
+#: ce9c5d49f51546c0be4f6acf3e909a85
+#: manuscript.utils.visualization.visualize_page:16 of
 msgid "Page object from manuscript.data containing detected blocks/text spans."
-msgstr "Объект Page из manuscript.data, содержащий обнаруженные блоки и text span-ы."
+msgstr ""
+"Объект Page из manuscript.data с обнаруженными блоками и текстовыми "
+"областями."
 
-#: manuscript.utils.visualization.visualize_page:19
+#: 3353b98b96eb434f9901e1593e37d91d
+#: manuscript.utils.visualization.visualize_page:19 of
 msgid "RGB color for text span boundaries."
-msgstr "RGB-цвет для границ text span-ов."
+msgstr "RGB-цвет границ текстовых областей."
 
-#: manuscript.utils.visualization.visualize_page:22
+#: 04190d06747c4d5f964ec1ff34eb68dd
+#: manuscript.utils.visualization.visualize_page:22 of
 msgid "Line thickness for text span boundaries."
-msgstr "Толщина линий для границ text span-ов."
+msgstr "Толщина линий границ текстовых областей."
 
-#: manuscript.utils.visualization.visualize_page:25
+#: 4fc6a7d767434a42924b4ed2e33976cc
+#: manuscript.utils.visualization.visualize_page:25 of
 msgid ""
-"If True, colors different text lines with different colors and shows "
-"semi-transparent block boundaries with different colors per block."
+"If True, colors different text lines with different colors and shows semi-"
+"transparent block boundaries with different colors per block."
 msgstr ""
-"Если True, раскрашивает разные текстовые строки в разные цвета и "
-"показывает полупрозрачные границы блоков с отдельным цветом для каждого "
-"блока."
+"При True окрашивает текстовые строки в разные цвета и показывает "
+"полупрозрачные границы блоков, каждый блок своим цветом."
 
-#: manuscript.utils.visualization.visualize_page:29
+#: 0ac5a8ded9b34994b9999d6b327645a0
+#: manuscript.utils.visualization.visualize_page:29 of
 msgid ""
-"If True and show_order=True, draw connecting lines between consecutive "
-"text spans showing the reading sequence."
+"If True and show_order=True, draw connecting lines between consecutive text "
+"spans showing the reading sequence."
 msgstr ""
-"Если True и show_order=True, рисует соединяющие линии между соседними "
-"text span-ами, показывая последовательность чтения."
+"При True и show_order=True рисует соединительные линии между "
+"последовательными текстовыми областями, показывая порядок чтения."
 
-#: manuscript.utils.visualization.visualize_page:33
+#: e1edbe01417841c790d54fc9fd03e49e
+#: manuscript.utils.visualization.visualize_page:33 of
 msgid ""
 "If True and show_order=True, display numbered markers on each text span "
 "showing the reading order."
 msgstr ""
-"Если True и show_order=True, отображает нумерованные маркеры на каждом "
-"text span-е, показывая порядок чтения."
+"При True и show_order=True показывает на каждой текстовой области номер её "
+"позиции в порядке чтения."
 
-#: manuscript.utils.visualization.visualize_page:37
+#: 382a489c76b3478db98ba214341f51b5
+#: manuscript.utils.visualization.visualize_page:37 of
 msgid "RGB color for connecting lines between text spans."
-msgstr "RGB-цвет для соединяющих линий между text span-ами."
+msgstr "RGB-цвет соединительных линий между текстовыми областями."
 
-#: manuscript.utils.visualization.visualize_page:40
+#: da73b02f032643f09cb4e448057bc321
+#: manuscript.utils.visualization.visualize_page:40 of
 msgid "Background color for order number boxes."
-msgstr "Цвет фона для блоков с номерами порядка."
+msgstr "Цвет фона меток с номерами порядка чтения."
 
-#: manuscript.utils.visualization.visualize_page:43
+#: 21ce0566e5144cfe968d8cd37fe8c12f
+#: manuscript.utils.visualization.visualize_page:43 of
 msgid "Text color for order numbers."
-msgstr "Цвет текста для номеров порядка."
+msgstr "Цвет текста номеров порядка чтения."
 
-#: manuscript.utils.visualization.visualize_page:46
+#: 0797df64b8a742eab7c5d35124907673
+#: manuscript.utils.visualization.visualize_page:46 of
 msgid ""
 "Maximum size for the longer dimension of the output image. Image will be "
 "resized proportionally if larger. Set to None to keep original size."
 msgstr ""
-"Максимальный размер большей стороны выходного изображения. Если "
-"изображение больше, оно будет пропорционально уменьшено. Установите None, "
-"чтобы сохранить исходный размер."
+"Максимальный размер длинной стороны выходного изображения. Более крупное "
+"изображение уменьшается пропорционально. None сохраняет исходный размер."
 
-#: manuscript.utils.visualization.visualize_page:51
+#: 013ba60d203f46dcbf5970352e8bb7e6
+#: manuscript.utils.visualization.visualize_page:51 of
 msgid ""
 "Visualized image with detection boxes and optional reading order "
 "annotations. When show_order=True, also includes semi-transparent block "
 "boundaries."
 msgstr ""
-"Визуализированное изображение с рамками детекции и, при необходимости, "
-"аннотациями порядка чтения. При show_order=True также включает "
+"Изображение с границами обнаруженных областей и необязательными "
+"обозначениями порядка чтения. При show_order=True также включает "
 "полупрозрачные границы блоков."
 
-#: manuscript.utils.visualization.visualize_page:57
+#: b4613045c03c4861bca035eb728c9c75
+#: manuscript.utils.visualization.visualize_page:57 of
 msgid "Basic visualization without reading order:"
 msgstr "Базовая визуализация без порядка чтения:"
 
-#: manuscript.utils.visualization.visualize_page:67
+#: 53c347b71a484f1387d30d4e69d4222d
+#: manuscript.utils.visualization.visualize_page:67 of
 msgid "Visualization with reading order and block boundaries:"
 msgstr "Визуализация с порядком чтения и границами блоков:"
 
-#: manuscript.utils.visualization.visualize_page:80
+#: 9e2a9e62c0fd4ceb81c2ebca47da04c2
+#: manuscript.utils.visualization.visualize_page:80 of
 msgid "Show connecting lines and numbers between text spans:"
-msgstr "Показ соединяющих линий и номеров между text span-ами."
+msgstr "Отображение соединительных линий и номеров текстовых областей:"
 
-#: manuscript.utils.sorting.organize_page:2
-msgid "Compatibility wrapper around ``SimpleSorting`` layout model."
-msgstr "Совместимый обёртчик вокруг layout-модели ``SimpleSorting``."
+#: de30653f2f9245ebaebb871ddc5481bd manuscript.utils.training.set_seed:2 of
+msgid "Set the Python and PyTorch random seeds; requires PyTorch."
+msgstr "Задаёт случайные зерна Python и PyTorch; требуется PyTorch."
 
-#: manuscript.utils.sorting.organize_page:7
-msgid "Input page with detected text spans."
-msgstr "Входная страница с обнаруженными text span-ами."
-
-#: manuscript.utils.sorting.organize_page:9
-msgid "Maximum number of column split attempts. Default is 10."
-msgstr "Максимальное число попыток разбиения на колонки. По умолчанию 10."
-
-#: manuscript.utils.sorting.organize_page:11
-msgid "If True, segment into columns before line grouping. Default is True."
+#: 188424eef0a74450a98e444fab28dfa5 manuscript.utils.training.set_seed:4 of
+msgid "This helper does not seed NumPy or guarantee deterministic execution."
 msgstr ""
-"Если True, сначала выполняет разбиение на колонки, а затем группировку "
-"по строкам. По умолчанию True."
+"Эта функция не задаёт зерно NumPy и не гарантирует детерминированное "
+"выполнение."
 
-#: manuscript.utils.sorting.organize_page:16
-msgid "Organized page."
-msgstr "Организованная страница."
-
-#: manuscript.utils.sorting.organize_page:45
-msgid "Notes"
-msgstr "Примечания"
-
-#: manuscript.utils.sorting.organize_page:46
-msgid ""
-"This function extracts all words from the input Page (regardless of their"
-" current organization), converts them to bounding boxes, performs column "
-"segmentation and line sorting, then rebuilds a clean Page structure."
-msgstr ""
-"Эта функция извлекает все слова из входного Page (независимо от их "
-"текущей организации), преобразует их в ограничивающие прямоугольники, "
-"выполняет сегментацию на колонки и сортировку строк, а затем заново "
-"строит чистую структуру Page."
-
-#: manuscript.utils.sorting.organize_page:50
-msgid ""
-"The function preserves all Word attributes (polygon, confidence, text, "
-"etc.) while updating the `order` field for reading sequence."
-msgstr ""
-"Функция сохраняет все атрибуты Word (полигон, уверенность, текст и т.д.), "
-"обновляя при этом поле `order`, отвечающее за последовательность чтения."
-
-#: manuscript.utils.training.set_seed:2
-msgid "Set random seed for reproducibility across random, numpy, and PyTorch."
-msgstr ""
-"Установка случайного зерна для воспроизводимости в random, NumPy и "
-"PyTorch."
-
-#: manuscript.utils.training.set_seed:19
+#: 37dab9a680da4d8899c5765b467042a7 manuscript.utils.training.set_seed:20 of
 msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
 msgstr ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
 
 #~ msgid "Alpha for darkening background (0=no darkening, 1=fully dark)."
 #~ msgstr ""
-#~ "Альфа-коэффициент затемнения фона (0 — "
-#~ "без затемнения, 1 — полностью тёмный)."
+#~ "Альфа-коэффициент затемнения фона (0 — без"
+#~ " затемнения, 1 — полностью тёмный)."
 
 #~ msgid "Gaussian blur kernel size (0=no blur, must be odd)."
 #~ msgstr "Размер ядра гауссова размытия (0 — без размытия, должен быть нечётным)."
+
+#~ msgid "Visualize a Page object with detected text spans/blocks."
+#~ msgstr "Визуализация объекта Page с обнаруженными text span-ами и блоками."
+
+#~ msgid ""
+#~ "This function draws all text spans "
+#~ "from the Page structure on the image,"
+#~ " optionally showing reading order with "
+#~ "numbered markers and connecting lines. When"
+#~ " show_order=True, it also visualizes blocks"
+#~ " with semi-transparent bounding boxes, "
+#~ "each block having a distinct color."
+#~ msgstr ""
+#~ "Эта функция рисует все text span-ы из"
+#~ " структуры Page на изображении, при "
+#~ "необходимости отображая порядок чтения с "
+#~ "помощью нумерованных маркеров и соединяющих "
+#~ "линий. При show_order=True также визуализируются"
+#~ " блоки с полупрозрачными ограничивающими "
+#~ "рамками, при этом каждый блок имеет "
+#~ "свой цвет."
+
+#~ msgid ""
+#~ "Input image. Can be: - Path to "
+#~ "image file (str or Path) - supports"
+#~ " Unicode paths - RGB numpy array "
+#~ "with shape (H, W, 3) - PIL "
+#~ "Image object"
+#~ msgstr ""
+#~ "Входное изображение. Может быть:  - путь"
+#~ " к файлу изображения (str или Path) "
+#~ "— поддерживаются Unicode-пути  - RGB-массив "
+#~ "NumPy с формой (H, W, 3)  - "
+#~ "объект PIL Image"
+
+#~ msgid "Page object from manuscript.data containing detected blocks/text spans."
+#~ msgstr ""
+#~ "Объект Page из manuscript.data, содержащий "
+#~ "обнаруженные блоки и text span-ы."
+
+#~ msgid "RGB color for text span boundaries."
+#~ msgstr "RGB-цвет для границ text span-ов."
+
+#~ msgid "Line thickness for text span boundaries."
+#~ msgstr "Толщина линий для границ text span-ов."
+
+#~ msgid ""
+#~ "If True, colors different text lines "
+#~ "with different colors and shows semi-"
+#~ "transparent block boundaries with different "
+#~ "colors per block."
+#~ msgstr ""
+#~ "Если True, раскрашивает разные текстовые "
+#~ "строки в разные цвета и показывает "
+#~ "полупрозрачные границы блоков с отдельным "
+#~ "цветом для каждого блока."
+
+#~ msgid ""
+#~ "If True and show_order=True, draw "
+#~ "connecting lines between consecutive text "
+#~ "spans showing the reading sequence."
+#~ msgstr ""
+#~ "Если True и show_order=True, рисует "
+#~ "соединяющие линии между соседними text "
+#~ "span-ами, показывая последовательность чтения."
+
+#~ msgid ""
+#~ "If True and show_order=True, display "
+#~ "numbered markers on each text span "
+#~ "showing the reading order."
+#~ msgstr ""
+#~ "Если True и show_order=True, отображает "
+#~ "нумерованные маркеры на каждом text span-е,"
+#~ " показывая порядок чтения."
+
+#~ msgid "RGB color for connecting lines between text spans."
+#~ msgstr "RGB-цвет для соединяющих линий между text span-ами."
+
+#~ msgid "Background color for order number boxes."
+#~ msgstr "Цвет фона для блоков с номерами порядка."
+
+#~ msgid "Text color for order numbers."
+#~ msgstr "Цвет текста для номеров порядка."
+
+#~ msgid ""
+#~ "Maximum size for the longer dimension "
+#~ "of the output image. Image will be"
+#~ " resized proportionally if larger. Set "
+#~ "to None to keep original size."
+#~ msgstr ""
+#~ "Максимальный размер большей стороны выходного "
+#~ "изображения. Если изображение больше, оно "
+#~ "будет пропорционально уменьшено. Установите None,"
+#~ " чтобы сохранить исходный размер."
+
+#~ msgid ""
+#~ "Visualized image with detection boxes and"
+#~ " optional reading order annotations. When "
+#~ "show_order=True, also includes semi-transparent"
+#~ " block boundaries."
+#~ msgstr ""
+#~ "Визуализированное изображение с рамками детекции"
+#~ " и, при необходимости, аннотациями порядка "
+#~ "чтения. При show_order=True также включает "
+#~ "полупрозрачные границы блоков."
+
+#~ msgid "Basic visualization without reading order:"
+#~ msgstr "Базовая визуализация без порядка чтения:"
+
+#~ msgid "Visualization with reading order and block boundaries:"
+#~ msgstr "Визуализация с порядком чтения и границами блоков:"
+
+#~ msgid "Show connecting lines and numbers between text spans:"
+#~ msgstr "Показ соединяющих линий и номеров между text span-ами."
+
+#~ msgid "Notes"
+#~ msgstr "Примечания"
+
+#~ msgid ""
+#~ "This function extracts all words from "
+#~ "the input Page (regardless of their "
+#~ "current organization), converts them to "
+#~ "bounding boxes, performs column segmentation "
+#~ "and line sorting, then rebuilds a "
+#~ "clean Page structure."
+#~ msgstr ""
+#~ "Эта функция извлекает все слова из "
+#~ "входного Page (независимо от их текущей "
+#~ "организации), преобразует их в ограничивающие "
+#~ "прямоугольники, выполняет сегментацию на колонки"
+#~ " и сортировку строк, а затем заново "
+#~ "строит чистую структуру Page."
+
+#~ msgid ""
+#~ "The function preserves all Word attributes"
+#~ " (polygon, confidence, text, etc.) while "
+#~ "updating the `order` field for reading "
+#~ "sequence."
+#~ msgstr ""
+#~ "Функция сохраняет все атрибуты Word "
+#~ "(полигон, уверенность, текст и т.д.), "
+#~ "обновляя при этом поле `order`, отвечающее"
+#~ " за последовательность чтения."
+
+#~ msgid "Set random seed for reproducibility across random, numpy, and PyTorch."
+#~ msgstr ""
+#~ "Установка случайного зерна для воспроизводимости"
+#~ " в random, NumPy и PyTorch."
+
+#~ msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
+#~ msgstr ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"

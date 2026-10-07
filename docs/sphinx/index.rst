@@ -18,6 +18,8 @@ computational efficiency under limited resources.
 
    getting_started
    model_zoo
+   model_registry
+   release_notes
    pipeline_usage
    structure
    api/index

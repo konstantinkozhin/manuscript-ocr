@@ -103,7 +103,10 @@ class TestBaseArtifactModelRuntimeEdges:
             return handles[len(added_dirs) - 1]
 
         with patch.object(base_module.sys, "prefix", str(tmp_path)):
-            with patch.object(base_module.os, "name", "nt"):
+            # Keep filesystem paths native while exercising the Windows branch.
+            with patch.object(base_module.os, "name", "nt"), patch.object(
+                base_module, "Path", type(tmp_path)
+            ):
                 with patch.object(
                     base_module.os,
                     "add_dll_directory",

@@ -1,0 +1,172 @@
+# Russian translations for manuscript-ocr documentation.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr
+# package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-06 15:49+0700\n"
+"PO-Revision-Date: 2026-10-06 00:00+0700\n"
+"Last-Translator: OpenAI Codex\n"
+"Language: ru\n"
+"Language-Team: ru\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: c2b61ba4ad814dc08514024cd84eb629 model_registry.rst:2
+msgid "Model Registry"
+msgstr "Реестр моделей"
+
+#: 3c32e247e2e940da95ed4ff6b2b5b456 model_registry.rst:4
+msgid ""
+"Version 0.1.13 resolves model presets through a shared registry. Local "
+"paths, HTTP/HTTPS URLs, GitHub release URLs and Google Drive identifiers "
+"remain supported. Importing ``manuscript.models`` does not make network "
+"requests."
+msgstr ""
+"Версия 0.1.13 разрешает имена пресетов через общий реестр. Локальные пути, "
+"HTTP/HTTPS URL, ссылки на релизы GitHub и идентификаторы Google Drive "
+"по-прежнему поддерживаются. Импорт ``manuscript.models`` не выполняет "
+"сетевые запросы."
+
+#: d1845f75fd234b129e048c35e3c7fcbe model_registry.rst:9
+msgid "Sources and refresh"
+msgstr "Источники и обновление"
+
+#: 359c4b060ff24ef4ae5ab4f1c8d64c6f model_registry.rst:11
+msgid ""
+"The official registry is read from ``main`` on GitHub, with GitVerse as a "
+"mirror. The package includes a fallback snapshot. The cached catalog is "
+"refreshed when missing, when a requested key is unknown, or once after all "
+"artifact mirrors fail. There is no time-based refresh or background polling."
+" Invalid responses do not replace a valid cached catalog."
+msgstr ""
+"Официальный реестр читается из ``main`` на GitHub, GitVerse используется как"
+" зеркало. Пакет содержит резервный снимок. Кэшированный каталог обновляется "
+"при его отсутствии, при неизвестном запрошенном ключе или один раз после "
+"отказа всех зеркал артефакта. Обновления по времени и фонового опроса нет. "
+"Некорректные ответы не заменяют исправный кэшированный каталог."
+
+#: 3bedcdd833eb498e98656334b6d7d455 model_registry.rst:27
+msgid ""
+"``trba_base_g0`` is a checkpoint-only preset; it has no published ONNX "
+"weights. Download progress is displayed for artifacts that need downloading."
+msgstr ""
+"``trba_base_g0`` — пресет только с чекпоинтом; опубликованных ONNX-весов у "
+"него нет. Для артефактов, требующих скачивания, отображается прогресс "
+"загрузки."
+
+#: 03e8fc0d6bbd490582890d8e6412130a model_registry.rst:30
+msgid ""
+"Custom catalogs supplement the official catalog. With ``priority=True``, "
+"their entries override official keys: use this only for a source whose "
+"metadata and artifact URLs you trust. ``persist=True`` retains the source "
+"for later processes. Call ``refresh()`` to activate changes to the source "
+"configuration. Unavailable custom sources retain their last valid cached "
+"catalog."
+msgstr ""
+"Пользовательские каталоги дополняют официальный. При ``priority=True`` их "
+"записи переопределяют официальные ключи: используйте это только для "
+"источника, чьим метаданным и URL артефактов вы доверяете. ``persist=True`` "
+"сохраняет источник для последующих процессов. Вызовите ``refresh()``, чтобы "
+"применить изменение конфигурации источников. При недоступности "
+"пользовательского источника сохраняется его последний исправный кэшированный"
+" каталог."
+
+#: df3e041a698f4c23b28b3022554f95d6 model_registry.rst:42
+msgid "Storage and integrity"
+msgstr "Хранение и целостность"
+
+#: d392b80a2b1847a08302b682884c4e28 model_registry.rst:44
+msgid ""
+"The default root is ``~/.manuscript``; override it with ``MANUSCRIPT_HOME``."
+" Each bundle lives in ``models/<model-key>/`` with its ``model.json`` "
+"manifest, weights, supporting files and a shared ``LICENSE.txt`` when "
+"declared. Catalogs and persistent source settings live under "
+"``registries/``."
+msgstr ""
+"Корень по умолчанию — ``~/.manuscript``; его можно переопределить через "
+"``MANUSCRIPT_HOME``. Каждый комплект хранится в ``models/<model-key>/`` "
+"вместе с манифестом ``model.json``, весами, вспомогательными файлами и общей"
+" ``LICENSE.txt``, если она объявлена. Каталоги реестра и сохранённые "
+"настройки источников находятся в ``registries/``."
+
+#: 1899041a02584c52925386488a483a68 model_registry.rst:49
+msgid ""
+"Required artifacts are downloaded together. Checkpoints and lexicons may be "
+"optional; CharLM requests its lexicon when needed. A declared license is "
+"fetched alongside requested artifacts. Files are verified for declared size "
+"and SHA-256 before atomic replacement. A ``null`` size or hash disables that"
+" particular check. Old flat files under ``weights/`` are reused only when "
+"their SHA-256 matches; the old files are retained."
+msgstr ""
+"Обязательные артефакты загружаются вместе. Чекпоинты и словари могут быть "
+"необязательными; CharLM запрашивает словарь при необходимости. Объявленная "
+"лицензия скачивается вместе с запрошенными артефактами. До атомарной замены "
+"файлы проверяются по объявленным размеру и SHA-256. ``null`` для размера или"
+" хеша отключает соответствующую проверку. Старые файлы в ``weights/`` "
+"используются повторно только при совпадении SHA-256; исходные файлы "
+"сохраняются."
+
+#: ec97fd8e8b9d4f7f81d44f0208f1aadb model_registry.rst:56
+msgid ""
+"``list_installed()`` includes partial bundles. ``verify()`` returns checks "
+"for required files, a declared license and optional files already present. "
+"``is_installed()`` is true only if that nonempty set of checks passes. "
+"``remove()`` deletes the bundle identified by its key."
+msgstr ""
+"``list_installed()`` включает частично скачанные комплекты. ``verify()`` "
+"проверяет обязательные файлы, объявленную лицензию и уже имеющиеся "
+"необязательные файлы. ``is_installed()`` возвращает true только при успешном"
+" прохождении этого непустого набора проверок. ``remove()`` удаляет комплект "
+"по его ключу."
+
+#: 498d89c02b534d179b5b875efa8395b6 model_registry.rst:71
+msgid "Compatibility and catalog metadata"
+msgstr "Совместимость и метаданные каталога"
+
+#: f8a6f5dca5a841bdb939a6b832404c29 model_registry.rst:73
+msgid ""
+"``model_classes`` restricts the public class that may load a preset. "
+"Compatibility metadata accepts an exact ``library_version`` and inclusive "
+"``library_version_min`` / ``library_version_max`` bounds. A mismatch emits a"
+" ``RuntimeWarning`` and execution continues. Older official models declare "
+"0.1.10–0.1.13; legacy exact entries declaring 0.1.13 also accept that range."
+" This describes tested compatibility, not a guarantee for untested versions."
+msgstr ""
+"``model_classes`` ограничивает публичный класс, который может загрузить "
+"пресет. Метаданные совместимости поддерживают точную ``library_version`` и "
+"включительные границы ``library_version_min`` / ``library_version_max``. При"
+" несовпадении выдаётся ``RuntimeWarning``, выполнение продолжается. Старые "
+"официальные модели объявляют 0.1.10–0.1.13; legacy-записи с точной версией "
+"0.1.13 также принимают этот диапазон. Это описание проверенной "
+"совместимости, а не гарантия для непроверенных версий."
+
+#: 7312dcf1a0c24f93991044175f3ac952 model_registry.rst:80
+msgid ""
+"Catalog schema version is ``1``. Each entry includes ``description``, a "
+"shared model ``license`` and ``artifacts``. An artifact specifies "
+"``filename``, ``format``, ``size``, ``sha256``, ordered mirror ``urls`` and "
+"optionally ``required`` (true by default). Mirrors must serve identical "
+"bytes. Unknown metadata uses JSON ``null``. Publish a new model under a new "
+"key; update URLs to move existing artifacts. Do not infer a model license "
+"from the library license."
+msgstr ""
+"Версия схемы каталога — ``1``. Каждая запись содержит ``description``, общую"
+" лицензию модели ``license`` и ``artifacts``. Артефакт задаёт ``filename``, "
+"``format``, ``size``, ``sha256``, упорядоченные зеркала ``urls`` и "
+"необязательный признак ``required`` (по умолчанию true). Зеркала должны "
+"отдавать одинаковые байты. Неизвестные метаданные обозначаются JSON "
+"``null``. Новую модель публикуйте под новым ключом; для переноса "
+"существующих артефактов обновите URL. Не выводите лицензию модели из "
+"лицензии библиотеки."
+
+#: f6663a47cb504715b8593adb75b17908 model_registry.rst:87
+msgid "See :doc:`api/models` for function signatures."
+msgstr "Сигнатуры функций приведены в :doc:`api/models`."

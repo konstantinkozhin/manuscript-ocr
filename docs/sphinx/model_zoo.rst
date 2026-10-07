@@ -154,9 +154,9 @@ Architecture Sources
 --------------------
 
 - `EAST: An Efficient and Accurate Scene Text Detector <https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_
-  (Zhou et al., CVPR 2017) — академическая основа для семейства детекторов ``EAST``.
-  Реализация в manuscript-ocr основана на оригинальной архитектуре, но процедура обучения
-  существенно переработана. Предобученные веса получены авторами проекта.
+  (Zhou et al., CVPR 2017) is the academic basis of the ``EAST`` detector family.
+  The implementation follows the original architecture with a substantially reworked
+  training procedure. Pretrained weights were produced by the project authors.
 - `What Is Wrong With Scene Text Recognition Model Comparisons? Dataset and Model Analysis <https://arxiv.org/abs/1904.01906>`_
-  — архитектурная основа для семейства ``TRBA`` (TPS-ResNet-BiLSTM-Attn).
-  Распознаватели в manuscript-ocr адаптированы под задачи проекта.
+  is the architectural basis of the ``TRBA`` family (TPS-ResNet-BiLSTM-Attn).
+  Recognizers are adapted to the tasks of manuscript-ocr.

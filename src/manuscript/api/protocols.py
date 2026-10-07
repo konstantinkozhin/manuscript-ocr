@@ -1,11 +1,11 @@
-from typing import Any, Optional, Protocol, runtime_checkable
+from typing import Any, Dict, Optional, Protocol, Union, runtime_checkable
 
 from manuscript.data import Page
 
 
 @runtime_checkable
 class DetectorProtocol(Protocol):
-    def predict(self, image: Any, **kwargs: Any) -> Page: ...
+    def predict(self, image: Any, **kwargs: Any) -> Union[Page, Dict[str, Any]]: ...
 
 
 @runtime_checkable

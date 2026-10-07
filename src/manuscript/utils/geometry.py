@@ -9,8 +9,7 @@ def _box_iou(
     box2: Union[Tuple[float, float, float, float], np.ndarray]
 ) -> float:
     """
-    Вычисляет Intersection over Union (IoU) для двух ограничивающих прямоугольников,
-    выровненных по осям.
+    Calculate Intersection over Union (IoU) for two axis-aligned bounding boxes.
     """
     x1_min, y1_min, x1_max, y1_max = box1
     x2_min, y2_min, x2_max, y2_max = box2
@@ -40,23 +39,22 @@ def polygon_to_bbox(
     pad: float = 0.0,
 ) -> Optional[Tuple[int, int, int, int]]:
     """
-    Преобразует полигон с произвольным числом вершин в обрезанный ограничивающий
-    прямоугольник, выровненный по осям.
+    Convert a polygon with any number of vertices to a clipped axis-aligned
+    bounding box.
 
-    Параметры
+    Parameters
     ----------
     polygon : array-like of shape (N, 2)
-        Вершины полигона в координатах изображения.
+        Polygon vertices in image coordinates.
     image_shape : tuple, optional
-        Форма исходного изображения для обрезки.
+        Source image shape used for clipping.
     pad : float, optional
-        Дополнительный отступ в пикселях вокруг полигона. По умолчанию ``0``.
+        Extra padding in pixels around the polygon. Default is ``0``.
 
-    Возвращает
+    Returns
     -------
     tuple or None
-        Ограничивающий прямоугольник в виде ``(x1, y1, x2, y2)`` или ``None``,
-        если результат недопустим.
+        Bounding box as ``(x1, y1, x2, y2)`` or ``None`` if invalid.
     """
     pts = np.asarray(polygon, dtype=np.float32)
     if pts.ndim != 2 or pts.shape[1] != 2 or pts.size == 0:
@@ -96,21 +94,21 @@ def crop_axis_aligned(
     pad: float = 0.0,
 ) -> Optional[np.ndarray]:
     """
-    Вырезает выровненный по осям прямоугольник, охватывающий полигон.
+    Crop an axis-aligned rectangle covering the polygon.
 
-    Параметры
+    Parameters
     ----------
     image : numpy.ndarray
-        Исходное изображение.
+        Source image.
     polygon : array-like of shape (N, 2)
-        Вершины полигона в координатах изображения.
+        Polygon vertices in image coordinates.
     pad : float, optional
-        Дополнительный отступ в пикселях. По умолчанию ``0``.
+        Extra padding in pixels around the polygon. Default is ``0``.
 
-    Возвращает
+    Returns
     -------
     numpy.ndarray or None
-        Вырезанный фрагмент изображения или ``None``, если bbox недопустим.
+        Image crop, or ``None`` if the bounding box is invalid.
     """
     bbox = polygon_to_bbox(polygon, image_shape=image.shape, pad=pad)
     if bbox is None:
@@ -130,27 +128,25 @@ def crop_polygon_mask(
     background: int = 255,
 ) -> Optional[np.ndarray]:
     """
-    Вырезает ограничивающий прямоугольник полигона и маскирует пиксели за
-    пределами полигона.
+    Crop the polygon bounding box and mask pixels outside the polygon.
 
-    Работает с произвольными полигонами формы ``(N, 2)``.
+    Works with arbitrary polygons of shape ``(N, 2)``.
 
-    Параметры
+    Parameters
     ----------
     image : numpy.ndarray
-        Исходное изображение.
+        Source image.
     polygon : array-like of shape (N, 2)
-        Вершины полигона в координатах изображения.
+        Polygon vertices in image coordinates.
     pad : float, optional
-        Дополнительный отступ в пикселях. По умолчанию ``0``.
+        Extra padding in pixels around the polygon. Default is ``0``.
     background : int, optional
-        Значение пикселей фона вне полигона. По умолчанию ``255``.
+        Background pixel value outside the polygon. Default is ``255``.
 
-    Возвращает
+    Returns
     -------
     numpy.ndarray or None
-        Вырезанный фрагмент с замаскированными пикселями или ``None``,
-        если bbox недопустим.
+        Masked image crop, or ``None`` if the bounding box is invalid.
     """
     pts = np.asarray(polygon, dtype=np.float32)
     bbox = polygon_to_bbox(pts, image_shape=image.shape, pad=pad)
@@ -181,23 +177,22 @@ def order_quad_points(
     points: Union[np.ndarray, Tuple[Tuple[float, float], ...]]
 ) -> np.ndarray:
     """
-    Упорядочивает ровно 4 точки полигона в порядке: верхний левый, верхний правый,
-    нижний правый, нижний левый.
+    Order exactly 4 polygon points as top-left, top-right, bottom-right, bottom-left.
 
-    Параметры
+    Parameters
     ----------
     points : array-like of shape (4, 2)
-        Четыре точки полигона в произвольном порядке.
+        Quadrilateral vertices.
 
-    Возвращает
+    Returns
     -------
-    numpy.ndarray of shape (4, 2)
-        Точки, упорядоченные по часовой стрелке, начиная с верхнего левого угла.
+    numpy.ndarray
+        Ordered vertices as float32.
 
     Raises
     ------
     ValueError
-        Если передано не ровно 4 точки.
+        If exactly four points are not provided.
     """
     pts = np.asarray(points, dtype=np.float32)
     if pts.shape != (4, 2):
@@ -221,30 +216,24 @@ def warp_quad(
     background: int = 255,
 ) -> Optional[np.ndarray]:
     """
-    Применяет перспективное преобразование к четырёхугольному полигону и возвращает
-    выпрямленный кроп.
+    Perspective-warp a quadrilateral polygon into a rectified crop.
 
-    Функция намеренно предназначена только для четырёхугольников. Для полигонов с
-    другим числом вершин возвращает ``None``, чтобы вызывающий код мог выбрать
-    запасную стратегию.
+    This helper is intentionally quad-specific. For non-quad polygons it returns
+    ``None`` so callers may choose a fallback strategy.
 
-    Параметры
+    Parameters
     ----------
     image : numpy.ndarray
-        Исходное изображение.
+        Source image.
     polygon : array-like of shape (4, 2)
-        Четыре вершины четырёхугольника.
-    output_size : tuple of (int, int), optional
-        Целевой размер выходного кропа ``(ширина, высота)``. Если ``None``,
-        размер вычисляется автоматически на основе длин сторон полигона.
-    background : int, optional
-        Значение пикселей фона. По умолчанию ``255``.
+        Quadrilateral vertices in image coordinates.
+    output_size : tuple of int, optional
+        Crop size ``(width, height)``. If ``None``, estimate it from polygon edges.
 
-    Возвращает
+    Returns
     -------
     numpy.ndarray or None
-        Выпрямленный кроп или ``None``, если полигон не является четырёхугольником
-        или результат пустой.
+        Rectified image crop, or ``None`` for an invalid quadrilateral.
     """
     pts = np.asarray(polygon, dtype=np.float32)
     if pts.shape != (4, 2):
@@ -287,26 +276,20 @@ def merge_polygons(
     method: str = "bbox",
 ) -> Optional[List[Tuple[float, float]]]:
     """
-    Объединяет несколько полигонов в один.
+    Merge multiple polygons into a single polygon.
 
-    Параметры
+    Parameters
     ----------
     polygons : sequence of array-like polygons
-        Входные полигоны формы ``(N, 2)``.
+        Input polygons with shape ``(N, 2)``.
     method : {"bbox", "convex_hull"}, optional
-        Стратегия объединения. ``"bbox"`` возвращает выровненный по осям прямоугольник,
-        охватывающий все точки. ``"convex_hull"`` возвращает выпуклую оболочку над всеми
-        точками.
+        Merge strategy. ``"bbox"`` returns an axis-aligned rectangle covering
+        all points. ``"convex_hull"`` returns a convex hull over all points.
 
-    Возвращает
+    Returns
     -------
     list of tuple or None
-        Объединённый полигон или ``None``, если ``polygons`` пустой.
-
-    Raises
-    ------
-    ValueError
-        Если какой-либо полигон имеет недопустимую форму или передан неизвестный метод.
+        Merged polygon, or ``None`` when ``polygons`` is empty.
     """
     if not polygons:
         return None
@@ -337,3 +320,65 @@ def merge_polygons(
         return [(float(x), float(y)) for x, y in hull.reshape(-1, 2)]
 
     raise ValueError(f"method must be 'bbox' or 'convex_hull', got: {method}")
+
+
+def boxes_to_polygons(boxes: np.ndarray) -> np.ndarray:
+    """Convert [N, 4+] xyxy boxes to [N, 4, 2] float32 polygons."""
+    if len(boxes) == 0:
+        return np.zeros((0, 4, 2), dtype=np.float32)
+
+    polygons = np.zeros((len(boxes), 4, 2), dtype=np.float32)
+    polygons[:, 0, 0] = boxes[:, 0]
+    polygons[:, 0, 1] = boxes[:, 1]
+    polygons[:, 1, 0] = boxes[:, 2]
+    polygons[:, 1, 1] = boxes[:, 1]
+    polygons[:, 2, 0] = boxes[:, 2]
+    polygons[:, 2, 1] = boxes[:, 3]
+    polygons[:, 3, 0] = boxes[:, 0]
+    polygons[:, 3, 1] = boxes[:, 3]
+    return polygons
+
+
+def clip_polygons(
+    polygons: np.ndarray,
+    image_hw: Tuple[int, int],
+) -> np.ndarray:
+    """Clamp polygon vertices to image bounds without changing the input."""
+    if len(polygons) == 0:
+        return polygons
+
+    clipped = polygons.copy()
+    image_h, image_w = image_hw
+    clipped[:, :, 0] = np.clip(clipped[:, :, 0], 0, image_w)
+    clipped[:, :, 1] = np.clip(clipped[:, :, 1], 0, image_h)
+    return clipped
+
+
+def polygon_areas(polygons: np.ndarray) -> np.ndarray:
+    """Compute absolute shoelace areas for a batch of polygons."""
+    if len(polygons) == 0:
+        return np.zeros((0,), dtype=np.float32)
+
+    shifted = np.roll(polygons, shift=-1, axis=1)
+    cross = polygons[:, :, 0] * shifted[:, :, 1] - shifted[:, :, 0] * polygons[:, :, 1]
+    return 0.5 * np.abs(cross.sum(axis=1)).astype(np.float32)
+
+
+def box_intersection_area(box_a: np.ndarray, box_b: np.ndarray) -> float:
+    """Return intersection area of two xyxy boxes."""
+    x1 = max(float(box_a[0]), float(box_b[0]))
+    y1 = max(float(box_a[1]), float(box_b[1]))
+    x2 = min(float(box_a[2]), float(box_b[2]))
+    y2 = min(float(box_a[3]), float(box_b[3]))
+    return max(0.0, x2 - x1) * max(0.0, y2 - y1)
+
+
+def polygons_to_boxes(polygons: np.ndarray) -> np.ndarray:
+    """Return float32 xyxy bounds for [N, vertices, 2] polygons.
+
+    Unlike polygon_to_bbox, this batch operation preserves fractional
+    coordinates and does not apply crop rounding, padding or clipping.
+    """
+    if len(polygons) == 0:
+        return np.zeros((0, 4), dtype=np.float32)
+    return np.column_stack([polygons.min(axis=1), polygons.max(axis=1)]).astype(np.float32)

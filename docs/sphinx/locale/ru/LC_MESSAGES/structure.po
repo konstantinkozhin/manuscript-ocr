@@ -1,7 +1,14 @@
+# Russian translations for manuscript-ocr documentation.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr
+# package.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr 0.1.11\n"
-"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-06 15:49+0700\n"
+"PO-Revision-Date: 2026-10-06 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
 "Language-Team: ru\n"
@@ -10,27 +17,40 @@ msgstr ""
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
 
+#: 65883b9eae814e8d8de20694c57e7676 structure.rst:2
 msgid "Library Structure"
 msgstr "Структура библиотеки"
 
+#: 4d3b77ef54074052a689b213f5bf5232 structure.rst:34
 msgid "Overview"
 msgstr "Обзор"
 
+#: 4f2308104b40472ba387cf1fcad024a2 structure.rst:36
 msgid "``Pipeline`` orchestrates OCR stages."
 msgstr "``Pipeline`` координирует этапы OCR."
 
+#: 7c78bcf85d3942f69bef111b40bab54e structure.rst:37
 msgid "``detectors`` provide detection models such as ``YOLO`` and ``EAST``."
 msgstr "``detectors`` предоставляют модели детекции, такие как ``YOLO`` и ``EAST``."
 
+#: ecc31184e2c947098255321f8352e812 structure.rst:38
 msgid "``layouts`` provide ordering/grouping models (for example ``SimpleSorting``)."
-msgstr "``layouts`` предоставляют модели упорядочивания и группировки, например ``SimpleSorting``."
+msgstr ""
+"``layouts`` предоставляют модели упорядочивания и группировки, например "
+"``SimpleSorting``."
 
+#: a8a89692951e48b49a0c993919721df5 structure.rst:39
 msgid "``recognizers`` provide text recognition models."
 msgstr "``recognizers`` предоставляют модели распознавания текста."
 
+#: 189f31b066074f5abee7e37ae1070220 structure.rst:40
 msgid "``correctors`` provide text post-processing models."
 msgstr "``correctors`` предоставляют модели постобработки текста."
 
+#: 8b183b1171424571a4708e4dd0ba75bf structure.rst:41
 msgid "``utils.organize_page`` remains as a compatibility wrapper over layout logic."
-msgstr "``utils.organize_page`` остаётся совместимым обёрточным вызовом над layout-логикой."
+msgstr ""
+"``utils.organize_page`` остаётся совместимым обёрточным вызовом над "
+"layout-логикой."

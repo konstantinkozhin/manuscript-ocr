@@ -1,70 +1,61 @@
-# SOME DESCRIPTIVE TITLE.
+# Russian translations for manuscript-ocr documentation.
 # Copyright (C) 2026, Konstantin Kozhin
 # This file is distributed under the same license as the manuscript-ocr
 # package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr 0.1.11\n"
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-05 19:57+0700\n"
-"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"POT-Creation-Date: 2026-10-06 16:00+0700\n"
+"PO-Revision-Date: 2026-10-06 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
-"Language-Team: ru\n"
 "Language: ru\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Language-Team: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:2
-#: 9fea74bfee3e4e95a80ce726a8631f7c
+#: 9b1b74934208463fb852e0815530153c api/data.rst:2
 msgid "Data Structures"
 msgstr "Структуры данных"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:4
-#: 9123f2b8764542349c6534b1a2e4dadc
+#: api/data.rst:4 d1115d2ac53d4083ab5bc27f801972b2
 msgid "Core data structures for representing OCR results."
 msgstr "Основные структуры данных для представления результатов OCR."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:7
-#: 4cc4f370201f4b78b567498ddc2a6374
+#: ae7d4ee17a254ec6a53484e6abf94a74 api/data.rst:7
 msgid "Data Model"
 msgstr "Модель данных"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:9
-#: d0ec79e792cc4ee1aa035c36d61f7678
+#: api/data.rst:8 f06c0a2b8e9a4946a6b80384c1b7f829
 msgid "The following diagram shows the relationships between data structures:"
 msgstr "Следующая диаграмма показывает взаимосвязи между структурами данных:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:41
-#: 8ec1cbcf1a0c43e5b078aea2eda1457c
+#: 11d7d5e5468c4e1597a981708a4a726a api/data.rst:40
 msgid "Compatibility"
 msgstr "Совместимость"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:43
-#: 02a32a191bcd46ab842d2cf3ec05039e
+#: api/data.rst:41 fd5875476ca74f54b4de046a1a7ded2b
 msgid ""
 "The canonical names in ``v0_1_11`` are ``TextSpan`` and ``text_spans``. For "
 "code and services that still target ``v0_1_10``, ``Word`` and ``words`` "
 "remain available as compatibility aliases on import, validation, and Python "
 "attribute access."
 msgstr ""
-"Канонические имена в ``v0_1_11`` — ``TextSpan`` и ``text_spans``. Для кода и "
-"сервисов, которые всё ещё ориентируются на ``v0_1_10``, ``Word`` и ``words`` "
-"остаются доступными как алиасы совместимости при импорте, валидации и "
-"доступе к атрибутам из Python."
+"Канонические имена в ``v0_1_11`` — ``TextSpan`` и ``text_spans``. Для кода и"
+" сервисов, которые всё ещё ориентируются на ``v0_1_10``, ``Word`` и "
+"``words`` остаются доступными как алиасы совместимости при импорте, "
+"валидации и доступе к атрибутам из Python."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:48
-#: 81b06c4d6468476081a9942fcfcf0ab1
+#: a0bce7e7f2e84105b9f0e1b38336d96e api/data.rst:46
 msgid "When exporting OCR results, choose the schema explicitly:"
 msgstr "При экспорте результатов OCR указывайте схему явно:"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:55
-#: 1d3c8a464dc342e6a944cc8959ee1854
+#: 1150035c92594b8f9141e09893447af6 api/data.rst:53
 msgid ""
 "Use ``\"v0_1_10\"`` only for legacy JSON consumers. New integrations should "
 "prefer ``\"v0_1_11\"``."
@@ -72,65 +63,51 @@ msgstr ""
 "Используйте ``\"v0_1_10\"`` только для потребителей старого JSON-контракта. "
 "Для новых интеграций предпочтительнее ``\"v0_1_11\"``."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:59
-#: f7e93d52479c44e09dd444118542a572
+#: 540480792af9400eb25a0a1b3abecc92 api/data.rst:57
 msgid "Module Reference"
 msgstr "Справочник модуля"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data:1 8a1263284f464f10a7917776817085a0
+#: c8480834c82b4bc483ad36679ab91c3d manuscript.data:1 of
 msgid "Data structures for manuscript OCR."
 msgstr "Структуры данных для OCR рукописей."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data:3 182421dc98d348cfa371dc32427deefa
+#: 7958d3f0c5fa4add89967a43f425b854 manuscript.data:3 of
 msgid ""
-"This package contains the core data structures used to represent OCR results "
-"throughout the manuscript-ocr library."
+"This package contains the core data structures used to represent OCR results"
+" throughout the manuscript-ocr library."
 msgstr ""
 "Этот пакет содержит основные структуры данных, используемые для "
 "представления результатов OCR во всей библиотеке manuscript-ocr."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:1 manuscript.data.structures.Line:1
-#: manuscript.data.structures.Page:1 manuscript.data.structures.TextSpan:1
-#: 225785ccb9e6477b914a1e2788555a65 f47ca2f1c5224a7692b1f79880cd8b48
-#: dddb24e0530342e384302d3d5f47ff86 6c8cde59135e45a2ba50d266a1768172
+#: 68d8247891a84ca2a041aeb546961cbe 8a47e08442764ea8af2134d2dca22a01
+#: manuscript.data.structures.Block:1 manuscript.data.structures.Line:1
+#: manuscript.data.structures.Page:1 manuscript.data.structures.TextSpan:1 of
 msgid "Bases: :py:class:`~pydantic.BaseModel`"
 msgstr "Базовый класс: :py:class:`~pydantic.BaseModel`"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:2 bc66626417d44856bc18feda466d00de
+#: dbd0d62525b04a87b02df6ef8ad7d3bb manuscript.data.structures.TextSpan:2 of
 msgid "A single detected or recognized text span."
 msgstr "Один обнаруженный или распознанный текстовый фрагмент."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:4 9f572c88edea4838958c21559fa88bd5
+#: 1dd9cf7f509b45bdbdaf4f8972de65be manuscript.data.structures.TextSpan:4 of
 msgid ""
-"A text span is the smallest OCR region in the pipeline. It may correspond to "
-"a word, a whole text line, or any other contiguous text segment returned by "
-"a detector."
+"A text span is the smallest OCR region in the pipeline. It may correspond to"
+" a word, a whole text line, or any other contiguous text segment returned by"
+" a detector."
 msgstr ""
-"TextSpan — это наименьшая OCR-область в конвейере. Она может соответствовать "
-"слову, целой текстовой строке или любому другому непрерывному текстовому "
+"TextSpan — это наименьшая OCR-область в конвейере. Она может соответствовать"
+" слову, целой текстовой строке или любому другому непрерывному текстовому "
 "сегменту, возвращённому детектором."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:0
-#: 1d80c5b2c0554aecb2e988686122a07f d2b49e5df2ea4a73ab78778adc37107b
-#: 0f76158c219644188f40e83c4a8a114f 48282423a1b24b6ab831a8009f532049
-#: 66774ebfed7344f6a4a9a5b0e6df0344 9cfe9b06fb72405185f63a96d2a05ef6
+#: 9acc474658e149d9909040d6e76404a4 api/data.rst c63d815dcbe848dab341ce573a4e765c
 msgid "Parameters"
 msgstr "Параметры"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:0
-#: c4d048b1cb9848ee96d6068457c62e0b ee2a2bdd6a1247808f2b302d7a458289
-#: 8a5a056f514d4d2fbc30f83589e50541 3a08aebed0364c71af055322a7344fe5
-#: fdb4a784dedb42a4809f4672fbb56ae0 13abbd3d97134d328bf5ffda0f08f442
+#: 501d287ceb7d40b58ae1e79e19806be2 80392faee516476781d2e5bd141ffbdb api/data.rst
 msgid "Return type"
 msgstr "Тип возвращаемого значения"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:10 3517c2d360e94e9791708a1ae2ca9e90
+#: 55b1d3841a9d4f23ab18d641c58308e1 manuscript.data.structures.TextSpan:10 of
 msgid ""
 "Polygon vertices (x, y), ordered clockwise. The public data model supports "
 "arbitrary polygons with 4 or more points. For quadrilateral text regions, "
@@ -142,35 +119,27 @@ msgstr ""
 "четырёхугольных текстовых областей канонический порядок такой: TL -> TR -> "
 "BR -> BL (верхний левый, верхний правый, нижний правый, нижний левый)."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:0 manuscript.data.structures.Line:0
-#: manuscript.data.structures.Page:0 manuscript.data.structures.TextSpan:0
-#: 21835ad7db6e436196d12e40877ffb48 d598a7e665904e59b601a5c4f1e39338
-#: c7c8e5173a224b4facad547545c13931 249e6601417c4b48a000d20663f7cb9a
-#: 152fae13b5f740babc5a17437b6c0d6a 4afaeb38b6624294bdd6fdb04257943f
-#: ff02a7933b1d458a8efe16af977425b1 5e75748c6eb2473594ab1e5c1d7fdcbc
-#: b372d597699a4bf18a353a724280b912 e56c9d12555b4e0990135b6743c8bab1
-#: 05926fcd0668419583e8f5da2306c363
+#: 2e487f5e569e438fab09ea5dbd8dfa0d 3076778440284ec7bc9fb814747efa02
+#: 6c11f7727a97446aa9fed1967af0e0d3 a8bf1d3e8616408cb0fca8e7e94a46ae
+#: b9bcee55f16b4975acb6071029cd8c57 ea7a7162638b4189a3151affa367f725
+#: manuscript.data.structures.Block manuscript.data.structures.Line
+#: manuscript.data.structures.Page manuscript.data.structures.TextSpan of
 msgid "type"
 msgstr "тип"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:15 7b7e316fe39b4dedadc0ce1851b06bc1
+#: 0eceadb60f884d8b9247bab1b2bc7cfa manuscript.data.structures.TextSpan:15 of
 msgid "List[Tuple[float, float]]"
 msgstr "List[Tuple[float, float]]"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:19 ef6639176dba44b2989ea12b8c227e7b
+#: 3753aedc94d14496b1e6b792cf544f0b manuscript.data.structures.TextSpan:19 of
 msgid "Text detection confidence score from detector (0.0 to 1.0)."
 msgstr "Оценка уверенности детекции текста от детектора (от 0.0 до 1.0)."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:21 cc47b9fc3aa7480aa0803fe31ce9be20
+#: c4ccb5d84cfe4dbfb95c72a83e5d10ef manuscript.data.structures.TextSpan:21 of
 msgid "float"
 msgstr "float"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:25 50639526535e4ca184682adca45cee3b
+#: 1be29cdb6a4c4a319847f81190c13dd9 manuscript.data.structures.TextSpan:25 of
 msgid ""
 "Recognized text content (populated by OCR pipeline). None if only detection "
 "was performed."
@@ -178,60 +147,50 @@ msgstr ""
 "Распознанное текстовое содержимое (заполняется OCR-конвейером). None, если "
 "выполнялась только детекция."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:28 9a8df0b0ca7c477db43fc039f3e3573c
+#: 298d3b37c60c4c7d81c6998ea3e41fec manuscript.data.structures.TextSpan:28 of
 msgid "str, optional"
-msgstr "str, необязательный"
+msgstr "str, optional"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:32 a3e5beccb4b54781a4e8d3088402c8d6
+#: fbce810571994051a8b67e5fa1a4424c manuscript.data.structures.TextSpan:32 of
 msgid ""
-"Text recognition confidence score from recognizer (0.0 to 1.0). None if only "
-"detection was performed."
+"Text recognition confidence score from recognizer (0.0 to 1.0). None if only"
+" detection was performed."
 msgstr ""
 "Оценка уверенности распознавания текста от распознавателя (от 0.0 до 1.0). "
 "None, если выполнялась только детекция."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:35 1389d030131f4ecdbb6d3b6a21c83e49
+#: 9f54ac501ea0463f9466ed6b7a259ea2 manuscript.data.structures.TextSpan:35 of
 msgid "float, optional"
-msgstr "float, необязательный"
+msgstr "float, optional"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:39 8bcff1335d944e0e81b8350c114c8dfe
+#: 0384d1dc10554cc3be6c5a4e17f54997 manuscript.data.structures.TextSpan:39 of
 msgid "Text span position inside the line after sorting. None before sorting."
-msgstr "Позиция текстового фрагмента внутри строки после сортировки. None до сортировки."
+msgstr ""
+"Позиция текстового фрагмента внутри строки после сортировки. None до "
+"сортировки."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:22 manuscript.data.structures.Line:14
-#: manuscript.data.structures.TextSpan:41 4ebc4fedc8644c4a8ea35dfa5042d1a1
-#: 9a0d23a405bd463a947dfbeef6a0ab4c a93bdc3ec457411f9a908fdb29ceae1e
+#: 73e041276a434f35bfb3ce181efca0f9 fc8e66e1c9ca454bb21845c20e874190
+#: manuscript.data.structures.Block:22 manuscript.data.structures.Line:14
+#: manuscript.data.structures.TextSpan:41 of
 msgid "int, optional"
-msgstr "int, необязательный"
+msgstr "int, optional"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:25 manuscript.data.structures.Line:17
-#: manuscript.data.structures.Page:14
-#: manuscript.data.structures.Page.from_json:12
+#: 7a15cef427ae4795b3fedd0b2f3cf01c 8ccac92610044499ba30b8f6fe44754f
+#: manuscript.data.structures.Block:25 manuscript.data.structures.Line:17
+#: manuscript.data.structures.Page:14 manuscript.data.structures.Page.from_json:12
 #: manuscript.data.structures.Page.to_json:18
-#: manuscript.data.structures.TextSpan:44 38dbc54da6ff492e8fdeeb8bb9a8ac36
-#: 8be1557841ae410e9a611e8e0896274b 0b717fb828a54095ba722bd30833b921
-#: 9ab46b2b356149c9a00661b7368ccff4 2784a5c8131f42c0957fc1d11a02a2e2
-#: 23b84ca9c6504bd38d6ea2bdfc98c67b
+#: manuscript.data.structures.TextSpan:44 of
 msgid "Examples"
 msgstr "Примеры"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:52 manuscript.data.structures.Line:40
-#: manuscript.data.structures.Page:32 manuscript.data.structures.TextSpan:57
-#: 2e0954b56bd040bd8dff14b33503b6da a2df5a6221df4272a4a243c9bb18b163
-#: cfbe9478fb474348b38aeb24a06f286b b9d3c5dbd64e4fb986818ed0a7c36902
+#: 66b557d3e1ed4071a646ecead30bf4af fe3fc9fe2d50421399bb9568e9166040
+#: manuscript.data.structures.Block:52 manuscript.data.structures.Line:40
+#: manuscript.data.structures.Page:32 manuscript.data.structures.TextSpan:57 of
 msgid "Methods"
 msgstr "Методы"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:62:<autosummary>:1
-#: 4eeb79950a2347e1861acd66c1e19f5a
+#: 729d3c4ab5304899a7813ea0872e7484
+#: manuscript.data.structures.TextSpan:62:<autosummary>:1 of
 msgid ""
 ":py:obj:`__call__ <manuscript.data.TextSpan.__call__>`\\ \\(\\*args\\, "
 "\\*\\*kwargs\\)"
@@ -239,95 +198,55 @@ msgstr ""
 ":py:obj:`__call__ <manuscript.data.TextSpan.__call__>`\\ \\(\\*args\\, "
 "\\*\\*kwargs\\)"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:57:<autosummary>:1
+#: 1d7c06617c97470782a2b0a22e0c8ba5 fefe7675114947b7ab34926ddf2741e5
+#: manuscript.data.structures.Block:57:<autosummary>:1
 #: manuscript.data.structures.Line:45:<autosummary>:1
 #: manuscript.data.structures.Page:40:<autosummary>:1
-#: manuscript.data.structures.TextSpan:62:<autosummary>:1
-#: c3e67d37e3024a2e8ebfcdaa10a30d71 fffa31495e534a09871878ad218fb6d3
-#: 80b7dd2856694b1fb2a5408b6b3669bd 01e4974fec3044d6854e5b6da9fdf9d6
+#: manuscript.data.structures.TextSpan:62:<autosummary>:1 of
 msgid "Call self as a function."
 msgstr "Вызов объекта как функции."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:64 ed4c90e0dbc549ffa8e2bb70574aef5d
-msgid "**detection_confidence**"
-msgstr "**detection_confidence**"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:60 manuscript.data.structures.Line:47
-#: manuscript.data.structures.Page:42 manuscript.data.structures.TextSpan:65
-#: f2375ca3f8c248fe9213c733feaf3c09 c2571c5f388549b18446215fa8a7d4d5
-#: 39b186b508f443dabaa02e537fd4f18b 9a16800f06fc4103b37bcb4dc507f15b
+#: 5f1fb06b1ebe439896199f9302bfaea9 manuscript.data.structures.Block:60
+#: manuscript.data.structures.Line:47 manuscript.data.structures.Page:42
+#: manuscript.data.structures.TextSpan:64 of
 msgid "**model_config**"
 msgstr "**model_config**"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:61 manuscript.data.structures.Line:48
-#: manuscript.data.structures.TextSpan:66 6486058c471146c6b7661d6601019d1a
-#: 89a379803c734e23992161165e7b349f 4b6da1bbc7d44b29ac7144f5fae8082f
-msgid "**order**"
-msgstr "**order**"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:67 884c52a4ab904daea344356524500c97
-msgid "**polygon**"
-msgstr "**polygon**"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:68 e2665bdca6a6440789867216ffcf6665
-msgid "**recognition_confidence**"
-msgstr "**recognition_confidence**"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:69 7709293277f9485b9e3a0cbb112cf65d
-msgid "**text**"
-msgstr "**text**"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Line:2 1483895a19554899a98b770526da7633
+#: bce4cb9eaeed48fb87f3d5e2b839bc1f manuscript.data.structures.Line:2 of
 msgid "A single text line containing one or more text spans."
 msgstr "Одна текстовая строка, содержащая один или несколько текстовых фрагментов."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Line:6 1cabd479ff6a42a69e763287ea819ae1
+#: 2c591f741f924a3687da6fb15e58a64c manuscript.data.structures.Line:6 of
 msgid "List of text spans in the line."
 msgstr "Список текстовых фрагментов в строке."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Line:8 ebb8779d11c5436d8a667b06e6e432a2
+#: f9417456fb594b43bd552bbc0cd59172 manuscript.data.structures.Line:8 of
 msgid "List[TextSpan]"
 msgstr "List[TextSpan]"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Line:12 0d737c51c03c4c9da73f046b087b32d0
-msgid ""
-"Line position inside a block or page after sorting. None before sorting."
+#: fd20ce4809594ea9a5ba04258ec16276 manuscript.data.structures.Line:12 of
+msgid "Line position inside a block or page after sorting. None before sorting."
 msgstr ""
 "Позиция строки внутри блока или страницы после сортировки. None до "
 "сортировки."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:0 manuscript.data.structures.Line:0
-#: dfbc00d771634f4dbfa39b9a8f530412 5654a29694bb4f058509435e583bb329
+#: 401a111343d0470b8689771847846543 manuscript.data.structures.Block
+#: manuscript.data.structures.Line of
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:48 manuscript.data.structures.Line:36
-#: 178bcccca1bf459d90af52fdd1c72a4e 7d9679a4cea54d948b51746f4bda4cab
+#: 4eba2ded7cd84ef3a0bfb3ecfa554551 manuscript.data.structures.Block:48
+#: manuscript.data.structures.Line:36 of
 msgid ":obj:`words <words>`"
 msgstr ":obj:`words <words>`"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.Line.words:2 manuscript.data.structures.Line:37
-#: 4c930ead21574c849ab986d0c0c954a1 e42dc7e6fc12423d91c96e54ec73f425
+#: c668afd265c5413b8e618baee4ff9058 manuscript.data.Line.words:2
+#: manuscript.data.structures.Line:37 of
 msgid "Backward-compatible alias for ``text_spans``."
 msgstr "Алиас обратной совместимости для ``text_spans``."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Line:45:<autosummary>:1
-#: 8dddb468370c4ae6a6a3848b271b7056
+#: b99dfbd7c30d4047bfc94d41806c5b64
+#: manuscript.data.structures.Line:45:<autosummary>:1 of
 msgid ""
 ":py:obj:`__call__ <manuscript.data.Line.__call__>`\\ \\(\\*args\\, "
 "\\*\\*kwargs\\)"
@@ -335,29 +254,24 @@ msgstr ""
 ":py:obj:`__call__ <manuscript.data.Line.__call__>`\\ \\(\\*args\\, "
 "\\*\\*kwargs\\)"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:62 manuscript.data.structures.Line:49
-#: c2f585e43c544b8da45c4a0854af176b 182319a2fe044f3b893162ecdafc46da
+#: b59ea135acca4c48bd5d881fac27917b manuscript.data.structures.Block:61
+#: manuscript.data.structures.Line:48 of
 msgid "**text_spans**"
 msgstr "**text_spans**"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:2 be5441739b694543b0dcacfea344bf4a
+#: a855489dcb7f4aff899d3937973cb360 manuscript.data.structures.Block:2 of
 msgid "A logical text block (e.g., paragraph, column)."
 msgstr "Логический текстовый блок (например, абзац или колонка)."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:6 e2222faa425243a89f394f2142fbcbe6
+#: ea4bc2d3aed342f3b57b57bbf841bd01 manuscript.data.structures.Block:6 of
 msgid "List of text lines in the block."
 msgstr "Список текстовых строк в блоке."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:8 7edff4a7da004aaeaf3d1d9c7f19a878
+#: 192d5e96a4044b308d5439d04ef890a9 manuscript.data.structures.Block:8 of
 msgid "List[Line]"
 msgstr "List[Line]"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:12 f78a6e3e0d4143cea93737d752e632c5
+#: d524f78fca294bf585b788414a717ede manuscript.data.structures.Block:12 of
 msgid ""
 "Optional flat list of text spans used as a shorthand input. If ``lines`` is "
 "empty and ``text_spans`` are provided, they are wrapped into a single line."
@@ -366,25 +280,21 @@ msgstr ""
 "сокращённый вход. Если ``lines`` пуст, а ``text_spans`` переданы, они "
 "оборачиваются в одну строку."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:16 94f3baf71c804b2d94b6cec27c191331
+#: 5b6b211c0e8543bea67f4a384e863d4d manuscript.data.structures.Block:16 of
 msgid "List[TextSpan], optional"
-msgstr "List[TextSpan], необязательный"
+msgstr "List[TextSpan], optional"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:20 d71f55f5c0b54629846e9c6d0cb2590a
+#: 1f7aa608022e4071b4b3d279ac5ee8b8 manuscript.data.structures.Block:20 of
 msgid "Block reading-order position after sorting. None before sorting."
 msgstr "Позиция блока в порядке чтения после сортировки. None до сортировки."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.Block.words:2 manuscript.data.structures.Block:49
-#: 13362f055c214f8ea722ab98a0a0bb47 e84b2a22cd864de8bea09da34a9ff7cf
+#: e996c2536482440687c747b8ea7dcf56 manuscript.data.Block.words:2
+#: manuscript.data.structures.Block:49 of
 msgid "Backward-compatible alias for flat ``text_spans`` input."
 msgstr "Алиас обратной совместимости для плоского входа ``text_spans``."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:57:<autosummary>:1
-#: f893e8e1ed934e9aa5c9a15aab8e7f4f
+#: 0e97a5a0178745df9a41276205a55d6f
+#: manuscript.data.structures.Block:57:<autosummary>:1 of
 msgid ""
 ":py:obj:`__call__ <manuscript.data.Block.__call__>`\\ \\(\\*args\\, "
 "\\*\\*kwargs\\)"
@@ -392,24 +302,19 @@ msgstr ""
 ":py:obj:`__call__ <manuscript.data.Block.__call__>`\\ \\(\\*args\\, "
 "\\*\\*kwargs\\)"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:59 be78b1e71af44c849dcdcfe92ae10b88
+#: b625f938eafc438eaa1eeccd1d03c97c manuscript.data.structures.Block:59 of
 msgid "**lines**"
 msgstr "**lines**"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block.__init__:2
-#: 1992b1ff97314d61afe4757be9d846c9
+#: e35d1b35dd2145aab339d8d43ee1a150 manuscript.data.structures.Block.__init__:2 of
 msgid "Initialize Block, normalizing flat ``text_spans`` into one line."
 msgstr "Инициализирует Block, сводя плоский список ``text_spans`` к одной строке."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:2 9e4cd7c0dd7b440d9dbbd5163d3d5483
+#: cc6b40cdc456498f8ab956abcb299ddb manuscript.data.structures.Page:2 of
 msgid "A document page containing blocks of text."
 msgstr "Страница документа, содержащая текстовые блоки."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:4 77f955434fa34b2ab358cb1482a187f3
+#: 9a514b1ea5ac442a90cdf6507d252cb2 manuscript.data.structures.Page:4 of
 msgid ""
 "For a full visual diagram of the data model, see: ``DATA_MODEL.md`` located "
 "in the same module directory."
@@ -417,19 +322,16 @@ msgstr ""
 "Полную визуальную диаграмму модели данных см. в файле ``DATA_MODEL.md``, "
 "расположенном в том же каталоге модуля."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:9 52a296f7be944f6c863740b73681ac23
+#: 2f10eec6da61406d996d09e0217ef168 manuscript.data.structures.Page:9 of
 msgid "List of text blocks on the page."
 msgstr "Список текстовых блоков на странице."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:11 65e9a2d430904b59bc5d39ec6e257310
+#: ad676d508863445aa8adb01ea5ae54e1 manuscript.data.structures.Page:11 of
 msgid "List[Block]"
 msgstr "List[Block]"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:40:<autosummary>:1
-#: a9249b2f65314a16a0c168354b090a44
+#: ecc6d393178f4f718f0fc88828f58818
+#: manuscript.data.structures.Page:40:<autosummary>:1 of
 msgid ""
 ":py:obj:`__call__ <manuscript.data.Page.__call__>`\\ \\(\\*args\\, "
 "\\*\\*kwargs\\)"
@@ -437,37 +339,28 @@ msgstr ""
 ":py:obj:`__call__ <manuscript.data.Page.__call__>`\\ \\(\\*args\\, "
 "\\*\\*kwargs\\)"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:40:<autosummary>:1
-#: a9a107d096dd45a29ef797ffaad899ff
+#: ed81658da0a04447bf4a443671813b16
+#: manuscript.data.structures.Page:40:<autosummary>:1 of
 msgid ":py:obj:`from_json <manuscript.data.Page.from_json>`\\ \\(source\\)"
-msgstr ""
-":py:obj:`from_json <manuscript.data.Page.from_json>`\\ \\(source\\)"
+msgstr ":py:obj:`from_json <manuscript.data.Page.from_json>`\\ \\(source\\)"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.from_json:2
-#: manuscript.data.structures.Page:40:<autosummary>:1
-#: 11973e6dd4b34f9fbc755a34e7b3f8f3 76a56426012d47aa825469f342a7fb3f
+#: b85b7f675e79418da5808a5b13152ef2 manuscript.data.structures.Page.from_json:2
+#: manuscript.data.structures.Page:40:<autosummary>:1 of
 msgid "Load Page from JSON file or string."
 msgstr "Загрузить Page из JSON-файла или строки."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:40:<autosummary>:1
-#: f8bdafec569441c689e567904ed48c39
+#: a7bcfff9b0ea47bfb1d831aafb9af869
+#: manuscript.data.structures.Page:40:<autosummary>:1 of
 msgid ":py:obj:`to_dict <manuscript.data.Page.to_dict>`\\ \\(\\[schema\\]\\)"
-msgstr ""
-":py:obj:`to_dict <manuscript.data.Page.to_dict>`\\ \\(\\[schema\\]\\)"
+msgstr ":py:obj:`to_dict <manuscript.data.Page.to_dict>`\\ \\(\\[schema\\]\\)"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.to_dict:2
-#: manuscript.data.structures.Page:40:<autosummary>:1
-#: 34cd6bd421304ef1808281d2df500dd0 de244363d5474f4a988e6cd9147399d5
+#: 59464af673724d74b53b5b3e96200961 manuscript.data.structures.Page.to_dict:2
+#: manuscript.data.structures.Page:40:<autosummary>:1 of
 msgid "Export Page to a plain Python dictionary."
 msgstr "Экспортирует Page в обычный словарь Python."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:40:<autosummary>:1
-#: ed741064e74345b8b47f5aa30fc8ba38
+#: e07bfd4cc8294a2691ad84e45fb9fc65
+#: manuscript.data.structures.Page:40:<autosummary>:1 of
 msgid ""
 ":py:obj:`to_json <manuscript.data.Page.to_json>`\\ \\(\\[path\\, indent\\, "
 "schema\\]\\)"
@@ -475,71 +368,54 @@ msgstr ""
 ":py:obj:`to_json <manuscript.data.Page.to_json>`\\ \\(\\[path\\, indent\\, "
 "schema\\]\\)"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.to_json:2
-#: manuscript.data.structures.Page:40:<autosummary>:1
-#: 952fd37d62c647e4b357b658255bdb2f c5dbd02b4bad45798fffbf012783e453
+#: dfe78af62b824425b990a726845a6498 manuscript.data.structures.Page.to_json:2
+#: manuscript.data.structures.Page:40:<autosummary>:1 of
 msgid "Export Page to JSON."
 msgstr "Экспорт Page в JSON."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.from_json:5
-#: 9134a7143cf6420991544b3b834785fb
+#: 9f68712d4fcc428c9f30bebdd8567b85 manuscript.data.structures.Page.from_json:5 of
 msgid "Path to JSON file or JSON string."
 msgstr "Путь к JSON-файлу или JSON-строка."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:0
-#: 7e4d57a58c374f06a2918b00017fcc97 4a448c6e3dd54030b512f4f73fa7674c
+#: api/data.rst e8572a9453ce4bb1acc1774b41441671
 msgid "Returns"
 msgstr "Возвращает"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.from_json:8
-#: f37f40515b0a4418b2aa097e4f6fed79
+#: 1de5faebea7b45fbbe73c364d6b717cf manuscript.data.structures.Page.from_json:8 of
 msgid "Loaded Page object."
 msgstr "Загруженный объект Page."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.to_dict:5
-#: manuscript.data.structures.Page.to_json:11 d75f0886ddd547358eac7e00a730147e
-#: 00a08e5750d842ff8e2b70b46c1ac0cb
+#: bf8dc0dbf90644a6a669b51083f9739c manuscript.data.structures.Page.to_dict:5
+#: manuscript.data.structures.Page.to_json:11 of
 msgid "Output schema version. Default is ``\"v0_1_11\"``."
 msgstr "Версия выходной схемы. По умолчанию ``\"v0_1_11\"``."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.to_dict:21
-#: 9e13ce956bf84eff9ce6e30611408ffd
+#: cf5c92373e8240448df20f812b16314b manuscript.data.structures.Page.to_dict:21 of
 msgid ""
-":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ \\\\"
-"\\[\\:py\\:class\\:\\`str\\`\\, \\:py\\:data\\:\\`\\~typing.Any\\`\\]`"
+":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ "
+"\\\\\\[\\:py\\:class\\:\\`str\\`\\, \\:py\\:data\\:\\`\\~typing.Any\\`\\]`"
 msgstr ""
-":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ \\\\"
-"\\[\\:py\\:class\\:\\`str\\`\\, \\:py\\:data\\:\\`\\~typing.Any\\`\\]`"
+":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ "
+"\\\\\\[\\:py\\:class\\:\\`str\\`\\, \\:py\\:data\\:\\`\\~typing.Any\\`\\]`"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.to_json:5
-#: 61f1c9e6fca641c297e83d1b9efe241e
+#: dbcd721506cc4a3aa350774c7e70513e manuscript.data.structures.Page.to_json:5 of
 msgid "If provided, saves JSON to file."
 msgstr "Если указан, сохраняет JSON в файл."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.to_json:8
-#: fa25c620e28f4e45ab75183971bd98f1
+#: 70776158b956460182a13b3d4e716259 manuscript.data.structures.Page.to_json:8 of
 msgid "JSON indentation. Default is 2."
 msgstr "Отступ JSON. По умолчанию 2."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.to_json:14
-#: cd4a9e140b744a209f4c0b37bccf0a13
+#: a78db387e0114b889e402384767dc8fe manuscript.data.structures.Page.to_json:14 of
 msgid "JSON string representation."
 msgstr "Строковое представление JSON."
 
 #~ msgid ""
-#~ ":py:obj:`__call__ <manuscript.data.Word.__call__>`\\ \\(\\*args\\, "
-#~ "\\*\\*kwargs\\)"
+#~ ":py:obj:`__call__ <manuscript.data.Word.__call__>`\\ "
+#~ "\\(\\*args\\, \\*\\*kwargs\\)"
 #~ msgstr ""
-#~ ":py:obj:`__call__ <manuscript.data.Word.__call__>`\\ \\(\\*args\\, "
-#~ "\\*\\*kwargs\\)"
+#~ ":py:obj:`__call__ <manuscript.data.Word.__call__>`\\ "
+#~ "\\(\\*args\\, \\*\\*kwargs\\)"
 
 #~ msgid "List of words in the line."
 #~ msgstr "Список слов в строке."
@@ -548,17 +424,34 @@ msgstr "Строковое представление JSON."
 #~ msgstr "List[Word]"
 
 #~ msgid ""
-#~ "Legacy: Direct list of words without line structure. Used for backward "
-#~ "compatibility. If both `lines` and `words` are empty, creates a single "
-#~ "line from words."
+#~ "Legacy: Direct list of words without "
+#~ "line structure. Used for backward "
+#~ "compatibility. If both `lines` and `words`"
+#~ " are empty, creates a single line "
+#~ "from words."
 #~ msgstr ""
-#~ "Устаревшее: прямой список слов без структуры строк. Используется для "
-#~ "обратной совместимости. Если и `lines`, и `words` пусты, создаётся одна "
-#~ "строка из слов."
+#~ "Устаревшее: прямой список слов без "
+#~ "структуры строк. Используется для обратной "
+#~ "совместимости. Если и `lines`, и `words`"
+#~ " пусты, создаётся одна строка из слов."
 
 #~ msgid "**words**"
 #~ msgstr "**words**"
 
 #~ msgid "Initialize Block with backward compatibility for words-only input."
-#~ msgstr ""
-#~ "Инициализация Block с обратной совместимостью для ввода только слов."
+#~ msgstr "Инициализация Block с обратной совместимостью для ввода только слов."
+
+#~ msgid "**detection_confidence**"
+#~ msgstr "**detection_confidence**"
+
+#~ msgid "**order**"
+#~ msgstr "**order**"
+
+#~ msgid "**polygon**"
+#~ msgstr "**polygon**"
+
+#~ msgid "**recognition_confidence**"
+#~ msgstr "**recognition_confidence**"
+
+#~ msgid "**text**"
+#~ msgstr "**text**"

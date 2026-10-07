@@ -58,4 +58,5 @@ prefer ``"v0_1_11"``.
 .. automodule:: manuscript.data
    :members:
    :undoc-members:
+   :exclude-members: polygon, detection_confidence, recognition_confidence, text, order, blocks
    :show-inheritance:

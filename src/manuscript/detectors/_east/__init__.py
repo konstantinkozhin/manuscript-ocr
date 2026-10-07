@@ -1,14 +1,13 @@
+import warnings
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import cv2
 import numpy as np
-import onnxruntime as ort
 
 from manuscript.api.detector import BaseDetector
 
-from ...data import Block, Line, Page, TextSpan
 from ...utils import read_image
 from .lanms import locality_aware_nms
 from .utils import (
@@ -116,9 +115,9 @@ class EAST(BaseDetector):
     quantization : int, optional
         Quantization resolution for point coordinates during decoding.
         Default is 2.
-    axis_aligned_output : bool, optional
-        If True, outputs axis-aligned rectangles instead of original quads.
-        Default is True.
+    axis_aligned_output : bool, optional, deprecated
+        Deprecated. Explicit True outputs axis-aligned rectangles.
+        By default, original quads are preserved.
     remove_area_anomalies : bool, optional
         If True, removes quads with extremely large area relative to the
         distribution. Default is False.
@@ -151,9 +150,6 @@ class EAST(BaseDetector):
     default_weights_name = "east_50_g1"
     registry_model_class = "EAST"
 
-    pretrained_registry = {
-        "east_50_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/east_50_g1.onnx",
-    }
 
     def __init__(
         self,
@@ -170,7 +166,7 @@ class EAST(BaseDetector):
         iou_threshold_standard: Optional[float] = 0.05,
         score_geo_scale: float = 0.25,
         quantization: int = 2,
-        axis_aligned_output: bool = True,
+        axis_aligned_output: Optional[bool] = None,
         remove_area_anomalies: bool = False,
         anomaly_sigma_threshold: float = 5.0,
         anomaly_min_box_count: int = 30,
@@ -199,7 +195,10 @@ class EAST(BaseDetector):
         self.score_geo_scale = score_geo_scale
         self.quantization = quantization
 
-        self.axis_aligned_output = axis_aligned_output
+        if axis_aligned_output is not None:
+            warnings.warn("axis_aligned_output is deprecated; configure recognition crops instead",
+                          DeprecationWarning, stacklevel=2)
+        self.axis_aligned_output = bool(axis_aligned_output)
         self.remove_area_anomalies = remove_area_anomalies
         self.anomaly_sigma_threshold = anomaly_sigma_threshold
         self.anomaly_min_box_count = anomaly_min_box_count
@@ -212,15 +211,7 @@ class EAST(BaseDetector):
         if self.onnx_session is not None:
             return
 
-        self._prepare_runtime_dependencies()
-        providers = self.runtime_providers()
-
-        self.onnx_session = ort.InferenceSession(
-            self.weights,
-            providers=providers,
-        )
-
-        self._log_device_info(self.onnx_session)
+        self.onnx_session = self._create_onnx_session()
 
     def _scale_boxes_to_original(
         self, boxes: np.ndarray, orig_size: Tuple[int, int]
@@ -402,7 +393,7 @@ class EAST(BaseDetector):
         return merged
 
     def _run_inference_on_image(
-        self, img: np.ndarray
+        self, img: np.ndarray, return_raw: bool = False
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Run ONNX inference on a single image.
@@ -444,12 +435,15 @@ class EAST(BaseDetector):
             iou_threshold_standard=self.iou_threshold_standard,
         )
 
-        return final_quads_nms, score_map, geo_map
+        result = (final_quads_nms, score_map, geo_map)
+        return (*result, dict(zip(output_names, outputs))) if return_raw else result
 
     def predict(
         self,
         img_or_path: Union[str, Path, np.ndarray],
-    ) -> Page:
+        return_raw: bool = False,
+        *, return_masks: bool = False, return_outputs: bool = False,
+    ):
         """
         Run EAST inference and return detected page structure.
 
@@ -515,13 +509,20 @@ class EAST(BaseDetector):
         orig_h, orig_w = img.shape[:2]
 
         # Run inference on original image
-        final_quads_nms, _, _ = self._run_inference_on_image(img)
+        inference = (self._run_inference_on_image(img, return_raw=True) if return_outputs
+                     else self._run_inference_on_image(img))
+        final_quads_nms, score_map, geo_map = inference[:3]
+        raw_outputs = inference[3] if return_outputs else None
 
         # TTA: Run on horizontally flipped image and merge results
         if self.use_tta:
             # Flip image horizontally
             img_flipped = np.fliplr(img).copy()
-            final_quads_flipped, _, _ = self._run_inference_on_image(img_flipped)
+            flipped = (self._run_inference_on_image(img_flipped, return_raw=True) if return_outputs
+                       else self._run_inference_on_image(img_flipped))
+            final_quads_flipped = flipped[0]
+            if return_outputs:
+                raw_outputs.update({"flipped_" + key: value for key, value in flipped[3].items()})
 
             # Scale both to original size first
             scaled_orig = self._scale_boxes_to_original(
@@ -598,19 +599,13 @@ class EAST(BaseDetector):
             else processed_quads
         )
 
-        text_spans: List[TextSpan] = []
-        for quad in output_quads:
-            pts = quad[:8].reshape(4, 2)
-            score = float(np.clip(quad[8], 0.0, 1.0))
-            text_spans.append(TextSpan(polygon=pts.tolist(), detection_confidence=score))
-
-        for idx, text_span in enumerate(text_spans):
-            text_span.order = idx
-
-        page = Page(
-            blocks=[Block(lines=[Line(text_spans=text_spans, order=0)], order=0)]
-        )
-
+        page = self._page_from_regions(output_quads[:, :8].reshape(-1, 4, 2),
+                                       np.clip(output_quads[:, 8], 0, 1), ordered=True)
+        if return_raw or return_masks or return_outputs:
+            detections = [{"polygon": quad[:8].reshape(4, 2).astype(float).tolist(),
+                           "confidence": float(np.clip(quad[8], 0, 1))} for quad in processed_quads]
+            return self._raw_result(page, raw_outputs, detections, (orig_h, orig_w),
+                                    model_image_size=[self.target_size, self.target_size])
         return page
 
     @staticmethod

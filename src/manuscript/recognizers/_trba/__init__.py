@@ -9,27 +9,9 @@ import onnxruntime as ort
 from PIL import Image
 
 from manuscript.api.recognizer import BaseRecognizer
-from manuscript.data import Page
-from manuscript.utils import (
-    crop_axis_aligned,
-    read_image,
-)
+from manuscript.utils import read_image
 
-from .._common.debug import save_debug_regions
-from .._common.region_preparers import (
-    call_region_preparer,
-    prepare_bbox_regions,
-    prepare_polygon_mask_regions,
-    prepare_quad_warp_regions,
-    prepare_text_regions,
-)
-from .._common.region_types import (
-    REGION_PREPARER_PRESETS,
-    PreparedRegion,
-    RecognitionPrediction,
-    normalize_prepared_regions,
-    normalize_recognition_predictions,
-)
+from .._common.region_types import PreparedRegion, RecognitionPrediction
 from .data.charset import load_charset
 
 Config = None
@@ -64,99 +46,101 @@ def _ensure_training_dependencies() -> None:
 
 class TRBA(BaseRecognizer):
     """
-    Инициализация модели распознавания текста TRBA с использованием ONNX Runtime.
+    Initialize TRBA text recognition model with ONNX Runtime.
 
-    Параметры
+    Parameters
     ----------
     weights : str or Path, optional
-        Путь или идентификатор для весов ONNX-модели. Поддерживаются:
+        Path or identifier for ONNX model weights. Supports:
 
-        - Локальный путь к файлу: ``"path/to/model.onnx"``
+        - Local file path: ``"path/to/model.onnx"``
         - HTTP/HTTPS URL: ``"https://example.com/model.onnx"``
-        - GitHub-релиз: ``"github://owner/repo/tag/file.onnx"``
+        - GitHub release: ``"github://owner/repo/tag/file.onnx"``
         - Google Drive: ``"gdrive:FILE_ID"``
-        - Предустановленное имя: ``"trba_lite_g1"`` или ``"trba_base_g1"`` (из pretrained_registry)
-        - ``None``: автоматически загружает пресет по умолчанию (trba_lite_g1)
+        - Preset name: ``"trba_lite_g1"`` or ``"trba_base_g1"`` (from pretrained_registry)
+        - ``None``: auto-downloads default preset (trba_lite_g1)
 
     config : str or Path, optional
-        Путь или идентификатор для конфигурационного файла JSON модели. Поддерживаются
-        те же схемы URL, что и для ``weights``. Если ``None``, конфигурация определяется
-        автоматически по расположению весов или используется конфигурация пресета по умолчанию.
+        Path or identifier for model configuration JSON. Same URL schemes
+        as ``weights``. If ``None``, attempts to infer from weights location
+        or uses default config for preset models.
     charset : str or Path, optional
-        Путь или идентификатор для файла набора символов. Если ``None``, выполняется поиск
-        набора символов рядом с весами или используется набор символов пакета по умолчанию.
+        Path or identifier for character set file. If ``None``, attempts to
+        find charset near weights or falls back to package default.
     device : {"cuda", "coreml", "cpu"}, optional
-        Устройство для вычислений. Если ``None``, автоматически выбирается CPU.
-        Для ускорения на GPU/CoreML:
+        Compute device. If ``None``, automatically selects CPU.
+        For GPU/CoreML acceleration:
 
         - CUDA (NVIDIA): ``pip install onnxruntime-gpu``
         - CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``
 
-        По умолчанию ``None`` (CPU).
+        Default is ``None`` (CPU).
     rotate_threshold : float or None, optional
-        Порог соотношения сторон для поворота вертикальных кропов текстовых областей
-        перед распознаванием. Если ``height > width * rotate_threshold``, кроп
-        поворачивается на 90 градусов по часовой стрелке. Установите ``0`` или ``None``
-        для отключения. По умолчанию ``1.5``.
+        Aspect-ratio threshold for rotating vertical text-span crops before
+        recognition. If ``height > width * rotate_threshold``, crop is
+        rotated 90 degrees clockwise. Set to ``0`` or ``None`` to disable.
+        Default is ``1.5``.
     region_preparer : {"bbox", "polygon_mask", "quad_warp"} or callable, optional
-        Стратегия преобразования полигонов ``Page`` в кропы для распознавания.
-        ``"bbox"`` извлекает выровненные по осям ограничивающие прямоугольники для
-        произвольных полигонов. ``"polygon_mask"`` маскирует пиксели за пределами полигона
-        внутри плотного кропа и также поддерживает произвольные полигоны. ``"quad_warp"``
-        выпрямляет только 4-точечные полигоны с помощью перспективного преобразования перед
-        распознаванием. Можно также передать пользовательский callable, который должен
-        возвращать список подготовленных текстовых областей. По умолчанию ``"bbox"``.
+        Strategy used to convert ``Page`` polygons into recognition crops.
+        ``"bbox"`` extracts axis-aligned bounding boxes for arbitrary polygons.
+        ``"polygon_mask"`` masks pixels outside the polygon inside a tight crop
+        and also supports arbitrary polygons. ``"quad_warp"`` rectifies only
+        4-point polygons with a perspective transform before recognition. A
+        custom callable may also be provided and should return a list of
+        prepared text regions. Default is ``"bbox"``.
     region_preparer_options : dict or None, optional
-        Опциональная конфигурация для встроенных preparers. По умолчанию ``None``.
-        Типичные параметры: ``pad`` для ``"bbox"`` и ``"polygon_mask"``, или
-        ``output_size=(width, height)`` для ``"quad_warp"``. Полигоны без 4-х точек,
-        переданные в ``"quad_warp"``, по умолчанию возвращаются к bbox-кропам.
+        Optional configuration for built-in region preparers. Defaults to
+        ``None``. Typical options are ``pad`` for ``"bbox"`` and
+        ``"polygon_mask"``, or ``output_size=(width, height)`` for
+        ``"quad_warp"``. Non-quad polygons passed to ``"quad_warp"`` fall back
+        to bbox crops by default.
     min_text_size : int, optional
-        Минимальная ширина/высота кропа в пикселях для запуска распознавания текстовой
-        области. Текстовые области ниже этого порога пропускаются. По умолчанию ``5``.
+        Minimum crop width/height in pixels to run recognition for a text span.
+        Text spans below this threshold are skipped. Default is ``5``.
     batch_size : int, optional
-        Размер батча для инференса по умолчанию, используемый когда
-        ``predict(..., batch_size=...)`` не задан. По умолчанию ``128``.
+        Default inference batch size used when ``predict(..., batch_size=...)``
+        is not provided. Default is ``128``.
     **kwargs
-        Дополнительные параметры конфигурации (зарезервированы для будущего использования).
+        Additional configuration options (reserved for future use).
 
     Raises
     ------
     FileNotFoundError
-        Если указанные файлы не существуют.
+        If specified files do not exist.
     ValueError
-        Если формат весов недопустим.
+        If weights format is invalid.
 
     Notes
     -----
-    Класс предоставляет три основных публичных метода:
+    The class provides three main public methods:
 
-    - ``predict`` — запуск распознавания текстовых областей в объекте ``Page``.
-    - ``train`` — высокоуровневая точка входа для обучения модели TRBA на пользовательских наборах данных.
-    - ``export`` — статический метод для экспорта модели PyTorch в формат ONNX.
+    - ``predict`` - run recognition over text spans in a ``Page`` object.
+    - ``train`` - high-level training entrypoint to train a TRBA model
+      on custom datasets.
+    - ``export`` - static method to export PyTorch model to ONNX format.
 
-    Модель использует ONNX Runtime для быстрого инференса на CPU и GPU.
-    Для ускорения на GPU установите: ``pip install onnxruntime-gpu``
+    Model uses ONNX Runtime for fast inference on CPU and GPU.
+    For GPU acceleration, install: ``pip install onnxruntime-gpu``
 
     Examples
     --------
-    Создание распознавателя с пресетом по умолчанию (автозагрузка):
+    Create recognizer with default preset (auto-downloads):
 
     >>> from manuscript.recognizers import TRBA
     >>> recognizer = TRBA()
 
-    Загрузка из локального ONNX-файла:
+    Load from local ONNX file:
 
     >>> recognizer = TRBA(weights="path/to/model.onnx")
 
-    Загрузка из GitHub-релиза:
+    Load from GitHub release:
 
     >>> recognizer = TRBA(
     ...     weights="github://owner/repo/v1.0/model.onnx",
     ...     config="github://owner/repo/v1.0/config.json"
     ... )
 
-    Принудительное использование CPU:
+    Force CPU execution:
 
     >>> recognizer = TRBA(weights="model.onnx", device="cpu")
     """
@@ -164,23 +148,8 @@ class TRBA(BaseRecognizer):
     default_weights_name = "trba_lite_g1"
     registry_model_class = "TRBA"
 
-    pretrained_registry = {
-        "trba_lite_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_lite_g1.onnx",
-        "trba_lite_g2": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_lite_g2.onnx",
-        "trba_base_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_base_g1.onnx",
-    }
-
-    config_registry = {
-        "trba_lite_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_lite_g1.json",
-        "trba_lite_g2": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_lite_g2.json",
-        "trba_base_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_base_g1.json",
-    }
-
-    charset_registry = {
-        "trba_lite_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_lite_g1.txt",
-        "trba_lite_g2": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_lite_g2.txt",
-        "trba_base_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/trba_base_g1.txt",
-    }
+    config_registry = {}
+    charset_registry = {}
 
     def __init__(
         self,
@@ -196,24 +165,15 @@ class TRBA(BaseRecognizer):
         batch_size: int = 128,
         **kwargs,
     ):
-        if "region_predictor" in kwargs:
-            raise TypeError(
-                "region_predictor has been removed from TRBA. "
-                "Pass a custom recognizer to Pipeline instead."
-            )
-        if "recognizer_debug_dir" in kwargs:
-            raise TypeError(
-                "recognizer_debug_dir has been removed from TRBA. "
-                "Use debug_save_dir instead."
-            )
-
-        default_debug_save_dir = kwargs.pop("debug_save_dir", None)
-
-        # Initialize artifact-backed recognizer infrastructure.
         super().__init__(
             weights=weights,
             device=device,
             force_download=force_download,
+            rotate_threshold=rotate_threshold,
+            region_preparer=region_preparer,
+            region_preparer_options=region_preparer_options,
+            min_text_size=min_text_size,
+            batch_size=batch_size,
             **kwargs,
         )
 
@@ -238,6 +198,10 @@ class TRBA(BaseRecognizer):
         self.cnn_in_channels = config_dict.get("cnn_in_channels", 3)
         self.cnn_out_channels = config_dict.get("cnn_out_channels", 512)
         self.cnn_backbone = config_dict.get("cnn_backbone", "seresnet31")
+        for name in ("max_length", "img_h", "img_w"):
+            self._positive_integer(getattr(self, name), name)
+        if self.cnn_in_channels != 3:
+            raise ValueError("TRBA preprocessing requires a three-channel RGB model")
 
         # Load charset
         if not Path(self.charset_path).exists():
@@ -258,169 +222,37 @@ class TRBA(BaseRecognizer):
 
         # Initialize ONNX session
         self.onnx_session = None
-        self.rotate_threshold = rotate_threshold
-        self.region_preparer = self._validate_region_preparer(region_preparer)
-        self.region_preparer_options = dict(region_preparer_options or {})
-        self.min_text_size = min_text_size
-        self.batch_size = max(1, int(batch_size))
-        self.default_debug_save_dir = (
-            None
-            if default_debug_save_dir is None
-            else Path(default_debug_save_dir).expanduser()
-        )
         self._supports_multi_batch_inference: Optional[bool] = None
         self._single_batch_warning_emitted = False
 
-    def _resolve_config(self, config: Optional[str]) -> str:
-        """
-        Resolve config path using shared artifact resolution.
-        Falls back to inferring from weights location.
+    def _resolve_config(self, config):
+        path = super()._resolve_config(config)
+        if path is None:
+            raise FileNotFoundError("TRBA requires a config artifact or explicit config")
+        return path
 
-        Search order:
-        1. Explicit config parameter (if provided)
-        2. Preset name from config_registry (if weights stem matches)
-        3. Same filename as weights but with .json extension
-        4. Default preset config
-        """
-        if config is not None:
-            # Use shared artifact resolution.
-            return self._resolve_extra_artifact(
-                config,
-                default_name=None,
-                registry=self.config_registry,
-                description="config",
-            )
-
-        if getattr(self, '_resolved_model_artifacts', None):
-            return str(self._resolved_model_artifacts['config'])
-
-        # Try to infer from weights location
-        weights_path = Path(self.weights)
-        weights_stem = weights_path.stem
-
-        # 1. Try preset name in config registry
-        if weights_stem in self.config_registry:
-            return self._resolve_extra_artifact(
-                weights_stem,
-                default_name=None,
-                registry=self.config_registry,
-                description="config",
-            )
-
-        # 2. Try same filename with .json extension (e.g., model.onnx -> model.json)
-        config_candidate = weights_path.with_suffix(".json")
-        if config_candidate.exists():
-            return str(config_candidate.absolute())
-
-        # 3. Use default preset config
-        if (
-            self.default_weights_name
-            and self.default_weights_name in self.config_registry
-        ):
-            return self._resolve_extra_artifact(
-                self.default_weights_name,
-                default_name=None,
-                registry=self.config_registry,
-                description="config",
-            )
-
-        raise FileNotFoundError(
-            f"Could not find config file for weights: {self.weights}. "
-            f"Expected config at: {config_candidate}. "
-            f"Please specify config explicitly or ensure config file has same name as weights."
-        )
-
-    def _resolve_charset(self, charset: Optional[str]) -> str:
-        """
-        Resolve charset path using shared artifact resolution.
-        Falls back to inferring from weights location or package default.
-
-        Search order:
-        1. Explicit charset parameter (if provided)
-        2. Preset name from charset_registry (if weights stem matches)
-        3. Same filename as weights but with .txt extension
-        4. Default preset charset
-        5. Package default charset (configs/charset.txt)
-        """
+    def _resolve_charset(self, charset):
         if charset is not None:
-            # Use shared artifact resolution.
-            return self._resolve_extra_artifact(
-                charset,
-                default_name=None,
-                registry=self.charset_registry,
-                description="charset",
-            )
-
-        if getattr(self, '_resolved_model_artifacts', None):
-            return str(self._resolved_model_artifacts['charset'])
-
-        # Try to infer from weights location
-        weights_path = Path(self.weights)
-        weights_stem = weights_path.stem
-
-        # 1. Try preset name in charset registry
-        if weights_stem in self.charset_registry:
-            return self._resolve_extra_artifact(
-                weights_stem,
-                default_name=None,
-                registry=self.charset_registry,
-                description="charset",
-            )
-
-        # 2. Try same filename with .txt extension (e.g., model.onnx -> model.txt)
-        charset_candidate = weights_path.with_suffix(".txt")
-        if charset_candidate.exists():
-            return str(charset_candidate.absolute())
-
-        # 3. Try default preset charset
-        if (
-            self.default_weights_name
-            and self.default_weights_name in self.charset_registry
-        ):
-            return self._resolve_extra_artifact(
-                self.default_weights_name,
-                default_name=None,
-                registry=self.charset_registry,
-                description="charset",
-            )
-
-        # 4. Fallback to package default charset
-        current_dir = Path(__file__).parent
-        package_charset = current_dir / "configs" / "charset.txt"
-        if package_charset.exists():
-            return str(package_charset.absolute())
-
-        raise FileNotFoundError(
-            f"Could not find charset file. "
-            f"Expected charset at: {charset_candidate} or {package_charset}. "
-            f"Please specify charset explicitly or ensure charset file has same name as weights."
-        )
-
-    @staticmethod
-    def _validate_region_preparer(
-        region_preparer: Union[str, Callable[..., Sequence[Any]]]
-    ) -> Union[str, Callable[..., Sequence[Any]]]:
-        if isinstance(region_preparer, str):
-            if region_preparer not in REGION_PREPARER_PRESETS:
-                raise ValueError(
-                    f"region_preparer must be one of {REGION_PREPARER_PRESETS}, "
-                    f"got: {region_preparer}"
-                )
-            return region_preparer
-
-        if not callable(region_preparer):
-            raise TypeError("region_preparer must be a preset name or callable")
-        return region_preparer
+            return self._resolve_extra_artifact(charset, default_name=None, registry={}, description="charset")
+        resolved = getattr(self, "_resolved_model_artifacts", {}).get("charset")
+        if resolved:
+            return str(resolved)
+        candidate = Path(self.weights).with_suffix(".txt")
+        if candidate.is_file():
+            return str(candidate.absolute())
+        raise FileNotFoundError("TRBA requires a charset artifact or explicit charset")
 
     def _initialize_session(self):
         """Initialize ONNX Runtime session (lazy loading)."""
         if self.onnx_session is not None:
             return
 
-        self._prepare_runtime_dependencies()
-        providers = self.runtime_providers()
-        self.onnx_session = ort.InferenceSession(str(self.weights), providers=providers)
-        self._log_device_info(self.onnx_session)
+        session = self._create_onnx_session()
+        inputs = session.get_inputs()
+        if len(inputs) != 1 or inputs[0].type not in ("tensor(float)", "tensor(float16)"):
+            raise ValueError("TRBA requires one float32/float16 image input")
+        self._input_dtype = np.float16 if inputs[0].type == "tensor(float16)" else np.float32
+        self.onnx_session = session
 
     def _preprocess_image(
         self, image: Union[np.ndarray, str, Path, Image.Image]
@@ -449,106 +281,8 @@ class TRBA(BaseRecognizer):
 
         img_normalized = (canvas.astype(np.float32) - 127.5) / 127.5
         img_chw = np.transpose(img_normalized, (2, 0, 1))
-        return np.expand_dims(img_chw, axis=0)
+        return np.expand_dims(img_chw, axis=0).astype(getattr(self, "_input_dtype", np.float32), copy=False)
 
-    def _apply_region_rotation(self, crop: np.ndarray) -> np.ndarray:
-        """
-        Rotate tall crops to horizontal orientation when auto-rotation is enabled.
-        """
-        if not self.rotate_threshold:
-            return crop
-
-        height, width = crop.shape[:2]
-        if height > width * self.rotate_threshold:
-            return np.rot90(crop, k=-1)
-        return crop
-
-    def _prepare_crop(self, crop: np.ndarray) -> np.ndarray:
-        """
-        Backward-compatible alias for crop orientation logic.
-        """
-        return self._apply_region_rotation(crop)
-
-    def _extract_word_image(
-        self, image: np.ndarray, polygon: np.ndarray
-    ) -> Optional[np.ndarray]:
-        """
-        Backward-compatible axis-aligned text-span crop helper.
-        """
-        return crop_axis_aligned(image, polygon, pad=0)
-
-    @staticmethod
-    def _normalize_text_regions(regions: Sequence[Any]) -> List[PreparedRegion]:
-        return normalize_prepared_regions(regions)
-
-    @staticmethod
-    def _normalize_text_predictions(
-        predictions: Sequence[Any],
-    ) -> List[RecognitionPrediction]:
-        return normalize_recognition_predictions(predictions)
-
-    def _prepare_bbox_regions(
-        self, page: Page, image: np.ndarray, options: Optional[Dict[str, Any]] = None
-    ) -> List[PreparedRegion]:
-        return prepare_bbox_regions(
-            page,
-            image,
-            min_text_size=self.min_text_size,
-            rotate_region=self._apply_region_rotation,
-            options=options,
-        )
-
-    def _prepare_polygon_mask_regions(
-        self, page: Page, image: np.ndarray, options: Optional[Dict[str, Any]] = None
-    ) -> List[PreparedRegion]:
-        return prepare_polygon_mask_regions(
-            page,
-            image,
-            min_text_size=self.min_text_size,
-            rotate_region=self._apply_region_rotation,
-            options=options,
-        )
-
-    def _prepare_quad_warp_regions(
-        self, page: Page, image: np.ndarray, options: Optional[Dict[str, Any]] = None
-    ) -> List[PreparedRegion]:
-        return prepare_quad_warp_regions(
-            page,
-            image,
-            min_text_size=self.min_text_size,
-            rotate_region=self._apply_region_rotation,
-            options=options,
-        )
-
-    def _prepare_text_regions(
-        self,
-        page: Page,
-        image: np.ndarray,
-        options: Optional[Dict[str, Any]] = None,
-    ) -> List[PreparedRegion]:
-        preset = self.region_preparer
-        if not isinstance(preset, str):
-            raise TypeError("_prepare_text_regions is available only for preset preparers")
-
-        return prepare_text_regions(
-            page=page,
-            image=image,
-            preset=preset,
-            min_text_size=self.min_text_size,
-            rotate_region=self._apply_region_rotation,
-            options=options,
-        )
-
-    def _call_region_preparer(self, page: Page, image: np.ndarray) -> List[PreparedRegion]:
-        return call_region_preparer(
-            page=page,
-            image=image,
-            preparer=self.region_preparer,
-            options=self.region_preparer_options,
-            recognizer=self,
-            min_text_size=self.min_text_size,
-            rotate_region=self._apply_region_rotation,
-        )
 
     def _warn_single_batch_only(self) -> None:
         if self._single_batch_warning_emitted:
@@ -586,7 +320,7 @@ class TRBA(BaseRecognizer):
                 self._warn_single_batch_only()
             return 1
 
-        return requested_batch_size
+        return int(input_batch_dim) if isinstance(input_batch_dim, int) and input_batch_dim > 0 else requested_batch_size
 
     @staticmethod
     def _is_batch_shape_error(exc: Exception) -> bool:
@@ -605,6 +339,9 @@ class TRBA(BaseRecognizer):
         self,
         logits: np.ndarray,
     ) -> List[RecognitionPrediction]:
+        if (logits.ndim != 3 or logits.shape[2] != len(self.itos)
+                or logits.shape[1] == 0 or not np.isfinite(logits).all()):
+            raise ValueError("Invalid TRBA logits or charset mismatch")
         preds = np.argmax(logits, axis=-1)
         probs = self._softmax(logits, axis=-1)
 
@@ -637,16 +374,19 @@ class TRBA(BaseRecognizer):
         self,
         regions: Sequence[PreparedRegion],
         batch_size: Optional[int] = None,
+        return_raw: bool = False,
     ) -> List[RecognitionPrediction]:
         return self._run_inference_batches(
             regions=regions,
             batch_size=batch_size,
+            return_raw=return_raw,
         )
 
     def _run_inference_batches(
         self,
         regions: Sequence[PreparedRegion],
         batch_size: Optional[int] = None,
+        return_raw: bool = False,
     ) -> List[RecognitionPrediction]:
         """
         Run ONNX inference on prepared text regions.
@@ -688,7 +428,7 @@ class TRBA(BaseRecognizer):
                     for batch_tensor in batch_tensors:
                         single_input = np.expand_dims(batch_tensor, axis=0)
                         single_logits = self.onnx_session.run([output_name], {input_name: single_input})[0]
-                        results.extend(self._decode_recognition_logits(single_logits))
+                        results.extend(self._decode_predictions(single_logits, return_raw))
                     continue
                 raise
 
@@ -698,134 +438,10 @@ class TRBA(BaseRecognizer):
             if len(logits) != original_batch_size:
                 logits = logits[:original_batch_size]
 
-            results.extend(self._decode_recognition_logits(logits))
+            results.extend(self._decode_predictions(logits, return_raw))
 
         return results
 
-    def _predict_word_images(
-        self,
-        images: List[Union[np.ndarray, str, Path, Image.Image]],
-        batch_size: Optional[int] = None,
-    ) -> List[Dict[str, Any]]:
-        """
-        Backward-compatible wrapper for raw image list inference.
-        """
-        regions = [
-            PreparedRegion(
-                text_span=None,
-                image=read_image(image),
-                polygon=np.empty((0, 2), dtype=np.float32),
-                meta={"region_preparer": "legacy_raw_images"},
-            )
-            for image in images
-        ]
-        if batch_size is None:
-            batch_size = self.batch_size
-        predictions = self._predict_text_images(regions, batch_size=batch_size)
-        return [
-            {"text": prediction.text, "confidence": prediction.confidence, "meta": dict(prediction.meta)}
-            for prediction in predictions
-        ]
-
-    def _save_debug_regions(
-        self,
-        regions: Sequence[PreparedRegion],
-        debug_save_dir: Union[str, Path],
-        predictions: Optional[Sequence[RecognitionPrediction]] = None,
-        *,
-        write_images: bool = True,
-    ) -> None:
-        save_debug_regions(
-            regions=regions,
-            debug_save_dir=debug_save_dir,
-            predictions=predictions,
-            write_images=write_images,
-        )
-
-    @staticmethod
-    def _apply_text_predictions(
-        regions: Sequence[PreparedRegion],
-        predictions: Sequence[RecognitionPrediction],
-    ) -> None:
-        if len(regions) != len(predictions):
-            raise ValueError(
-                "predictor must return the same number of predictions as regions"
-            )
-
-        for region, prediction in zip(regions, predictions):
-            region.text_span.text = prediction.text
-            region.text_span.recognition_confidence = prediction.confidence
-
-    def predict(
-        self,
-        page: Page,
-        image: Optional[Union[np.ndarray, str, Path, Image.Image]] = None,
-        batch_size: Optional[int] = None,
-        debug_save_dir: Optional[Union[str, Path]] = None,
-        profile: bool = False,
-    ) -> Page:
-        """
-        Распознаёт текст для текстовых областей на ``Page`` и возвращает обновлённый ``Page``.
-
-        Параметры
-        ----------
-        page : Page
-            Объект страницы с обнаруженными полигонами текстовых областей.
-        image : str, Path, numpy.ndarray, or PIL.Image, optional
-            Исходное изображение страницы для извлечения текстовых регионов. Если ``None``,
-            распознавание пропускается и возвращается глубокая копия ``page``.
-        batch_size : int or None, optional
-            Количество подготовленных текстовых регионов для одновременной обработки. Если
-            ``None``, используется ``batch_size``, переданный в конструктор.
-        debug_save_dir : str or Path, optional
-            Если указан, сохраняет подготовленные кропы для распознавания в эту директорию
-            в виде файлов ``*.png`` вместе с ``index.json``. Кропы сохраняются после
-            ``region_preparer`` и авторотации, то есть в той же ориентации, в которой
-            поступают на вход инференса распознавателя.
-
-        Возвращает
-        -------
-        Page
-            Новый объект ``Page`` с заполненными ``text`` и ``recognition_confidence``
-            для обработанных текстовых областей.
-        """
-        result_page = page.model_copy(deep=True)
-        if image is None:
-            return result_page
-
-        if debug_save_dir is None:
-            debug_save_dir = self.default_debug_save_dir
-        if batch_size is None:
-            batch_size = self.batch_size
-
-        image_array = read_image(image)
-
-        regions = self._call_region_preparer(result_page, image_array)
-        if not regions:
-            return result_page
-
-        if debug_save_dir is not None:
-            self._save_debug_regions(
-                regions=regions,
-                debug_save_dir=debug_save_dir,
-                write_images=True,
-            )
-
-        predictions = self._normalize_text_predictions(
-            self._predict_text_images(
-                regions=regions,
-                batch_size=batch_size,
-            )
-        )
-        if debug_save_dir is not None:
-            self._save_debug_regions(
-                regions=regions,
-                debug_save_dir=debug_save_dir,
-                predictions=predictions,
-                write_images=False,
-            )
-        self._apply_text_predictions(regions, predictions)
-        return result_page
 
     @staticmethod
     def _softmax(x: np.ndarray, axis: int = -1) -> np.ndarray:
@@ -877,127 +493,124 @@ class TRBA(BaseRecognizer):
         **extra_config: Any,
     ):
         """
-        Обучение модели распознавания текста TRBA на пользовательских наборах данных.
+        Train TRBA text recognition model on custom datasets.
 
-        Параметры
+        Parameters
         ----------
         train_csvs : str, Path or sequence of paths
-            Путь(и) к обучающим CSV-файлам. Каждый CSV должен содержать столбцы:
-            ``image_path`` (относительно ``train_roots``) и ``text`` (эталонная транскрипция).
+            Path(s) to training CSV files. Each CSV should have columns:
+            ``image_path`` (relative to ``train_roots``) and ``text`` (ground
+            truth transcription).
         train_roots : str, Path or sequence of paths
-            Корневая директория/директории с обучающими изображениями. Должны совпадать по
-            длине с ``train_csvs``.
+            Root directory/directories containing training images. Must have
+            same length as ``train_csvs``.
         val_csvs : str, Path, sequence of paths, or None, optional
-            Путь(и) к валидационным CSV-файлам в том же формате, что и ``train_csvs``.
-            Если ``None``, валидация не выполняется. По умолчанию ``None``.
+            Path(s) to validation CSV files with same format as ``train_csvs``.
+            If ``None``, no validation is performed. Default is ``None``.
         val_roots : str, Path, sequence of paths, or None, optional
-            Корневая директория/директории для валидационных изображений. Должны совпадать
-            по длине с ``val_csvs``, если указаны. По умолчанию ``None``.
+            Root directory/directories for validation images. Must match length
+            of ``val_csvs`` if provided. Default is ``None``.
         exp_dir : str or Path, optional
-            Директория эксперимента для сохранения чекпоинтов и логов.
-            Если ``None``, генерируется автоматически на основе метки времени.
-            По умолчанию ``None``.
+            Experiment directory where checkpoints and logs will be saved.
+            If ``None``, auto-generated based on timestamp. Default is ``None``.
         charset_path : str or Path, optional
-            Путь к файлу набора символов. Если ``None``, используется набор символов
-            пакета по умолчанию. По умолчанию ``None``.
+            Path to character set file. If ``None``, uses default charset from
+            package. Default is ``None``.
         encoding : str, optional
-            Кодировка текста для чтения CSV-файлов. По умолчанию ``"utf-8"``.
+            Text encoding for reading CSV files. Default is ``"utf-8"``.
         img_h : int, optional
-            Целевая высота входных изображений (пиксели). По умолчанию 64.
+            Target height for input images (pixels). Default is 64.
         img_w : int, optional
-            Целевая ширина входных изображений (пиксели). По умолчанию 256.
+            Target width for input images (pixels). Default is 256.
         max_len : int, optional
-            Максимальная длина последовательности для распознавания текста. По умолчанию 25.
+            Maximum sequence length for text recognition. Default is 25.
         hidden_size : int, optional
-            Размер скрытого измерения для RNN-энкодера/декодера. По умолчанию 256.
+            Hidden dimension size for RNN encoder/decoder. Default is 256.
         num_encoder_layers : int, optional
-            Количество двунаправленных LSTM-слоёв в энкодере. По умолчанию 2.
+            Number of Bidirectional LSTM layers in the encoder. Default is 2.
         cnn_in_channels : int, optional
-            Количество входных каналов CNN-бэкбона (3 для RGB, 1 для оттенков серого).
-            По умолчанию 3.
+            Number of input channels for CNN backbone (3 for RGB, 1 for grayscale). Default is 3.
         cnn_out_channels : int, optional
-            Количество выходных каналов CNN-бэкбона. По умолчанию 512.
+            Number of output channels from CNN backbone. Default is 512.
         cnn_backbone : {"seresnet31", "seresnet31-lite"}, optional
-            Вариант CNN-бэкбона. ``"seresnet31"`` — стандартный SE-ResNet-31,
-            ``"seresnet31-lite"`` — облегчённая версия с depthwise-свёртками.
-            По умолчанию ``"seresnet31"``.
+            CNN backbone variant. ``"seresnet31"`` keeps the standard SE-ResNet-31,
+            while ``"seresnet31-lite"`` enables a depthwise-lite version. Default is ``"seresnet31"``.
         ctc_weight : float, optional
-            Начальный вес CTC-лосса при обучении (CTC всегда используется для стабильности):
+            Initial weight for CTC loss during training (CTC always used for stability):
             ``loss = attn_loss * (1 - ctc_weight) + ctc_loss * ctc_weight``.
-            Вес CTC убывает с эпохами. По умолчанию 0.3.
+            CTC weight decays over epochs. Default is 0.3.
         ctc_weight_decay_epochs : int, optional
-            Число эпох, за которое вес CTC убывает до минимального значения.
-            По умолчанию 50.
+            Number of epochs for CTC weight to decay to minimum. Default is 50.
         ctc_weight_min : float, optional
-            Минимальное значение веса CTC после затухания. По умолчанию 0.0.
+            Minimum value for CTC weight after decay. Default is 0.0.
         max_grad_norm : float, optional
-            Максимальная норма градиента для клиппинга (предотвращает взрывной
-            рост градиентов/NaN). По умолчанию 5.0.
+            Maximum gradient norm for clipping (prevents gradient explosion/NaN).
+            Default is 5.0.
         batch_size : int, optional
-            Размер батча при обучении. По умолчанию 32.
+            Training batch size. Default is 32.
         epochs : int, optional
-            Количество эпох обучения. По умолчанию 20.
+            Number of training epochs. Default is 20.
         lr : float, optional
-            Скорость обучения. По умолчанию 1e-3.
+            Learning rate. Default is 1e-3.
         optimizer : {"Adam", "SGD", "AdamW"}, optional
-            Тип оптимизатора. По умолчанию ``"AdamW"``.
+            Optimizer type. Default is ``"AdamW"``.
         scheduler : {"ReduceLROnPlateau", "CosineAnnealingLR", "OneCycleLR", "None"}, optional
-            Тип планировщика скорости обучения:
+            Learning rate scheduler type:
 
-            - ``"OneCycleLR"`` — one-cycle политика с косинусным отжигом (по умолчанию, рекомендуется)
-            - ``"ReduceLROnPlateau"`` — снижение LR при плато валидационного лосса
-            - ``"CosineAnnealingLR"`` — косинусный отжиг по эпохам
-            - ``"None"`` или ``None`` — постоянная скорость обучения
+            - ``"OneCycleLR"`` - one-cycle policy with cosine annealing (default, recommended)
+            - ``"ReduceLROnPlateau"`` - reduce LR on validation loss plateau
+            - ``"CosineAnnealingLR"`` - cosine annealing over epochs
+            - ``"None"`` or ``None`` - constant learning rate
 
-            По умолчанию ``"OneCycleLR"``.
+            Default is ``"OneCycleLR"``.
         weight_decay : float, optional
-            Коэффициент L2-регуляризации весов. По умолчанию 0.0.
+            L2 weight decay coefficient. Default is 0.0.
         momentum : float, optional
-            Моментум для оптимизатора SGD. По умолчанию 0.9.
+            Momentum for SGD optimizer. Default is 0.9.
         val_interval : int, optional
-            Выполнять валидацию каждые N эпох. По умолчанию 1.
+            Perform validation every N epochs. Default is 1.
         val_size : int, optional
-            Максимальное количество валидационных примеров. По умолчанию 3000.
+            Maximum number of validation samples to use. Default is 3000.
         train_proportions : sequence of float, optional
-            Пропорции выборки для нескольких обучающих наборов данных. Должны давать
-            сумму 1.0 и совпадать по длине с ``train_csvs``. Если ``None``, наборы данных
-            конкатенируются равномерно. По умолчанию ``None``.
+            Sampling proportions for multiple training datasets. Must sum to 1.0
+            and match length of ``train_csvs``. If ``None``, datasets are
+            concatenated equally. Default is ``None``.
         num_workers : int, optional
-            Количество воркеров для загрузки данных. По умолчанию 0.
+            Number of data loading workers. Default is 0.
         seed : int, optional
-            Случайное зерно для воспроизводимости. По умолчанию 42.
+            Random seed for reproducibility. Default is 42.
         resume_from : str or Path, optional
-            Путь к файлу чекпоинта для возобновления обучения. По умолчанию ``None``.
+            Path to checkpoint file to resume training from. Default is ``None``.
         save_interval : int, optional
-            Сохранять чекпоинт каждые N эпох. Если ``None``, сохраняется только лучшая
-            модель. По умолчанию ``None``.
+            Save checkpoint every N epochs. If ``None``, only saves best model.
+            Default is ``None``.
         device : {"cuda", "cpu"}, optional
-            Устройство для обучения. По умолчанию ``"cuda"``.
+            Training device. Default is ``"cuda"``.
         freeze_cnn : {"none", "all", "first", "last"}, optional
-            Политика заморозки CNN. По умолчанию ``"none"``.
+            CNN freezing policy. Default is ``"none"``.
         freeze_enc_rnn : {"none", "all", "first", "last"}, optional
-            Политика заморозки энкодерной RNN. По умолчанию ``"none"``.
+            Encoder RNN freezing policy. Default is ``"none"``.
         freeze_attention : {"none", "all"}, optional
-            Политика заморозки модуля внимания. По умолчанию ``"none"``.
+            Attention module freezing policy. Default is ``"none"``.
         pretrain_weights : str, Path, bool, or None, optional
-            Предобученные веса для инициализации:
+            Pretrained weights to initialize from:
 
-            - ``"default"`` или ``True`` — использовать веса релиза
-            - ``None`` или ``False`` — обучение с нуля
-            - str/Path — путь или URL к пользовательскому файлу весов
+            - ``"default"`` or ``True`` - use the registry checkpoint for ``trba_lite_g1``
+            - ``None`` or ``False`` - train from scratch
+            - str/Path - path or URL to custom weights file
 
-            По умолчанию ``"default"``.
+            Default is ``"default"``.
         **extra_config : dict, optional
-            Дополнительные параметры конфигурации, передаваемые в конфиг обучения.
+            Additional configuration parameters passed to training config.
 
-        Возвращает
+        Returns
         -------
         str
-            Путь к чекпоинту лучшей модели, сохранённой во время обучения.
+            Path to the best model checkpoint saved during training.
 
         Examples
         --------
-        Обучение на одном наборе данных с валидацией:
+        Train on single dataset with validation:
 
         >>> from manuscript.recognizers import TRBA
         >>>
@@ -1014,11 +627,11 @@ class TRBA(BaseRecognizer):
         ... )
         >>> print(f"Best model saved at: {best_model}")
 
-        Обучение на нескольких наборах данных с пользовательскими пропорциями:
+        Train on multiple datasets with custom proportions:
 
         >>> train_csvs = ["data/dataset1/train.csv", "data/dataset2/train.csv"]
         >>> train_roots = ["data/dataset1/images", "data/dataset2/images"]
-        >>> train_proportions = [0.7, 0.3]  # 70% из dataset1, 30% из dataset2
+        >>> train_proportions = [0.7, 0.3]  # 70% from dataset1, 30% from dataset2
         >>>
         >>> best_model = TRBA.train(
         ...     train_csvs=train_csvs,
@@ -1032,7 +645,7 @@ class TRBA(BaseRecognizer):
         ...     weight_decay=1e-4,
         ... )
 
-        Возобновление обучения с чекпоинта:
+        Resume training from checkpoint:
 
         >>> best_model = TRBA.train(
         ...     train_csvs="data/train.csv",
@@ -1041,7 +654,7 @@ class TRBA(BaseRecognizer):
         ...     epochs=100,
         ... )
 
-        Дообучение на предобученных весах с заморозкой CNN:
+        Fine-tune from pretrained weights with frozen CNN:
 
         >>> best_model = TRBA.train(
         ...     train_csvs="data/finetune.csv",
@@ -1052,7 +665,7 @@ class TRBA(BaseRecognizer):
         ...     lr=1e-4,
         ... )
 
-        Обучение с CTC для стабильности (всегда включён):
+        Train with CTC for stability (always enabled):
 
         >>> best_model = TRBA.train(
         ...     train_csvs="data/train.csv",
@@ -1197,64 +810,64 @@ class TRBA(BaseRecognizer):
         simplify: bool = True,
     ) -> None:
         """
-        Экспорт модели TRBA PyTorch в формат ONNX.
+        Export TRBA PyTorch model to ONNX format.
 
-        Метод конвертирует обученную модель TRBA из PyTorch в формат ONNX,
-        который может использоваться для более быстрого инференса с ONNX Runtime.
-        Экспортированную модель можно загрузить через ``TRBA(weights="model.onnx")``.
+        This method converts a trained TRBA model from PyTorch to ONNX format,
+        which can be used for faster inference with ONNX Runtime. The exported
+        model can be loaded using ``TRBA(weights="model.onnx")``.
 
-        Параметры
+        Parameters
         ----------
         weights_path : str or Path
-            Путь к файлу весов модели PyTorch (.pth).
+            Path to the PyTorch model weights file (.pth).
         config_path : str or Path
-            Путь к конфигурационному JSON-файлу модели. Используется для определения
-            архитектуры модели (img_h, img_w, max_len, hidden_size и др.).
+            Path to the model configuration JSON file. Used to determine
+            model architecture (img_h, img_w, max_len, hidden_size, etc.).
         charset_path : str or Path
-            Путь к файлу набора символов (charset.txt). Используется для определения
-            num_classes модели.
+            Path to the charset file (charset.txt). Used to determine
+            num_classes for the model.
         output_path : str or Path
-            Путь, по которому будет сохранена ONNX-модель (.onnx).
+            Path where the ONNX model will be saved (.onnx).
         opset_version : int, optional
-            Версия ONNX opset для экспорта. По умолчанию 14.
+            ONNX opset version to use for export. Default is 14.
         simplify : bool, optional
-            Если ``True``, применяет упрощение графа ONNX с помощью onnx-simplifier
-            для оптимизации модели. Требует пакет ``onnx-simplifier``.
-            По умолчанию ``True``.
+            If True, applies ONNX graph simplification using onnx-simplifier
+            to optimize the model. Requires ``onnx-simplifier`` package.
+            Default is True.
 
-        Возвращает
+        Returns
         -------
         None
-            ONNX-модель сохраняется по пути ``output_path``.
+            The ONNX model is saved to ``output_path``.
 
         Raises
         ------
         ImportError
-            Если необходимые пакеты (torch, onnx) не установлены.
+            If required packages (torch, onnx) are not installed.
         FileNotFoundError
-            Если ``weights_path`` или ``config_path`` не существуют.
+            If ``weights_path`` or ``config_path`` do not exist.
 
         Notes
         -----
-        Экспортированная ONNX-модель имеет один выход:
+        The exported ONNX model has one output:
 
-        - ``logits``: предсказания символов с формой ``(batch, max_length+1, num_classes)``
+        - ``logits``: Character predictions with shape ``(batch, max_length+1, num_classes)``
 
-        Модель использует жадное декодирование (argmax) и поддерживает динамический размер батча.
-        Длина последовательности фиксирована равной ``max_length + 1`` из конфига (аналогично
-        режиму инференса PyTorch для совместимости).
+        The model uses greedy decoding (argmax) and supports dynamic batch size.
+        The sequence length is fixed to ``max_length + 1`` from the config (same as PyTorch
+        inference mode for compatibility).
 
-        Экспортируемая архитектура:
-        - CNN-бэкбон (SE-ResNet-31 или SE-ResNet-31-Lite)
-        - Двунаправленный LSTM-энкодер
-        - Attention-декодер (жадное декодирование)
+        Architecture exported:
+        - CNN backbone (SE-ResNet-31 or SE-ResNet-31-Lite)
+        - Bidirectional LSTM encoder
+        - Attention decoder (greedy decoding)
 
-        Примечание: экспортируется только attention-декодер. CTC-голова используется
-        только при обучении и не включается в ONNX-модель.
+        Note: Only the attention decoder is exported. CTC head is used only
+        during training and is not included in the ONNX model.
 
         Examples
         --------
-        Экспорт модели TRBA в ONNX:
+        Export TRBA model to ONNX:
 
         >>> from manuscript.recognizers import TRBA
         >>> TRBA.export(
@@ -1269,7 +882,7 @@ class TRBA(BaseRecognizer):
         Input size: 64x256
         [OK] ONNX model saved to: trba_model.onnx
 
-        Экспорт с пользовательским opset:
+        Export with custom opset:
 
         >>> TRBA.export(
         ...     weights_path="model.pth",
@@ -1280,17 +893,17 @@ class TRBA(BaseRecognizer):
         ...     simplify=False
         ... )
 
-        Использование экспортированной модели для инференса:
+        Use the exported model for inference:
 
         >>> from manuscript.detectors import EAST
         >>> recognizer = TRBA(weights="trba_model.onnx")
         >>> detector = EAST()
-        >>> det = detector.predict("page.jpg")
-        >>> result = recognizer.predict(det["page"], image="page.jpg")
+        >>>         >>> page = detector.predict(Page(), image="page.jpg")
+        >>> result = recognizer.predict(page, image="page.jpg")
 
         See Also
         --------
-        TRBA.__init__ : Инициализация распознавателя TRBA с ONNX-моделью.
+        TRBA.__init__ : Initialize TRBA recognizer with ONNX model.
         """
         import torch
         from .model.model import TRBAModel, TRBAONNXWrapper

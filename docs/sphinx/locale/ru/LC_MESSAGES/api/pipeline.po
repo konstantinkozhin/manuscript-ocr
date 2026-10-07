@@ -1,48 +1,41 @@
-# SOME DESCRIPTIVE TITLE.
+# Russian translations for manuscript-ocr documentation.
 # Copyright (C) 2026, Konstantin Kozhin
 # This file is distributed under the same license as the manuscript-ocr
 # package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr 0.1.11\n"
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-05 19:57+0700\n"
-"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"POT-Creation-Date: 2026-10-06 15:49+0700\n"
+"PO-Revision-Date: 2026-10-06 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
-"Language-Team: ru\n"
 "Language: ru\n"
-"MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: 8bit\n"
+"Language-Team: ru\n"
 "Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
 "n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
-"Generated-By: Babel 2.18.0\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/pipeline.rst:2
-#: dc860a84410c4187ba2a4b7b3b595715
+#: api/pipeline.rst:2 d9dffe2b32794b1eb88151a9598f4685
 msgid "Pipeline"
 msgstr "Конвейер"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/pipeline.rst:4
-#: ed4d740089344f769eddaa19cc039b0a
+#: 07aef321790346b9bb9f8c983a5ec438 api/pipeline.rst:4
 msgid "The main high-level interface for OCR processing."
 msgstr "Основной высокоуровневый интерфейс для OCR-обработки."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline:1 df8acf871cb84c4a823c2fe93b29d967
+#: 89f5236751894647860bbc88f29b0c9a manuscript._pipeline.Pipeline:1 of
 msgid "Bases: :py:class:`object`"
 msgstr "Базовый класс: :py:class:`object`"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline:2 a06183fc84434fd891bf57be7d7a5a2d
+#: 8efcf8b876b74a9482ac694fa45267fa manuscript._pipeline.Pipeline:2 of
 msgid "High-level OCR pipeline with configurable stage ordering."
-msgstr ""
-"Высокоуровневый OCR-конвейер с настраиваемым порядком этапов."
+msgstr "Высокоуровневый OCR-конвейер с настраиваемым порядком этапов."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline:4 077bcaa69186445b86ac812f23493df9
+#: 23ecf541453745918ad408406b940b4e manuscript._pipeline.Pipeline:4 of
 msgid ""
 "Default pipeline: ``detector -> layout -> recognizer``. ``corrector`` is "
 "optional and disabled by default."
@@ -50,60 +43,49 @@ msgstr ""
 "Конвейер по умолчанию: ``detector -> layout -> recognizer``. ``corrector`` "
 "необязателен и по умолчанию отключён."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline:0 5194de115a5e4cc283c11d03b413a03b
+#: 0e74e611f7a24999a4b2d2ca4b311249 manuscript._pipeline.Pipeline of
 msgid "Attributes"
 msgstr "Атрибуты"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline:11 c7bcc5f4030b4c57a271745750fbf19d
+#: e369cdafceda4748845b251eed6880bd manuscript._pipeline.Pipeline:11 of
 msgid "**last_correction_page**"
 msgstr "**last_correction_page**"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline:14 af480903a7ef42c3b6ca3d694f1340bd
+#: 0328ce1bd49c4b4792545fc45ae74136 manuscript._pipeline.Pipeline:14 of
 msgid "**last_detection_page**"
 msgstr "**last_detection_page**"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline:17 c813a84cfd7e40c6b0fd13e9cfad0e02
+#: 7208798c6473404197beea22e97555e4 manuscript._pipeline.Pipeline:17 of
 msgid "**last_layout_page**"
 msgstr "**last_layout_page**"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline:20 994652d617fa47c6b0966801afea05c4
+#: f924117460a64997b4cb8127a762980e manuscript._pipeline.Pipeline:20 of
 msgid "**last_recognition_page**"
 msgstr "**last_recognition_page**"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/pipeline.rst:0
-#: b1abcc9d365b46ce8a0e32da52af5a78 c3773320ca034332aad85f6fdfca86d5
-#: e7dd62c9044e45f68e782bd17d7f72bf d86347501dba43bca7314de4050c3de9
+#: 395860663e414293b980f1784d577edf 56a329f3218d422f847fd3806348f1bc
+#: 8f7cb72c498743e895b5af28b5458955 af244100b3034f499a0e4744d92df826
+#: api/pipeline.rst
 msgid "Parameters"
 msgstr "Параметры"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline:24 35eb71c0ce3541bcbdd08caaf1dff33e
+#: 06714e081b8641b2ba72d709479b2198 manuscript._pipeline.Pipeline:24 of
 msgid "Methods"
 msgstr "Методы"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline:40:<autosummary>:1
-#: 888267ca06dc4930852c43e2ac566edd
-msgid ""
-":py:obj:`get_text <manuscript._pipeline.Pipeline.get_text>`\\ \\(page\\)"
-msgstr ""
-":py:obj:`get_text <manuscript._pipeline.Pipeline.get_text>`\\ \\(page\\)"
+#: 16b0cca3a1c44f47a964c672d7f70a11
+#: manuscript._pipeline.Pipeline:40:<autosummary>:1 of
+msgid ":py:obj:`get_text <manuscript._pipeline.Pipeline.get_text>`\\ \\(page\\)"
+msgstr ":py:obj:`get_text <manuscript._pipeline.Pipeline.get_text>`\\ \\(page\\)"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline.get_text:2
-#: manuscript._pipeline.Pipeline:40:<autosummary>:1
-#: 895adeead3264a939955e4c76ef8ea4d 12ddcec6921740c0a1f98514e3a2863c
+#: 7645c18d67684846bc01cd766e6a5a13 835381613bb8402d8678f7d90f2a5f75
+#: manuscript._pipeline.Pipeline.get_text:2
+#: manuscript._pipeline.Pipeline:40:<autosummary>:1 of
 msgid "Extract plain text from ``Page`` object."
 msgstr "Извлечь обычный текст из объекта ``Page``."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline:40:<autosummary>:1
-#: 9073c16a813c47018ce9258bd6922ffe
+#: 578fc68ecedf49009fd7455ec5480065
+#: manuscript._pipeline.Pipeline:40:<autosummary>:1 of
 msgid ""
 ":py:obj:`predict <manuscript._pipeline.Pipeline.predict>`\\ \\(image\\[\\, "
 "vis\\, profile\\]\\)"
@@ -111,44 +93,37 @@ msgstr ""
 ":py:obj:`predict <manuscript._pipeline.Pipeline.predict>`\\ \\(image\\[\\, "
 "vis\\, profile\\]\\)"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline.predict:2
-#: manuscript._pipeline.Pipeline:40:<autosummary>:1
-#: 5739978c1ddb456c81b877a9390ea944 ab57c94dac324894bc847202b8e985bc
+#: 2f2c9e80c3ae46e8b843016c21304761 e31cafd469354c33b9cba41dd5347abb
+#: manuscript._pipeline.Pipeline.predict:2
+#: manuscript._pipeline.Pipeline:40:<autosummary>:1 of
 msgid "Run pipeline on a single image."
 msgstr "Запустить конвейер на одном изображении."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline.__init__:2 70861f9e5b6d4935a59beba5a8feda35
+#: 03e0c577925345a2baf50c81e17b1f16 manuscript._pipeline.Pipeline.__init__:2 of
 msgid "Initialize OCR pipeline."
 msgstr "Инициализация OCR-конвейера."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline.__init__:5 90ac0d8a4c0a48b39f566ed9e95cc50c
+#: 9a3e9eb85ea04ae581fbb29370b84a78 manuscript._pipeline.Pipeline.__init__:5 of
 msgid ""
 "Detector instance with ``predict(image) -> Page``. If omitted, default "
 "``YOLO(weights=\"yolo26x_obb_text_g1\")`` is used. Detector cannot be "
 "disabled."
 msgstr ""
 "Экземпляр детектора с интерфейсом ``predict(image) -> Page``. Если не "
-"указан, используется ``YOLO(weights=\"yolo26x_obb_text_g1\")`` по "
-"умолчанию. Детектор отключить нельзя."
+"указан, используется ``YOLO(weights=\"yolo26x_obb_text_g1\")`` по умолчанию."
+" Детектор отключить нельзя."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline.__init__:10
-#: ab65348f89e048c5af46364844e647da
+#: 6013b89799224ad18e13043f8c971e2d manuscript._pipeline.Pipeline.__init__:10 of
 msgid ""
 "Layout model instance with ``predict(page, image=None) -> Page``. If "
 "omitted, default ``SimpleSorting()`` is used. Pass ``None`` to disable "
 "layout stage."
 msgstr ""
-"Экземпляр layout-модели с интерфейсом ``predict(page, image=None) -> "
-"Page``. Если не указан, используется ``SimpleSorting()`` по умолчанию. "
-"Передайте ``None``, чтобы отключить этап layout."
+"Экземпляр layout-модели с интерфейсом ``predict(page, image=None) -> Page``."
+" Если не указан, используется ``SimpleSorting()`` по умолчанию. Передайте "
+"``None``, чтобы отключить этап layout."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline.__init__:15
-#: 167e05b005b04fd1a1b9a6029c6f0556
+#: a217b9d00080488eb34502318ffb62d5 manuscript._pipeline.Pipeline.__init__:15 of
 msgid ""
 "Recognizer instance with ``predict(page, image=None, ...) -> Page``. If "
 "omitted, default ``TRBA(weights=\"trba_lite_g2\")`` is used. Pass ``None`` "
@@ -158,70 +133,65 @@ msgstr ""
 "Page``. Если не указан, используется ``TRBA(weights=\"trba_lite_g2\")`` по "
 "умолчанию. Передайте ``None``, чтобы отключить этап распознавания."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline.__init__:20
-#: a0b304e56657488fb42320e20db6b1d9
+#: 6d3825d0489a443494743a23a97265d3 manuscript._pipeline.Pipeline.__init__:20 of
 msgid ""
 "Corrector instance with ``predict(page, image=None) -> Page``. Default is "
 "``None`` (disabled)."
 msgstr ""
-"Экземпляр корректора с интерфейсом ``predict(page, image=None) -> Page``. "
-"По умолчанию ``None`` (отключён)."
+"Экземпляр корректора с интерфейсом ``predict(page, image=None) -> Page``. По"
+" умолчанию ``None`` (отключён)."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline.__init__:24
-#: 24af3fa338dc40aba02660cb7074516e
+#: e5e150d695f647d7bbe55f436ede33f3 manuscript._pipeline.Pipeline.__init__:24 of
 msgid "Slot where layout stage is executed. Default is ``\"detector\"``."
 msgstr "Слот, в котором выполняется этап layout. По умолчанию ``\"detector\"``."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline.predict:5 5ba83789bcae47e8bf71bf668c8f03ab
+#: 58ca1e9c310e4e18b979201a11e45f70 manuscript._pipeline.Pipeline.predict:5 of
 msgid "Input image."
 msgstr "Входное изображение."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline.predict:8 2adf3e948e984ced96023d262a7f4995
+#: 7f36b994b8d245e08d818eebb640c275 manuscript._pipeline.Pipeline.predict:8 of
 msgid "If True, returns visualization image together with result."
-msgstr ""
-"Если True, возвращает изображение визуализации вместе с результатом."
+msgstr "Если True, возвращает изображение визуализации вместе с результатом."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline.predict:11 8185815e1de24d17a2f11ba448259468
+#: d5f4e71a11c24a60a47e5cb73b3692fa manuscript._pipeline.Pipeline.predict:11 of
 msgid "If True, prints timing per stage."
 msgstr "Если True, выводит время выполнения каждого этапа."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/pipeline.rst:0
-#: 05460c54b8db4bdc9c0af78207ca0e88 5f6ac3148495456c8a885f1842b7daa8
+#: api/pipeline.rst c9885442d6504e158a63d902ade81d87
+#: ff04fe3a7127494fbdd435e8995fa595
 msgid "Return type"
 msgstr "Тип возвращаемого значения"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline.predict:27 7f3bd373e17a418f8c657eba01880037
+#: 406c5d10778e4051a7327412c0d6f6c4 manuscript._pipeline.Pipeline.predict:27 of
 msgid ""
-":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Union\\`\\\\ \\\\"
-"\\[\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ \\\\\\[\\:py\\:class\\:"
-"\\`str\\`\\, \\:py\\:class\\:\\`\\~manuscript.data.structures.Page\\`\\]\\, "
+":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Union\\`\\\\ "
+"\\\\\\[\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ "
+"\\\\\\[\\:py\\:class\\:\\`str\\`\\, "
+"\\:py\\:class\\:\\`\\~manuscript.data.structures.Page\\`\\]\\, "
 "\\:py\\:class\\:\\`tuple\\`\\]`"
 msgstr ""
-":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Union\\`\\\\ \\\\"
-"\\[\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ \\\\\\[\\:py\\:class\\:"
-"\\`str\\`\\, \\:py\\:class\\:\\`\\~manuscript.data.structures.Page\\`\\]\\, "
+":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Union\\`\\\\ "
+"\\\\\\[\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ "
+"\\\\\\[\\:py\\:class\\:\\`str\\`\\, "
+"\\:py\\:class\\:\\`\\~manuscript.data.structures.Page\\`\\]\\, "
 "\\:py\\:class\\:\\`tuple\\`\\]`"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/_pipeline.py:docstring
-#: of manuscript._pipeline.Pipeline.get_text:19
-#: 912525c0ef2b4143ae77b6b88e66c54e
+#: 5d99940e252d445595b9a264e27c244b manuscript._pipeline.Pipeline.get_text:19 of
 msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\``"
 msgstr ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\``"
 
 #~ msgid ""
-#~ "The Pipeline class orchestrates EAST detector, TRBA recognizer, and "
-#~ "optional text corrector to perform complete OCR workflow: detection → "
-#~ "crop extraction → recognition → correction → result merging."
+#~ "The Pipeline class orchestrates EAST "
+#~ "detector, TRBA recognizer, and optional "
+#~ "text corrector to perform complete OCR "
+#~ "workflow: detection → crop extraction → "
+#~ "recognition → correction → result merging."
 #~ msgstr ""
-#~ "Класс Pipeline координирует детектор EAST, распознаватель TRBA и "
-#~ "опциональный корректор текста для выполнения полного OCR-процесса: "
-#~ "детекция → извлечение кропов → распознавание → коррекция → объединение "
+#~ "Класс Pipeline координирует детектор EAST, "
+#~ "распознаватель TRBA и опциональный корректор "
+#~ "текста для выполнения полного OCR-процесса: "
+#~ "детекция → извлечение кропов → "
+#~ "распознавание → коррекция → объединение "
 #~ "результатов."
 
 #~ msgid "Text detector instance"
@@ -265,64 +235,75 @@ msgstr ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\``"
 
 #~ msgid "Text detector instance. If None, creates default EAST detector."
 #~ msgstr ""
-#~ "Экземпляр детектора текста. Если None, создаётся детектор EAST по "
-#~ "умолчанию."
+#~ "Экземпляр детектора текста. Если None, "
+#~ "создаётся детектор EAST по умолчанию."
 
 #~ msgid "Text recognizer instance. If None, creates default TRBA recognizer."
 #~ msgstr ""
-#~ "Экземпляр распознавателя текста. Если None, создаётся распознаватель TRBA "
-#~ "по умолчанию."
+#~ "Экземпляр распознавателя текста. Если None, "
+#~ "создаётся распознаватель TRBA по умолчанию."
 
 #~ msgid ""
-#~ "Minimum text size in pixels. Boxes smaller than this will be filtered out "
-#~ "before recognition. Default is 5."
+#~ "Minimum text size in pixels. Boxes "
+#~ "smaller than this will be filtered "
+#~ "out before recognition. Default is 5."
 #~ msgstr ""
-#~ "Минимальный размер текста в пикселях. Боксы меньшего размера будут "
-#~ "отфильтрованы перед распознаванием. По умолчанию 5."
+#~ "Минимальный размер текста в пикселях. Боксы"
+#~ " меньшего размера будут отфильтрованы перед"
+#~ " распознаванием. По умолчанию 5."
 
 #~ msgid ""
-#~ "Input image. Can be: - Path to image file (str or Path) - RGB numpy array "
-#~ "with shape (H, W, 3) in uint8 - PIL Image object"
+#~ "Input image. Can be: - Path to "
+#~ "image file (str or Path) - RGB "
+#~ "numpy array with shape (H, W, 3) "
+#~ "in uint8 - PIL Image object"
 #~ msgstr ""
-#~ "Входное изображение. Может быть:  - путь к файлу изображения (str или "
-#~ "Path)  - RGB-массив NumPy формы (H, W, 3) в формате uint8  - объект PIL "
+#~ "Входное изображение. Может быть:  - путь"
+#~ " к файлу изображения (str или Path)  "
+#~ "- RGB-массив NumPy формы (H, W, 3)"
+#~ " в формате uint8  - объект PIL "
 #~ "Image"
 
 #~ msgid ""
-#~ "If True, performs both detection and recognition. If False, performs only "
+#~ "If True, performs both detection and "
+#~ "recognition. If False, performs only "
 #~ "detection. Default is True."
 #~ msgstr ""
-#~ "Если True, выполняет детекцию и распознавание. Если False, выполняет "
-#~ "только детекцию. По умолчанию True."
+#~ "Если True, выполняет детекцию и "
+#~ "распознавание. Если False, выполняет только "
+#~ "детекцию. По умолчанию True."
 
 #~ msgid ""
-#~ "If True, prints timing information for each pipeline stage. Default is "
-#~ "False."
+#~ "If True, prints timing information for "
+#~ "each pipeline stage. Default is False."
 #~ msgstr ""
-#~ "Если True, выводит информацию о времени выполнения каждого этапа "
-#~ "конвейера. По умолчанию False."
+#~ "Если True, выводит информацию о времени "
+#~ "выполнения каждого этапа конвейера. По "
+#~ "умолчанию False."
 
 #~ msgid "Returns"
 #~ msgstr "Возвращает"
 
 #~ msgid ""
-#~ "If vis=False:     dict with keys:     - \"page\" : Page object with "
-#~ "detection/recognition results  If vis=True:     tuple of (result_dict, "
-#~ "vis_image)"
+#~ "If vis=False:     dict with keys:     - "
+#~ "\"page\" : Page object with "
+#~ "detection/recognition results  If vis=True:     "
+#~ "tuple of (result_dict, vis_image)"
 #~ msgstr ""
-#~ "Если vis=False:  словарь с ключами:  - \"page\" : объект Page с "
-#~ "результатами детекции/распознавания  Если vis=True:  кортеж (result_dict, "
-#~ "vis_image)"
+#~ "Если vis=False:  словарь с ключами:  - "
+#~ "\"page\" : объект Page с результатами "
+#~ "детекции/распознавания  Если vis=True:  кортеж "
+#~ "(result_dict, vis_image)"
 
 #~ msgid "If vis=False:"
 #~ msgstr "Если vis=False:"
 
 #~ msgid ""
-#~ "dict with keys: - \"page\" : Page object with detection/recognition "
-#~ "results"
+#~ "dict with keys: - \"page\" : Page "
+#~ "object with detection/recognition results"
 #~ msgstr ""
-#~ "словарь с ключами:  - \"page\" : объект Page с результатами детекции/"
-#~ "распознавания"
+#~ "словарь с ключами:  - \"page\" : "
+#~ "объект Page с результатами детекции/распознавания"
 
 #~ msgid "If vis=True:"
 #~ msgstr "Если vis=True:"
@@ -349,11 +330,14 @@ msgstr ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\``"
 #~ msgstr "Извлечённый текст, в котором строки разделены переводами строки."
 
 #~ msgid ""
-#~ "Aspect ratio threshold for automatic rotation of vertical text crops. If "
-#~ "``height > width * rotate_threshold``, crop is rotated 90° clockwise."
+#~ "Aspect ratio threshold for automatic "
+#~ "rotation of vertical text crops. If "
+#~ "``height > width * rotate_threshold``, crop"
+#~ " is rotated 90° clockwise."
 #~ msgstr ""
-#~ "Порог соотношения сторон для автоматического поворота вертикального "
-#~ "текста. Если ``height > width * rotate_threshold``, изображение "
+#~ "Порог соотношения сторон для автоматического "
+#~ "поворота вертикального текста. Если ``height "
+#~ "> width * rotate_threshold``, изображение "
 #~ "поворачивается на 90° по часовой стрелке."
 
 #~ msgid "float"
@@ -380,20 +364,18 @@ msgstr ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\``"
 #~ msgid "Page after recognition (before correction)."
 #~ msgstr "Страница после распознавания (до коррекции)."
 
-#~ msgid ""
-#~ "Page after detection (before recognition). None if predict() not called."
+#~ msgid "Page after detection (before recognition). None if predict() not called."
 #~ msgstr ""
-#~ "Страница после детекции (до распознавания). None, если predict() не "
-#~ "вызывался."
+#~ "Страница после детекции (до распознавания). "
+#~ "None, если predict() не вызывался."
 
-#~ msgid ""
-#~ "Page after recognition (before correction). None if predict() not called."
+#~ msgid "Page after recognition (before correction). None if predict() not called."
 #~ msgstr ""
-#~ "Страница после распознавания (до коррекции). None, если predict() не "
-#~ "вызывался."
+#~ "Страница после распознавания (до коррекции). "
+#~ "None, если predict() не вызывался."
 
-#~ msgid ""
-#~ "Page after correction. None if corrector not used or predict() not called."
+#~ msgid "Page after correction. None if corrector not used or predict() not called."
 #~ msgstr ""
-#~ "Страница после коррекции. None, если корректор не используется или "
-#~ "predict() не вызывался."
+#~ "Страница после коррекции. None, если "
+#~ "корректор не используется или predict() не"
+#~ " вызывался."

@@ -492,6 +492,12 @@ class BaseArtifactModel(ABC):
                 except OSError:
                     pass
 
+    def _create_onnx_session(self, weights=None, **kwargs):
+        self._prepare_runtime_dependencies()
+        session = ort.InferenceSession(str(self.weights if weights is None else weights), providers=self.runtime_providers(), **kwargs)
+        self._log_device_info(session)
+        return session
+
     # -------------------------------------------------------------------------
     # BACKEND INITIALIZATION
     # -------------------------------------------------------------------------

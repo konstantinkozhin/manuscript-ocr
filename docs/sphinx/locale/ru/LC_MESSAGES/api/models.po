@@ -1,0 +1,122 @@
+# Russian translations for manuscript-ocr documentation.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr
+# package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-06 15:49+0700\n"
+"PO-Revision-Date: 2026-10-06 00:00+0700\n"
+"Last-Translator: OpenAI Codex\n"
+"Language: ru\n"
+"Language-Team: ru\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: a923b6f32cfa4598ad1e4318ae18f951 api/models.rst:2
+msgid "Models"
+msgstr "Модели"
+
+#: 98573ceae560420681c8833008117188 api/models.rst:4
+msgid ""
+"Public helpers use the default registry root. Create ``Registry(root=...)`` "
+"when you need a separate cache."
+msgstr ""
+"Публичные функции используют стандартный корень реестра. Для отдельного кэша"
+" создайте ``Registry(root=...)``."
+
+#: 1200f53f2f0c476eb211b67f11705ddd api/models.rst:9
+msgid ""
+"Returns metadata for a key; ``model_class`` optionally validates the "
+"consuming class. An unknown key triggers a catalog refresh before raising "
+"``ValueError``."
+msgstr ""
+"Возвращает метаданные по ключу; ``model_class`` позволяет проверить класс, "
+"использующий модель. При неизвестном ключе каталог обновляется перед выдачей"
+" ``ValueError``."
+
+#: 39f1522262ba444abfb31c7f2da85ac7 api/models.rst:14
+msgid "Refreshes configured sources and returns the effective catalog."
+msgstr "Обновляет настроенные источники и возвращает объединённый каталог."
+
+#: 7618ebb5a30641ffa294401423728b01 manuscript.models.registry.add_registry:2 of
+msgid "Add an extra catalog; priority=True lets its entries override official ones."
+msgstr ""
+"Добавляет дополнительный каталог; priority=True позволяет его записям "
+"переопределять официальные."
+
+#: 46a9068b4c2d4fc091801285ec34f0af api/models.rst:18
+msgid ""
+"Adds a source for this process and optionally persists it. Call "
+"``refresh()`` after changing sources."
+msgstr ""
+"Добавляет источник для текущего процесса и при необходимости сохраняет его. "
+"После изменения источников вызовите ``refresh()``."
+
+#: 57a68cc5dede42bdb8c40780f1b5871c api/models.rst:23
+msgid ""
+"Returns a mapping of artifact roles to local paths. With ``artifact=None``, "
+"fetches required artifacts; otherwise fetches the requested role. A declared"
+" license is included. ``force_download=True`` bypasses reuse of existing "
+"artifact files."
+msgstr ""
+"Возвращает соответствие ролей артефактов локальным путям. При "
+"``artifact=None`` загружает обязательные артефакты, иначе — запрошенную "
+"роль. Объявленная лицензия также включается. ``force_download=True`` "
+"отключает повторное использование существующих файлов артефактов."
+
+#: 631a4b28215c4a968e7c9e0624ad4403 api/models.rst:29
+msgid "Alias of ``resolve()`` with the same arguments and return value."
+msgstr "Псевдоним ``resolve()`` с теми же аргументами и возвращаемым значением."
+
+#: 664b21be0bb148ec9e1d15b837cd00f0 manuscript.models.registry.path:2 of
+msgid "Return the model directory without downloading artifacts."
+msgstr "Возвращает каталог модели без скачивания артефактов."
+
+#: api/models.rst:33 e19bf895ee394999b73a5414d63d4d35
+msgid ""
+"Returns the bundle directory without downloading artifacts. Looking up its "
+"metadata may refresh the catalog; the directory and manifest may be created."
+msgstr ""
+"Возвращает каталог комплекта без скачивания артефактов. Поиск метаданных "
+"может обновить каталог реестра; директория и манифест могут быть созданы."
+
+#: 58aa34f20a834730bdf26cb1bdac654a manuscript.models.registry.list_installed:2 of
+msgid "List local model manifests, including partially downloaded bundles."
+msgstr ""
+"Перечисляет локальные манифесты моделей, включая частично скачанные "
+"комплекты."
+
+#: ab1214b110e540a7b2f4927050d6022a manuscript.models.registry.verify:2 of
+msgid "Verify required and already downloaded optional files against the registry."
+msgstr "Проверяет обязательные и уже скачанные необязательные файлы по реестру."
+
+#: 3377f28f46f7444cabfd2b0eeeaf86ee api/models.rst:40
+msgid "Returns a mapping from artifact role to boolean verification result."
+msgstr "Возвращает соответствие ролей артефактов логическим результатам проверки."
+
+#: 8aeeaf9b46e7467f9e3837ce71d8f706 api/models.rst:44
+msgid "Returns whether all required verification checks pass."
+msgstr "Возвращает, прошли ли все обязательные проверки."
+
+#: f0e643183875425f89097d83a67bb9f9 manuscript.models.registry.remove:2 of
+msgid "Remove the bundle identified by its registry key."
+msgstr "Удаляет комплект, определяемый ключом реестра."
+
+#: 1d302de2601649f7aea72d1fe9748463 manuscript.models.registry.Registry:1 of
+msgid "Bases: :py:class:`object`"
+msgstr "Базовый класс: :py:class:`object`"
+
+#: api/models.rst:51 b5bb1336a0ea4283b096b47b3b516257
+msgid ""
+"For source priority, compatibility warnings and cache layout, see "
+":doc:`../model_registry`."
+msgstr ""
+"Приоритет источников, предупреждения о совместимости и структура кэша "
+"описаны в :doc:`../model_registry`."

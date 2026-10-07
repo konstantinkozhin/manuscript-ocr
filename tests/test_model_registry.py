@@ -230,14 +230,14 @@ def test_bundled_registry_valid():
     assert sum(a is not None for e in data['models'].values() for a in e['artifacts'].values()) == 34
 
 
-@pytest.mark.parametrize('class_name', ['TRBA', 'YOLO', 'EAST', 'CharLM', 'PPOCRv5Rec'])
+@pytest.mark.parametrize('class_name', ['TRBA', 'YOLO', 'EAST', 'CharLM', 'PPOCRRec'])
 def test_public_classes_resolve_new_names_and_companions(tmp_path, monkeypatch, class_name):
     from manuscript import models
-    from manuscript.recognizers import TRBA, PPOCRv5Rec
+    from manuscript.recognizers import TRBA, PPOCRRec
     from manuscript.detectors import YOLO, EAST
     from manuscript.correctors import CharLM
 
-    classes = {c.__name__: c for c in (TRBA, YOLO, EAST, CharLM, PPOCRv5Rec)}
+    classes = {c.__name__: c for c in (TRBA, YOLO, EAST, CharLM, PPOCRRec)}
     config = b'{"max_len":25,"hidden_size":256,"img_h":64,"img_w":256,"imgsz":1280}'
     charset = b'<PAD>\n<SOS>\n<EOS>\na\nb\nc'
     vocab = b'["a","b","c"]'
@@ -250,9 +250,9 @@ def test_public_classes_resolve_new_names_and_companions(tmp_path, monkeypatch, 
     monkeypatch.setattr(models, 'info', r.info)
     network(monkeypatch, {'https://files/weights': b'weights', 'https://config': config,
                           'https://charset': charset, 'https://vocab': vocab})
-    if class_name == 'PPOCRv5Rec':
+    if class_name == 'PPOCRRec':
         # PPOCR's format-specific startup is tested separately; exercise its resolver here.
-        instance = object.__new__(PPOCRv5Rec)
+        instance = object.__new__(PPOCRRec)
         instance.force_download = False
         assert Path(instance._resolve_weights('demo')).read_bytes() == b'weights'
     else:

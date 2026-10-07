@@ -16,7 +16,7 @@ Install the package and the Sphinx toolchain:
 
 ```bash
 python3 -m pip install -e .
-python3 -m pip install sphinx sphinx-rtd-theme numpydoc sphinx-autodoc-typehints sphinxcontrib-mermaid
+python3 -m pip install sphinx sphinx-rtd-theme numpydoc sphinx-autodoc-typehints sphinxcontrib-mermaid sphinx-intl
 ```
 
 Install `tectonic` for PDF generation.
@@ -27,10 +27,20 @@ On macOS:
 brew install tectonic
 ```
 
+## Update Russian Translations
+
+```bash
+python3 -m sphinx -b gettext docs/sphinx docs/sphinx/_build/gettext
+sphinx-intl update -p docs/sphinx/_build/gettext -l ru
+```
+
+Translate new or changed messages in `docs/sphinx/locale/ru/LC_MESSAGES/*.po`
+before building. An HTML build succeeding does not guarantee translation coverage.
+
 ## Build Versioned HTML
 
 ```bash
-VERSION=0.1.12
+VERSION=0.1.13
 
 mkdir -p docs/sphinx/_site/$VERSION/en docs/sphinx/_site/$VERSION/ru
 
@@ -55,7 +65,7 @@ Result:
 ## Build Russian PDF
 
 ```bash
-VERSION=0.1.12
+VERSION=0.1.13
 
 python3 -m sphinx -b latex \
   -D language=ru \

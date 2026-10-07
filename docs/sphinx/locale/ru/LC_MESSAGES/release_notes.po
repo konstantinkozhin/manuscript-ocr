@@ -1,0 +1,116 @@
+# Russian translations for manuscript-ocr documentation.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr
+# package.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-06 15:49+0700\n"
+"PO-Revision-Date: 2026-10-06 00:00+0700\n"
+"Last-Translator: OpenAI Codex\n"
+"Language: ru\n"
+"Language-Team: ru\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
+"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: a0ed42c7d78341039f4c37f5a3caa132 release_notes.rst:2
+msgid "Release Notes"
+msgstr "Изменения версий"
+
+#: d3ca2b2cf87a4f9fa2497d12017520a3 release_notes.rst:5
+msgid "0.1.13"
+msgstr "0.1.13"
+
+#: 647865f756bc4e388e6c883ded34cb23 release_notes.rst:8
+msgid "Model management"
+msgstr "Управление моделями"
+
+#: b692196fabbd40a480c79c0fee12b6fd release_notes.rst:10
+msgid ""
+"Presets and TRBA pretraining now use a shared mirrored registry. Model "
+"bundles store weights, supporting files and a declared license together, "
+"validate class, file size and SHA-256, and reuse verified legacy cache "
+"files. Public helpers download, inspect, verify and remove bundles. "
+"Downloads display progress. Version compatibility mismatches warn and allow "
+"execution to continue. See :doc:`model_registry`."
+msgstr ""
+"Пресеты и предобучение TRBA теперь используют общий реестр с зеркалами. "
+"Комплекты моделей хранят веса, вспомогательные файлы и объявленную лицензию "
+"вместе, проверяют класс, размер файлов и SHA-256, повторно используют "
+"проверенные файлы старого кэша. Публичные функции загружают, описывают, "
+"проверяют и удаляют комплекты. Загрузка отображает прогресс. Несовпадение "
+"версии совместимости вызывает предупреждение и не останавливает выполнение. "
+"См. :doc:`model_registry`."
+
+#: 7a8dd3ad4c894390a4a92c7e303564a6 release_notes.rst:18
+msgid "Inference fixes"
+msgstr "Исправления инференса"
+
+#: ec6de77058c046ec9b4ede159a587477 release_notes.rst:20
+msgid ""
+"TRBA pads the last incomplete batch to the effective ONNX batch size and "
+"returns only the original predictions. This avoids severe CUDA inference "
+"slowdowns on page-scale runs. Pipeline now respects the recognizer's "
+"configured batch size."
+msgstr ""
+"TRBA дополняет последний неполный батч до эффективного размера ONNX-батча и "
+"возвращает только исходные предсказания. Это устраняет сильное замедление "
+"CUDA-инференса при обработке страниц. Pipeline теперь учитывает размер "
+"батча, настроенный в распознавателе."
+
+#: d3fdba06fbd049caa0a8cbd6e66f6339 release_notes.rst:24
+msgid ""
+"On Windows, CUDA initialization loads NVIDIA runtime DLLs from ``site-"
+"packages/nvidia`` and retains DLL directory handles. This fixes cuDNN "
+"frontend sublibrary loading. Training imports and heavy public exports are "
+"lazy, so runtime inference avoids unnecessary PyTorch imports."
+msgstr ""
+"В Windows инициализация CUDA загружает NVIDIA runtime DLL из ``site-"
+"packages/nvidia`` и сохраняет дескрипторы каталогов DLL. Это исправляет "
+"загрузку вспомогательных библиотек cuDNN frontend. Импорты обучения и "
+"тяжёлые публичные экспорты выполняются лениво, поэтому инференс избегает "
+"ненужных импортов PyTorch."
+
+#: aeab6b28c07c4b32b23a44ed8af020f4 release_notes.rst:30
+msgid "Training and export"
+msgstr "Обучение и экспорт"
+
+#: 4a7490dde45540c0be321a88a9714e37 release_notes.rst:32
+msgid ""
+"TRBA supports a PARSeq decoder, the ``SEResNet31LiteV2`` backbone and "
+"optional TPS rectification. Attention remains the default decoder. Training "
+"and ONNX export preserve architecture settings and use decoder-specific loss"
+" and decoding length. See :doc:`api/recognizers` for configuration."
+msgstr ""
+"TRBA поддерживает декодер PARSeq, backbone ``SEResNet31LiteV2`` и "
+"необязательное выпрямление TPS. Attention остаётся декодером по умолчанию. "
+"Обучение и ONNX-экспорт сохраняют параметры архитектуры и используют функцию"
+" потерь и длину декодирования, соответствующие декодеру. Конфигурация "
+"описана в :doc:`api/recognizers`."
+
+#: 4c6a41e8b33a4ce7ae40d39b6ab5202f release_notes.rst:37
+msgid ""
+"Checkpoint loading reports keys filtered during compatibility loading. "
+"Checkpoint and weight writes are atomic, CPU Torch RNG state is saved and "
+"restored, and seed setup also seeds NumPy. These changes do not guarantee "
+"full reproducibility across devices or all random generators."
+msgstr ""
+"Загрузка чекпоинта сообщает о ключах, отфильтрованных при совместимой "
+"загрузке. Запись чекпоинтов и весов атомарна, состояние CPU Torch RNG "
+"сохраняется и восстанавливается, настройка seed также задаёт зерно NumPy. "
+"Эти изменения не гарантируют полную воспроизводимость между устройствами или"
+" для всех генераторов случайных чисел."
+
+#: 9fbf60a2085a4ae4a5ee22ffe88a258c release_notes.rst:42
+msgid ""
+"Regression tests cover partial ONNX batches, architecture configuration, "
+"training, export and experiment launching."
+msgstr ""
+"Регрессионные тесты покрывают неполные ONNX-батчи, конфигурацию архитектуры,"
+" обучение, экспорт и запуск экспериментов."
