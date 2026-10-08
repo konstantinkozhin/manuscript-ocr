@@ -503,12 +503,12 @@
           "required": true
         },
         "config": {
-          "filename": "yolo26s_obb_text_g1.raw.yaml",
-          "format": "yaml",
-          "size": 1810,
-          "sha256": "08fb5df9fee8227a6a48559a6de6e56fff103c787c07d824d4b79f606135ee03",
+          "filename": "yolo26s_obb_text_g1.raw.json",
+          "format": "json",
+          "size": 85,
+          "sha256": "abe7f5e68259874d6ea58e4c9781796ee800799d3bc9034f93027d423e27634f",
           "urls": [
-            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.yaml"
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.json"
           ],
           "required": true
         }
@@ -546,12 +546,12 @@
           "required": true
         },
         "config": {
-          "filename": "yolo26x_obb_text_g1.raw.yaml",
-          "format": "yaml",
-          "size": 1810,
-          "sha256": "fe2a37982089e54a11979a7f8423fb2be555c499ed5f62e0dddf54cfc60deb87",
+          "filename": "yolo26x_obb_text_g1.raw.json",
+          "format": "json",
+          "size": 85,
+          "sha256": "abe7f5e68259874d6ea58e4c9781796ee800799d3bc9034f93027d423e27634f",
           "urls": [
-            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.yaml"
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.json"
           ],
           "required": true
         }
