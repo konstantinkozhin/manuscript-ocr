@@ -121,8 +121,8 @@
         "config": {
           "filename": "mask2former_line_v0_prev.json",
           "format": "json",
-          "size": 441,
-          "sha256": "f02afb6f28651e10f6db47cc42996e6163291850fe08c27edcbcf5860e134031",
+          "size": 538,
+          "sha256": "9c1281ce677e68f441f55fb6ab94fb358bbebe018d81cf4db2117cd4c9e84c42",
           "urls": [
             "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.json"
           ],
