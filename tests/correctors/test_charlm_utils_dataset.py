@@ -1,10 +1,6 @@
 """Reliability tests for CharLM helper and dataset modules."""
 
-import csv
 import importlib
-import sys
-from pathlib import Path
-from types import ModuleType, SimpleNamespace
 
 import pytest
 
@@ -12,31 +8,9 @@ torch = pytest.importorskip("torch")
 
 
 def _load_charlm_modules(monkeypatch):
-    fake_lev = ModuleType("Levenshtein")
-
-    def _distance(a, b):
-        dp = [[0] * (len(b) + 1) for _ in range(len(a) + 1)]
-        for i in range(len(a) + 1):
-            dp[i][0] = i
-        for j in range(len(b) + 1):
-            dp[0][j] = j
-        for i in range(1, len(a) + 1):
-            for j in range(1, len(b) + 1):
-                cost = 0 if a[i - 1] == b[j - 1] else 1
-                dp[i][j] = min(
-                    dp[i - 1][j] + 1,
-                    dp[i][j - 1] + 1,
-                    dp[i - 1][j - 1] + cost,
-                )
-        return dp[-1][-1]
-
-    fake_lev.distance = _distance
-    monkeypatch.setitem(sys.modules, "Levenshtein", fake_lev)
-    sys.modules.pop("manuscript.correctors._charlm.utils", None)
-    sys.modules.pop("manuscript.correctors._charlm.dataset", None)
-    utils_module = importlib.import_module("manuscript.correctors._charlm.utils")
-    dataset_module = importlib.import_module("manuscript.correctors._charlm.dataset")
-    return utils_module, dataset_module
+    pytest.importorskip("Levenshtein")
+    return (importlib.import_module("manuscript.correctors._charlm.utils"),
+            importlib.import_module("manuscript.correctors._charlm.dataset"))
 
 
 class FakeMLM:
@@ -206,3 +180,48 @@ class TestCharLMDatasets:
 
         assert x.tolist()[:3] == [3, 1, 5]
         assert y.tolist()[:3] == [-100, 5, -100]
+
+
+@pytest.mark.parametrize("return_details", [False, True])
+def test_reconstruct_word_preserves_text_outside_model_context(return_details):
+    pytest.importorskip("Levenshtein")
+    from manuscript.correctors._charlm.utils import reconstruct_word
+    from unittest.mock import Mock
+    model = Mock()
+    result = reconstruct_word(model, "abcdefgh", {}, {}, "cpu", 4, .05, .95, 2,
+                              return_trace=return_details)
+    assert result == (("abcdefgh", [], []) if return_details else "abcdefgh")
+    model.assert_not_called()
+    model.eval.assert_not_called()
+
+
+def test_pairs_dataset_excludes_pairs_without_targets_inside_context():
+    from manuscript.correctors._charlm.dataset import PairsDataset
+    from manuscript.correctors._charlm.utils import build_vocab
+
+    c2i, _, _ = build_vocab(["abc"])
+    dataset = PairsDataset(
+        [("aaaab", "aaaac"), ("aaaa", "aaaa"), ("abca", "acca")], c2i, max_len=4,
+    )
+    assert len(dataset) == 1
+    _, targets = dataset[0]
+    assert (targets != -100).any()
+
+
+def test_pairs_dataset_rejects_insertion_or_deletion_pairs():
+    from manuscript.correctors._charlm.dataset import PairsDataset
+    with pytest.raises(ValueError, match="equal lengths"):
+        PairsDataset([("abc", "ab")], {}, max_len=4)
+
+
+def test_torch_correction_preserves_unknown_characters():
+    from manuscript.correctors._charlm.utils import build_vocab, reconstruct_word
+
+    c2i, i2c, _ = build_vocab(["cat", "cot"])
+    result, trace, confidences = reconstruct_word(
+        FakeMLM(c2i), "?ot", c2i, i2c, "cpu", 5, .9, .9, 2,
+        return_trace=True, return_p_cur=True,
+    )
+    assert result == "?at"
+    assert all(item["pos"] != 0 for item in trace)
+    assert all(position != 0 for position, _, _ in confidences)

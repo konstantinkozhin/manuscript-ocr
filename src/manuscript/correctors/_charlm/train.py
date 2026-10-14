@@ -2,6 +2,7 @@ import os
 import json
 import random
 import csv
+import math
 import torch
 import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
@@ -73,6 +74,12 @@ class MixedDataset(Dataset):
 
 def train(config=None):
     cfg = {**DEFAULT_CONFIG, **(config or {})}
+    for key in ("epochs", "batch_size", "accumulation_steps", "max_len", "steps_per_epoch"):
+        if isinstance(cfg[key], bool) or not isinstance(cfg[key], int) or cfg[key] <= 0:
+            raise ValueError(f"{key} must be a positive integer")
+    checkpoint = None
+    if cfg.get("checkpoint"):
+        checkpoint = torch.load(cfg["checkpoint"], map_location="cpu", weights_only=False)
     os.makedirs(cfg["exp_dir"], exist_ok=True)
     ckpt_dir = os.path.join(cfg["exp_dir"], "checkpoints")
     os.makedirs(ckpt_dir, exist_ok=True)
@@ -97,7 +104,20 @@ def train(config=None):
         words = random.sample(words, cfg["max_words"])
     logger.log(f"Words: {len(words):,}")
 
-    c2i, i2c, chars = build_vocab(words)
+    if not allowed_chars:
+        raise ValueError("charset must contain letters")
+    c2i, i2c, chars = build_vocab([*words, "".join(sorted(allowed_chars))])
+    if checkpoint is not None:
+        saved_chars = checkpoint.get("vocab")
+        if saved_chars is None:
+            vocab_path = os.path.join(os.path.dirname(os.path.dirname(cfg["checkpoint"])), "vocab.json")
+            if not os.path.isfile(vocab_path):
+                raise ValueError("Resume requires the checkpoint vocabulary")
+            with open(vocab_path, encoding="utf-8") as stream:
+                saved_chars = json.load(stream)
+        chars = saved_chars
+        c2i = {ch: index for index, ch in enumerate(chars)}
+        i2c = dict(enumerate(chars))
     vocab_size = len(chars)
     with open(os.path.join(cfg["exp_dir"], "vocab.json"), "w", encoding="utf-8") as f:
         json.dump(chars, f, ensure_ascii=False)
@@ -150,7 +170,7 @@ def train(config=None):
         raise ValueError("No datasets: set text_path or pairs_path")
 
     train_loader = DataLoader(
-        dataset, batch_size=cfg["batch_size"], shuffle=True, num_workers=0, pin_memory=True
+        dataset, batch_size=cfg["batch_size"], shuffle=True, num_workers=0, pin_memory=device == "cuda"
     )
 
     for name, pairs, fname in [("eval", eval_pairs, "ocr_eval_pairs.tsv")]:
@@ -171,7 +191,7 @@ def train(config=None):
 
     optimizer = torch.optim.AdamW(model.parameters(), lr=cfg["lr"], weight_decay=cfg["weight_decay"])
     scheduler = torch.optim.lr_scheduler.CosineAnnealingLR(
-        optimizer, T_max=max(1, cfg["epochs"] * len(train_loader))
+        optimizer, T_max=cfg["epochs"] * math.ceil(len(train_loader) / cfg["accumulation_steps"])
     )
     
     scaler = torch.cuda.amp.GradScaler() if cfg.get("use_amp", False) and device == "cuda" else None
@@ -179,16 +199,15 @@ def train(config=None):
         logger.log("Using mixed precision (AMP)")
 
     start_epoch = 1
-    if cfg.get("checkpoint") and os.path.exists(cfg["checkpoint"]):
-        logger.log(f"Loading checkpoint: {cfg['checkpoint']}")
-        ckpt = torch.load(cfg["checkpoint"], map_location=device)
-        model.load_state_dict(ckpt["model"])
-        if "optimizer" in ckpt:
-            optimizer.load_state_dict(ckpt["optimizer"])
-        if "epoch" in ckpt:
-            start_epoch = ckpt["epoch"] + 1
-        if scaler and "scaler" in ckpt:
-            scaler.load_state_dict(ckpt["scaler"])
+    if checkpoint is not None:
+        model.load_state_dict(checkpoint["model"])
+        if "optimizer" in checkpoint:
+            optimizer.load_state_dict(checkpoint["optimizer"])
+        if "scheduler" in checkpoint:
+            scheduler.load_state_dict(checkpoint["scheduler"])
+        start_epoch = checkpoint.get("epoch", 0) + 1
+        if scaler and "scaler" in checkpoint:
+            scaler.load_state_dict(checkpoint["scaler"])
         logger.log(f"Resuming from epoch {start_epoch}")
 
     corrector = CharLMCorrector(
@@ -196,44 +215,52 @@ def train(config=None):
         cfg["mask_threshold"], cfg["apply_threshold"], cfg["max_edits"], lexicon
     )
 
+    if checkpoint is not None:
+        if "random_state" in checkpoint:
+            random.setstate(checkpoint["random_state"])
+        if "torch_rng_state" in checkpoint:
+            torch.set_rng_state(checkpoint["torch_rng_state"].cpu())
+        if device == "cuda" and "cuda_rng_state" in checkpoint:
+            torch.cuda.set_rng_state_all(checkpoint["cuda_rng_state"])
+
     for epoch in range(start_epoch, cfg["epochs"] + 1):
         model.train()
         total_loss = total_acc = 0.0
-        accumulation_steps = cfg.get("accumulation_steps", 1)
+        accumulation_steps = cfg["accumulation_steps"]
         pbar = tqdm(train_loader, desc=f"Epoch {epoch}")
-        
+
         optimizer.zero_grad()
         for step_idx, (x, y) in enumerate(pbar):
             x, y = x.to(device), y.to(device)
-            
+            group_start = (step_idx // accumulation_steps) * accumulation_steps
+            group_size = min(accumulation_steps, len(train_loader) - group_start)
             if scaler:
                 with torch.cuda.amp.autocast():
                     logits = model(x)
-                    loss = F.cross_entropy(logits.view(-1, vocab_size), y.view(-1), ignore_index=-100)
-                loss = loss / accumulation_steps
-                scaler.scale(loss).backward()
-                
-                if (step_idx + 1) % accumulation_steps == 0:
-                    if cfg["grad_clip"] > 0:
-                        scaler.unscale_(optimizer)
-                        torch.nn.utils.clip_grad_norm_(model.parameters(), cfg["grad_clip"])
-                    scaler.step(optimizer)
-                    scaler.update()
-                    optimizer.zero_grad()
-                    scheduler.step()
+                    loss = F.cross_entropy(logits.reshape(-1, vocab_size), y.reshape(-1), ignore_index=-100)
+                scaler.scale(loss / group_size).backward()
             else:
                 logits = model(x)
-                loss = F.cross_entropy(logits.view(-1, vocab_size), y.view(-1), ignore_index=-100)
-                loss = loss / accumulation_steps
-                loss.backward()
-                
-                if (step_idx + 1) % accumulation_steps == 0:
-                    if cfg["grad_clip"] > 0:
-                        torch.nn.utils.clip_grad_norm_(model.parameters(), cfg["grad_clip"])
+                loss = F.cross_entropy(logits.reshape(-1, vocab_size), y.reshape(-1), ignore_index=-100)
+                (loss / group_size).backward()
+
+            if (step_idx + 1) % accumulation_steps == 0 or step_idx + 1 == len(train_loader):
+                if scaler:
+                    scaler.unscale_(optimizer)
+                if cfg["grad_clip"] > 0:
+                    torch.nn.utils.clip_grad_norm_(model.parameters(), cfg["grad_clip"])
+                if scaler:
+                    scale = scaler.get_scale()
+                    scaler.step(optimizer)
+                    scaler.update()
+                    updated = scaler.get_scale() >= scale
+                else:
                     optimizer.step()
-                    optimizer.zero_grad()
+                    updated = True
+                optimizer.zero_grad()
+                if updated:
                     scheduler.step()
-            
+
             acc = masked_accuracy(logits, y)
             total_loss += loss.item()
             total_acc += acc
@@ -253,7 +280,13 @@ def train(config=None):
                 for k, v in stats.items():
                     logger.log(f"{k}: {v:.4f}")
 
-        ckpt_dict = {"model": model.state_dict(), "epoch": epoch, "optimizer": optimizer.state_dict()}
+        ckpt_dict = {
+            "model": model.state_dict(), "epoch": epoch, "optimizer": optimizer.state_dict(),
+            "scheduler": scheduler.state_dict(), "vocab": chars,
+            "random_state": random.getstate(), "torch_rng_state": torch.get_rng_state(),
+        }
+        if device == "cuda":
+            ckpt_dict["cuda_rng_state"] = torch.cuda.get_rng_state_all()
         if scaler:
             ckpt_dict["scaler"] = scaler.state_dict()
         torch.save(ckpt_dict, os.path.join(ckpt_dir, f"charlm_epoch_{epoch}.pt"))

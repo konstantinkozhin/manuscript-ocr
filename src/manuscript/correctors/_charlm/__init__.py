@@ -16,8 +16,8 @@ class CharLM(BaseCorrector):
     Character-level language model corrector using ONNX Runtime.
 
     CharLM uses a Transformer-based masked language model to correct
-    OCR errors at the character level. It analyzes character confidence
-    and applies corrections based on learned substitution patterns.
+    OCR substitution errors. It estimates each character's probability from
+    its masked context; recognition_confidence from OCR is not used.
 
     Parameters
     ----------
@@ -28,16 +28,18 @@ class CharLM(BaseCorrector):
         - HTTP/HTTPS URL: ``"https://example.com/model.onnx"``
         - GitHub release: ``"github://owner/repo/tag/file.onnx"``
         - Google Drive: ``"gdrive:FILE_ID"``
-        - Preset name: ``"prereform_charlm_g1"`` or ``"modern_charlm_g1"`` (from pretrained_registry)
+        - Preset name: ``"prereform_charlm_g1"`` or ``"modern_charlm_g1"`` (from the model registry)
         - ``None``: auto-downloads default preset (prereform_charlm_g1)
 
     vocab : str or Path, optional
-        Path to vocabulary JSON file. If None, inferred from weights location.
+        Path to vocabulary JSON file. Required for local weights; registry presets
+        supply their own vocabulary artifact.
     lexicon : str, Path, or set, optional
         Word list for dictionary-based validation. Supports:
 
         - Local file path: ``"path/to/words.txt"``
-        - Preset name: ``"prereform_words"`` or ``"modern_words"`` (from lexicon_registry)
+        - Model registry key: ``"prereform_charlm_g1"`` or ``"modern_charlm_g1"``
+          (loads its lexicon artifact)
         - Python set: ``{"word1", "word2", ...}``
         - ``None``: auto-downloads default lexicon for model preset
           (prereform_words for prereform_charlm_g1, modern_words for modern_charlm_g1)
@@ -53,6 +55,11 @@ class CharLM(BaseCorrector):
         Maximum number of edits per word. Default is 2.
     min_word_len : int, optional
         Minimum word length to attempt correction. Default is 4.
+    max_len : int, optional
+        Model context length. Longer words are preserved. Default is 32.
+    correction_levels : sequence of str, optional
+        TextRegion levels to correct: word, line or block. Default is ("word",).
+        Text is split into words while preserving case and separators.
     **kwargs
         Additional configuration options.
 
@@ -65,26 +72,6 @@ class CharLM(BaseCorrector):
 
     default_weights_name = "prereform_charlm_g1"
     registry_model_class = "CharLM"
-    pretrained_registry = {
-        "prereform_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.onnx",
-        "modern_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.onnx",
-    }
-
-    vocab_registry = {
-        "prereform_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.json",
-        "modern_charlm_g1": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.json",
-    }
-
-    lexicon_registry = {
-        "prereform_words": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt",
-        "modern_words": "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_words.txt",
-    }
-
-    default_lexicon_for_model = {
-        "prereform_charlm_g1": "prereform_words",
-        "modern_charlm_g1": "modern_words",
-    }
-
     def __init__(
         self,
         weights: Optional[Union[str, Path]] = None,
@@ -97,12 +84,13 @@ class CharLM(BaseCorrector):
         max_edits: int = 2,
         min_word_len: int = 4,
         max_len: int = 32,
+        correction_levels=("word",),
         **kwargs,
     ):
+        self._configure_correction_levels(correction_levels)
+
         if weights is None and self.default_weights_name is not None:
             weights = self.default_weights_name
-
-        self._weights_preset = weights if weights in self.pretrained_registry else None
 
         if weights is None:
             self.device = device or "cpu"
@@ -115,6 +103,7 @@ class CharLM(BaseCorrector):
                 weights=weights,
                 device=device,
                 force_download=force_download,
+                correction_levels=correction_levels,
                 **kwargs,
             )
 
@@ -146,15 +135,6 @@ class CharLM(BaseCorrector):
                 lexicon_path = resolve(name, self.registry_model_class, artifact='lexicon',
                                        force_download=self.force_download)['lexicon']
                 self._load_lexicon(lexicon_path)
-        elif (
-            self._weights_preset
-            and self._weights_preset in self.default_lexicon_for_model
-        ):
-            # Auto-load default lexicon for known model presets
-            default_lexicon_name = self.default_lexicon_for_model[self._weights_preset]
-            lexicon_path = self._resolve_lexicon(default_lexicon_name)
-            if lexicon_path:
-                self._load_lexicon(lexicon_path)
 
         self.onnx_session = None
 
@@ -162,37 +142,22 @@ class CharLM(BaseCorrector):
             self._load_vocab()
 
     def _resolve_vocab(self, vocab: Optional[str]) -> Optional[str]:
-        """Resolve vocab path, inferring from weights location if needed."""
+        """Resolve an explicit vocab path or the registered model artifact."""
         if vocab is not None:
             return self._resolve_extra_artifact(
-                vocab, default_name=None, registry=self.vocab_registry, description="vocab"
+                vocab, default_name=None, registry={}, description="vocab"
             )
 
-        if vocab is None and getattr(self, '_resolved_model_artifacts', None):
-            return str(self._resolved_model_artifacts['vocab'])
+        resolved = getattr(self, '_resolved_model_artifacts', {}).get('vocab')
+        if resolved:
+            return str(resolved)
 
-        # Use actual weights preset (if any), otherwise fall back to default
-        preset_to_use = self._weights_preset or self.default_weights_name
-        if preset_to_use and preset_to_use in self.vocab_registry:
-            return self._resolve_extra_artifact(
-                preset_to_use,
-                default_name=None,
-                registry=self.vocab_registry,
-                description="vocab",
-            )
-
-        if self.weights:
-            weights_path = Path(self.weights)
-            vocab_candidate = weights_path.parent / "vocab.json"
-            if vocab_candidate.exists():
-                return str(vocab_candidate.absolute())
-
-        return None
+        raise ValueError("CharLM local weights require an explicit vocab path")
 
     def _resolve_lexicon(self, lexicon: str) -> Optional[str]:
         """Resolve lexicon path from registry or local file."""
         return self._resolve_extra_artifact(
-            lexicon, default_name=None, registry=self.lexicon_registry, description="lexicon"
+            lexicon, default_name=None, registry={}, description="lexicon"
         )
 
     def _load_vocab(self):
@@ -244,24 +209,23 @@ class CharLM(BaseCorrector):
         Returns
         -------
         Page
-            Corrected Page object with updated text-span texts.
+            Page copy with corrected text at the selected levels.
         """
         _ = image
+        result = self._copy_page(page)
 
         if self.weights is None or not self.c2i:
-            return page.model_copy(deep=True)
+            return result
+
+        regions = list(self._text_regions(result))
+        if not regions:
+            return result
 
         if self.onnx_session is None:
             self._initialize_session()
 
-        result = page.model_copy(deep=True)
-
-        for block in result.blocks:
-            for line in block.lines:
-                for text_span in line.text_spans:
-                    if text_span.text:
-                        corrected = self._correct_word(text_span.text)
-                        text_span.text = corrected
+        for region in regions:
+            region.text = self._correct_word(region.text)
 
         return result
 
@@ -302,12 +266,14 @@ class CharLM(BaseCorrector):
 
     def _correct_single_word(self, word: str) -> str:
         """Apply MLM-based correction to a single lowercase word."""
-        chars = list(word[: self.max_len])
+        # Words outside the model context must remain intact.
+        if len(word) > self.max_len:
+            return word
+        chars = list(word)
         L = len(chars)
         if L == 0:
             return word
 
-        # Use 0 as fallback for unknown tokens (safer than potentially out-of-bounds unk)
         unk = self.c2i.get("<UNK>", 0)
         mask = self.c2i.get("<MASK>", 1)
         pad = self.c2i.get("<PAD>", 0)
@@ -328,7 +294,6 @@ class CharLM(BaseCorrector):
         try:
             logits = self.onnx_session.run([output_name], {input_name: batch_array})[0]
         except Exception as e:
-            # If ONNX inference fails (e.g., vocab mismatch), log warning and return original word
             import warnings
 
             warnings.warn(
@@ -341,7 +306,7 @@ class CharLM(BaseCorrector):
         probs = self._softmax(logits, axis=-1)
         vocab_size = probs.shape[-1]
 
-        # Track which positions have unknown characters (should not be corrected)
+        # Preserve characters the model vocabulary cannot represent.
         unknown_positions = set()
         for i, ch in enumerate(chars):
             if ch not in self.c2i or self.c2i[ch] >= vocab_size:
@@ -349,7 +314,6 @@ class CharLM(BaseCorrector):
 
         confidences = []
         for i in range(L):
-            # Skip unknown characters
             if i in unknown_positions:
                 continue
             char_id = self.c2i[chars[i]]
@@ -688,7 +652,7 @@ class CharLM(BaseCorrector):
         print(f"Layers: {n_layers}")
         print(f"Heads: {n_heads}")
 
-        dummy_input = torch.zeros(1, max_len, dtype=torch.long)
+        dummy_input = torch.full((1, max_len), c2i.get("<MASK>", 1), dtype=torch.long)
 
         output_path.parent.mkdir(parents=True, exist_ok=True)
 
@@ -705,6 +669,7 @@ class CharLM(BaseCorrector):
             },
             opset_version=opset_version,
             do_constant_folding=True,
+            dynamo=False,
         )
 
         print(f"[OK] ONNX model saved to: {output_path}")

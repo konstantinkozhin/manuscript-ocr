@@ -1,662 +1,171 @@
-import pytest
+"""Deterministic CharLM inference tests: no downloads or real model required."""
+import json
+from types import SimpleNamespace
+from unittest.mock import Mock
 import numpy as np
-from copy import deepcopy
-
-from manuscript.api.corrector import BaseCorrector
-from manuscript.data import TextSpan, Line, Block, Page
+import pytest
 from manuscript.correctors import CharLM
-
-
-# ============================================================================
-# Helper functions
-# ============================================================================
-
-
-def create_sample_page() -> Page:
-    """Create a sample Page for testing."""
-    word1 = TextSpan(
-        polygon=[(10.0, 20.0), (100.0, 20.0), (100.0, 40.0), (10.0, 40.0)],
-        detection_confidence=0.95,
-        text="Hello",
-        recognition_confidence=0.98,
-    )
-    word2 = TextSpan(
-        polygon=[(110.0, 20.0), (200.0, 20.0), (200.0, 40.0), (110.0, 40.0)],
-        detection_confidence=0.92,
-        text="World",
-        recognition_confidence=0.96,
-    )
-    line = Line(text_spans=[word1, word2])
-    block = Block(lines=[line])
-    return Page(blocks=[block])
-
-
-def create_empty_page() -> Page:
-    """Create an empty Page for testing."""
-    return Page(blocks=[])
-
-
-# ============================================================================
-# Tests for BaseCorrector
-# ============================================================================
-
-
-class TestBaseCorrector:
-    """Tests asserting BaseCorrector usage."""
-
-    def test_base_model_is_abstract(self):
-        """BaseCorrector is abstract and cannot be instantiated."""
-        with pytest.raises(TypeError):
-            BaseCorrector()
-
-    def test_subclass_must_implement_predict_and_initialize(self):
-        """A subclass implementing required methods can be instantiated and used."""
-
-        class MinimalCorrector(BaseCorrector):
-            default_weights_name = None
-            
-            def __init__(self):
-                self.device = "cpu"
-                self.weights = None
-                self.extra_config = {}
-                self.session = None
-            
-            def _initialize_session(self):
-                pass
-
-            def predict(self, page: Page, image=None) -> Page:
-                return page.model_copy(deep=True)
-
-        corrector = MinimalCorrector()
-        page = create_sample_page()
-
-        result = corrector.predict(page, image=np.zeros((16, 16, 3), dtype=np.uint8))
-        assert isinstance(result, Page)
-
-    def test_base_model_call_invokes_predict(self):
-        """__call__ should forward to predict()."""
-
-        class CallableCorrector(BaseCorrector):
-            default_weights_name = None
-            
-            def __init__(self):
-                self.device = "cpu"
-                self.weights = None
-                self.extra_config = {}
-                self.session = None
-                self.call_count = 0
-            
-            def _initialize_session(self):
-                pass
-
-            def predict(self, page: Page, image=None) -> Page:
-                self.call_count += 1
-                return page.model_copy(deep=True)
-
-        corrector = CallableCorrector()
-        page = create_sample_page()
-
-        result = corrector(page, image=np.zeros((16, 16, 3), dtype=np.uint8))
-
-        assert corrector.call_count == 1
-        assert isinstance(result, Page)
-
-
-# ============================================================================
-# Tests for CharLM
-# ============================================================================
-
-
-class TestCharLM:
-    """Tests for CharLM corrector implementation."""
-
-    def test_charlm_creation(self):
-        """CharLM can be instantiated with API-compatible signature."""
-        corrector = CharLM(weights=None, device="cpu")
-        assert corrector is not None
-        assert hasattr(corrector, "device")
-        assert hasattr(corrector, "weights")
-
-    def test_charlm_inherits_base(self):
-        """CharLM inherits from BaseCorrector."""
-        corrector = CharLM(weights=None)
-        assert isinstance(corrector, BaseCorrector)
-
-    def test_charlm_returns_page(self):
-        """CharLM.predict returns a Page object."""
-        corrector = CharLM(weights=None)
-        page = create_sample_page()
-
-        result = corrector.predict(page)
-
-        assert isinstance(result, Page)
-
-    def test_charlm_accepts_optional_image_argument(self):
-        """CharLM.predict accepts optional image argument and returns Page."""
-        corrector = CharLM(weights=None)
-        page = create_sample_page()
-        image = np.zeros((64, 64, 3), dtype=np.uint8)
-
-        result = corrector.predict(page, image=image)
-
-        assert isinstance(result, Page)
-
-    def test_charlm_returns_copy(self):
-        """CharLM returns a copy, not the same object."""
-        corrector = CharLM(weights=None)
-        page = create_sample_page()
-
-        result = corrector.predict(page)
-
-        assert result is not page
-
-    def test_charlm_deep_copy(self):
-        """CharLM returns a deep copy."""
-        corrector = CharLM(weights=None)
-        page = create_sample_page()
-
-        result = corrector.predict(page)
-
-        page.blocks[0].lines[0].text_spans[0].text = "Modified"
-
-        assert result.blocks[0].lines[0].text_spans[0].text == "Hello"
-
-    def test_charlm_preserves_text_without_weights(self):
-        """CharLM without weights preserves all text content."""
-        corrector = CharLM(weights=None)
-        page = create_sample_page()
-
-        result = corrector.predict(page)
-
-        assert result.blocks[0].lines[0].text_spans[0].text == "Hello"
-        assert result.blocks[0].lines[0].text_spans[1].text == "World"
-
-    def test_charlm_preserves_structure(self):
-        """CharLM preserves page structure."""
-        corrector = CharLM(weights=None)
-        page = create_sample_page()
-
-        result = corrector.predict(page)
-
-        assert len(result.blocks) == len(page.blocks)
-        assert len(result.blocks[0].lines) == len(page.blocks[0].lines)
-        assert len(result.blocks[0].lines[0].text_spans) == len(page.blocks[0].lines[0].text_spans)
-
-    def test_charlm_preserves_coordinates(self):
-        """CharLM preserves polygon coordinates."""
-        corrector = CharLM(weights=None)
-        page = create_sample_page()
-
-        result = corrector.predict(page)
-
-        original_polygon = page.blocks[0].lines[0].text_spans[0].polygon
-        result_polygon = result.blocks[0].lines[0].text_spans[0].polygon
-        assert result_polygon == original_polygon
-
-    def test_charlm_preserves_confidence(self):
-        """CharLM preserves confidence scores."""
-        corrector = CharLM(weights=None)
-        page = create_sample_page()
-
-        result = corrector.predict(page)
-
-        orig_word = page.blocks[0].lines[0].text_spans[0]
-        result_word = result.blocks[0].lines[0].text_spans[0]
-        assert result_word.detection_confidence == orig_word.detection_confidence
-        assert result_word.recognition_confidence == orig_word.recognition_confidence
-
-    def test_charlm_empty_page(self):
-        """CharLM handles empty page."""
-        corrector = CharLM(weights=None)
-        page = create_empty_page()
-
-        result = corrector.predict(page)
-
-        assert isinstance(result, Page)
-        assert len(result.blocks) == 0
-
-    def test_charlm_callable(self):
-        """CharLM can be called directly via __call__ alias."""
-        corrector = CharLM(weights=None)
-        page = create_sample_page()
-
-        result = corrector(page)
-
-        assert isinstance(result, Page)
-        assert result.blocks[0].lines[0].text_spans[0].text == "Hello"
-
-    def test_charlm_multiple_calls(self):
-        """CharLM can be called multiple times."""
-        corrector = CharLM(weights=None)
-        page1 = create_sample_page()
-        page2 = create_sample_page()
-        page2.blocks[0].lines[0].text_spans[0].text = "Different"
-
-        result1 = corrector.predict(page1)
-        result2 = corrector.predict(page2)
-
-        assert result1.blocks[0].lines[0].text_spans[0].text == "Hello"
-        assert result2.blocks[0].lines[0].text_spans[0].text == "Different"
-
-    def test_charlm_default_parameters(self):
-        """CharLM has sensible default parameters."""
-        corrector = CharLM(weights=None)
-        
-        assert hasattr(corrector, "mask_threshold")
-        assert hasattr(corrector, "apply_threshold")
-        assert hasattr(corrector, "max_edits")
-        assert hasattr(corrector, "min_word_len")
-        
-    def test_charlm_custom_thresholds(self):
-        """CharLM accepts custom threshold parameters."""
-        corrector = CharLM(
-            weights=None,
-            mask_threshold=0.1,
-            apply_threshold=0.9,
-            max_edits=3,
-            min_word_len=3
-        )
-        
-        assert corrector.mask_threshold == 0.1
-        assert corrector.apply_threshold == 0.9
-        assert corrector.max_edits == 3
-        assert corrector.min_word_len == 3
-
-
-# ============================================================================
-# Tests for module imports
-# ============================================================================
-
-
-class TestModuleImports:
-    """Tests for module structure and imports."""
-
-    def test_import_from_correctors(self):
-        """Can import CharLM from manuscript.correctors."""
-        from manuscript.correctors import CharLM
-
-        assert CharLM is not None
-
-    def test_import_from_manuscript(self):
-        """Can import CharLM from manuscript root."""
-        from manuscript import CharLM
-
-        assert CharLM is not None
-
-    def test_correctors_in_all(self):
-        """Correctors are in __all__."""
-        import manuscript.correctors
-
-        assert "CharLM" in manuscript.correctors.__all__
-
-
-# ============================================================================
-# Tests for custom corrector implementation
-# ============================================================================
-
-
-class TestCustomCorrector:
-    """Tests for implementing custom correctors."""
-
-    def test_custom_corrector_modifies_text(self):
-        """Custom corrector can modify TextSpan text."""
-
-        class UppercaseCorrector(BaseCorrector):
-            default_weights_name = None
-            
-            def __init__(self):
-                self.device = "cpu"
-                self.weights = None
-                self.extra_config = {}
-                self.session = None
-            
-            def _initialize_session(self):
-                pass
-            
-            def predict(self, page: Page, image=None) -> Page:
-                result = page.model_copy(deep=True)
-                for block in result.blocks:
-                    for line in block.lines:
-                        for text_span in line.text_spans:
-                            if text_span.text:
-                                text_span.text = text_span.text.upper()
-                return result
-
-        corrector = UppercaseCorrector()
-        page = create_sample_page()
-
-        result = corrector.predict(page)
-
-        assert result.blocks[0].lines[0].text_spans[0].text == "HELLO"
-        assert result.blocks[0].lines[0].text_spans[1].text == "WORLD"
-        assert page.blocks[0].lines[0].text_spans[0].text == "Hello"
-
-    def test_custom_corrector_uses_context(self):
-        """Custom corrector can use TextSpan context."""
-
-        class ContextAwareCorrector(BaseCorrector):
-            default_weights_name = None
-            
-            def __init__(self):
-                self.device = "cpu"
-                self.weights = None
-                self.extra_config = {}
-                self.session = None
-            
-            def _initialize_session(self):
-                pass
-            
-            def predict(self, page: Page, image=None) -> Page:
-                result = page.model_copy(deep=True)
-                for block in result.blocks:
-                    for line in block.lines:
-                        texts = [w.text for w in line.text_spans if w.text]
-                        if line.text_spans and line.text_spans[0].text:
-                            line.text_spans[0].text = f"[{len(texts)} words] {line.text_spans[0].text}"
-                return result
-
-        corrector = ContextAwareCorrector()
-        page = create_sample_page()
-
-        result = corrector.predict(page)
-
-        assert result.blocks[0].lines[0].text_spans[0].text == "[2 words] Hello"
-
-    def test_custom_corrector_with_kwargs(self):
-        """Custom corrector can accept additional kwargs."""
-
-        class ConfigurableCorrector(BaseCorrector):
-            default_weights_name = None
-            
-            def __init__(self, prefix: str = ""):
-                self.device = "cpu"
-                self.weights = None
-                self.extra_config = {}
-                self.session = None
-                self.prefix = prefix
-            
-            def _initialize_session(self):
-                pass
-            
-            def predict(self, page: Page, image=None) -> Page:
-                result = page.model_copy(deep=True)
-                for block in result.blocks:
-                    for line in block.lines:
-                        for text_span in line.text_spans:
-                            if text_span.text:
-                                text_span.text = self.prefix + text_span.text
-                return result
-
-        corrector = ConfigurableCorrector(prefix=">>")
-        page = create_sample_page()
-
-        result = corrector.predict(page)
-
-        assert result.blocks[0].lines[0].text_spans[0].text == ">>Hello"
-
-
-# ============================================================================
-# Tests for CharLM specific functionality
-# ============================================================================
-
-
-class TestCharLMAdvanced:
-    """Advanced tests for CharLM corrector."""
-
-    def test_charlm_default_weights_name(self):
-        """CharLM has default_weights_name attribute."""
-        assert hasattr(CharLM, "default_weights_name")
-        assert CharLM.default_weights_name == "prereform_charlm_g1"
-
-    def test_charlm_pretrained_registry(self):
-        """CharLM has pretrained_registry with available presets."""
-        assert hasattr(CharLM, "pretrained_registry")
-        assert "prereform_charlm_g1" in CharLM.pretrained_registry
-        assert "modern_charlm_g1" in CharLM.pretrained_registry
-
-    def test_charlm_vocab_registry(self):
-        """CharLM has vocab_registry."""
-        assert hasattr(CharLM, "vocab_registry")
-        assert "prereform_charlm_g1" in CharLM.vocab_registry
-        assert "modern_charlm_g1" in CharLM.vocab_registry
-
-    def test_charlm_lexicon_registry(self):
-        """CharLM has lexicon_registry."""
-        assert hasattr(CharLM, "lexicon_registry")
-        assert "prereform_words" in CharLM.lexicon_registry
-        assert "modern_words" in CharLM.lexicon_registry
-
-    def test_charlm_without_weights_returns_copy(self):
-        """CharLM without weights returns a deep copy of the page."""
-        corrector = CharLM(weights=None)
-        page = create_sample_page()
-
-        result = corrector.predict(page)
-
-        assert result is not page
-        assert result.blocks[0].lines[0].text_spans[0].text == page.blocks[0].lines[0].text_spans[0].text
-
-    def test_charlm_accepts_lexicon_as_set(self):
-        """CharLM accepts lexicon as a set."""
-        lexicon = {"hello", "world"}
-        corrector = CharLM(weights=None, lexicon=lexicon)
-        
-        assert corrector.lexicon is not None
-        assert "hello" in corrector.lexicon
-        assert "world" in corrector.lexicon
-
-    def test_charlm_max_len_parameter(self):
-        """CharLM accepts max_len parameter."""
-        corrector = CharLM(weights=None, max_len=64)
-        
-        assert corrector.max_len == 64
-
-    def test_charlm_handles_multiple_blocks(self):
-        """CharLM handles pages with multiple blocks."""
-        corrector = CharLM(weights=None)
-        
-        word1 = TextSpan(
-            polygon=[(10.0, 20.0), (100.0, 20.0), (100.0, 40.0), (10.0, 40.0)],
-            detection_confidence=0.95,
-            text="Block1",
-            recognition_confidence=0.98,
-        )
-        word2 = TextSpan(
-            polygon=[(10.0, 60.0), (100.0, 60.0), (100.0, 80.0), (10.0, 80.0)],
-            detection_confidence=0.92,
-            text="Block2",
-            recognition_confidence=0.96,
-        )
-        line1 = Line(text_spans=[word1])
-        line2 = Line(text_spans=[word2])
-        block1 = Block(lines=[line1])
-        block2 = Block(lines=[line2])
-        page = Page(blocks=[block1, block2])
-
-        result = corrector.predict(page)
-
-        assert len(result.blocks) == 2
-        assert result.blocks[0].lines[0].text_spans[0].text == "Block1"
-        assert result.blocks[1].lines[0].text_spans[0].text == "Block2"
-
-    def test_charlm_handles_multiple_lines(self):
-        """CharLM handles blocks with multiple lines."""
-        corrector = CharLM(weights=None)
-        
-        word1 = TextSpan(
-            polygon=[(10.0, 20.0), (100.0, 20.0), (100.0, 40.0), (10.0, 40.0)],
-            detection_confidence=0.95,
-            text="Line1",
-            recognition_confidence=0.98,
-        )
-        word2 = TextSpan(
-            polygon=[(10.0, 50.0), (100.0, 50.0), (100.0, 70.0), (10.0, 70.0)],
-            detection_confidence=0.92,
-            text="Line2",
-            recognition_confidence=0.96,
-        )
-        line1 = Line(text_spans=[word1])
-        line2 = Line(text_spans=[word2])
-        block = Block(lines=[line1, line2])
-        page = Page(blocks=[block])
-
-        result = corrector.predict(page)
-
-        assert len(result.blocks[0].lines) == 2
-        assert result.blocks[0].lines[0].text_spans[0].text == "Line1"
-        assert result.blocks[0].lines[1].text_spans[0].text == "Line2"
-
-    def test_charlm_handles_words_without_text(self):
-        """CharLM handles words with None text."""
-        corrector = CharLM(weights=None)
-        
-        text_span = TextSpan(
-            polygon=[(10.0, 20.0), (100.0, 20.0), (100.0, 40.0), (10.0, 40.0)],
-            detection_confidence=0.95,
-            text=None,
-            recognition_confidence=None,
-        )
-        line = Line(text_spans=[text_span])
-        block = Block(lines=[line])
-        page = Page(blocks=[block])
-
-        result = corrector.predict(page)
-
-        assert result.blocks[0].lines[0].text_spans[0].text is None
-
-    def test_charlm_handles_empty_text(self):
-        """CharLM handles words with empty text."""
-        corrector = CharLM(weights=None)
-        
-        text_span = TextSpan(
-            polygon=[(10.0, 20.0), (100.0, 20.0), (100.0, 40.0), (10.0, 40.0)],
-            detection_confidence=0.95,
-            text="",
-            recognition_confidence=0.98,
-        )
-        line = Line(text_spans=[text_span])
-        block = Block(lines=[line])
-        page = Page(blocks=[block])
-
-        result = corrector.predict(page)
-
-        assert result.blocks[0].lines[0].text_spans[0].text == ""
-
-    def test_charlm_has_train_method(self):
-        """CharLM has static train method."""
-        assert hasattr(CharLM, "train")
-        assert callable(CharLM.train)
-
-    def test_charlm_has_export_method(self):
-        """CharLM has static export method."""
-        assert hasattr(CharLM, "export")
-        assert callable(CharLM.export)
-
-
-# ============================================================================
-# Tests for create_page_from_text utility
-# ============================================================================
-
-
-class TestCreatePageFromText:
-    """Tests for create_page_from_text utility function."""
-
-    def test_create_page_from_text_import(self):
-        """Can import create_page_from_text from manuscript.utils."""
-        from manuscript.utils import create_page_from_text
-        assert create_page_from_text is not None
-
-    def test_create_page_from_text_single_line(self):
-        """Creates page from single line."""
-        from manuscript.utils import create_page_from_text
-        
-        page = create_page_from_text(["Hello world"])
-        
-        assert isinstance(page, Page)
-        assert len(page.blocks) == 1
-        assert len(page.blocks[0].lines) == 1
-        assert len(page.blocks[0].lines[0].text_spans) == 2
-        assert page.blocks[0].lines[0].text_spans[0].text == "Hello"
-        assert page.blocks[0].lines[0].text_spans[1].text == "world"
-
-    def test_create_page_from_text_multiple_lines(self):
-        """Creates page from multiple lines."""
-        from manuscript.utils import create_page_from_text
-        
-        page = create_page_from_text(["Line one", "Line two", "Line three"])
-        
-        assert len(page.blocks[0].lines) == 3
-        assert page.blocks[0].lines[0].text_spans[0].text == "Line"
-        assert page.blocks[0].lines[1].text_spans[0].text == "Line"
-        assert page.blocks[0].lines[2].text_spans[0].text == "Line"
-
-    def test_create_page_from_text_empty_lines(self):
-        """Handles empty lines correctly."""
-        from manuscript.utils import create_page_from_text
-        
-        page = create_page_from_text(["Hello", "", "World"])
-        
-        # Empty lines are skipped
-        assert len(page.blocks[0].lines) == 2
-
-    def test_create_page_from_text_default_confidence(self):
-        """Uses default confidence of 1.0."""
-        from manuscript.utils import create_page_from_text
-        
-        page = create_page_from_text(["Test"])
-        
-        text_span = page.blocks[0].lines[0].text_spans[0]
-        assert text_span.detection_confidence == 1.0
-        assert text_span.recognition_confidence == 1.0
-
-    def test_create_page_from_text_custom_confidence(self):
-        """Accepts custom confidence parameter."""
-        from manuscript.utils import create_page_from_text
-        
-        page = create_page_from_text(["Test"], confidence=0.5)
-        
-        text_span = page.blocks[0].lines[0].text_spans[0]
-        assert text_span.detection_confidence == 0.5
-        assert text_span.recognition_confidence == 0.5
-
-    def test_create_page_from_text_has_valid_polygons(self):
-        """Words have valid polygon coordinates."""
-        from manuscript.utils import create_page_from_text
-        
-        page = create_page_from_text(["Test"])
-        
-        text_span = page.blocks[0].lines[0].text_spans[0]
-        assert len(text_span.polygon) == 4
-        for x, y in text_span.polygon:
-            assert isinstance(x, float)
-            assert isinstance(y, float)
-
-    def test_create_page_from_text_empty_list(self):
-        """Handles empty list input."""
-        from manuscript.utils import create_page_from_text
-        
-        page = create_page_from_text([])
-        
-        assert len(page.blocks[0].lines) == 0
-
-    def test_create_page_from_text_cyrillic(self):
-        """Works with Cyrillic text."""
-        from manuscript.utils import create_page_from_text
-        
-        page = create_page_from_text(["Привет мир"])
-        
-        assert page.blocks[0].lines[0].text_spans[0].text == "Привет"
-        assert page.blocks[0].lines[0].text_spans[1].text == "мир"
-
-    def test_create_page_from_text_with_charlm(self):
-        """Integration test: create_page_from_text works with CharLM."""
-        from manuscript.utils import create_page_from_text
-        
-        page = create_page_from_text(["Hello world"])
-        corrector = CharLM(weights=None)
-        
-        result = corrector.predict(page)
-        
-        assert isinstance(result, Page)
-        assert result.blocks[0].lines[0].text_spans[0].text == "Hello"
-        assert result.blocks[0].lines[0].text_spans[1].text == "world"
+from manuscript.data import Page, TextRegion
+
+
+@pytest.fixture
+def corrector(tmp_path):
+    weights = tmp_path / "model.onnx"
+    vocab = tmp_path / "vocab.json"
+    weights.write_bytes(b"test")
+    vocab.write_text(json.dumps(["<PAD>", "<MASK>", "<UNK>", *"abcdefghijklmnopqrstuvwxyz"]))
+    model = CharLM(weights=weights, vocab=vocab, device="cpu", min_word_len=3, max_len=8)
+    model.onnx_session = Mock()
+    model.onnx_session.get_inputs.return_value = [SimpleNamespace(name="input")]
+    model.onnx_session.get_outputs.return_value = [SimpleNamespace(name="logits")]
+    return model
+
+
+def set_predictions(model, word, replacements):
+    """Each masked position predicts its source character unless overridden."""
+    size = len(model.c2i)
+    logits = np.full((len(word), model.max_len, size), -20., dtype=np.float32)
+    for i, char in enumerate(word):
+        logits[i, i, model.c2i.get(char, 2)] = 20.
+    for i, char in replacements.items():
+        logits[i, i] = -20.
+        logits[i, i, model.c2i[char]] = 20.
+    model.onnx_session.run.return_value = [logits]
+
+
+def test_local_artifacts_load_vocab_and_normalize_lexicon(corrector, tmp_path):
+    assert corrector.c2i["<PAD>"] == 0
+    vocab = tmp_path / "vocab.json"
+    model = CharLM(weights=corrector.weights, vocab=vocab, lexicon={"CAT", "dog"})
+    assert model.lexicon == frozenset({"cat", "dog"})
+    lexicon = tmp_path / "words.txt"
+    lexicon.write_text("CAT\n\ndog\n")
+    model = CharLM(weights=corrector.weights, vocab=vocab, lexicon=lexicon)
+    assert model.lexicon == frozenset({"cat", "dog"})
+
+
+def test_default_preset_supplies_its_own_artifacts(corrector, monkeypatch):
+    resolve = Mock(return_value={"weights": corrector.weights, "vocab": corrector.vocab_path})
+    monkeypatch.setattr("manuscript.models.resolve", resolve)
+    monkeypatch.setattr("manuscript.models.info", lambda *args: {"artifacts": {}})
+    model = CharLM(device="cpu")
+    resolve.assert_called_once_with("prereform_charlm_g1", "CharLM", force_download=False)
+    assert model.vocab_path == corrector.vocab_path
+    assert model.c2i == corrector.c2i
+
+
+def test_lazy_session_created_once(corrector, monkeypatch):
+    corrector.onnx_session = None
+    constructor = Mock(return_value=Mock())
+    monkeypatch.setattr("manuscript.correctors._charlm.ort.InferenceSession", constructor)
+    corrector._initialize_session()
+    corrector._initialize_session()
+    constructor.assert_called_once_with(corrector.weights, providers=["CPUExecutionProvider"])
+
+
+def test_prediction_preserves_tree_and_selected_levels(corrector):
+    page = Page(image_width=10, image_height=10)
+    line = TextRegion(type="line", text="cot")
+    word = TextRegion(type="word", text="Cot!", detection_confidence=.8, recognition_confidence=.9)
+    line.children = [word, TextRegion(type="word")]
+    page.children = [line]
+    set_predictions(corrector, "cot", {1: "a"})
+    result = corrector.predict(page, image=np.zeros((10, 10, 3), np.uint8))
+    output = result.children[0].children[0]
+    assert output.text == "Cat!" and line.text == "cot" and word.text == "Cot!"
+    assert output.parent is result.children[0]
+    assert (output.detection_confidence, output.recognition_confidence) == (.8, .9)
+    assert result.children[0].children[1].text is None
+
+
+def test_empty_page_does_not_initialize_backend(corrector):
+    corrector.onnx_session = None
+    corrector._initialize_session = Mock()
+    result = corrector.predict(Page(image_width=10, image_height=10))
+    assert not result.children
+    corrector._initialize_session.assert_not_called()
+
+
+@pytest.mark.parametrize("text", ["Cat!", "CAT!", "cAt!"])
+def test_case_and_punctuation_are_preserved(corrector, text):
+    set_predictions(corrector, "cat", {1: "o"})
+    assert corrector._correct_word(text) == text.replace("a", "o").replace("A", "O")
+
+
+def test_short_and_dictionary_words_skip_inference(corrector):
+    corrector.lexicon = frozenset({"cat"})
+    assert corrector._correct_word("Cat, ox!") == "Cat, ox!"
+    corrector.onnx_session.run.assert_not_called()
+
+
+@pytest.mark.parametrize("max_edits,expected", [(0, "cot"), (1, "cat"), (2, "car")])
+def test_edit_limit(corrector, max_edits, expected):
+    corrector.max_edits = max_edits
+    set_predictions(corrector, "cot", {1: "a", 2: "r"})
+    assert corrector._correct_single_word("cot") == expected
+
+
+@pytest.mark.parametrize("setting,value", [("mask_threshold", 0), ("apply_threshold", .95)])
+def test_thresholds_can_prevent_edits(corrector, setting, value):
+    setattr(corrector, setting, value)
+    set_predictions(corrector, "cot", {1: "a"})
+    if setting == "apply_threshold":
+        corrector.mask_threshold = .2
+        logits = corrector.onnx_session.run.return_value[0]
+        logits[1, 1, corrector.c2i["a"]] = 2.
+        logits[1, 1, corrector.c2i["o"]] = 0.
+    assert corrector._correct_single_word("cot") == "cot"
+
+
+@pytest.mark.parametrize("lexicon,expected", [({"cat"}, "cat"), ({"dog"}, "cot")])
+def test_candidate_must_belong_to_lexicon(corrector, lexicon, expected):
+    corrector.lexicon = frozenset(lexicon)
+    set_predictions(corrector, "cot", {1: "a"})
+    assert corrector._correct_single_word("cot") == expected
+
+
+@pytest.mark.parametrize("token", ["<PAD>", "<MASK>", "<UNK>"])
+def test_special_tokens_are_never_inserted(corrector, token):
+    set_predictions(corrector, "cot", {1: token})
+    assert corrector._correct_single_word("cot") == "cot"
+
+
+def test_unknown_character_is_not_replaced(corrector):
+    set_predictions(corrector, "c?t", {1: "a"})
+    assert corrector._correct_single_word("c?t") == "c?t"
+
+
+def test_long_word_is_preserved_without_inference(corrector):
+    word = "abcdefghijklmnopqrstuvwxyz"
+    assert corrector._correct_single_word(word) == word
+    assert corrector._correct_word(word.upper()) == word.upper()
+    corrector.onnx_session.run.assert_not_called()
+
+
+def test_inference_failure_warns_and_preserves_text(corrector):
+    corrector.onnx_session.run.side_effect = RuntimeError("vocab mismatch")
+    with pytest.warns(RuntimeWarning, match="Returning original text"):
+        assert corrector._correct_word("Cot!") == "Cot!"
+
+
+def test_local_corrector_does_not_use_default_preset_vocab(tmp_path):
+    model = object.__new__(CharLM)
+    model.weights = str(tmp_path / "model.onnx")
+    (tmp_path / "vocab.json").write_text('{}')
+    with pytest.raises(ValueError, match="explicit vocab"):
+        model._resolve_vocab(None)
+
+
+
+def test_line_correction_override_does_not_correct_child_words(corrector):
+    corrector._configure_correction_levels(["line"])
+    page = Page(image_width=10, image_height=10)
+    line = TextRegion(type="line", text="Cot")
+    word = TextRegion(type="word", text="Cot")
+    line.children = [word]
+    page.children = [line]
+    set_predictions(corrector, "cot", {1: "a"})
+    result = corrector.predict(page)
+    assert result.children[0].text == "Cat"
+    assert result.children[0].children[0].text == "Cot"
+    assert line.text == "Cot" and word.text == "Cot"

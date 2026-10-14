@@ -3,8 +3,6 @@
 import csv
 import importlib
 import json
-import sys
-from types import ModuleType
 
 import pytest
 
@@ -13,19 +11,7 @@ import torch.nn as nn
 
 
 def _load_charlm_train_module(monkeypatch):
-    fake_lev = ModuleType("Levenshtein")
-
-    def _distance(a, b):
-        return abs(len(a) - len(b)) + sum(ca != cb for ca, cb in zip(a, b))
-
-    fake_lev.distance = _distance
-    monkeypatch.setitem(sys.modules, "Levenshtein", fake_lev)
-    for name in (
-        "manuscript.correctors._charlm.utils",
-        "manuscript.correctors._charlm.dataset",
-        "manuscript.correctors._charlm.train",
-    ):
-        sys.modules.pop(name, None)
+    pytest.importorskip("Levenshtein")
     return importlib.import_module("manuscript.correctors._charlm.train")
 
 
@@ -131,6 +117,8 @@ class TestCharLMTrainHelpers:
 
         assert len(mixed) == 3
         assert mixed[0] == "p1"
+        monkeypatch.setattr(train_module.random, "random", lambda: 0.8)
+        assert mixed[1] == "ng1"
 
     def test_train_runs_one_cpu_step_and_writes_checkpoint(self, monkeypatch, tmp_path):
         train_module = _load_charlm_train_module(monkeypatch)
@@ -192,4 +180,6 @@ class TestCharLMTrainHelpers:
         assert isinstance(model, nn.Module)
         assert vocab[0]["a"] == 3
         assert json.loads((exp_dir / "vocab.json").read_text(encoding="utf-8"))[3] == "a"
-        assert (exp_dir / "checkpoints" / "charlm_epoch_1.pt").exists()
+        checkpoint = torch.load(exp_dir / "checkpoints" / "charlm_epoch_1.pt", weights_only=True)
+        assert checkpoint["optimizer"]["state"]
+        assert checkpoint["scheduler"]["last_epoch"] == 1

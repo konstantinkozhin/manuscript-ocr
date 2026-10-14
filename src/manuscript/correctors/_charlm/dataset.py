@@ -51,7 +51,13 @@ class NgramDataset(Dataset):
 
 class PairsDataset(Dataset):
     def __init__(self, pairs, c2i, max_len, min_len=4):
-        self.pairs = pairs
+        self.pairs = []
+        for incorrect, correct in pairs:
+            if len(incorrect) != len(correct):
+                raise ValueError("CharLM pairs must have equal lengths")
+            # Differences outside the context leave no supervised positions.
+            if any(a != b for a, b in zip(incorrect[:max_len], correct[:max_len])):
+                self.pairs.append((incorrect, correct))
         self.c2i = c2i
         self.max_len = max_len
         self.min_len = min_len
