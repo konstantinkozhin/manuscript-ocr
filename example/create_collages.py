@@ -7,8 +7,7 @@ from manuscript import Pipeline
 from manuscript.utils import visualize_page
 
 
-IMAGE_SUFFIXES = {".jpg", ".jpeg", ".png", ".bmp", ".tif", ".tiff", ".webp"}
-DEFAULT_INPUT_DIR = Path(__file__).resolve().parent / "images"
+DEFAULT_INPUT_DIR = Path(__file__).resolve().parent / "images" / "full"
 DEFAULT_OUTPUT_DIR = Path(__file__).resolve().parent / "collages"
 DEFAULT_OUTPUT_FILE = DEFAULT_OUTPUT_DIR / "example_images_collage.png"
 BACKGROUND = (248, 248, 245)
@@ -31,23 +30,14 @@ IMAGE_CELL_WIDTH = 380
 IMAGE_CELL_HEIGHT = 300
 TEXT_PANEL_WIDTH = 180
 TEXT_LINE_SPACING = 1
-SHOW_ORDER = True
+NUMBERS_LEVELS = [1, 2]
 OUTPUT_WIDTH = 2048
 COLLAGE_ITEMS = [
-    (0, "Рукописный дореформенный"),
-    (1, "Печатный дореформенный"),
-    (2, "Современный русский"),
-    (4, "Русский текст на уличной сцене"),
+    ("img1.jpeg", "Рукописный дореформенный"),
+    ("img2.jpeg", "Печатный дореформенный"),
+    ("img3.jpeg", "Современный русский"),
+    ("img5.jpeg", "Русский текст на уличной сцене"),
 ]
-
-
-def iter_images(input_dir: Path) -> list[Path]:
-    image_paths = sorted(
-        path
-        for path in input_dir.iterdir()
-        if path.is_file() and path.suffix.lower() in IMAGE_SUFFIXES
-    )
-    return image_paths
 
 
 def load_font(font_size: int) -> ImageFont.FreeTypeFont | ImageFont.ImageFont:
@@ -250,16 +240,14 @@ def resize_output(image: Image.Image, target_width: int) -> Image.Image:
 def build_visualization(
     pipeline: Pipeline,
     image_path: Path,
-    show_order: bool,
+    numbers_levels: list[int],
 ) -> tuple[Image.Image, str]:
     result = pipeline.predict(image_path)
     page = result["page"]
     vis_image = visualize_page(
         image_path,
         page,
-        show_order=show_order,
-        show_lines=False,
-        show_numbers=False,
+        numbers_levels=numbers_levels,
     ).convert("RGB")
     text = pipeline.get_text(page)
     return vis_image, text
@@ -347,27 +335,21 @@ def main() -> None:
     if not input_dir.is_dir():
         raise NotADirectoryError(f"Input path is not a directory: {input_dir}")
 
-    image_paths = iter_images(input_dir)
-    if not image_paths:
-        raise FileNotFoundError(f"No images found in: {input_dir}")
-    card_count = len(COLLAGE_ITEMS)
-    required_image_count = max(index for index, _ in COLLAGE_ITEMS) + 1
-    if len(image_paths) < required_image_count:
-        raise ValueError(
-            f"Expected at least {required_image_count} images in {input_dir}, got {len(image_paths)}."
-        )
+    for filename, _ in COLLAGE_ITEMS:
+        if not (input_dir / filename).is_file():
+            raise FileNotFoundError(f"Missing collage image: {input_dir / filename}")
 
     pipeline = Pipeline()
     title_font = load_font(TITLE_FONT_SIZE)
     text_font = load_font(TEXT_FONT_SIZE)
     cards: list[tuple[str, Image.Image, str]] = []
 
-    for image_index, title in COLLAGE_ITEMS:
-        image_path = image_paths[image_index]
+    for filename, title in COLLAGE_ITEMS:
+        image_path = input_dir / filename
         vis_image, text = build_visualization(
             pipeline=pipeline,
             image_path=image_path,
-            show_order=SHOW_ORDER,
+            numbers_levels=NUMBERS_LEVELS,
         )
         cards.append((title, vis_image, text))
 
