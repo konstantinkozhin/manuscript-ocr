@@ -7,10 +7,12 @@ from .base import BaseArtifactModel
 
 
 class BaseLayout(BaseArtifactModel):
-    """Public layout base with ``predict(page, image=None, **kwargs) -> Page``.
+    """Base class for organizing document-tree Pages.
 
-    Layouts may accept detector_result to reuse decoded detection classes and
-    geometry supplied by Pipeline, without another model inference.
+    Subclasses implement predict(page, image=None, **kwargs) and return a Page
+    with the desired containment and reading order. Child sequence defines order.
+    Layouts may accept detector_result to reuse detection geometry and classes
+    supplied by Pipeline without running the detector again.
     """
 
     @abstractmethod

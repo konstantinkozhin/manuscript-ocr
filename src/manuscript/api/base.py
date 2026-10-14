@@ -2,6 +2,8 @@ from abc import ABC, abstractmethod
 import contextlib
 import ctypes
 import io
+import hashlib
+import logging
 import os
 from pathlib import Path
 import sys
@@ -11,6 +13,7 @@ import tempfile
 import time
 import urllib.error
 import urllib.request
+from urllib.parse import urlsplit
 
 import onnxruntime as ort
 
@@ -22,7 +25,7 @@ except ImportError:
 
 class BaseArtifactModel(ABC):
     """
-    Shared infrastructure for artifact-backed OCR stages.
+    Base class for OCR stages loading model artifacts and using ONNX Runtime.
 
     The class provides the common mechanics used by detectors, recognizers,
     layouts, and correctors:
@@ -30,7 +33,8 @@ class BaseArtifactModel(ABC):
     - artifact loading from local files, URLs, GitHub releases, Google Drive,
       and preset registries
     - device selection and ONNX Runtime provider resolution
-    - unified ``predict`` / ``train`` / ``export`` surface
+    Subclasses define their predict, train and export behavior. This class does
+    not interpret Page elements or define detection and recognition semantics.
     """
 
     default_weights_name: Optional[str] = None
@@ -77,10 +81,6 @@ class BaseArtifactModel(ABC):
         - CUDA (NVIDIA GPU): CUDAExecutionProvider
         - CoreML (Apple Silicon): CoreMLExecutionProvider
         - CPU: CPUExecutionProvider
-        
-        Note: GPU/CoreML providers require separate installation:
-        - CUDA: pip install onnxruntime-gpu
-        - Apple Silicon: pip install onnxruntime-silicon
         """
         if self.device == "cuda":
             return ["CUDAExecutionProvider", "CPUExecutionProvider"]
@@ -171,46 +171,14 @@ class BaseArtifactModel(ABC):
             self._runtime_preload_message = "\n".join(captured)
     
     def _log_device_info(self, session):
-        """
-        Log information about requested and actual execution providers.
-        
-        Parameters
-        ----------
-        session : onnxruntime.InferenceSession
-            The initialized ONNX Runtime session
-        """
-        requested_providers = self.runtime_providers()
-        actual_providers = session.get_providers()
-        
-        print(f"[{self.__class__.__name__}] Device configuration:")
-        print(f"  Requested device: {self.device}")
-        print(f"  Requested providers: {requested_providers}")
-        print(f"  Active providers: {actual_providers}")
-        
-        # Check if primary provider is available
-        if self.device == "cuda" and "CUDAExecutionProvider" not in actual_providers:
-            print(f"  Warning: CUDA requested but not available. Falling back to CPU.")
-            available_providers = set()
-            try:
-                available_providers = set(ort.get_available_providers())
-            except Exception:
-                pass
-
-            if "CUDAExecutionProvider" not in available_providers:
-                print(f"      Install onnxruntime-gpu for CUDA support: pip install onnxruntime-gpu")
-            else:
-                print("      CUDAExecutionProvider is installed, but its CUDA/cuDNN DLLs did not initialize.")
-                print("      Install CUDA 12 / cuDNN 9 runtime DLLs or let onnxruntime preload them.")
-                if self._runtime_preload_message:
-                    print("      preload_dlls output:")
-                    for line in self._runtime_preload_message.splitlines():
-                        print(f"        {line}")
-        elif self.device == "coreml" and "CoreMLExecutionProvider" not in actual_providers:
-            print(f"  Warning: CoreML requested but not available. Falling back to CPU.")
-            print(f"      Install onnxruntime-silicon for CoreML support: pip install onnxruntime-silicon")
-        else:
-            primary_provider = actual_providers[0] if actual_providers else "Unknown"
-            print(f"  Running on: {primary_provider}")
+        logger = logging.getLogger(__name__)
+        actual = session.get_providers()
+        logger.debug("%s: device=%s, requested providers=%s, active providers=%s",
+                     type(self).__name__, self.device, self.runtime_providers(), actual)
+        requested = {"cuda": "CUDAExecutionProvider", "coreml": "CoreMLExecutionProvider"}.get(self.device)
+        if requested and requested not in actual:
+            logger.warning("%s requested %s, but active providers are %s",
+                           type(self).__name__, requested, actual)
 
     # -------------------------------------------------------------------------
     # WEIGHT RESOLUTION (main artifact)
@@ -310,13 +278,15 @@ class BaseArtifactModel(ABC):
         if v.startswith("gdrive:"):
             return self._download_gdrive(v)
 
+        # An explicit missing path must not be treated as a registry alias.
+        if isinstance(value, Path) or Path(v).is_absolute() or "/" in v or "\\" in v:
+            raise FileNotFoundError(f"{description} file not found: {v}")
+
         # 5) Preset
         if self.registry_model_class:
             from manuscript.models import resolve
 
             role = 'config' if description == 'model config' else description
-            if role == 'lexicon' and v in ('modern_words', 'prereform_words'):
-                v = v.replace('_words', '_charlm_g1')
             return str(resolve(v, self.registry_model_class, artifact=role,
                                force_download=self.force_download)[role])
 
@@ -342,9 +312,16 @@ class BaseArtifactModel(ABC):
         d.mkdir(parents=True, exist_ok=True)
         return d
 
+    def _http_cache_path(self, url: str) -> Path:
+        filename = Path(urlsplit(url).path).name or "artifact"
+        digest = hashlib.sha256(url.encode("utf-8")).hexdigest()
+        directory = self._cache_dir / digest
+        directory.mkdir(parents=True, exist_ok=True)
+        return directory / filename
+
     def _download_http(self, url: str) -> str:
         """Download file from HTTP/HTTPS URL"""
-        file = self._cache_dir / Path(url).name
+        file = self._http_cache_path(url)
         if file.exists() and not self.force_download:
             return str(file)
 
@@ -356,7 +333,7 @@ class BaseArtifactModel(ABC):
         last_error = None
 
         for attempt in range(1, max_attempts + 1):
-            tmp = tempfile.NamedTemporaryFile(delete=False).name
+            tmp = tempfile.NamedTemporaryFile(dir=file.parent, delete=False).name
 
             try:
                 if tqdm is not None:
@@ -390,11 +367,7 @@ class BaseArtifactModel(ABC):
                     # No tqdm available, simple download
                     urllib.request.urlretrieve(url, tmp)
 
-                # Overwrite cached files only after a successful download.
-                if file.exists():
-                    shutil.copy2(tmp, file)
-                else:
-                    shutil.move(tmp, file)
+                os.replace(tmp, file)
                 print(f" Downloaded to {file}")
                 return str(file)
 

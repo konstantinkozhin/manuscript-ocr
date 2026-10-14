@@ -1,3 +1,4 @@
+from tests.support.modules import patch_modules
 import builtins
 import importlib.util
 from pathlib import Path
@@ -62,28 +63,28 @@ class TestBaseArtifactModelRuntimeEdges:
         ]
 
     def test_log_device_info_warns_when_cuda_provider_unavailable(
-        self, tmp_path, capsys
+        self, tmp_path, caplog
     ):
         model = _make_model(tmp_path, device="cuda")
         session = SimpleNamespace(get_providers=lambda: ["CPUExecutionProvider"])
 
         model._log_device_info(session)
 
-        captured = capsys.readouterr().out
-        assert "CUDA requested but not available" in captured
-        assert "onnxruntime-gpu" in captured
+        captured = caplog.text
+        assert "requested CUDAExecutionProvider" in captured
+        assert "CPUExecutionProvider" in captured
 
     def test_log_device_info_warns_when_coreml_provider_unavailable(
-        self, tmp_path, capsys
+        self, tmp_path, caplog
     ):
         model = _make_model(tmp_path, device="coreml")
         session = SimpleNamespace(get_providers=lambda: ["CPUExecutionProvider"])
 
         model._log_device_info(session)
 
-        captured = capsys.readouterr().out
-        assert "CoreML requested but not available" in captured
-        assert "onnxruntime-silicon" in captured
+        captured = caplog.text
+        assert "requested CoreMLExecutionProvider" in captured
+        assert "CPUExecutionProvider" in captured
 
     def test_prepare_runtime_dependencies_adds_windows_nvidia_dirs_and_preloads(
         self, tmp_path
@@ -104,8 +105,9 @@ class TestBaseArtifactModelRuntimeEdges:
 
         with patch.object(base_module.sys, "prefix", str(tmp_path)):
             # Keep filesystem paths native while exercising the Windows branch.
-            with patch.object(base_module.os, "name", "nt"), patch.object(
-                base_module, "Path", type(tmp_path)
+            with (
+                patch.object(base_module.os, "name", "nt"),
+                patch.object(base_module, "Path", type(tmp_path)),
             ):
                 with patch.object(
                     base_module.os,
@@ -113,7 +115,9 @@ class TestBaseArtifactModelRuntimeEdges:
                     side_effect=fake_add_dll_directory,
                     create=True,
                 ):
-                    with patch.object(base_module.ort, "preload_dlls", create=True) as mock_preload:
+                    with patch.object(
+                        base_module.ort, "preload_dlls", create=True
+                    ) as mock_preload:
                         model._prepare_runtime_dependencies()
 
         assert added_dirs == [str(cudnn_dir), str(cublas_dir)]
@@ -168,7 +172,9 @@ class TestBaseArtifactModelRuntimeEdges:
                         "manuscript.api.base.urllib.request.urlretrieve",
                         side_effect=fake_urlretrieve,
                     ):
-                        result = model._download_http("https://example.com/fallback.onnx")
+                        result = model._download_http(
+                            "https://example.com/fallback.onnx"
+                        )
 
         captured = capsys.readouterr().out
         assert "downloading without progress" in captured
@@ -217,7 +223,9 @@ class TestBaseArtifactModelRuntimeEdges:
                         side_effect=fake_urlretrieve,
                     ):
                         with patch("manuscript.api.base.time.sleep") as mock_sleep:
-                            result = model._download_http("https://example.com/retry.onnx")
+                            result = model._download_http(
+                                "https://example.com/retry.onnx"
+                            )
 
         assert attempts["count"] == 2
         assert mock_sleep.call_count == 1
@@ -253,8 +261,11 @@ class TestBaseArtifactModelRuntimeEdges:
     def test_download_gdrive_raises_when_gdown_returns_none(self, tmp_path):
         model = _make_model(tmp_path)
 
-        with patch.dict("sys.modules", {"gdown": SimpleNamespace(download=lambda **_: None)}):
-            with pytest.raises(RuntimeError, match="Failed to download from Google Drive"):
+        with patch_modules({"gdown": SimpleNamespace(download=lambda **_: None)}
+        ):
+            with pytest.raises(
+                RuntimeError, match="Failed to download from Google Drive"
+            ):
                 model._download_gdrive("gdrive:missing-file")
 
     def test_download_gdrive_force_download_replaces_cached_file(self, tmp_path):
@@ -273,9 +284,7 @@ class TestBaseArtifactModelRuntimeEdges:
             return output
 
         with patch.object(base_module.Path, "home", return_value=cache_root):
-            with patch.dict(
-                "sys.modules",
-                {"gdown": SimpleNamespace(download=fake_download)},
+            with patch_modules({"gdown": SimpleNamespace(download=fake_download)},
             ):
                 result = model._download_gdrive("gdrive:abc123")
 
@@ -303,3 +312,30 @@ def test_base_module_falls_back_when_tqdm_is_missing(monkeypatch):
     spec.loader.exec_module(module)
 
     assert module.tqdm is None
+
+
+@pytest.mark.parametrize("status,attempts", [(404, 1), (503, 5)])
+def test_failed_refresh_preserves_cache_and_removes_partial_files(tmp_path, monkeypatch, status, attempts):
+    model = _make_model(tmp_path)
+    model.force_download = True
+    url = "https://example.com/model.onnx"
+    cached = model._http_cache_path(url)
+    cached.write_bytes(b"working weights")
+    temporary_files = []
+
+    def download(source, target):
+        temporary_files.append(Path(target))
+        Path(target).write_bytes(b"partial weights")
+        raise urllib.error.HTTPError(source, status, "unavailable", None, None)
+
+    monkeypatch.setattr(base_module, "tqdm", None)
+    monkeypatch.setattr(base_module.urllib.request, "urlretrieve", download)
+    with patch.object(base_module.time, "sleep") as sleep:
+        with pytest.raises(urllib.error.HTTPError) as error:
+            model._download_http(url)
+    assert error.value.code == status
+    assert len(temporary_files) == attempts
+    assert sleep.call_count == attempts - 1
+    assert cached.read_bytes() == b"working weights"
+    assert all(not path.exists() for path in temporary_files)
+    assert list(cached.parent.iterdir()) == [cached]

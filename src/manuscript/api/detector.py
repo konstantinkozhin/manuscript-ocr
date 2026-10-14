@@ -4,32 +4,33 @@ from pathlib import Path
 from typing import Any, Dict, Union
 
 import numpy as np
-import onnxruntime as ort
 
-from manuscript.data import Block, Line, Page, TextSpan
+from manuscript.data import Page, Element
 from .base import BaseArtifactModel
 
 
 class BaseDetector(BaseArtifactModel):
-    """Page by default; return_raw includes compact geometry and class details.
+    """Base class for detectors producing document-tree Pages.
 
-    Results contain page, detections, image_size and metadata. return_masks
-    adds available masks; return_outputs adds named original model tensors,
-    including mask logits when the graph emits them. Either flag also enables
-    dictionary output. Heavy arrays are retained only when explicitly requested.
+    By default, predict() returns a Page. Optional return flags expose
+    additional detection data:
+
+    - return_raw: a dictionary containing the Page, detection geometry,
+    class details, image size and metadata.
+    - return_masks: also include available segmentation masks.
+    - return_outputs: also include original model output tensors.
+
+    Each flag enables dictionary output. Masks and model tensors are
+    included only when explicitly requested.
     """
 
-    def _load_detector_config(self, config=None, *, suffixes=(".json",), required=True):
+    def _load_detector_config(self, config=None, *, required=True):
         if config is None:
             config = getattr(self, "_resolved_model_artifacts", {}).get("config")
-            if config is None:
-                config = next((Path(self.weights).with_suffix(suffix)
-                               for suffix in suffixes
-                               if Path(self.weights).with_suffix(suffix).is_file()), None)
         if config is None:
             if required:
                 raise ValueError(f"{type(self).__name__} requires a configuration; "
-                                 "provide config, a registry artifact, or a sidecar")
+                                 "provide config explicitly for local weights, or use a registry preset")
             return None, None
         if isinstance(config, dict):
             return dict(config), None
@@ -45,14 +46,52 @@ class BaseDetector(BaseArtifactModel):
             raise ValueError("Detector config must be an object")
         return values, path
 
+    def _configure_region_types(self, config):
+        self.region_classes = self._validate_region_types(config)
+
     @staticmethod
-    def _page_from_regions(polygons, scores, *, one_per_line=False, ordered=False):
-        spans = [TextSpan(polygon=[(float(x), float(y)) for x, y in polygon],
-                          detection_confidence=float(score), order=i if ordered else None)
-                 for i, (polygon, score) in enumerate(zip(polygons, scores))]
-        lines = ([Line(text_spans=[span]) for span in spans] if one_per_line else
-                 [Line(text_spans=spans, order=0 if ordered else None)])
-        return Page(blocks=[Block(lines=lines, order=0 if ordered else None)])
+    def _validate_region_types(config):
+        mappings = config.get("region_classes")
+        if not isinstance(mappings, dict) or not mappings:
+            raise ValueError("Detector config requires region_classes")
+        region_classes = {}
+        for class_id, fields in mappings.items():
+            if (isinstance(class_id, bool) or not isinstance(class_id, (int, str))
+                    or (isinstance(class_id, str) and not class_id.isdecimal())):
+                raise ValueError("region_classes IDs must be nonnegative integers")
+            class_id = int(class_id)
+            if class_id < 0 or class_id in region_classes:
+                raise ValueError("region_classes IDs must be nonnegative and unique")
+            if not isinstance(fields, dict):
+                raise ValueError("region_classes values must be objects")
+            fields = dict(fields)
+            if {"polygon", "detection_confidence"} & fields.keys():
+                raise ValueError("region_classes cannot override detection geometry or confidence")
+            kind = fields.get("type")
+            if kind == "page":
+                raise ValueError("Page cannot be a detection region")
+            Element.resolve_type(kind)(**fields)
+            region_classes[class_id] = fields
+        return region_classes
+
+    def _tree_from_regions(self, polygons, scores, class_ids, image_hw):
+        if not (len(polygons) == len(scores) == len(class_ids)):
+            raise ValueError("Detection arrays must have equal lengths")
+        from manuscript.utils.geometry import repair_detection_polygon
+        page = Page(image_height=int(image_hw[0]), image_width=int(image_hw[1]))
+        nodes = []
+        for polygon, score, class_id in zip(polygons, scores, class_ids):
+            if int(class_id) not in self.region_classes:
+                raise ValueError(f"Unconfigured detection class: {class_id}")
+            polygon = repair_detection_polygon(polygon)
+            if polygon is None:
+                continue  # No two-dimensional geometry exists to recover.
+            fields = self.region_classes[int(class_id)]
+            nodes.append(Element.registry.get(fields["type"], Element)(
+                **fields, polygon=np.asarray(polygon).astype(float).tolist(),
+                detection_confidence=float(score)))
+        page.children = nodes
+        return page
 
     @staticmethod
     def _raw_result(page, outputs, detections, image_hw, **metadata):

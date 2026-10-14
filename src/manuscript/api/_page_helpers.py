@@ -29,7 +29,11 @@ def accepts_predict_kwarg(stage: Any, name: str) -> bool:
 
 def call_page_stage(stage: Any, page: Page, **kwargs: Any) -> Page:
     """Call ``stage.predict`` with kwargs filtered by signature."""
-    return stage.predict(page, **filter_predict_kwargs(stage, kwargs))
+    result = stage.predict(page, **filter_predict_kwargs(stage, kwargs))
+    if not isinstance(result, Page):
+        raise TypeError(f"{type(stage).__name__}.predict must return a document-tree Page")
+    result.validate_tree()
+    return result
 
 
 __all__ = [

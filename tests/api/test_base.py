@@ -1,11 +1,10 @@
 """Tests for BaseArtifactModel class."""
 
+from tests.support.modules import patch_modules
+
 import pytest
-import tempfile
-import shutil
 from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
-import onnxruntime as ort
 
 import manuscript.api.base as base_module
 from manuscript.api.base import BaseArtifactModel
@@ -209,90 +208,42 @@ class TestWeightResolution:
         with pytest.raises(ValueError, match="Unknown weights"):
             ConcreteModel(weights="nonexistent_file_or_preset.onnx")
     
-    @patch("manuscript.api.base.urllib.request.urlretrieve")
-    def test_http_url_download(self, mock_urlretrieve, tmp_path):
-        """Test downloading from HTTP URL."""
-        url = "https://example.com/model.onnx"
-        
-        # Ensure cache file doesn't exist
-        cache_dir = Path.home() / ".manuscript" / "weights"
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        cached_file = cache_dir / "model.onnx"
-        
-        # Remove if exists from previous tests
-        if cached_file.exists():
-            cached_file.unlink()
-        
-        try:
-            def fake_download(url, tmp_path):
-                # Write to the temp path that will be moved to cache
-                Path(tmp_path).write_text("downloaded content")
-            
-            mock_urlretrieve.side_effect = fake_download
-            
-            model = ConcreteModel(weights=url)
-            
-            # Should have downloaded to cache
-            assert "model.onnx" in model.weights
-            mock_urlretrieve.assert_called_once()
-        finally:
-            if cached_file.exists():
-                cached_file.unlink()
-    
-    @patch("manuscript.api.base.urllib.request.urlretrieve")
-    def test_https_url_download(self, mock_urlretrieve, tmp_path):
-        """Test downloading from HTTPS URL."""
-        url = "https://secure.example.com/model.onnx"
-        
-        cache_dir = Path.home() / ".manuscript" / "weights"
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        cached_file = cache_dir / "model.onnx"
-        
-        # Remove if exists from previous tests
-        if cached_file.exists():
-            cached_file.unlink()
-        
-        try:
-            def fake_download(url, tmp_path):
-                Path(tmp_path).write_text("downloaded content")
-        
-            mock_urlretrieve.side_effect = fake_download
-            
-            model = ConcreteModel(weights=url)
-            assert "model.onnx" in model.weights
-        finally:
-            if cached_file.exists():
-                cached_file.unlink()
-    
-    @patch.object(ConcreteModel, '_download_http')
-    def test_github_url_resolution(self, mock_download_http, tmp_path):
-        """Test GitHub URL resolution to proper download URL."""
-        github_spec = "github://owner/repo/v1.0/model.onnx"
-        
-        mock_file = tmp_path / "model.onnx"
-        mock_file.write_text("mock")
-        mock_download_http.return_value = str(mock_file)
-        
-        model = ConcreteModel(weights=github_spec)
-        
-        # Should convert to GitHub releases URL
-        expected_url = "https://github.com/owner/repo/releases/download/v1.0/model.onnx"
-        mock_download_http.assert_called_once_with(expected_url)
-    
-    @patch.object(ConcreteModel, '_download_http')
-    def test_github_url_with_nested_path(self, mock_download_http, tmp_path):
-        """Test GitHub URL with nested path."""
-        github_spec = "github://owner/repo/v2.0/models/subdir/model.onnx"
-        
-        mock_file = tmp_path / "model.onnx"
-        mock_file.write_text("mock")
-        mock_download_http.return_value = str(mock_file)
-        
-        model = ConcreteModel(weights=github_spec)
-        
-        expected_url = "https://github.com/owner/repo/releases/download/v2.0/models/subdir/model.onnx"
-        mock_download_http.assert_called_once_with(expected_url)
-    
+    @pytest.mark.parametrize("url", [
+        "http://example.com/model.onnx",
+        "https://example.com/model.onnx",
+    ])
+    def test_url_weights_download_to_cache(self, tmp_path, monkeypatch, url):
+        calls = []
+
+        def download(source, target):
+            calls.append(source)
+            Path(target).write_bytes(b"downloaded weights")
+
+        monkeypatch.setattr(base_module, "tqdm", None)
+        monkeypatch.setattr(base_module.urllib.request, "urlretrieve", download)
+        model = ConcreteModel(weights=url)
+        assert calls == [url]
+        assert model.weights == str(model._http_cache_path(url))
+        assert Path(model.weights).read_bytes() == b"downloaded weights"
+
+    @pytest.mark.parametrize("spec,expected_url", [
+        (
+            "github://owner/repo/v1.0/model.onnx",
+            "https://github.com/owner/repo/releases/download/v1.0/model.onnx",
+        ),
+        (
+            "github://owner/repo/v2.0/models/subdir/model.onnx",
+            "https://github.com/owner/repo/releases/download/v2.0/models/subdir/model.onnx",
+        ),
+    ])
+    def test_github_weights_resolution(self, tmp_path, spec, expected_url):
+        weights = tmp_path / "downloaded.onnx"
+        weights.write_bytes(b"weights")
+        with patch.object(ConcreteModel, "_download_http", return_value=str(weights)) as download:
+            model = ConcreteModel(weights=spec)
+        download.assert_called_once_with(expected_url)
+        assert model.weights == str(weights)
+
     def test_gdrive_url_resolution(self, tmp_path):
         """Test Google Drive URL resolution with gdown."""
         gdrive_spec = "gdrive:1234567890abcdef"
@@ -303,7 +254,7 @@ class TestWeightResolution:
         cached_file = cache_root / ".manuscript" / "weights" / "1234567890abcdef.bin"
 
         with patch.object(base_module.Path, "home", return_value=cache_root):
-            with patch.dict("sys.modules", {"gdown": MagicMock()}):
+            with patch_modules({"gdown": MagicMock()}):
                 import gdown
 
                 gdown.download.return_value = str(mock_file)
@@ -406,6 +357,7 @@ class TestExtraArtifactResolution:
         )
         
         mock_download.assert_called_once_with("https://example.com/artifact.txt")
+        assert result == str(mock_file)
     
     @patch.object(ConcreteModel, '_download_http')
     def test_resolve_artifact_from_github(self, mock_download, tmp_path):
@@ -428,6 +380,7 @@ class TestExtraArtifactResolution:
         
         expected_url = "https://github.com/user/repo/releases/download/v1.0/artifact.txt"
         mock_download.assert_called_once_with(expected_url)
+        assert result == str(mock_file)
     
     def test_resolve_artifact_from_gdrive(self, tmp_path):
         """Test downloading artifact from Google Drive with gdown."""
@@ -440,7 +393,7 @@ class TestExtraArtifactResolution:
         cached_file = cache_root / ".manuscript" / "weights" / "ABCDEFG123.bin"
 
         with patch.object(base_module.Path, "home", return_value=cache_root):
-            with patch.dict("sys.modules", {"gdown": MagicMock()}):
+            with patch_modules({"gdown": MagicMock()}):
                 import gdown
 
                 gdown.download.return_value = str(mock_file)
@@ -528,6 +481,11 @@ class TestCacheDirectory:
 # ============================================================================
 class TestDownloadHelpers:
     """Tests for download helper methods."""
+
+    @pytest.fixture(autouse=True)
+    def plain_http_downloads(self, monkeypatch):
+        # Progress and fallback behavior have dedicated tests in runtime_edges.
+        monkeypatch.setattr(base_module, "tqdm", None)
     
     @patch("urllib.request.urlretrieve")
     def test_download_http_new_file(self, mock_urlretrieve, tmp_path):
@@ -546,8 +504,11 @@ class TestDownloadHelpers:
         
         result = model._download_http(url)
         
-        assert "newfile.onnx" in result
-        assert Path(result).exists()
+        assert result == str(model._http_cache_path(url))
+        assert Path(result).read_text() == "new content"
+        assert mock_urlretrieve.call_count == 1
+        assert mock_urlretrieve.call_args.args[0] == url
+        assert not Path(mock_urlretrieve.call_args.args[1]).exists()
     
     @patch("urllib.request.urlretrieve")
     def test_download_http_cached_file(self, mock_urlretrieve, tmp_path):
@@ -558,9 +519,8 @@ class TestDownloadHelpers:
         url = "https://example.com/cached.onnx"
         
         # Pre-create cached file
-        cache_dir = Path.home() / ".manuscript" / "weights"
-        cache_dir.mkdir(parents=True, exist_ok=True)
-        cached_file = cache_dir / "cached.onnx"
+        model = ConcreteModel(weights=str(weights_file))
+        cached_file = model._http_cache_path(url)
         
         try:
             cached_file.write_text("already cached")
@@ -582,9 +542,6 @@ class TestDownloadHelpers:
         weights_file.write_text("mock", encoding="utf-8")
 
         cache_root = tmp_path / "cache_home"
-        cached_file = cache_root / ".manuscript" / "weights" / "cached.onnx"
-        cached_file.parent.mkdir(parents=True, exist_ok=True)
-        cached_file.write_text("stale", encoding="utf-8")
 
         def fake_urlretrieve(url, target):
             Path(target).write_text("fresh", encoding="utf-8")
@@ -598,27 +555,13 @@ class TestDownloadHelpers:
                     weights=str(weights_file),
                     force_download=True,
                 )
+                cached_file = model._http_cache_path("https://example.com/cached.onnx")
+                cached_file.write_text("stale", encoding="utf-8")
                 result = model._download_http("https://example.com/cached.onnx")
 
         assert result == str(cached_file)
         assert cached_file.read_text(encoding="utf-8") == "fresh"
         assert mock_urlretrieve.call_count == 1
-    
-    def test_download_github_url_construction(self, tmp_path):
-        """Test GitHub URL is correctly constructed."""
-        weights_file = tmp_path / "model.onnx"
-        weights_file.write_text("mock")
-        
-        model = ConcreteModel(weights=str(weights_file))
-        
-        with patch.object(model, '_download_http') as mock_download:
-            mock_download.return_value = str(tmp_path / "downloaded.onnx")
-            
-            spec = "github://owner/repo/v1.0.0/weights.onnx"
-            result = model._download_github(spec)
-            
-            expected = "https://github.com/owner/repo/releases/download/v1.0.0/weights.onnx"
-            mock_download.assert_called_once_with(expected)
     
     def test_download_gdrive_url_construction(self, tmp_path):
         """Test Google Drive download with gdown."""
@@ -631,7 +574,7 @@ class TestDownloadHelpers:
         cached_file = cache_root / ".manuscript" / "weights" / "1Ab2Cd3Ef4Gh5.bin"
 
         with patch.object(base_module.Path, "home", return_value=cache_root):
-            with patch.dict("sys.modules", {"gdown": MagicMock()}):
+            with patch_modules({"gdown": MagicMock()}):
                 import gdown
 
                 gdown.download.return_value = str(downloaded_file)
@@ -656,7 +599,7 @@ class TestDownloadHelpers:
         model = ConcreteModel(weights=str(weights_file))
         
         # Mock gdown as not available
-        with patch.dict('sys.modules', {'gdown': None}):
+        with patch_modules({'gdown': None}):
             with patch.object(model, '_download_http') as mock_download_http:
                 mock_download_http.return_value = str(tmp_path / "downloaded.onnx")
                 
@@ -666,6 +609,7 @@ class TestDownloadHelpers:
                 # Should fallback to direct URL via _download_http
                 expected = "https://drive.google.com/uc?export=download&id=1Ab2Cd3Ef4Gh5"
                 mock_download_http.assert_called_once_with(expected)
+                assert result == mock_download_http.return_value
 
 
 # ============================================================================
@@ -713,28 +657,8 @@ class TestModelInitialization:
         
         assert model.session is None
     
-    def test_initialize_session_called(self, tmp_path):
-        """Test _initialize_session creates session."""
-        weights_file = tmp_path / "model.onnx"
-        weights_file.write_text("mock")
-        
-        model = ConcreteModel(weights=str(weights_file))
-        model._initialize_session()
-        
-        assert model.session is not None
-        assert model.session.initialized is True
-    
-    def test_predict_method(self, tmp_path):
-        """Test predict method works."""
-        weights_file = tmp_path / "model.onnx"
-        weights_file.write_text("mock")
-        
-        model = ConcreteModel(weights=str(weights_file))
-        result = model.predict(5)
-        
-        assert result == {"result": 10}
-        assert model.session is not None
-    
+
+
     def test_call_method_delegates_to_predict(self, tmp_path):
         """Test __call__ delegates to predict."""
         weights_file = tmp_path / "model.onnx"
@@ -764,72 +688,79 @@ class TestModelInitialization:
             ConcreteModel.export()
 
 
-# ============================================================================
-# Integration tests
-# ============================================================================
-class TestIntegration:
-    """Integration tests for complete workflows."""
-    
-    def test_full_workflow_local_weights(self, tmp_path):
-        """Test complete workflow with local weights."""
-        # Create weights file
-        weights_file = tmp_path / "model.onnx"
-        weights_file.write_text("mock weights")
-        
-        # Initialize model
-        model = ConcreteModel(weights=str(weights_file), device="cpu")
-        
-        # Verify setup
-        assert model.device == "cpu"
-        assert Path(model.weights).exists()
-        assert model.session is None
-        
-        # Make prediction
-        result = model.predict(10)
-        
-        # Verify prediction and session
-        assert result == {"result": 20}
-        assert model.session is not None
-    
-    @patch.object(ConcreteModel, '_download_http')
-    def test_full_workflow_preset_weights(self, mock_download, tmp_path):
-        """Test complete workflow with preset weights."""
-        # Setup mock download
-        mock_file = tmp_path / "preset.onnx"
-        mock_file.write_text("preset weights")
-        mock_download.return_value = str(mock_file)
-        
-        # Initialize with preset
-        model = ConcreteModel(weights="preset1", device="cuda")
-        
-        # Verify
-        assert model.device == "cuda"
-        assert Path(model.weights).exists()
-        mock_download.assert_called_once()
-        
-        # Make prediction
-        result = model(5)
-        assert result == {"result": 10}
-    
-    def test_model_with_multiple_artifacts(self, tmp_path):
-        """Test model using multiple artifacts."""
-        # Create files
-        weights = tmp_path / "model.onnx"
-        config = tmp_path / "config.json"
-        
-        weights.write_text("weights")
-        config.write_text('{"setting": "value"}')
-        
-        # Initialize
-        model = ConcreteModel(weights=str(weights))
-        
-        # Resolve extra artifact
-        config_path = model._resolve_extra_artifact(
-            str(config),
-            default_name=None,
-            registry={},
-            description="config"
-        )
-        
-        assert Path(config_path).exists()
-        assert Path(model.weights).exists()
+def test_canonical_registry_forwards_class_and_download_policy(tmp_path, monkeypatch):
+    class RegisteredModel(ConcreteModel):
+        registry_model_class = "TestRegisteredModel"
+
+    weights = tmp_path / "weights.onnx"
+    config = tmp_path / "config.json"
+    weights.write_bytes(b"weights")
+    config.write_text('{}')
+    resolve = Mock(return_value={"weights": weights, "config": config})
+    monkeypatch.setattr("manuscript.models.resolve", resolve)
+    model = RegisteredModel(weights="preset", force_download=True)
+    resolve.assert_called_once_with("preset", "TestRegisteredModel", force_download=True)
+    assert model.weights == str(weights)
+    assert model._resolved_model_artifacts["config"] == config
+    resolve.return_value = {"config": config}
+    with pytest.raises(ValueError, match="no inference weights"):
+        RegisteredModel(weights="missing_weights")
+
+
+def test_onnx_session_uses_providers_options_and_runtime_setup(tmp_path, monkeypatch):
+    weights = tmp_path / "model.onnx"
+    weights.write_bytes(b"test")
+    model = ConcreteModel(weights=str(weights), device="cpu")
+    prepare = Mock()
+    log = Mock()
+    session = Mock()
+    constructor = Mock(return_value=session)
+    monkeypatch.setattr(model, "_prepare_runtime_dependencies", prepare)
+    monkeypatch.setattr(model, "_log_device_info", log)
+    monkeypatch.setattr(base_module.ort, "InferenceSession", constructor)
+    options = object()
+    assert model._create_onnx_session(sess_options=options) is session
+    constructor.assert_called_once_with(str(weights), providers=["CPUExecutionProvider"], sess_options=options)
+    prepare.assert_called_once_with()
+    log.assert_called_once_with(session)
+
+
+@pytest.mark.parametrize("description,role", [("model config", "config"), ("vocab", "vocab")])
+def test_extra_registry_artifact_forwards_role_and_download_policy(tmp_path, monkeypatch, description, role):
+    class RegisteredModel(ConcreteModel):
+        registry_model_class = "TestRegisteredModel"
+
+    weights = tmp_path / "weights.onnx"
+    weights.write_bytes(b"weights")
+    artifact = tmp_path / "artifact.json"
+    resolve = Mock(return_value={role: artifact})
+    monkeypatch.setattr("manuscript.models.resolve", resolve)
+    model = RegisteredModel(weights=weights, force_download=True)
+    result = model._resolve_extra_artifact(
+        "preset", default_name=None, registry={}, description=description,
+    )
+    resolve.assert_called_once_with(
+        "preset", "TestRegisteredModel", artifact=role, force_download=True,
+    )
+    assert result == str(artifact)
+
+
+@pytest.mark.parametrize("missing", ["absolute", "relative", "path_object"])
+def test_missing_explicit_extra_path_does_not_resolve_as_preset(tmp_path, monkeypatch, missing):
+    class RegisteredModel(ConcreteModel):
+        registry_model_class = "TestRegisteredModel"
+
+    weights = tmp_path / "weights.onnx"
+    weights.write_bytes(b"weights")
+    resolve = Mock()
+    monkeypatch.setattr("manuscript.models.resolve", resolve)
+    monkeypatch.chdir(tmp_path)
+    value = {
+        "absolute": str(tmp_path / "missing.json"),
+        "relative": "configs/missing.json",
+        "path_object": Path("missing.json"),
+    }[missing]
+    model = RegisteredModel(weights=weights)
+    with pytest.raises(FileNotFoundError, match="config file not found"):
+        model._resolve_extra_artifact(value, default_name=None, registry={}, description="config")
+    resolve.assert_not_called()

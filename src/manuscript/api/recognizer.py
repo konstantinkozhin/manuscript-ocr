@@ -1,11 +1,12 @@
 import json
+import warnings
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 import numpy as np
 from PIL import Image
 
-from manuscript.data import Page
+from manuscript.data import Page, TextRegion
 from manuscript.utils.geometry import crop_axis_aligned
 from manuscript.utils.io import read_image
 from manuscript.recognizers._common.debug import save_debug_regions
@@ -21,12 +22,22 @@ from .base import BaseArtifactModel
 
 
 class BaseRecognizer(BaseArtifactModel):
-    """Artifact-backed recognizer with a shared Page and text-region workflow.
+    """Base class for recognizing text in document-tree Pages.
 
-    Models implement ``_predict_text_images`` to recognize prepared crops.
-    Custom recognizers may instead override ``predict`` directly.
+    The shared predict() workflow copies the Page, prepares crops at
+    recognition_levels, and stores text and confidence on selected TextRegions.
+    Levels come from the model config unless explicitly overridden. When several
+    levels are selected, the deepest matching regions are recognized.
+
+    use_orientation=True undoes a region's absolute clockwise angle before
+    recognition. Known orientation, including zero, takes precedence over the
+    rotate_threshold heuristic for tall crops. Missing orientation uses that
+    heuristic; None or zero rotate_threshold disables it.
+
+    Models implement _predict_text_images(); custom stages may override predict().
     """
 
+    use_orientation = True
     config_registry: Dict[str, str] = {}
 
     def __init__(
@@ -35,11 +46,14 @@ class BaseRecognizer(BaseArtifactModel):
         device: Optional[str] = None,
         force_download: bool = False,
         rotate_threshold: Optional[float] = 1.5,
+        use_orientation: bool = True,
         region_preparer: Union[str, Callable[..., Sequence[Any]]] = "bbox",
         region_preparer_options: Optional[Dict[str, Any]] = None,
         min_text_size: int = 5,
         batch_size: int = 16,
         debug_save_dir: Optional[Union[str, Path]] = None,
+        levels: Optional[Sequence[str]] = None,
+        recognition_levels: Optional[Sequence[str]] = None,
         **kwargs: Any,
     ):
         for removed, replacement in (
@@ -55,14 +69,34 @@ class BaseRecognizer(BaseArtifactModel):
                 or not np.isfinite(rotate_threshold) or rotate_threshold < 0):
             raise ValueError("rotate_threshold must be nonnegative and finite or None")
         super().__init__(weights=weights, device=device, force_download=force_download, **kwargs)
+        if not isinstance(use_orientation, bool):
+            raise ValueError("use_orientation must be a boolean")
+        self.use_orientation = use_orientation
         self.rotate_threshold = rotate_threshold
+        if levels is not None and recognition_levels is not None:
+            raise ValueError("Specify recognition_levels or levels, not both")
+        selected_levels = recognition_levels if recognition_levels is not None else levels
+        self.levels = self._validate_levels(selected_levels) if selected_levels is not None else None
         self.region_preparer = self._validate_region_preparer(region_preparer)
         self.region_preparer_options = dict(region_preparer_options or {})
+        if self.levels is not None:
+            self.region_preparer_options["levels"] = self.levels
         self.min_text_size = min_text_size
         self.batch_size = max(1, int(batch_size))
         self.default_debug_save_dir = (
             Path(debug_save_dir).expanduser() if debug_save_dir is not None else None
         )
+
+    @staticmethod
+    def _validate_levels(levels):
+        if isinstance(levels, str) or not levels or set(levels) - {"word", "line", "block"}:
+            raise ValueError("levels must be a nonempty list of word, line or block")
+        return tuple(dict.fromkeys(levels))
+
+    def _configure_recognition_levels(self, config):
+        if self.levels is None:
+            self.levels = self._validate_levels(config.get("recognition_levels"))
+        self.region_preparer_options["levels"] = self.levels
 
     @staticmethod
     def _positive_integer(value, name):
@@ -95,27 +129,6 @@ class BaseRecognizer(BaseArtifactModel):
         if getattr(self, '_resolved_model_artifacts', None):
             value = self._resolved_model_artifacts.get('config')
             return str(value) if value else None
-
-        if getattr(self, "_weights_preset", None) in self.config_registry:
-            return self._resolve_extra_artifact(
-                self.config_registry[self._weights_preset],
-                default_name=None,
-                registry=self.config_registry,
-                description="config",
-            )
-
-        weights_path = Path(self.weights)
-        candidates = [
-            weights_path.with_suffix(".json"),
-            weights_path.with_suffix(".yml"),
-            weights_path.with_suffix(".yaml"),
-            weights_path.parent / "inference.json",
-            weights_path.parent / "inference.yml",
-            weights_path.parent / "inference.yaml",
-        ]
-        for candidate in candidates:
-            if candidate.exists():
-                return str(candidate.absolute())
 
         return None
 
@@ -155,7 +168,19 @@ class BaseRecognizer(BaseArtifactModel):
             raise TypeError("region_preparer must be a preset name or callable")
         return region_preparer
 
-    def _apply_region_rotation(self, crop: np.ndarray) -> np.ndarray:
+    def _apply_region_rotation(self, crop: np.ndarray, region=None) -> np.ndarray:
+        """Undo the region's clockwise orientation, or use the shape heuristic."""
+        orientation = getattr(region, "orientation", None)
+        if self.use_orientation and orientation is not None:
+            angle = float(orientation) % 360
+            if angle == 0:
+                return crop
+            if angle % 90 == 0:
+                return np.ascontiguousarray(np.rot90(crop, k=int(angle / 90)))
+            return np.asarray(Image.fromarray(crop).rotate(
+                angle, resample=Image.Resampling.BICUBIC, expand=True,
+                fillcolor=(255, 255, 255) if crop.ndim == 3 else 255,
+            ))
         if not self.rotate_threshold:
             return crop
 
@@ -318,7 +343,11 @@ class BaseRecognizer(BaseArtifactModel):
         With return_raw=True, return a dictionary containing the Page and
         per-region predictions with model-specific metadata.
         """
-        result_page = page.model_copy(deep=True)
+        if not isinstance(page, Page):
+            raise TypeError("Recognizer requires the document-tree Page")
+        # Pydantic deep-copy copies parent links separately from child links.
+        # Rebuild the tree explicitly so every child points to the copied parent.
+        result_page = page.clone()
         def result(regions=(), predictions=()):
             if not return_raw:
                 return result_page
@@ -339,6 +368,17 @@ class BaseRecognizer(BaseArtifactModel):
         image_array = read_image(image)
         regions = self._call_region_preparer(result_page, image_array)
         if not regions:
+            available_levels = {node.type for node in result_page.descendants
+                                if isinstance(node, TextRegion)}
+            selected_levels = self.region_preparer_options.get("levels") or self.levels or ("word", "line")
+            if available_levels and not available_levels.intersection(selected_levels):
+                warnings.warn(
+                    f"{type(self).__name__}: recognition skipped because page text levels "
+                    f"{sorted(available_levels)} do not match recognition_levels="
+                    f"{list(selected_levels)}. Override recognition_levels when initializing "
+                    "the recognizer, or add a text segmentation stage for the requested levels.",
+                    UserWarning, stacklevel=2,
+                )
             return result()
 
         if debug_save_dir is not None:
