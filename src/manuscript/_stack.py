@@ -20,20 +20,6 @@ class Stack:
         Results are merged in list order. Only detector-only Stacks support
         this mode; page processors require the preceding result.
 
-    Notes
-    -----
-    Each detector receives the original image; its root regions are appended
-    to the common Page. Duplicates are retained. A layout processor can then
-    build containment and reading order.
-
-    Layouts, recognizers and correctors receive the preceding Page. Later
-    processors can overwrite earlier text or corrections. The supplied Page
-    and detector Pages are copied before accumulation.
-
-    A page processor's first predict parameter must be named page or annotated
-    as Page. Other processors receive the image. Supported predict options are
-    forwarded; individual batch sizes are preserved unless overridden.
-
     Examples
     --------
     >>> detector = Stack([block_detector, word_detector])

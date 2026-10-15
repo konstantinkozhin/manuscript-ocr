@@ -1,12 +1,36 @@
 // Add "Versions" section into the left Sphinx sidebar (Contents area).
 // Supports both deployed docs (/0.1.13/en/...) and local preview:
+// - _site/0.1.13/en/...
 // - _build/html/en/...
 // - _archive/0.1.11/en/...
 (function () {
-  var versions = ["0.1.13", "0.1.11", "0.1.10"];
+  var versions = ["0.1.13", "0.1.12", "0.1.11", "0.1.10"];
   var latestVersion = versions[0];
 
+  // Pages introduced after the archived versions were published.
+  var introducedIn = {
+    "acknowledgements.html": "0.1.12",
+    "related_work.html": "0.1.12",
+    "model_zoo.html": "0.1.12",
+    "api/layouts.html": "0.1.12",
+    "release_notes.html": "0.1.13",
+    "migration_0_1_13.html": "0.1.13",
+  };
+
   function parseDocLocation(pathname) {
+    var localArchive = pathname.match(
+      /^(.*)\/_archive\/(0\.\d+\.\d+)\/(en|ru)\/(.*)$/
+    );
+    if (localArchive) {
+      return {
+        mode: "local-archive",
+        basePrefix: localArchive[1],
+        currentVersion: localArchive[2],
+        currentLanguage: localArchive[3],
+        suffix: localArchive[4],
+      };
+    }
+
     var deployed = pathname.match(/^(.*)\/(0\.\d+\.\d+)\/(en|ru)\/(.*)$/);
     if (deployed) {
       return {
@@ -29,24 +53,16 @@
       };
     }
 
-    var localArchive = pathname.match(
-      /^(.*)\/_archive\/(0\.\d+\.\d+)\/(en|ru)\/(.*)$/
-    );
-    if (localArchive) {
-      return {
-        mode: "local-archive",
-        basePrefix: localArchive[1],
-        currentVersion: localArchive[2],
-        currentLanguage: localArchive[3],
-        suffix: localArchive[4],
-      };
-    }
-
     return null;
   }
 
   function buildTargetPath(pathname, search, hash, locationInfo, targetVersion) {
     var targetPath = pathname;
+    var suffix = locationInfo.suffix;
+    var introduced = introducedIn[suffix];
+    if (introduced && versions.indexOf(targetVersion) > versions.indexOf(introduced)) {
+      suffix = "index.html";
+    }
 
     if (locationInfo.mode === "deployed") {
       targetPath =
@@ -56,7 +72,7 @@
         "/" +
         locationInfo.currentLanguage +
         "/" +
-        locationInfo.suffix;
+        suffix;
     } else if (locationInfo.mode === "local-latest") {
       if (targetVersion === latestVersion) {
         targetPath = pathname;
@@ -68,16 +84,18 @@
           "/" +
           locationInfo.currentLanguage +
           "/" +
-          locationInfo.suffix;
+          suffix;
       }
     } else if (locationInfo.mode === "local-archive") {
       if (targetVersion === latestVersion) {
         targetPath =
           locationInfo.basePrefix +
-          "/_build/html/" +
+          "/_site/" +
+          latestVersion +
+          "/" +
           locationInfo.currentLanguage +
           "/" +
-          locationInfo.suffix;
+          suffix;
       } else {
         targetPath =
           locationInfo.basePrefix +
@@ -86,11 +104,13 @@
           "/" +
           locationInfo.currentLanguage +
           "/" +
-          locationInfo.suffix;
+          suffix;
       }
     }
 
-    return targetPath + (search || "") + (hash || "");
+    // Anchors can change between releases, even when the page still exists.
+    var targetHash = targetVersion === locationInfo.currentVersion ? hash : "";
+    return targetPath + (search || "") + (targetHash || "");
   }
 
   document.addEventListener("DOMContentLoaded", function () {

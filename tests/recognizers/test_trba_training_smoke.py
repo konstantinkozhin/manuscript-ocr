@@ -162,7 +162,7 @@ class TinyTRBAModel(nn.Module):
         super().__init__()
         self.cnn = nn.Sequential(nn.Conv2d(cnn_in_channels, 4, 1), nn.BatchNorm2d(4))
         self.enc_rnn = nn.Sequential(nn.Linear(4, 4), nn.Linear(4, 4))
-        self.attn = TinyAttention(num_classes)
+        self.attention_decoder = TinyAttention(num_classes)
         self.proj = nn.Linear(cnn_in_channels, num_classes)
         self.transformation = transformation
         self.tps_num_fiducial = tps_num_fiducial

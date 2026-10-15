@@ -52,7 +52,7 @@ jobs:
           python -m sphinx -b gettext . _build/gettext
           sphinx-intl update -p _build/gettext -l ru
           # Build latest docs (EN/RU)
-          python -m sphinx -b html -D language=en -D release=${LATEST_DOCS_VERSION} -D version=${LATEST_DOCS_VERSION} . _site/${LATEST_DOCS_VERSION}/en
+          python -m sphinx -W --keep-going -b html -D language=en -D release=${LATEST_DOCS_VERSION} -D version=${LATEST_DOCS_VERSION} . _site/${LATEST_DOCS_VERSION}/en
           python -m sphinx -b html -D language=ru -D release=${LATEST_DOCS_VERSION} -D version=${LATEST_DOCS_VERSION} . _site/${LATEST_DOCS_VERSION}/ru
 
       - name: Copy archived docs
@@ -86,6 +86,7 @@ jobs:
             <p>Available versions:</p>
             <ul>
               <li><a href="0.1.13/en/index.html">0.1.13 (EN)</a> | <a href="0.1.13/ru/index.html">0.1.13 (RU)</a></li>
+              <li><a href="0.1.12/en/index.html">0.1.12 (EN)</a> | <a href="0.1.12/ru/index.html">0.1.12 (RU)</a></li>
               <li><a href="0.1.11/en/index.html">0.1.11 (EN)</a> | <a href="0.1.11/ru/index.html">0.1.11 (RU)</a></li>
               <li><a href="0.1.10/en/index.html">0.1.10 (EN)</a> | <a href="0.1.10/ru/index.html">0.1.10 (RU)</a></li>
             </ul>
@@ -95,7 +96,7 @@ jobs:
           cat > docs/sphinx/_site/versions.json <<'JSON'
           {
             "latest": "0.1.13",
-            "versions": ["0.1.13", "0.1.11", "0.1.10"]
+            "versions": ["0.1.13", "0.1.12", "0.1.11", "0.1.10"]
           }
           JSON
           touch docs/sphinx/_site/.nojekyll

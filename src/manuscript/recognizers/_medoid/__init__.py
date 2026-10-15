@@ -24,24 +24,6 @@ class MedoidRecognizer(MajorityVotingRecognizer):
         Run models concurrently in threads if True; default is False.
         List order determines tie priority regardless of completion order.
 
-    Notes
-    -----
-    Responses are NFC-normalized, lowercased and stripped. The winner minimizes
-    the sum of unit-cost character Levenshtein distances to all responses,
-    including duplicates. Ties prefer the first supporting model. Confidence
-    is unused; the normalized winner receives recognition_confidence=None.
-    None abstains, empty strings participate, and regions without responses
-    retain their input values. No new string is generated.
-
-    For every text region, discard answers longer than max(512, 8 * median
-    length) if at least three answers remain, regardless of the region type.
-    Distances are computed using RapidFuzz.
-
-    The inherited predict method accepts image, batch_size and return_raw.
-    Raw voting records add distance_sums, winning_distance_sum, used_models,
-    excluded_model_indices and length_limit. Candidates remain available before
-    filtering; votes count exact occurrences after filtering.
-
     Examples
     --------
     >>> recognizer = MedoidRecognizer([model_a, model_b, model_c])

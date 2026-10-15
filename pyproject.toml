@@ -65,7 +65,7 @@ trocr = ["tokenizers>=0.15,<1"]
 gpu = []
 
 # Apple Silicon support (CoreML acceleration)
-# User installs manually: pip install onnxruntime-silicon
+# Standard macOS onnxruntime wheels include CoreML; select device="coreml"
 silicon = []
 
 # Full development dependencies (includes PyTorch for training)

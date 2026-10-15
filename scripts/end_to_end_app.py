@@ -11,7 +11,7 @@ import onnxruntime as ort
 from PIL import Image
 
 from manuscript import CharLM, Pipeline, Stack, Element
-from manuscript.detectors import EAST, YOLO, RTDETR, DocUFCN
+from manuscript.detectors import EAST, YOLO
 from manuscript.detectors._mask2former import Mask2Former
 from manuscript.recognizers import TRBA, PPOCRRec, TrOCR, MajorityVotingRecognizer, MedoidRecognizer
 from manuscript.detectors._ppocr import PPOCR
@@ -71,7 +71,7 @@ RECOGNIZER_MODELS.insert(0, NO_RECOGNIZER)
 CORRECTOR_MODELS.insert(0, NO_CORRECTOR)
 LAYOUT_MODELS = {NO_LAYOUT: None, "ReadingSorting": ReadingSorting, "SimpleSorting": SimpleSorting}
 MODEL_CLASSES = {
-    "detector": {"EAST": EAST, "YOLO": YOLO, "Mask2Former": Mask2Former, "PPOCR": PPOCR, "RFDETR": RFDETR, "RTDETR": RTDETR, "DocUFCN": DocUFCN},
+    "detector": {"EAST": EAST, "YOLO": YOLO, "Mask2Former": Mask2Former, "PPOCR": PPOCR, "RFDETR": RFDETR},
     "recognizer": {"TRBA": TRBA, "PPOCRRec": PPOCRRec, "TrOCR": TrOCR},
     "corrector": {"CharLM": CharLM},
 }
@@ -305,10 +305,8 @@ def detector_settings(selection):
     elif detector_class is PPOCR:
         settings.update(target_size=config["preprocess"]["limit_side_len"],
                         score_thresh=config["postprocess"]["box_threshold"])
-    elif detector_class in (RFDETR, RTDETR):
+    elif detector_class is RFDETR:
         settings.update(target_size=config.get("target_size"), score_thresh=config.get("score_thresh", 0.5))
-    elif detector_class is DocUFCN:
-        settings.update(target_size=config["target_size"], score_thresh=config.get("score_thresh", 0.1))
     return settings
 
 

@@ -7,110 +7,158 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-06 15:49+0700\n"
-"PO-Revision-Date: 2026-10-06 00:00+0700\n"
+"POT-Creation-Date: 2026-10-15 20:25+0700\n"
+"PO-Revision-Date: 2026-10-15 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
 "Language-Team: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || "
+"n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: a0ed42c7d78341039f4c37f5a3caa132 release_notes.rst:2
+#: ../../release_notes.rst:2 c9fa8d92d01d400c9b23c109a471f19b
 msgid "Release Notes"
 msgstr "Изменения версий"
 
-#: d3ca2b2cf87a4f9fa2497d12017520a3 release_notes.rst:5
+#: ../../release_notes.rst:5 60c3c577b51145aa9976df960b04887a
 msgid "0.1.13"
 msgstr "0.1.13"
 
-#: 647865f756bc4e388e6c883ded34cb23 release_notes.rst:8
-msgid "Model management"
-msgstr "Управление моделями"
+#: ../../release_notes.rst:7 3fce4e2fbdcd440baa2e48b4294c97cc
+msgid "For changes required in existing integrations, see :doc:`migration_0_1_13`."
+msgstr "Как обновить код для новой версии, описано в :doc:`migration_0_1_13`."
 
-#: b692196fabbd40a480c79c0fee12b6fd release_notes.rst:10
+#: ../../release_notes.rst:9 2b8014095fad43bb9f45cce71e226450
 msgid ""
-"Presets and TRBA pretraining now use a shared mirrored registry. Model "
-"bundles store weights, supporting files and a declared license together, "
-"validate class, file size and SHA-256, and reuse verified legacy cache "
-"files. Public helpers download, inspect, verify and remove bundles. "
-"Downloads display progress. Version compatibility mismatches warn and allow "
-"execution to continue. See :doc:`model_registry`."
+"Replaced fixed blocks, lines and text spans with an extensible document tree using ``Element``, "
+"``Page`` and ``TextRegion``."
 msgstr ""
-"Пресеты и предобучение TRBA теперь используют общий реестр с зеркалами. "
-"Комплекты моделей хранят веса, вспомогательные файлы и объявленную лицензию "
-"вместе, проверяют класс, размер файлов и SHA-256, повторно используют "
-"проверенные файлы старого кэша. Публичные функции загружают, описывают, "
-"проверяют и удаляют комплекты. Загрузка отображает прогресс. Несовпадение "
-"версии совместимости вызывает предупреждение и не останавливает выполнение. "
-"См. :doc:`model_registry`."
+"Вместо фиксированной иерархии блоков, строк и текстовых фрагментов используется расширяемое "
+"дерево документа с ``Element``, ``Page`` и ``TextRegion``."
 
-#: 7a8dd3ad4c894390a4a92c7e303564a6 release_notes.rst:18
-msgid "Inference fixes"
-msgstr "Исправления инференса"
+#: ../../release_notes.rst:10 872d47c92ed84f19863f1aad4c102857
+msgid "Added table, cell and image elements with grid validation and orientation metadata."
+msgstr ""
+"Добавлены классы для таблиц, ячеек и изображений, проверка сетки таблиц и хранение ориентации "
+"элементов."
 
-#: ec6de77058c046ec9b4ede159a587477 release_notes.rst:20
+#: ../../release_notes.rst:11 9acc196967b04b249e49eb0135d3be70
 msgid ""
-"TRBA pads the last incomplete batch to the effective ONNX batch size and "
-"returns only the original predictions. This avoids severe CUDA inference "
-"slowdowns on page-scale runs. Pipeline now respects the recognizer's "
-"configured batch size."
+"Added single-image COCO serialization with Manuscript extensions and plain-text output from the "
+"tree."
 msgstr ""
-"TRBA дополняет последний неполный батч до эффективного размера ONNX-батча и "
-"возвращает только исходные предсказания. Это устраняет сильное замедление "
-"CUDA-инференса при обработке страниц. Pipeline теперь учитывает размер "
-"батча, настроенный в распознавателе."
+"Дерево документа можно сохранять в COCO для одного изображения с расширениями Manuscript и "
+"выводить в виде обычного текста."
 
-#: d3fdba06fbd049caa0a8cbd6e66f6339 release_notes.rst:24
+#: ../../release_notes.rst:12 89dc62f17fe6421fba59093a7d0f6a7e
+msgid "Added ``Stack`` for composing processors and running independent detectors in parallel."
+msgstr "Добавлен ``Stack`` для объединения обработчиков и параллельного запуска независимых детекторов."
+
+#: ../../release_notes.rst:13 3da3dcbe44524630adf4b52aaf414273
+msgid "Added majority-voting and medoid ensembles with strict validation of recognizer output trees."
+msgstr ""
+"Добавлены ансамбли распознавателей на основе голосования и метода медоида. Деревья, возвращённые "
+"моделями, проходят строгую проверку."
+
+#: ../../release_notes.rst:14 21fe2c3f7fb643da8c8458783b14b6cd
 msgid ""
-"On Windows, CUDA initialization loads NVIDIA runtime DLLs from ``site-"
-"packages/nvidia`` and retains DLL directory handles. This fixes cuDNN "
-"frontend sublibrary loading. Training imports and heavy public exports are "
-"lazy, so runtime inference avoids unnecessary PyTorch imports."
+"Added ``ReadingSorting`` for reading order and geometric containment with configurable overlap "
+"thresholds."
 msgstr ""
-"В Windows инициализация CUDA загружает NVIDIA runtime DLL из ``site-"
-"packages/nvidia`` и сохраняет дескрипторы каталогов DLL. Это исправляет "
-"загрузку вспомогательных библиотек cuDNN frontend. Импорты обучения и "
-"тяжёлые публичные экспорты выполняются лениво, поэтому инференс избегает "
-"ненужных импортов PyTorch."
+"Добавлен ``ReadingSorting``: определяет порядок чтения и вложенность регионов по геометрии. "
+"Пороги перекрытия можно настроить."
 
-#: aeab6b28c07c4b32b23a44ed8af020f4 release_notes.rst:30
-msgid "Training and export"
-msgstr "Обучение и экспорт"
-
-#: 4a7490dde45540c0be321a88a9714e37 release_notes.rst:32
+#: ../../release_notes.rst:15 cf1d5f494f484b9caa8a8ea656f2ebe6
 msgid ""
-"TRBA supports a PARSeq decoder, the ``SEResNet31LiteV2`` backbone and "
-"optional TPS rectification. Attention remains the default decoder. Training "
-"and ONNX export preserve architecture settings and use decoder-specific loss"
-" and decoding length. See :doc:`api/recognizers` for configuration."
+"Updated ``SimpleSorting`` to group tree regions while retaining original objects and table "
+"contents."
 msgstr ""
-"TRBA поддерживает декодер PARSeq, backbone ``SEResNet31LiteV2`` и "
-"необязательное выпрямление TPS. Attention остаётся декодером по умолчанию. "
-"Обучение и ONNX-экспорт сохраняют параметры архитектуры и используют функцию"
-" потерь и длину декодирования, соответствующие декодеру. Конфигурация "
-"описана в :doc:`api/recognizers`."
+"``SimpleSorting`` обновлён для группировки регионов дерева с сохранением исходных объектов и "
+"содержимого таблиц."
 
-#: 4c6a41e8b33a4ce7ae40d39b6ab5202f release_notes.rst:37
-msgid ""
-"Checkpoint loading reports keys filtered during compatibility loading. "
-"Checkpoint and weight writes are atomic, CPU Torch RNG state is saved and "
-"restored, and seed setup also seeds NumPy. These changes do not guarantee "
-"full reproducibility across devices or all random generators."
-msgstr ""
-"Загрузка чекпоинта сообщает о ключах, отфильтрованных при совместимой "
-"загрузке. Запись чекпоинтов и весов атомарна, состояние CPU Torch RNG "
-"сохраняется и восстанавливается, настройка seed также задаёт зерно NumPy. "
-"Эти изменения не гарантируют полную воспроизводимость между устройствами или"
-" для всех генераторов случайных чисел."
+#: ../../release_notes.rst:16 c2139695ca844093abb9b22c104ee377
+msgid "Added configurable recognition levels, crop preparation and orientation compensation."
+msgstr "Добавлены настраиваемые уровни распознавания, подготовка фрагментов и компенсация ориентации."
 
-#: 9fbf60a2085a4ae4a5ee22ffe88a258c release_notes.rst:42
-msgid ""
-"Regression tests cover partial ONNX batches, architecture configuration, "
-"training, export and experiment launching."
+#: ../../release_notes.rst:17 dd91bb55abd84dc78c4352f6a7ae1e83
+msgid "Added compatible PPOCRRec and TrOCR ONNX recognition, including TrOCR KV-cache decoding."
 msgstr ""
-"Регрессионные тесты покрывают неполные ONNX-батчи, конфигурацию архитектуры,"
-" обучение, экспорт и запуск экспериментов."
+"Добавлены совместимые ONNX-распознаватели PPOCRRec и TrOCR, включая декодирование TrOCR с KV-"
+"cache."
+
+#: ../../release_notes.rst:18 f237ef7afc824eb0803d7161e1743297
+msgid "Added compatible PPOCR, RFDETR and Mask2Former detector integrations."
+msgstr "Добавлена поддержка совместимых моделей PPOCR, RFDETR и Mask2Former."
+
+#: ../../release_notes.rst:19 2dbff562b59649ae8d2fdf200e3568dc
+msgid "Added explicit detector class mappings and optional raw results, masks and original ONNX outputs."
+msgstr ""
+"Типы регионов теперь явно сопоставляются с классами детектора. По запросу доступны подробные "
+"результаты, маски и исходные выходные тензоры ONNX."
+
+#: ../../release_notes.rst:20 3f0982b168bc45b8a2d2848177313cdc
+msgid "Preserved native detection polygons and deprecated axis-aligned output options on EAST and YOLO."
+msgstr ""
+"Результаты детекции сохраняют исходные полигоны. Параметры EAST и YOLO для преобразования в "
+"прямоугольники вдоль осей объявлены устаревшими."
+
+#: ../../release_notes.rst:21 940c80b5ae1d4d798707c87260ce1dba
+msgid ""
+"Added a mirrored remote model registry with local caching, artifact verification and model-"
+"management helpers."
+msgstr ""
+"Добавлен удалённый реестр моделей с зеркалом, локальным кешем, проверкой артефактов и функциями "
+"управления моделями."
+
+#: ../../release_notes.rst:22 4dc965814b9b42c3b7198686b7bce0f4
+msgid "Added per-stage pipeline timings and retained independent intermediate Page snapshots."
+msgstr "Пайплайн измеряет время каждого этапа и сохраняет независимые копии промежуточных Page."
+
+#: ../../release_notes.rst:23 aa0fa24aeaca4428a647ae055cf35bef
+msgid "Disabled correction by default and added explicit correction levels for CharLM."
+msgstr "Коррекция по умолчанию отключена; для CharLM добавлены явные уровни коррекции."
+
+#: ../../release_notes.rst:24 a10b6d8669a74401806b7ac5ca0a6245
+msgid "Fixed partial ONNX batches and preserved configured recognizer batch sizes in Pipeline."
+msgstr ""
+"Исправлена обработка неполных ONNX-батчей; Pipeline сохраняет настроенные размеры батчей "
+"распознавателей."
+
+#: ../../release_notes.rst:25 9c8fc1f7be1e4271ab8fd7316a110aaa
+msgid ""
+"Improved Windows CUDA runtime loading and kept training dependencies out of ordinary inference "
+"imports."
+msgstr ""
+"Улучшена загрузка библиотек CUDA в Windows. Обычный импорт для запуска моделей больше не "
+"загружает зависимости обучения."
+
+#: ../../release_notes.rst:26 9ee44c25ad5246af90ae5c7021b434c4
+msgid "Added PARSeq, SEResNet31LiteV2 and optional TPS rectification to TRBA training and export."
+msgstr "В обучение и экспорт TRBA добавлены PARSeq, SEResNet31LiteV2 и необязательная TPS-ректификация."
+
+#: ../../release_notes.rst:27 93c742c08d5c489a82233e9338cbd904
+msgid "Improved checkpoint saving, training resume and final gradient-accumulation updates."
+msgstr ""
+"Улучшены сохранение чекпоинтов, возобновление обучения и обработка последних шагов при накоплении"
+" градиентов."
+
+#: ../../release_notes.rst:28 0f1b3e9ef12d4e5a81fb743eebc2db0b
+msgid "Updated tree visualization, grouping, text collapsing and image-input utilities."
+msgstr "Обновлены визуализация дерева, группировка, свёртка текста и утилиты чтения изображений."
+
+#: ../../release_notes.rst:29 d927ed1dbab24ad2b1cbbb989196c113
+msgid "Moved model export tools to repository scripts and updated the end-to-end demonstration interface."
+msgstr ""
+"Инструменты экспорта моделей перенесены в скрипты репозитория; обновлён демонстрационный "
+"интерфейс полного пайплайна."
+
+#: ../../release_notes.rst:30 a7c3d81e55db4449863bbe7eac59ad8a
+msgid "Added notebooks for custom stages, model composition, training and export."
+msgstr "Добавлены ноутбуки для пользовательских этапов, объединения моделей, обучения и экспорта."
+
+#: ../../release_notes.rst:31 649a9358f25d4a708412e154a9e72d1d
+msgid "Expanded installation and test CI matrices through Python 3.14."
+msgstr "В CI добавлены проверки установки и тесты для версий Python до 3.14 включительно."

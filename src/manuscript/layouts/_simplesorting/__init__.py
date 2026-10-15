@@ -20,21 +20,6 @@ class SimpleSorting(BaseLayout):
     use_columns : bool, optional
         Separate Page-level words into columns before grouping. Default is True.
 
-    Notes
-    -----
-    Modifies and returns the supplied Page. Words with polygons are grouped
-    into new lines unless their parent is already a line. At the Page level,
-    each detected column receives a new block; with use_columns=False, all
-    Page-level words are grouped into one block.
-
-    Existing parent links are preserved apart from grouping these words.
-    Words inside lines sort left to right; other regions generally sort top
-    to bottom. A Page containing only blocks sorts them left to right.
-    Regions without geometry sort last. Table and cell contents are untouched.
-
-    Original regions keep their polygons, text, labels and confidence values.
-    New lines and blocks receive bounding rectangles and no text or confidence.
-
     Examples
     --------
     >>> from manuscript.layouts import SimpleSorting

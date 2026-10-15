@@ -33,6 +33,7 @@ class BaseArtifactModel(ABC):
     - artifact loading from local files, URLs, GitHub releases, Google Drive,
       and preset registries
     - device selection and ONNX Runtime provider resolution
+
     Subclasses define their predict, train and export behavior. This class does
     not interpret Page elements or define detection and recognition semantics.
     """

@@ -16,7 +16,7 @@ class BaseDetector(BaseArtifactModel):
     additional detection data:
 
     - return_raw: a dictionary containing the Page, detection geometry,
-    class details, image size and metadata.
+      class details, image size and metadata.
     - return_masks: also include available segmentation masks.
     - return_outputs: also include original model output tensors.
 

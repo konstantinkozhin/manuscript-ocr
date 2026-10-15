@@ -7,27 +7,55 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-06 15:49+0700\n"
-"PO-Revision-Date: 2026-10-06 00:00+0700\n"
+"POT-Creation-Date: 2026-10-15 20:25+0700\n"
+"PO-Revision-Date: 2026-10-15 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
 "Language-Team: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || "
+"n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: 6f9b87b2ab8f4e418148184a65b3bb36 acknowledgements.rst:2
+#: ../../acknowledgements.rst:2 fb58ecadb79f4f8dab4b3adbd0b3af57
+msgid "Authors and Acknowledgements"
+msgstr "Авторы и благодарности"
+
+#: ../../acknowledgements.rst:5 37765518d90b4a4695d8abc71eed8ee4
+msgid "Authors"
+msgstr "Авторы"
+
+#: ../../acknowledgements.rst:7 91811c22d9b34976b7c6595b84e0c793
+msgid "Pavel Sherstnev"
+msgstr "Павел Шерстнев"
+
+#: ../../acknowledgements.rst:8 923184281f474454a5a23da6047bc8d2
+msgid "Vlada Zhukovskaya"
+msgstr "Влада Жуковская"
+
+#: ../../acknowledgements.rst:9 0baa3e2402d044a79fc3433df04d9ee5
+msgid "Konstantin Kozhin"
+msgstr "Константин Кожин"
+
+#: ../../acknowledgements.rst:10 a11d17ce23fd476490e4a09810babd41
+msgid "Anna Pyataeva"
+msgstr "Анна Пятаева"
+
+#: ../../acknowledgements.rst:11 b3b2389f8ea047b680d68a231f6b4085
+msgid "Alina Nurimanova"
+msgstr "Алина Нуриманова"
+
+#: ../../acknowledgements.rst:14 f4d6195ca4714010a25b59d21aef8b12
 msgid "Acknowledgements"
 msgstr "Благодарности"
 
-#: 2c28691fb0224d87be2dda9e84be183c acknowledgements.rst:4
+#: ../../acknowledgements.rst:16 7e9729dff8ea4956a378b38a34da23d7
 msgid ""
-"This project was implemented with the support of a grant from the "
-"`Foundation for Assistance to Small Innovative Enterprises (FASIE) "
-"<https://fasie.ru/>`_, competition **\"Kod-II\"** (VII stage)."
+"This project was implemented with the support of a grant from the `Foundation for Assistance to "
+"Small Innovative Enterprises (FASIE) <https://fasie.ru/>`_, competition **\"Kod-II\"** (VII "
+"stage)."
 msgstr ""
-"Проект реализован при поддержке гранта `Фонда содействия инновациям "
-"<https://fasie.ru/>`_, конкурс «Код-ИИ», VII очередь."
+"Проект реализован при поддержке гранта `Фонда содействия инновациям <https://fasie.ru/>`_, "
+"конкурс «Код-ИИ», VII очередь."

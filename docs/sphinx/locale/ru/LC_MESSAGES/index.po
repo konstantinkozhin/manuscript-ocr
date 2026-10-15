@@ -7,76 +7,56 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-06 15:49+0700\n"
-"PO-Revision-Date: 2026-10-06 00:00+0700\n"
+"POT-Creation-Date: 2026-10-15 20:25+0700\n"
+"PO-Revision-Date: 2026-10-15 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
 "Language-Team: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || "
+"n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: index.rst:15
+#: ../../index.rst:15
 msgid "Contents:"
 msgstr "Содержание:"
 
-#: 6bee55dbb0304562be185e89cb91ea36 index.rst:2
+#: ../../index.rst:2 cb0bda93f74f4b868bb84cff4a7a5a54
 msgid "manuscript-ocr Documentation"
 msgstr "Документация manuscript-ocr"
 
-#: 8c31550ca1f6458e94cfb76a4f89eecd index.rst:4
+#: ../../index.rst:4 9f0163aed90c47f498733645c2130c82
 msgid "manuscript-ocr logo"
 msgstr "Логотип manuscript-ocr"
 
-#: 438d8d8dc07b44d8bf4ca9628bdd273a index.rst:8
+#: ../../index.rst:8 bab3dff3ae9540308fb2149d311d6d9b
 msgid ""
-"**Manuscript OCR** is an open-source Python framework for full OCR/HTR "
-"pipelines targeting pre-reform Russian manuscripts of the 18th-19th "
-"centuries as well as modern texts. The project focuses on digitization and "
-"analysis of historical textual heritage, with methods tailored to legacy "
-"orthography, complex page layouts, handwriting variation, and high "
-"computational efficiency under limited resources."
+"**Manuscript OCR** is an open-source Python framework for full OCR/HTR pipelines targeting pre-"
+"reform Russian manuscripts of the 18th-19th centuries as well as modern texts. The project "
+"focuses on digitization and analysis of historical textual heritage, with methods tailored to "
+"legacy orthography, complex page layouts, handwriting variation, and high computational "
+"efficiency under limited resources."
 msgstr ""
-"**Manuscript OCR** – открытый Python-фреймворк полного OCR/HTR-пайплайна для"
-" распознавания дореформенных рукописей на русском языке XVIII–XIX веков и "
-"современных текстов. Проект направлен на цифровизацию и анализ исторического"
-" текстового наследия с использованием разработанных методов, учитывающих "
-"устаревшую орфографию, сложную структуру страниц и вариативность почерков, и"
-" обеспечивающих высокую вычислительную эффективность на ограниченных "
-"ресурсах."
+"**Manuscript OCR** — открытая библиотека Python для распознавания дореформенных русских рукописей"
+" XVIII–XIX веков и современных текстов. Она объединяет все этапы OCR/HTR: от поиска текста на "
+"странице до распознавания и исправления ошибок. Методы библиотеки учитывают старую орфографию, "
+"сложную структуру страниц и различия в почерках и рассчитаны на работу при ограниченных "
+"вычислительных ресурсах."
 
-#: 82911a3611cb42fe9aec980b2b4d952a index.rst:30
+#: ../../index.rst:30 17aa2748b25448259585d0db822f2a2a
 msgid "Indices and tables"
-msgstr "Индексы и таблицы"
+msgstr "Указатели"
 
-#: b52ee457e0004c0886f23488d8624942 index.rst:32
+#: ../../index.rst:32 e7392acf760d44a996a2fa403cf631b0
 msgid ":ref:`genindex`"
 msgstr ":ref:`genindex`"
 
-#: 3ea9c7d0890c4d2891272fa5c0dd390e index.rst:33
+#: ../../index.rst:33 0637e61293234bf996846f48b6010efd
 msgid ":ref:`modindex`"
 msgstr ":ref:`modindex`"
 
-#: 4e9d4abb7ae9419a97c18ed747b2f9d4 index.rst:34
+#: ../../index.rst:34 51180f40b12e44cdbaa15124331117bf
 msgid ":ref:`search`"
 msgstr ":ref:`search`"
-
-#~ msgid ""
-#~ "**manuscript-ocr** is a Python library "
-#~ "for OCR (Optical Character Recognition) of"
-#~ " handwritten manuscripts and documents."
-#~ msgstr ""
-#~ "Manuscript OCR – открытый Python-фреймворк "
-#~ "полного OCR/HTR-пайплайна для распознавания "
-#~ "дореформенных рукописей на русском языке "
-#~ "XVIII–XIX веков и современных текстов. "
-#~ "Проект направлен на цифровизацию и анализ"
-#~ " исторического текстового наследия с "
-#~ "использованием разработанных методов, учитывающих "
-#~ "устаревшую орфографию, сложную структуру страниц"
-#~ " и вариативность почерков, и обеспечивающих"
-#~ " высокую вычислительную эффективность на "
-#~ "ограниченных ресурсах."

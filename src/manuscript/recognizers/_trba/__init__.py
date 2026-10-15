@@ -57,7 +57,7 @@ class TRBA(BaseRecognizer):
         - HTTP/HTTPS URL: ``"https://example.com/model.onnx"``
         - GitHub release: ``"github://owner/repo/tag/file.onnx"``
         - Google Drive: ``"gdrive:FILE_ID"``
-        - Preset name: ``"trba_lite_g1"`` or ``"trba_base_g1"`` (from pretrained_registry)
+        - Preset name: ``"trba_lite_g1"`` or ``"trba_base_g1"`` (from the model registry)
         - ``None``: auto-downloads default preset (trba_lite_g1)
 
     config : str or Path, optional
@@ -65,18 +65,19 @@ class TRBA(BaseRecognizer):
         as ``weights``. Required for local weights; registry presets supply
         their own config artifact.
         The config must include ``recognition_levels``, e.g. ``["word"]``.
-        Pass ``levels=["word"]`` to override this selection explicitly.
+        Pass ``recognition_levels=["word"]`` to override this selection explicitly.
     charset : str or Path, optional
         Path or identifier for character set file. Required for local weights;
         registry presets supply their own charset artifact.
     device : {"cuda", "coreml", "cpu"}, optional
-        Compute device. If ``None``, automatically selects CPU.
+        Compute device. If ``None``, selects CUDA when ONNX Runtime reports GPU support, otherwise CPU.
         For GPU/CoreML acceleration:
 
         - CUDA (NVIDIA): ``pip install onnxruntime-gpu``
-        - CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``
+        - CoreML (Apple Silicon): included in standard macOS ONNX Runtime wheels;
+          select ``device="coreml"`` explicitly.
 
-        Default is ``None`` (CPU).
+        Default is ``None`` (automatic selection).
     rotate_threshold : float or None, optional
         Aspect-ratio threshold for rotating vertical text-span crops before
         recognition. If ``height > width * rotate_threshold``, crop is
@@ -97,13 +98,22 @@ class TRBA(BaseRecognizer):
         ``"quad_warp"``. Non-quad polygons passed to ``"quad_warp"`` fall back
         to bbox crops by default.
     min_text_size : int, optional
-        Minimum crop width/height in pixels to run recognition for a text span.
-        Text spans below this threshold are skipped. Default is ``5``.
+        Minimum width and height of the region's axis-aligned bounding box
+        in source-image pixels, checked before padding, clipping or warping.
+        Regions below this threshold are skipped. Default is ``5``.
     batch_size : int, optional
         Default inference batch size used when ``predict(..., batch_size=...)``
         is not provided. Default is ``128``.
+    recognition_levels : sequence of str, optional
+        Word, line or block regions to recognize. Overrides the levels in the
+        model config; passed through ``**kwargs``.
+    use_orientation : bool, optional
+        Compensate known region orientation before recognition. Default is
+        ``True``; passed through ``**kwargs``. Known angles take precedence over
+        the aspect-ratio heuristic. Set ``rotate_threshold=None`` separately
+        to disable that heuristic for regions with unknown orientation.
     **kwargs
-        Additional configuration options (reserved for future use).
+        Additional options forwarded to the shared recognizer workflow.
 
     Raises
     ------
@@ -111,18 +121,6 @@ class TRBA(BaseRecognizer):
         If specified files do not exist.
     ValueError
         If weights format is invalid.
-
-    Notes
-    -----
-    The class provides three main public methods:
-
-    - ``predict`` - run recognition over text spans in a ``Page`` object.
-    - ``train`` - high-level training entrypoint to train a TRBA model
-      on custom datasets.
-    - ``export`` - static method to export PyTorch model to ONNX format.
-
-    Model uses ONNX Runtime for fast inference on CPU and GPU.
-    For GPU acceleration, install: ``pip install onnxruntime-gpu``
 
     Examples
     --------
@@ -133,18 +131,22 @@ class TRBA(BaseRecognizer):
 
     Load from local ONNX file:
 
-    >>> recognizer = TRBA(weights="path/to/model.onnx")
+    >>> recognizer = TRBA(
+    ...     weights="path/to/model.onnx",
+    ...     config="path/to/config.json", charset="path/to/charset.txt",
+    ... )
 
     Load from GitHub release:
 
     >>> recognizer = TRBA(
     ...     weights="github://owner/repo/v1.0/model.onnx",
-    ...     config="github://owner/repo/v1.0/config.json"
+    ...     config="github://owner/repo/v1.0/config.json",
+    ...     charset="github://owner/repo/v1.0/charset.txt",
     ... )
 
     Force CPU execution:
 
-    >>> recognizer = TRBA(weights="model.onnx", device="cpu")
+    >>> recognizer = TRBA(device="cpu")
     """
 
     default_weights_name = "trba_lite_g1"
@@ -500,21 +502,25 @@ class TRBA(BaseRecognizer):
         Parameters
         ----------
         train_csvs : str, Path or sequence of paths
-            Path(s) to training CSV files. Each CSV should have columns:
-            ``image_path`` (relative to ``train_roots``) and ``text`` (ground
-            truth transcription).
+            Path(s) to training CSV or TSV files. The first two columns contain
+            the image path (relative to ``train_roots``) and ground truth text.
+            Use ``filename,text`` as a CSV header, or omit the header.
+            Delimiters are detected automatically; ``.tsv`` files use tabs.
         train_roots : str, Path or sequence of paths
             Root directory/directories containing training images. Must have
             same length as ``train_csvs``.
         val_csvs : str, Path, sequence of paths, or None, optional
             Path(s) to validation CSV files with same format as ``train_csvs``.
-            If ``None``, no validation is performed. Default is ``None``.
+            If ``None``, validation samples are split from each training dataset
+            using ``val_size``. A ``None`` entry in a supplied list uses this
+            fallback for the corresponding training dataset. Default is ``None``.
         val_roots : str, Path, sequence of paths, or None, optional
             Root directory/directories for validation images. Must match length
             of ``val_csvs`` if provided. Default is ``None``.
         exp_dir : str or Path, optional
             Experiment directory where checkpoints and logs will be saved.
-            If ``None``, auto-generated based on timestamp. Default is ``None``.
+            If ``None``, uses the first available directory named ``exp1``,
+            ``exp2``, and so on. Default is ``None``.
         charset_path : str or Path, optional
             Path to character set file. If ``None``, uses default charset from
             package. Default is ``None``.
@@ -529,14 +535,18 @@ class TRBA(BaseRecognizer):
         hidden_size : int, optional
             Hidden dimension size for RNN encoder/decoder. Default is 256.
         num_encoder_layers : int, optional
-            Number of Bidirectional LSTM layers in the encoder. Default is 2.
+            Number of Bidirectional LSTM layers in the encoder. Default is 3.
         cnn_in_channels : int, optional
-            Number of input channels for CNN backbone (3 for RGB, 1 for grayscale). Default is 3.
+            Number of input channels for CNN backbone. The standard training
+            transforms and inference workflow use three-channel RGB images;
+            keep this at 3 when using those workflows. Default is 3.
         cnn_out_channels : int, optional
             Number of output channels from CNN backbone. Default is 512.
-        cnn_backbone : {"seresnet31", "seresnet31-lite"}, optional
+        cnn_backbone : {"seresnet31", "seresnet31-lite", "seresnetlite31v2"}, optional
             CNN backbone variant. ``"seresnet31"`` keeps the standard SE-ResNet-31,
-            while ``"seresnet31-lite"`` enables a depthwise-lite version. Default is ``"seresnet31"``.
+            while ``"seresnet31-lite"`` enables a depthwise-lite version and
+            ``"seresnetlite31v2"`` selects SEResNet31LiteV2.
+            Default is ``"seresnet31"``.
         ctc_weight : float, optional
             Initial weight for CTC loss during training (CTC always used for stability):
             ``loss = attn_loss * (1 - ctc_weight) + ctc_loss * ctc_weight``.
@@ -572,11 +582,15 @@ class TRBA(BaseRecognizer):
         val_interval : int, optional
             Perform validation every N epochs. Default is 1.
         val_size : int, optional
-            Maximum number of validation samples to use. Default is 3000.
+            Number of samples held out from each training dataset when no
+            separate validation set is supplied for it. Each such dataset must
+            have more than ``val_size`` valid samples to leave training data.
+            Separate validation sets are used in full. Default is 3000.
         train_proportions : sequence of float, optional
-            Sampling proportions for multiple training datasets. Must sum to 1.0
-            and match length of ``train_csvs``. If ``None``, datasets are
-            concatenated equally. Default is ``None``.
+            Sampling proportions for multiple training datasets, matching the
+            length of ``train_csvs``. Values are normalized to sum to 1.0.
+            If ``None``, datasets are concatenated and shuffled, so their
+            contributions follow their sizes. Default is ``None``.
         num_workers : int, optional
             Number of data loading workers. Default is 0.
         seed : int, optional
@@ -588,12 +602,20 @@ class TRBA(BaseRecognizer):
             None follows validation. Best checkpoints always follow validation.
         device : {"cuda", "cpu"}, optional
             Training device. Default is ``"cuda"``.
-        freeze_cnn : {"none", "all", "first", "last"}, optional
-            CNN freezing policy. Default is ``"none"``.
-        freeze_enc_rnn : {"none", "all", "first", "last"}, optional
-            Encoder RNN freezing policy. Default is ``"none"``.
-        freeze_attention : {"none", "all"}, optional
-            Attention module freezing policy. Default is ``"none"``.
+        freeze_cnn : {"none", "partial", "full"}, optional
+            CNN freezing policy. ``"partial"`` freezes conv0 and layers 1-3;
+            layer4 and conv_out remain trainable. ``"full"`` freezes the
+            entire CNN; ``"all"`` is an alias. Default is ``"none"``.
+        freeze_enc_rnn : {"none", "partial", "full"}, optional
+            Encoder RNN freezing policy. ``"partial"`` freezes the first
+            BiLSTM block. ``"full"`` freezes the entire encoder RNN;
+            ``"all"`` is an alias. Default is ``"none"``.
+        freeze_attention : {"none", "partial", "full"}, optional
+            Attention module freezing policy. ``"partial"`` freezes
+            attention_cell for the attention decoder; for PARSeq it freezes
+            all decoder parameters except generator. ``"full"``
+            freezes the entire module; ``"all"`` is an alias.
+            Default is ``"none"``.
         pretrain_weights : str, Path, bool, or None, optional
             Pretrained weights to initialize from:
 
@@ -602,6 +624,10 @@ class TRBA(BaseRecognizer):
             - str/Path - path or URL to custom weights file
 
             Default is ``"default"``.
+        recognition_levels : sequence of str, optional
+            Word, line or block regions to recognize during inference.
+            Saved in the model config; does not change the training samples
+            or create region geometry. Default is ``("word",)``.
         export_simplify : bool, optional
             Simplify the automatically exported ONNX graph with onnxsim.
             Default is False: native simplifier crashes in some environments
@@ -611,8 +637,9 @@ class TRBA(BaseRecognizer):
 
         Returns
         -------
-        str
-            Path to the best model checkpoint saved during training.
+        dict
+            Best validation metrics (``val_acc`` and ``val_loss``) and ``exp_dir``.
+            Saved weights and resumable checkpoints are written to ``exp_dir``.
 
         Examples
         --------
@@ -620,7 +647,7 @@ class TRBA(BaseRecognizer):
 
         >>> from manuscript.recognizers import TRBA
         >>>
-        >>> best_model = TRBA.train(
+        >>> training = TRBA.train(
         ...     train_csvs="data/train.csv",
         ...     train_roots="data/train_images",
         ...     val_csvs="data/val.csv",
@@ -631,7 +658,7 @@ class TRBA(BaseRecognizer):
         ...     img_h=64,
         ...     img_w=256,
         ... )
-        >>> print(f"Best model saved at: {best_model}")
+        >>> print(f"Training results: {training}")
 
         Train on multiple datasets with custom proportions:
 
@@ -639,7 +666,7 @@ class TRBA(BaseRecognizer):
         >>> train_roots = ["data/dataset1/images", "data/dataset2/images"]
         >>> train_proportions = [0.7, 0.3]  # 70% from dataset1, 30% from dataset2
         >>>
-        >>> best_model = TRBA.train(
+        >>> training = TRBA.train(
         ...     train_csvs=train_csvs,
         ...     train_roots=train_roots,
         ...     train_proportions=train_proportions,
@@ -653,27 +680,27 @@ class TRBA(BaseRecognizer):
 
         Resume training from checkpoint:
 
-        >>> best_model = TRBA.train(
+        >>> training = TRBA.train(
         ...     train_csvs="data/train.csv",
         ...     train_roots="data/train_images",
-        ...     resume_from="experiments/trba_exp1/checkpoints/last.pth",
+        ...     resume_from="experiments/trba_exp1/last_ckpt.pth",
         ...     epochs=100,
         ... )
 
         Fine-tune from pretrained weights with frozen CNN:
 
-        >>> best_model = TRBA.train(
+        >>> training = TRBA.train(
         ...     train_csvs="data/finetune.csv",
         ...     train_roots="data/finetune_images",
         ...     pretrain_weights="default",
-        ...     freeze_cnn="all",
+        ...     freeze_cnn="full",
         ...     epochs=20,
         ...     lr=1e-4,
         ... )
 
         Train with CTC for stability (always enabled):
 
-        >>> best_model = TRBA.train(
+        >>> training = TRBA.train(
         ...     train_csvs="data/train.csv",
         ...     train_roots="data/train_images",
         ...     optimizer="AdamW",
@@ -823,7 +850,8 @@ class TRBA(BaseRecognizer):
 
         This method converts a trained TRBA model from PyTorch to ONNX format,
         which can be used for faster inference with ONNX Runtime. The exported
-        model can be loaded using ``TRBA(weights="model.onnx")``.
+        model must be loaded with its matching configuration and charset:
+        ``TRBA(weights="model.onnx", config="config.json", charset="charset.txt")``.
 
         Parameters
         ----------
@@ -856,24 +884,6 @@ class TRBA(BaseRecognizer):
         FileNotFoundError
             If ``weights_path`` or ``config_path`` do not exist.
 
-        Notes
-        -----
-        The exported ONNX model has one output:
-
-        - ``logits``: Character predictions with shape ``(batch, max_length+1, num_classes)``
-
-        The model uses greedy decoding (argmax) and supports dynamic batch size.
-        The sequence length is fixed to ``max_length + 1`` from the config (same as PyTorch
-        inference mode for compatibility).
-
-        Architecture exported:
-        - CNN backbone (SE-ResNet-31 or SE-ResNet-31-Lite)
-        - Bidirectional LSTM encoder
-        - Attention decoder (greedy decoding)
-
-        Note: Only the attention decoder is exported. CTC head is used only
-        during training and is not included in the ONNX model.
-
         Examples
         --------
         Export TRBA model to ONNX:
@@ -905,10 +915,14 @@ class TRBA(BaseRecognizer):
         Use the exported model for inference:
 
         >>> from manuscript.detectors import EAST
-        >>> recognizer = TRBA(weights="trba_model.onnx")
+        >>> from manuscript.utils import read_image
+        >>> recognizer = TRBA(
+        ...     weights="trba_model.onnx", config="config.json", charset="charset.txt",
+        ... )
         >>> detector = EAST()
-        >>>         >>> page = detector.predict(Page(), image="page.jpg")
-        >>> result = recognizer.predict(page, image="page.jpg")
+        >>> image = read_image("page.jpg")
+        >>> page = detector.predict(image)
+        >>> result = recognizer.predict(page, image=image)
 
         See Also
         --------

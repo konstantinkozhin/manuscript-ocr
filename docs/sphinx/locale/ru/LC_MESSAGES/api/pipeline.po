@@ -7,375 +7,202 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-06 15:49+0700\n"
-"PO-Revision-Date: 2026-10-06 00:00+0700\n"
+"POT-Creation-Date: 2026-10-15 20:48+0700\n"
+"PO-Revision-Date: 2026-10-15 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
 "Language-Team: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || "
+"n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: api/pipeline.rst:2 d9dffe2b32794b1eb88151a9598f4685
+#: ../../api/pipeline.rst:2 c92961c2fea04ca6923d701469928d2e
+msgid "Pipeline and Stack"
+msgstr "Pipeline и Stack"
+
+#: ../../api/pipeline.rst:5 e36e837c86cd4345aac70dcae7c15ad1
 msgid "Pipeline"
-msgstr "Конвейер"
+msgstr "Pipeline"
 
-#: 07aef321790346b9bb9f8c983a5ec438 api/pipeline.rst:4
-msgid "The main high-level interface for OCR processing."
-msgstr "Основной высокоуровневый интерфейс для OCR-обработки."
-
-#: 89f5236751894647860bbc88f29b0c9a manuscript._pipeline.Pipeline:1 of
+#: 56410cc002aa4c518713510c4ae38f86 ac87d6b7edd94e06b4ab30f1ff3ed693 manuscript._pipeline.Pipeline:1
+#: manuscript._stack.Stack:1 of
 msgid "Bases: :py:class:`object`"
 msgstr "Базовый класс: :py:class:`object`"
 
-#: 8efcf8b876b74a9482ac694fa45267fa manuscript._pipeline.Pipeline:2 of
+#: f476fbc1701749e493cb14bf394a6065 manuscript._pipeline.Pipeline:2 of
 msgid "High-level OCR pipeline with configurable stage ordering."
-msgstr "Высокоуровневый OCR-конвейер с настраиваемым порядком этапов."
+msgstr "OCR-пайплайн с настраиваемым порядком этапов."
 
-#: 23ecf541453745918ad408406b940b4e manuscript._pipeline.Pipeline:4 of
+#: b96232733a44483a829ef9da63af8c1d manuscript._pipeline.Pipeline:4 of
 msgid ""
-"Default pipeline: ``detector -> layout -> recognizer``. ``corrector`` is "
-"optional and disabled by default."
+"Default pipeline: ``detector -> layout -> recognizer``. ``corrector`` is optional and disabled by"
+" default."
 msgstr ""
-"Конвейер по умолчанию: ``detector -> layout -> recognizer``. ``corrector`` "
-"необязателен и по умолчанию отключён."
+"Пайплайн по умолчанию: ``detector -> layout -> recognizer``. ``corrector`` необязателен и по "
+"умолчанию отключён."
 
-#: 0e74e611f7a24999a4b2d2ca4b311249 manuscript._pipeline.Pipeline of
-msgid "Attributes"
-msgstr "Атрибуты"
+#: 0b2abca89a6a4166a1b30f1eafd38d81 manuscript._pipeline.Pipeline:26 of
+msgid "Initialize OCR pipeline."
+msgstr "Инициализация OCR-пайплайна."
 
-#: e369cdafceda4748845b251eed6880bd manuscript._pipeline.Pipeline:11 of
-msgid "**last_correction_page**"
-msgstr "**last_correction_page**"
-
-#: 0328ce1bd49c4b4792545fc45ae74136 manuscript._pipeline.Pipeline:14 of
-msgid "**last_detection_page**"
-msgstr "**last_detection_page**"
-
-#: 7208798c6473404197beea22e97555e4 manuscript._pipeline.Pipeline:17 of
-msgid "**last_layout_page**"
-msgstr "**last_layout_page**"
-
-#: f924117460a64997b4cb8127a762980e manuscript._pipeline.Pipeline:20 of
-msgid "**last_recognition_page**"
-msgstr "**last_recognition_page**"
-
-#: 395860663e414293b980f1784d577edf 56a329f3218d422f847fd3806348f1bc
-#: 8f7cb72c498743e895b5af28b5458955 af244100b3034f499a0e4744d92df826
-#: api/pipeline.rst
+#: ../../api/pipeline.rst 164e2e0456904251bc96d58839e021a2 9ee4798eea0f4a39a09a17a0caa8043b
+#: dc32c8b51e96450586bf5f2a57051470
 msgid "Parameters"
 msgstr "Параметры"
 
-#: 06714e081b8641b2ba72d709479b2198 manuscript._pipeline.Pipeline:24 of
-msgid "Methods"
-msgstr "Методы"
-
-#: 16b0cca3a1c44f47a964c672d7f70a11
-#: manuscript._pipeline.Pipeline:40:<autosummary>:1 of
-msgid ":py:obj:`get_text <manuscript._pipeline.Pipeline.get_text>`\\ \\(page\\)"
-msgstr ":py:obj:`get_text <manuscript._pipeline.Pipeline.get_text>`\\ \\(page\\)"
-
-#: 7645c18d67684846bc01cd766e6a5a13 835381613bb8402d8678f7d90f2a5f75
-#: manuscript._pipeline.Pipeline.get_text:2
-#: manuscript._pipeline.Pipeline:40:<autosummary>:1 of
-msgid "Extract plain text from ``Page`` object."
-msgstr "Извлечь обычный текст из объекта ``Page``."
-
-#: 578fc68ecedf49009fd7455ec5480065
-#: manuscript._pipeline.Pipeline:40:<autosummary>:1 of
-msgid ""
-":py:obj:`predict <manuscript._pipeline.Pipeline.predict>`\\ \\(image\\[\\, "
-"vis\\, profile\\]\\)"
-msgstr ""
-":py:obj:`predict <manuscript._pipeline.Pipeline.predict>`\\ \\(image\\[\\, "
-"vis\\, profile\\]\\)"
-
-#: 2f2c9e80c3ae46e8b843016c21304761 e31cafd469354c33b9cba41dd5347abb
-#: manuscript._pipeline.Pipeline.predict:2
-#: manuscript._pipeline.Pipeline:40:<autosummary>:1 of
-msgid "Run pipeline on a single image."
-msgstr "Запустить конвейер на одном изображении."
-
-#: 03e0c577925345a2baf50c81e17b1f16 manuscript._pipeline.Pipeline.__init__:2 of
-msgid "Initialize OCR pipeline."
-msgstr "Инициализация OCR-конвейера."
-
-#: 9a3e9eb85ea04ae581fbb29370b84a78 manuscript._pipeline.Pipeline.__init__:5 of
+#: c3430046092a45e7997d28013b4c3701 manuscript._pipeline.Pipeline:29 of
 msgid ""
 "Detector instance with ``predict(image) -> Page``. If omitted, default "
-"``YOLO(weights=\"yolo26x_obb_text_g1\")`` is used. Detector cannot be "
-"disabled."
+"``YOLO(weights=\"yolo26x_obb_text_g1\")`` is used. Detector cannot be disabled."
 msgstr ""
-"Экземпляр детектора с интерфейсом ``predict(image) -> Page``. Если не "
-"указан, используется ``YOLO(weights=\"yolo26x_obb_text_g1\")`` по умолчанию."
-" Детектор отключить нельзя."
+"Экземпляр детектора с интерфейсом ``predict(image) -> Page``. Если не указан, используется "
+"``YOLO(weights=\"yolo26x_obb_text_g1\")`` по умолчанию. Детектор отключить нельзя."
 
-#: 6013b89799224ad18e13043f8c971e2d manuscript._pipeline.Pipeline.__init__:10 of
+#: f117595ad59d48aa8c2caf40a4f7dccf manuscript._pipeline.Pipeline:34 of
 msgid ""
-"Layout model instance with ``predict(page, image=None) -> Page``. If "
-"omitted, default ``SimpleSorting()`` is used. Pass ``None`` to disable "
-"layout stage."
+"Layout model instance with ``predict(page, image=None) -> Page``. If omitted, default "
+"``SimpleSorting()`` is used. Pass ``None`` to disable layout stage."
 msgstr ""
-"Экземпляр layout-модели с интерфейсом ``predict(page, image=None) -> Page``."
-" Если не указан, используется ``SimpleSorting()`` по умолчанию. Передайте "
-"``None``, чтобы отключить этап layout."
+"Экземпляр компонента анализа структуры с интерфейсом ``predict(page, image=None) -> Page``. Если "
+"не указан, используется ``SimpleSorting()`` по умолчанию. Передайте ``None``, чтобы отключить "
+"этап анализа структуры."
 
-#: a217b9d00080488eb34502318ffb62d5 manuscript._pipeline.Pipeline.__init__:15 of
+#: 333ca285b36a490d997e14393c587a84 manuscript._pipeline.Pipeline:39 of
 msgid ""
-"Recognizer instance with ``predict(page, image=None, ...) -> Page``. If "
-"omitted, default ``TRBA(weights=\"trba_lite_g2\")`` is used. Pass ``None`` "
-"to disable recognition stage."
+"Recognizer instance with ``predict(page, image=None, ...) -> Page``. If omitted, default "
+"``TRBA(weights=\"trba_lite_g2\")`` is used. Pass ``None`` to disable recognition stage."
 msgstr ""
-"Экземпляр распознавателя с интерфейсом ``predict(page, image=None, ...) -> "
-"Page``. Если не указан, используется ``TRBA(weights=\"trba_lite_g2\")`` по "
-"умолчанию. Передайте ``None``, чтобы отключить этап распознавания."
+"Экземпляр распознавателя с интерфейсом ``predict(page, image=None, ...) -> Page``. Если не "
+"указан, используется ``TRBA(weights=\"trba_lite_g2\")`` по умолчанию. Передайте ``None``, чтобы "
+"отключить этап распознавания."
 
-#: 6d3825d0489a443494743a23a97265d3 manuscript._pipeline.Pipeline.__init__:20 of
-msgid ""
-"Corrector instance with ``predict(page, image=None) -> Page``. Default is "
-"``None`` (disabled)."
+#: 8b8e8104d75444e0988efd8876a0c3af manuscript._pipeline.Pipeline:44 of
+msgid "Corrector instance with ``predict(page, image=None) -> Page``. Default is ``None`` (disabled)."
 msgstr ""
-"Экземпляр корректора с интерфейсом ``predict(page, image=None) -> Page``. По"
-" умолчанию ``None`` (отключён)."
+"Экземпляр корректора с интерфейсом ``predict(page, image=None) -> Page``. По умолчанию ``None`` "
+"(отключён)."
 
-#: e5e150d695f647d7bbe55f436ede33f3 manuscript._pipeline.Pipeline.__init__:24 of
+#: 70ea780f7ae34b8e859a90ff23a6622d manuscript._pipeline.Pipeline:48 of
 msgid "Slot where layout stage is executed. Default is ``\"detector\"``."
-msgstr "Слот, в котором выполняется этап layout. По умолчанию ``\"detector\"``."
+msgstr "Этап, после которого выполняется анализ структуры. По умолчанию ``\"detector\"``."
 
-#: 58ca1e9c310e4e18b979201a11e45f70 manuscript._pipeline.Pipeline.predict:5 of
+#: bd872e0c159e4ad48ee7911a2493eaf9 manuscript._pipeline.Pipeline.predict:2 of
+msgid "Run pipeline on a single image."
+msgstr "Запустить пайплайн на одном изображении."
+
+#: f15887158ac04edebfab4fb3cd53d1df manuscript._pipeline.Pipeline.predict:5 of
 msgid "Input image."
 msgstr "Входное изображение."
 
-#: 7f36b994b8d245e08d818eebb640c275 manuscript._pipeline.Pipeline.predict:8 of
+#: e7b5dc33228544a8b4ed237c2ac95edf manuscript._pipeline.Pipeline.predict:8 of
 msgid "If True, returns visualization image together with result."
 msgstr "Если True, возвращает изображение визуализации вместе с результатом."
 
-#: d5f4e71a11c24a60a47e5cb73b3692fa manuscript._pipeline.Pipeline.predict:11 of
+#: 53ec810902214890b4f44dda6410d198 manuscript._pipeline.Pipeline.predict:11 of
 msgid "If True, prints timing per stage."
 msgstr "Если True, выводит время выполнения каждого этапа."
 
-#: api/pipeline.rst c9885442d6504e158a63d902ade81d87
-#: ff04fe3a7127494fbdd435e8995fa595
+#: ../../api/pipeline.rst 2ea0d9746ebd48ba8ee3b104724457a6 b85ecc0ae88d4dc68afec288b0534dfc
 msgid "Return type"
 msgstr "Тип возвращаемого значения"
 
-#: 406c5d10778e4051a7327412c0d6f6c4 manuscript._pipeline.Pipeline.predict:27 of
+#: c5d0ed23a94a43559722d608d82f2108 manuscript._pipeline.Pipeline.predict:27 of
 msgid ""
 ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Union\\`\\\\ "
-"\\\\\\[\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ "
-"\\\\\\[\\:py\\:class\\:\\`str\\`\\, "
-"\\:py\\:class\\:\\`\\~manuscript.data.structures.Page\\`\\]\\, "
-"\\:py\\:class\\:\\`tuple\\`\\]`"
+"\\\\\\[\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ \\\\\\[\\:py\\:class\\:\\`str\\`\\, "
+"\\:py\\:class\\:\\`\\~manuscript.data.tree.Page\\`\\]\\, \\:py\\:class\\:\\`tuple\\`\\]`"
 msgstr ""
 ":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Union\\`\\\\ "
-"\\\\\\[\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ "
-"\\\\\\[\\:py\\:class\\:\\`str\\`\\, "
-"\\:py\\:class\\:\\`\\~manuscript.data.structures.Page\\`\\]\\, "
-"\\:py\\:class\\:\\`tuple\\`\\]`"
+"\\\\\\[\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ \\\\\\[\\:py\\:class\\:\\`str\\`\\, "
+"\\:py\\:class\\:\\`\\~manuscript.data.tree.Page\\`\\]\\, \\:py\\:class\\:\\`tuple\\`\\]`"
 
-#: 5d99940e252d445595b9a264e27c244b manuscript._pipeline.Pipeline.get_text:19 of
+#: 3bb7e3d3d9a14a959d6af54a1418cfa6 manuscript._pipeline.Pipeline.get_text:2 of
+msgid "Delegate text serialization to Page.get_text."
+msgstr "Возвращает текст через метод Page.get_text."
+
+#: fb76c90466744115a1caa4cf6c376c38 manuscript._pipeline.Pipeline.get_text:19 of
 msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\``"
 msgstr ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`str\\``"
 
-#~ msgid ""
-#~ "The Pipeline class orchestrates EAST "
-#~ "detector, TRBA recognizer, and optional "
-#~ "text corrector to perform complete OCR "
-#~ "workflow: detection → crop extraction → "
-#~ "recognition → correction → result merging."
-#~ msgstr ""
-#~ "Класс Pipeline координирует детектор EAST, "
-#~ "распознаватель TRBA и опциональный корректор "
-#~ "текста для выполнения полного OCR-процесса: "
-#~ "детекция → извлечение кропов → "
-#~ "распознавание → коррекция → объединение "
-#~ "результатов."
+#: 61f965dd389d4ad1b82b4010826573b6 manuscript.Pipeline.last_timings:2 of
+msgid "Return elapsed seconds for the last predict call as a dictionary copy."
+msgstr "Возвращает копию словаря со временем последнего вызова predict в секундах."
 
-#~ msgid "Text detector instance"
-#~ msgstr "Экземпляр детектора текста"
+#: 648709fb2ef742df916807b7f9bfff24 manuscript.Pipeline.last_timings:4 of
+msgid ""
+"Keys: detector, layout, recognizer, corrector, load_image, visualization and total. Only executed"
+" stages are present. Stage times include tree validation/snapshots and lazy model initialization."
+" Explicit image loading by Pipeline is recorded separately and subtracted from page-stage times. "
+"Loading performed inside a model remains part of that stage's time. Total includes orchestration "
+"and optional visualization. On failure, completed stage timings remain available without a total "
+"entry."
+msgstr ""
+"Ключи: detector, layout, recognizer, corrector, load_image, visualization и total. Присутствуют "
+"только выполненные этапы. Время этапа включает проверку дерева, снимки и отложенную инициализацию"
+" модели. Явная загрузка изображения в Pipeline учитывается отдельно и вычитается из времени "
+"этапов обработки Page. Загрузка внутри модели остаётся во времени её этапа. Общее время включает "
+"организацию вызовов и необязательную визуализацию. При ошибке время завершённых этапов "
+"сохраняется без записи total."
 
-#~ msgid "type"
-#~ msgstr "тип"
+#: ../../api/pipeline.rst:12 e6c0e05d5c40475ca7a579df263cb638
+msgid "Stack"
+msgstr "Stack"
 
-#~ msgid "EAST"
-#~ msgstr "EAST"
+#: 87dc1e9610194cc3b86f1dca07d5b219 manuscript._stack.Stack:2 of
+msgid "Combine processors in one Pipeline stage or run them directly."
+msgstr "Объединить обработчики в одном этапе Pipeline или запускать их напрямую."
 
-#~ msgid "Text recognizer instance"
-#~ msgstr "Экземпляр распознавателя текста"
+#: 41978fad795d4fb1bde4e8cb2313afb0 manuscript._stack.Stack:5 of
+msgid ""
+"Nonempty ordered collection implementing predict(image, ...) or predict(page, image=None, ...). "
+"Nested Stacks are supported."
+msgstr ""
+"Список из одного или нескольких обработчиков с predict(image, ...) или predict(page, image=None, "
+"...). Порядок списка определяет порядок запуска. Можно вкладывать Stack друг в друга."
 
-#~ msgid "TRBA"
-#~ msgstr "TRBA"
+#: ccafb10a41c7439a8cffcd4208373cb5 manuscript._stack.Stack:9 of
+msgid ""
+"Run image detectors concurrently in threads if True; default is False. Results are merged in list"
+" order. Only detector-only Stacks support this mode; page processors require the preceding "
+"result."
+msgstr ""
+"При True детекторы запускаются параллельно в потоках, а результаты объединяются в порядке списка."
+" По умолчанию False. Режим доступен только для Stack из детекторов: обработчики Page зависят от "
+"результата предыдущего обработчика."
 
-#~ msgid "Text corrector instance (None to skip correction)"
-#~ msgstr "Экземпляр корректора текста (None для пропуска коррекции)"
+#: de8794c7057b4c0d9566180a3219e5bc manuscript._stack.Stack:15 of
+msgid "Examples"
+msgstr "Примеры"
 
-#~ msgid "BaseCorrector, optional"
-#~ msgstr "BaseCorrector, опционально"
+#: dbd1aa7fdd6b45529cb8817a7bda5d1f manuscript._stack.Stack:23 of
+msgid ":py:obj:`manuscript.recognizers.MajorityVotingRecognizer`"
+msgstr ":py:obj:`manuscript.recognizers.MajorityVotingRecognizer`"
 
-#~ msgid "Minimum text box size in pixels (width and height)"
-#~ msgstr "Минимальный размер текстового бокса в пикселях (ширина и высота)"
+#: 85a16fafebab4c00a9aff2c216db4b4f manuscript._stack.Stack:24 of
+msgid "Vote by whole-string agreement."
+msgstr "Выбирает самый частый текстовый ответ целиком."
 
-#~ msgid "int"
-#~ msgstr "int"
+#: 73bba3ed55664e8cab3ad8a23e30fed5 manuscript._stack.Stack:26 of
+msgid ":py:obj:`manuscript.recognizers.MedoidRecognizer`"
+msgstr ":py:obj:`manuscript.recognizers.MedoidRecognizer`"
 
-#~ msgid "Examples"
-#~ msgstr "Примеры"
+#: 745ef1a0fc4c438692d6fb3df2456d9b manuscript._stack.Stack:27 of
+msgid "Select by summed edit distance."
+msgstr "Выбирает ответ с наименьшей суммой расстояний редактирования до остальных."
 
-#~ msgid "Create pipeline with default models:"
-#~ msgstr "Создание конвейера с моделями по умолчанию:"
+#: af081c50da454eed857cbd9e6616c745 manuscript._stack.Stack.predict:2 of
+msgid "Accept an image, a Page with optional image, or named inputs."
+msgstr "Принимает изображение, Page (при необходимости вместе с изображением) или именованные аргументы."
 
-#~ msgid "Create pipeline with custom models:"
-#~ msgstr "Создание конвейера с пользовательскими моделями:"
-
-#~ msgid "Create pipeline with text correction:"
-#~ msgstr "Создание конвейера с коррекцией текста:"
-
-#~ msgid "Text detector instance. If None, creates default EAST detector."
-#~ msgstr ""
-#~ "Экземпляр детектора текста. Если None, "
-#~ "создаётся детектор EAST по умолчанию."
-
-#~ msgid "Text recognizer instance. If None, creates default TRBA recognizer."
-#~ msgstr ""
-#~ "Экземпляр распознавателя текста. Если None, "
-#~ "создаётся распознаватель TRBA по умолчанию."
-
-#~ msgid ""
-#~ "Minimum text size in pixels. Boxes "
-#~ "smaller than this will be filtered "
-#~ "out before recognition. Default is 5."
-#~ msgstr ""
-#~ "Минимальный размер текста в пикселях. Боксы"
-#~ " меньшего размера будут отфильтрованы перед"
-#~ " распознаванием. По умолчанию 5."
-
-#~ msgid ""
-#~ "Input image. Can be: - Path to "
-#~ "image file (str or Path) - RGB "
-#~ "numpy array with shape (H, W, 3) "
-#~ "in uint8 - PIL Image object"
-#~ msgstr ""
-#~ "Входное изображение. Может быть:  - путь"
-#~ " к файлу изображения (str или Path)  "
-#~ "- RGB-массив NumPy формы (H, W, 3)"
-#~ " в формате uint8  - объект PIL "
-#~ "Image"
-
-#~ msgid ""
-#~ "If True, performs both detection and "
-#~ "recognition. If False, performs only "
-#~ "detection. Default is True."
-#~ msgstr ""
-#~ "Если True, выполняет детекцию и "
-#~ "распознавание. Если False, выполняет только "
-#~ "детекцию. По умолчанию True."
-
-#~ msgid ""
-#~ "If True, prints timing information for "
-#~ "each pipeline stage. Default is False."
-#~ msgstr ""
-#~ "Если True, выводит информацию о времени "
-#~ "выполнения каждого этапа конвейера. По "
-#~ "умолчанию False."
-
-#~ msgid "Returns"
-#~ msgstr "Возвращает"
-
-#~ msgid ""
-#~ "If vis=False:     dict with keys:     - "
-#~ "\"page\" : Page object with "
-#~ "detection/recognition results  If vis=True:     "
-#~ "tuple of (result_dict, vis_image)"
-#~ msgstr ""
-#~ "Если vis=False:  словарь с ключами:  - "
-#~ "\"page\" : объект Page с результатами "
-#~ "детекции/распознавания  Если vis=True:  кортеж "
-#~ "(result_dict, vis_image)"
-
-#~ msgid "If vis=False:"
-#~ msgstr "Если vis=False:"
-
-#~ msgid ""
-#~ "dict with keys: - \"page\" : Page "
-#~ "object with detection/recognition results"
-#~ msgstr ""
-#~ "словарь с ключами:  - \"page\" : "
-#~ "объект Page с результатами детекции/распознавания"
-
-#~ msgid "If vis=True:"
-#~ msgstr "Если vis=True:"
-
-#~ msgid "tuple of (result_dict, vis_image)"
-#~ msgstr "кортеж (result_dict, vis_image)"
-
-#~ msgid "Basic usage:"
-#~ msgstr "Базовое использование:"
-
-#~ msgid "Detection only:"
-#~ msgstr "Только детекция:"
-
-#~ msgid "With visualization:"
-#~ msgstr "С визуализацией:"
-
-#~ msgid "With profiling:"
-#~ msgstr "С профилированием:"
-
-#~ msgid "Page object with recognition results."
-#~ msgstr "Объект Page с результатами распознавания."
-
-#~ msgid "Extracted text with lines separated by newlines."
-#~ msgstr "Извлечённый текст, в котором строки разделены переводами строки."
-
-#~ msgid ""
-#~ "Aspect ratio threshold for automatic "
-#~ "rotation of vertical text crops. If "
-#~ "``height > width * rotate_threshold``, crop"
-#~ " is rotated 90° clockwise."
-#~ msgstr ""
-#~ "Порог соотношения сторон для автоматического "
-#~ "поворота вертикального текста. Если ``height "
-#~ "> width * rotate_threshold``, изображение "
-#~ "поворачивается на 90° по часовой стрелке."
-
-#~ msgid "float"
-#~ msgstr "float"
-
-#~ msgid "Disable automatic rotation of vertical text:"
-#~ msgstr "Отключение автоматического поворота вертикального текста:"
-
-#~ msgid ":obj:`last_correction_page <last_correction_page>`"
-#~ msgstr ":obj:`last_correction_page <last_correction_page>`"
-
-#~ msgid "Page after correction."
-#~ msgstr "Страница после коррекции."
-
-#~ msgid ":obj:`last_detection_page <last_detection_page>`"
-#~ msgstr ":obj:`last_detection_page <last_detection_page>`"
-
-#~ msgid "Page after detection (before recognition)."
-#~ msgstr "Страница после детекции (до распознавания)."
-
-#~ msgid ":obj:`last_recognition_page <last_recognition_page>`"
-#~ msgstr ":obj:`last_recognition_page <last_recognition_page>`"
-
-#~ msgid "Page after recognition (before correction)."
-#~ msgstr "Страница после распознавания (до коррекции)."
-
-#~ msgid "Page after detection (before recognition). None if predict() not called."
-#~ msgstr ""
-#~ "Страница после детекции (до распознавания). "
-#~ "None, если predict() не вызывался."
-
-#~ msgid "Page after recognition (before correction). None if predict() not called."
-#~ msgstr ""
-#~ "Страница после распознавания (до коррекции). "
-#~ "None, если predict() не вызывался."
-
-#~ msgid "Page after correction. None if corrector not used or predict() not called."
-#~ msgstr ""
-#~ "Страница после коррекции. None, если "
-#~ "корректор не используется или predict() не"
-#~ " вызывался."
+#: 5656c127794f438dafc09c79c90b16fa manuscript._stack.Stack.predict:4 of
+msgid ""
+"Return Page by default. Raw/mask/output flags return a dictionary with the final Page and "
+"detector results grouped by model. Page processors always run in Page mode. No prediction results"
+" are cached on the Stack."
+msgstr ""
+"По умолчанию возвращает Page. Флаги raw/mask/output включают словарь с итоговым Page и "
+"результатами детекторов, сгруппированными по моделям. Обработчики Page всегда запускаются в "
+"режиме Page. Stack не кеширует результаты предсказаний."

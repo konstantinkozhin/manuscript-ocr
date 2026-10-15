@@ -116,9 +116,6 @@ class Pipeline:
         profile : bool, optional
             If True, prints timing per stage.
 
-        Compatible detectors are asked for compact raw results without masks
-        or original tensors. Layout/recognizer/corrector stages accepting
-        detector_result receive that same dictionary for this call only.
         """
         start_time = time.perf_counter()
         self._last_timings = {}

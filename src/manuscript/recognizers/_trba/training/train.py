@@ -48,6 +48,22 @@ from .utils import (
 )
 
 
+def _freeze_attention_decoder(decoder, policy):
+    """Freeze decoder weights while retaining gradients to its input encoder."""
+    if policy == "full":
+        for parameter in decoder.parameters():
+            parameter.requires_grad = False
+    elif policy == "partial":
+        if hasattr(decoder, "attention_cell"):
+            parameters = decoder.attention_cell.parameters()
+        else:
+            # PARSeq has no attention_cell; retain only its output classifier.
+            parameters = (parameter for name, parameter in decoder.named_parameters()
+                          if not name.startswith("generator."))
+        for parameter in parameters:
+            parameter.requires_grad = False
+
+
 # -------------------------
 # CTC Decoding
 # -------------------------
@@ -1035,16 +1051,11 @@ def run_training(cfg: Config, device: str = "cuda"):
         return "enc_rnn: NONE (no freezing)"
 
     def _apply_attention_policy(policy: str):
+        _freeze_attention_decoder(model.attention_decoder, policy)
         if policy == "full":
-            _freeze_module(model.attn)
-            _wrap_forward_no_grad(model.attn)
             return "attention: FULL (all layers frozen)"
         if policy == "partial":
-            # keep generator trainable (most beneficial for vocab adaptation), freeze attention_cell
-            if hasattr(model.attn, "attention_cell"):
-                _freeze_module(model.attn.attention_cell)
-                _wrap_forward_no_grad(model.attn.attention_cell)
-            return "attention: PARTIAL (unfrozen generator, frozen attention_cell)"
+            return "attention: PARTIAL (unfrozen generator)"
         return "attention: NONE (no freezing)"
 
     freeze_cnn = _normalize_policy(getattr(cfg, "freeze_cnn", "none"))

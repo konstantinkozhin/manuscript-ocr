@@ -1,6 +1,9 @@
 def load_charset(charset_path: str):
     """
-    Loads the character vocabulary from a file of the format:
+    Load one token per line, preserving token order as model output indices.
+
+    PAD, SOS and EOS are required by TRBA; BLANK is optional. Literal spaces
+    are preserved and empty lines are ignored. Example:
         <PAD>
         <SOS>
         <EOS>

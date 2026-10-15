@@ -14,7 +14,55 @@ from manuscript.utils.numerics import softmax, sigmoid
 
 
 class RFDETR(BaseDetector):
-    """ONNX inference for RF-DETR models with configurable text classes."""
+    """Initialize RF-DETR detection or instance segmentation with ONNX Runtime.
+
+    Parameters
+    ----------
+    weights : str or Path
+        Compatible ONNX model file or model registry key. Local files,
+        HTTP/HTTPS URLs, ``github://owner/repo/tag/file.onnx`` and
+        ``gdrive:FILE_ID`` are supported. There is no default preset.
+    config : dict, str or Path, optional
+        Inference configuration, or a path/identifier for its JSON/YAML file.
+        Required for local weights; registry presets supply their config.
+        ``class_names`` maps output class IDs to names, and ``region_classes``
+        maps selected IDs to document fields, e.g. ``{0: {"type": "word"}}``.
+        Preprocessing and tensor names must match the exported model.
+    device : {"cuda", "coreml", "cpu"}, optional
+        Execution device. ``None`` selects CUDA when ONNX Runtime reports GPU
+        support, otherwise CPU. Select CoreML explicitly on supported macOS
+        installations. Default is ``None``.
+    score_thresh : float or None, optional
+        Minimum detection confidence in [0, 1]. ``None`` uses the config's
+        ``score_thresh``, falling back to 0.5 when absent.
+    class_ids : sequence of int or None, optional
+        Class IDs to retain. Each must appear in both ``class_names`` and
+        ``region_classes``. ``None`` uses the config's ``class_ids``, or all
+        mapped region IDs when that setting is absent.
+    target_size : int or None, optional
+        Square input size in pixels, without aspect-ratio preservation.
+        ``None`` uses the config's ``target_size`` or the fixed ONNX input
+        dimensions. Dynamic image dimensions require an explicit size.
+        A supplied size must agree with a fixed ONNX input shape.
+    force_download : bool, optional
+        Download artifacts again instead of reusing cached files.
+        Default is ``False``.
+    mask_threshold : float or None, optional
+        Foreground probability threshold for instance masks, strictly between
+        0 and 1. ``None`` uses the config's ``mask_threshold``, falling back to
+        0.5 when absent. Applies only to models with mask outputs.
+
+    Examples
+    --------
+    Load compatible local weights with their matching inference config:
+
+    >>> from manuscript.detectors._rfdetr import RFDETR
+    >>> detector = RFDETR(
+    ...     weights="model.onnx", config="config.json",
+    ...     score_thresh=0.4, device="cpu",
+    ... )
+    >>> page = detector.predict("document.jpg")
+    """
 
     registry_model_class = "RFDETR"
     def __init__(

@@ -61,14 +61,61 @@ def _resize_antialiased(image, height, width, resample, uint8_rounding=False):
 
 
 class TrOCR(BaseRecognizer):
-    """Recognize Page crops using a compatible ONNX encoder/decoder bundle.
+    """Recognize text regions using an ONNX encoder/decoder bundle.
 
-    Weights identify the encoder; config supplies decoder, tokenizer, image
-    preprocessing and generation parameters. Full-prefix decoder graphs are
-    supported, including conventional TrOCR and DINOv2/RoBERTa exports.
-    KV-cache bundles add a decoder_with_past graph and cache_mapping. Image
-    batches follow the encoder graph; legacy fixed-batch bundles remain usable.
-    Runtime uses ONNX Runtime and tokenizers, without PyTorch/transformers.
+    Parameters
+    ----------
+    weights : str or Path
+        Encoder ONNX file, URL or registry model key. No default preset.
+    config : str or Path, optional
+        Bundle configuration with preprocessing, generation and companion-file
+        paths. Required for local weights; otherwise taken from the registry.
+    decoder : str or Path, optional
+        Decoder ONNX file or URL. Defaults to the bundle's decoder artifact.
+    tokenizer : str or Path, optional
+        Tokenizer JSON file or URL. Defaults to the bundle's tokenizer artifact.
+        Requires the ``manuscript-ocr[trocr]`` extra.
+    device : str, optional
+        Runtime device, for example ``"cpu"`` or ``"cuda"``. Selected automatically
+        when omitted.
+    force_download : bool, default False
+        Download remote artifacts again even when cached.
+    rotate_threshold : float, optional
+        Rotate crops whose height exceeds width times this threshold.
+        ``None`` disables this shape heuristic; known orientation is still used.
+    region_preparer : str or callable, default "bbox"
+        Crop strategy: ``"bbox"``, ``"polygon_mask"``, ``"quad_warp"`` or a custom callable.
+    region_preparer_options : dict, optional
+        Additional options for the crop preparer.
+    min_text_size : int, default 5
+        Minimum crop side length in pixels; smaller crops are skipped.
+    batch_size : int, default 1
+        Requested crop batch size, subject to the ONNX graphs' batch dimensions.
+    recognition_levels : sequence of str, optional
+        Region types to recognize: ``"word"``, ``"line"`` or ``"block"``.
+        Defaults to ``recognition_levels`` from the bundle configuration.
+    generation : dict, optional
+        Override generation settings: ``num_beams``, ``max_length``,
+        ``length_penalty``, ``no_repeat_ngram_size`` and ``early_stopping``.
+    decoder_with_past : str or Path, optional
+        Cached decoder ONNX file or URL for a ``kv_cache`` bundle.
+        Defaults to the companion artifact declared by the bundle.
+    **kwargs
+        Additional base recognizer options, such as ``use_orientation`` and
+        ``debug_save_dir``.
+
+    Examples
+    --------
+    >>> from manuscript.recognizers import TrOCR
+    >>> from manuscript.utils import create_page_from_image
+    >>> recognizer = TrOCR(
+    ...     weights="encoder.onnx", config="config.json", recognition_levels=["line"],
+    ... )
+    >>> page, image = create_page_from_image(
+    ...     "line.png", region_type="line", return_image=True,
+    ... )
+    >>> result = recognizer.predict(page, image=image)
+    >>> print(result.get_text())
     """
 
     registry_model_class = "TrOCR"
@@ -364,7 +411,23 @@ class TrOCR(BaseRecognizer):
 
     @staticmethod
     def create_config(source, *, recognition_levels=None, output_path=None):
-        """Add recognition levels to an encoder bundle config and optionally save JSON."""
+        """Set recognition levels in an existing bundle configuration.
+
+        Parameters
+        ----------
+        source : dict or str or Path
+            Bundle configuration dictionary or path to its JSON file.
+        recognition_levels : sequence of str, optional
+            Region types: ``"word"``, ``"line"`` or ``"block"``. Uses the source
+            value when omitted, or ``["line"]`` if the source has no value.
+        output_path : str or Path, optional
+            Save the resulting configuration to this JSON file.
+
+        Returns
+        -------
+        dict
+            Updated configuration copy; the source dictionary is unchanged.
+        """
         from copy import deepcopy
 
         config = deepcopy(source) if isinstance(source, dict) else json.loads(

@@ -1,162 +1,186 @@
 Model Zoo
 =========
 
-This page lists the presets and release artifacts documented for version |release|.
+This page lists the 12 model presets documented for version |release|.
+The model registry and model files are hosted separately from the library and
+can be updated independently of the installed package. The official registry is
+``registry.json`` on
+`GitHub <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/registry.json>`_,
+with a `GitVerse mirror <https://gitverse.ru/api/repos/konstantin_kozhin/manuscript-ocr/raw/branch/main/registry.json>`_.
+When you select a preset by its model key, the required files are downloaded
+automatically.
 
 Detection
 ---------
 
 .. list-table::
    :class: model-zoo-table
-   :widths: 16 16 9 9 28 16 12
    :header-rows: 1
+   :widths: 25 12 18 45
 
-   * - Preset
-     - Architecture
-     - Params
-     - Rotated
-     - Artifacts
-     - Origin
+   * - Model key
+     - Class
      - License
+     - Artifacts
    * - ``east_50_g1``
-     - EAST (ResNet-50)
-     - 53.86M
-     - Yes
-     - | `east_50_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.onnx>`_
-       | `east_50_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.pth>`_
-     - Manuscript
+     - `EAST <https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`__
      - MIT
+     - | weights (required): `east_50_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.onnx>`_
+       | checkpoint (optional): `east_50_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.pth>`_
+       | config (required): `east_50_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.json>`_
+       | license (required): `east_50_g1.LICENSE.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.LICENSE.txt>`__
+   * - ``east_50_yenisei_gov_reports_g1``
+     - `EAST <https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`__
+     - MIT
+     - | weights (required): `east_50_yenisei_gov_reports_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_yenisei_gov_reports_g1.onnx>`_
+       | checkpoint (optional): `east_50_yenisei_gov_reports_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_yenisei_gov_reports_g1.pth>`_
+       | config (required): `east_50_yenisei_gov_reports_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_yenisei_gov_reports_g1.json>`_
+       | license (required): `east_50_yenisei_gov_reports_g1.LICENSE.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_yenisei_gov_reports_g1.LICENSE.txt>`__
+   * - ``mask2former_line_v0_prev``
+     - `Mask2Former <https://arxiv.org/abs/2112.01527>`__
+     - CC-BY-NC-3.0
+     - | weights (required): `mask2former_line_v0_prev.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.onnx>`_
+       | external_data (required): `mask2former_line_v0_prev.onnx.data <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.onnx.data>`_
+       | config (required): `mask2former_line_v0_prev.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.json>`_
+       | license (required): `mask2former_line_v0_prev.LICENSE.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.LICENSE.txt>`__
    * - ``yolo26s_obb_text_g1``
-     - YOLO26-S OBB
-     - 9.75M
-     - Yes
-     - | `yolo26s_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx>`_
-       | `yolo26s_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.pt>`_
-       | `yolo26s_obb_text_g1.raw.yaml <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.yaml>`_
-     - Trained by the authors with Ultralytics YOLO
-     - `Ultralytics license <https://github.com/ultralytics/ultralytics/blob/main/LICENSE>`_
+     - `YOLO26 OBB <https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/models/26/yolo26-obb.yaml>`__
+     - AGPL-3.0-only
+     - | checkpoint (optional): `yolo26s_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.pt>`_
+       | weights (required): `yolo26s_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.onnx>`_
+       | config (required): `yolo26s_obb_text_g1.raw.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.json>`_
+       | license (required): `yolo26s_obb_text_g1.LICENSE.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.LICENSE.txt>`__
    * - ``yolo26x_obb_text_g1``
-     - YOLO26-X OBB
-     - 57.61M
-     - Yes
-     - | `yolo26x_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.onnx>`_
-       | `yolo26x_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.pt>`_
-       | `yolo26x_obb_text_g1.raw.yaml <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.yaml>`_
-     - Trained by the authors with Ultralytics YOLO
-     - `Ultralytics license <https://github.com/ultralytics/ultralytics/blob/main/LICENSE>`_
+     - `YOLO26 OBB <https://github.com/ultralytics/ultralytics/blob/main/ultralytics/cfg/models/26/yolo26-obb.yaml>`__
+     - AGPL-3.0-only
+     - | checkpoint (optional): `yolo26x_obb_text_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.pt>`_
+       | weights (required): `yolo26x_obb_text_g1.raw.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.onnx>`_
+       | config (required): `yolo26x_obb_text_g1.raw.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.json>`_
+       | license (required): `yolo26x_obb_text_g1.LICENSE.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.LICENSE.txt>`__
+
+.. code-block:: python
+
+    from manuscript.detectors import EAST
+
+    detector = EAST(weights="east_50_g1")
 
 Layout
 ------
 
 .. list-table::
    :class: model-zoo-table
-   :widths: 16 20 8 22 12 12 10
    :header-rows: 1
+   :widths: 25 12 18 45
 
-   * - Preset
-     - Architecture
-     - Params
-     - Supports
-     - Artifacts
-     - Origin
+   * - Model key
+     - Class
      - License
+     - Artifacts
    * - ``SimpleSorting``
-     - Algorithmic ordering
-     - -
-     - Left-to-right, multi-column
-     - -
-     - Manuscript
+     - Algorithmic
      - MIT
+     - None
+   * - ``ReadingSorting``
+     - Algorithmic
+     - MIT
+     - None
+
+Layouts are included with the library and are created directly, without weights.
+
+.. code-block:: python
+
+    from manuscript.layouts import SimpleSorting
+
+    layout = SimpleSorting()
 
 Recognition
 -----------
 
 .. list-table::
    :class: model-zoo-table
-   :widths: 16 14 8 18 28 10 8
    :header-rows: 1
+   :widths: 25 12 18 45
 
-   * - Preset
-     - Architecture
-     - Params
-     - Script
-     - Artifacts
-     - Origin
+   * - Model key
+     - Class
      - License
+     - Artifacts
+   * - ``trba_base_g0``
+     - `TRBA <https://arxiv.org/abs/1904.01906>`__
+     - MIT
+     - | **Training checkpoint only (for fine-tuning; no ONNX inference).**
+       | checkpoint (optional): `trba_base_g0.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g0.pth>`_
+       | license (required): `trba_base_g0.LICENSE.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g0.LICENSE.txt>`__
    * - ``trba_base_g1``
-     - TRBA
-     - 45.10M
-     - Modern + pre-reform Russian
-     - | `trba_base_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.onnx>`_
-       | `trba_base_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.pth>`_
-       | `trba_base_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.json>`_
-       | `trba_base_g1.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.txt>`_
-     - Manuscript
+     - `TRBA <https://arxiv.org/abs/1904.01906>`__
      - MIT
+     - | config (required): `trba_base_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.json>`_
+       | weights (required): `trba_base_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.onnx>`_
+       | checkpoint (optional): `trba_base_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.pth>`_
+       | charset (required): `trba_base_g1.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.txt>`_
+       | license (required): `trba_base_g1.LICENSE.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.LICENSE.txt>`__
    * - ``trba_lite_g1``
-     - TRBA-Lite
-     - 9.46M
-     - Modern + pre-reform Russian
-     - | `trba_lite_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.onnx>`_
-       | `trba_lite_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.pth>`_
-       | `trba_lite_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.json>`_
-       | `trba_lite_g1.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.txt>`_
-     - Manuscript
+     - `TRBA <https://arxiv.org/abs/1904.01906>`__
      - MIT
+     - | config (required): `trba_lite_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.json>`_
+       | weights (required): `trba_lite_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.onnx>`_
+       | checkpoint (optional): `trba_lite_g1.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.pth>`_
+       | charset (required): `trba_lite_g1.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.txt>`_
+       | license (required): `trba_lite_g1.LICENSE.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.LICENSE.txt>`__
    * - ``trba_lite_g2``
-     - TRBA-Lite
-     - 9.46M
-     - Modern + pre-reform Russian
-     - | `trba_lite_g2.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.onnx>`_
-       | `trba_lite_g2.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.pth>`_
-       | `trba_lite_g2.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.json>`_
-       | `trba_lite_g2.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.txt>`_
-     - Manuscript
+     - `TRBA <https://arxiv.org/abs/1904.01906>`__
      - MIT
+     - | config (required): `trba_lite_g2.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.json>`_
+       | weights (required): `trba_lite_g2.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.onnx>`_
+       | checkpoint (optional): `trba_lite_g2.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.pth>`_
+       | charset (required): `trba_lite_g2.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.txt>`_
+       | license (required): `trba_lite_g2.LICENSE.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.LICENSE.txt>`__
+   * - ``trba_lite_g3_prt``
+     - `TRBA <https://arxiv.org/abs/1904.01906>`__
+     - MIT
+     - | config (required): `trba_lite_g3_prt.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g3_prt.json>`_
+       | weights (required): `trba_lite_g3_prt.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g3_prt.onnx>`_
+       | checkpoint (optional): `trba_lite_g3_prt.pth <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g3_prt.pth>`_
+       | charset (required): `trba_lite_g3_prt.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g3_prt.txt>`_
+       | license (required): `trba_lite_g3_prt.LICENSE.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g3_prt.LICENSE.txt>`__
+
+.. code-block:: python
+
+    from manuscript.recognizers import TRBA
+
+    recognizer = TRBA(weights="trba_lite_g2")
 
 Correction
 ----------
 
 .. list-table::
    :class: model-zoo-table
-   :widths: 16 14 8 16 28 10 8
    :header-rows: 1
+   :widths: 25 12 18 45
 
-   * - Preset
-     - Architecture
-     - Params
-     - Orthography
-     - Artifacts
-     - Origin
+   * - Model key
+     - Class
      - License
+     - Artifacts
    * - ``modern_charlm_g1``
      - CharLM
-     - 4.38M
-     - Modern Russian
-     - | `modern_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.onnx>`_
-       | `modern_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.pt>`_
-       | `modern_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.json>`_
-       | `modern_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_words.txt>`_
-     - Manuscript
      - MIT
+     - | vocab (required): `modern_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.json>`_
+       | weights (required): `modern_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.onnx>`_
+       | checkpoint (optional): `modern_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.pt>`_
+       | lexicon (optional): `modern_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_words.txt>`_
+       | license (required): `modern_charlm_g1.LICENSE.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.LICENSE.txt>`__
    * - ``prereform_charlm_g1``
      - CharLM
-     - 4.39M
-     - Pre-reform Russian
-     - | `prereform_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.onnx>`_
-       | `prereform_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.pt>`_
-       | `prereform_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.json>`_
-       | `prereform_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt>`_
-     - Manuscript
      - MIT
+     - | vocab (required): `prereform_charlm_g1.json <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.json>`_
+       | weights (required): `prereform_charlm_g1.onnx <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.onnx>`_
+       | checkpoint (optional): `prereform_charlm_g1.pt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.pt>`_
+       | lexicon (optional): `prereform_words.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_words.txt>`_
+       | license (required): `prereform_charlm_g1.LICENSE.txt <https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.LICENSE.txt>`__
 
-Architecture Sources
---------------------
+.. code-block:: python
 
-- `EAST: An Efficient and Accurate Scene Text Detector <https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_
-  (Zhou et al., CVPR 2017) is the academic basis of the ``EAST`` detector family.
-  The implementation follows the original architecture with a substantially reworked
-  training procedure. Pretrained weights were produced by the project authors.
-- `What Is Wrong With Scene Text Recognition Model Comparisons? Dataset and Model Analysis <https://arxiv.org/abs/1904.01906>`_
-  is the architectural basis of the ``TRBA`` family (TPS-ResNet-BiLSTM-Attn).
-  Recognizers are adapted to the tasks of manuscript-ocr.
+    from manuscript.correctors import CharLM
+
+    corrector = CharLM(weights="prereform_charlm_g1")

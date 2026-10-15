@@ -44,8 +44,9 @@ class CharLM(BaseCorrector):
         - ``None``: auto-downloads default lexicon for model preset
           (prereform_words for prereform_charlm_g1, modern_words for modern_charlm_g1)
 
-    device : {"cuda", "cpu"}, optional
-        Compute device. Default is auto-detected.
+    device : {"cuda", "coreml", "cpu"}, optional
+        Compute device. If None, selects CUDA when ONNX Runtime reports GPU
+        support, otherwise CPU. Select CoreML explicitly with ``device="coreml"``.
     mask_threshold : float, optional
         Confidence threshold below which characters are considered for correction.
         Default is 0.05.

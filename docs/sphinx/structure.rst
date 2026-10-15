@@ -4,38 +4,68 @@ Library Structure
 .. mermaid::
 
     graph LR
-        manuscript[manuscript]
+        manuscript[manuscript] --> Pipeline
+        manuscript --> Stack
+        manuscript --> data
+        manuscript --> detectors
+        manuscript --> layouts
+        manuscript --> recognizers
+        manuscript --> correctors
+        manuscript --> models
+        manuscript --> utils
+        manuscript --> api
 
-        manuscript --> Pipeline[Pipeline]
-        manuscript --> data[data]
-        manuscript --> detectors[detectors]
-        manuscript --> layouts[layouts]
-        manuscript --> recognizers[recognizers]
-        manuscript --> correctors[correctors]
-        manuscript --> utils[utils]
-        manuscript --> api[api]
+        data --> elements["Page, Element, TextRegion<br/>Table, Cell, Image"]
+        detectors --> detection["YOLO, EAST, PPOCR<br/>RFDETR, Mask2Former"]
+        layouts --> ordering["SimpleSorting<br/>ReadingSorting"]
+        recognizers --> recognition["TRBA, PPOCRRec, TrOCR"]
+        recognizers --> ensembles["MajorityVotingRecognizer<br/>MedoidRecognizer"]
+        correctors --> CharLM
+        models --> registry["Registry and artifact cache"]
+        api --> contracts["Base classes and protocols"]
 
-        Pipeline --> p1[predict]
-        Pipeline --> p2[get_text]
-        Pipeline --> p3[last_detection_page]
-        Pipeline --> p4[last_layout_page]
-        Pipeline --> p5[last_recognition_page]
-        Pipeline --> p6[last_correction_page]
+Modules
+-------
 
-        detectors --> EAST[EAST]
-        detectors --> YOLO[YOLO]
-        layouts --> SimpleSorting[SimpleSorting]
-        recognizers --> TRBA[TRBA]
-        correctors --> CharLM[CharLM]
+.. list-table::
+   :header-rows: 1
+   :widths: 25 75
 
-        utils --> organize_page[organize_page wrapper]
+   * - Module or class
+     - Responsibility
+   * - :doc:`Pipeline <api/pipeline>`
+     - Runs configured stages and exposes Page snapshots and execution timings.
+   * - :doc:`Stack <api/pipeline>`
+     - Composes processors, accumulates detector regions and optionally runs
+       independent detectors in parallel.
+   * - :doc:`data <api/data>`
+     - Defines elements, parent-child links, validation, COCO serialization and text output.
+   * - :doc:`detectors <api/detectors>`
+     - Produces configured regions and optional detailed detection results.
+   * - :doc:`layouts <api/layouts>`
+     - Groups, reparents and orders existing regions.
+   * - :doc:`recognizers <api/recognizers>`
+     - Recognizes selected text regions and combines independent predictions.
+   * - :doc:`correctors <api/correctors>`
+     - Updates recognized text, including CharLM character substitutions.
+   * - ``models``
+     - Resolves remote catalogs and manages local model artifacts.
+   * - :doc:`utils <api/utils>`
+     - Provides image input, geometry, grouping, transformations and visualization.
+   * - ``api``
+     - Defines stage protocols, base classes and shared artifact-loading behavior.
 
-Overview
---------
+Public entry points
+-------------------
 
-- ``Pipeline`` orchestrates OCR stages.
-- ``detectors`` provide detection models such as ``YOLO`` and ``EAST``.
-- ``layouts`` provide ordering/grouping models (for example ``SimpleSorting``).
-- ``recognizers`` provide text recognition models.
-- ``correctors`` provide text post-processing models.
-- ``utils.organize_page`` remains as a compatibility wrapper over layout logic.
+Import the components you need from their packages:
+
+.. code-block:: python
+
+    from manuscript import Pipeline, Stack
+    from manuscript.data import Page, TextRegion
+    from manuscript.detectors import YOLO
+    from manuscript.layouts import SimpleSorting, ReadingSorting
+    from manuscript.recognizers import TRBA, MajorityVotingRecognizer
+    from manuscript.correctors import CharLM
+    from manuscript import models

@@ -1,24 +1,54 @@
 Utilities
 =========
 
-Utility functions for image processing, visualization, page organization,
-text-span collapsing, and more.
+Images and test pages
+---------------------
 
-The utilities module also includes helpers for creating lightweight
-``Page`` objects without running the full pipeline:
+.. autofunction:: manuscript.utils.read_image
 
-- ``create_page_from_text`` for testing correctors and other text-processing
-  components from plain text.
-- ``create_page_from_image`` for wrapping a single image or crop into a
-  ``Page`` with one ``TextSpan`` covering the full image. It can also accept
-  a sequence of crops and build a synthetic page for direct recognizer
-  inference with the ``0.1.11+`` stage API.
+.. autofunction:: manuscript.utils.create_page_from_image
 
-.. automodule:: manuscript.utils
-   :members: read_image, create_page_from_text, create_page_from_image, organize_page, crop_axis_aligned, crop_polygon_mask, merge_polygons, order_quad_points, polygon_to_bbox, warp_quad, merge_text_spans, collapse_line_text_spans, collapse_block_text_spans, collapse_page_text_spans
-   :undoc-members:
-   :show-inheritance:
+.. autofunction:: manuscript.utils.create_page_from_text
+
+Grouping and ordering
+---------------------
+
+.. autofunction:: manuscript.utils.group_regions
+
+.. autofunction:: manuscript.utils.organize_page
+
+Collapsing text regions
+-----------------------
+
+.. autofunction:: manuscript.utils.merge_text_spans
+
+.. autofunction:: manuscript.utils.collapse_line_text_spans
+
+.. autofunction:: manuscript.utils.collapse_block_text_spans
+
+.. autofunction:: manuscript.utils.collapse_page_text_spans
+
+Geometry
+--------
+
+.. autofunction:: manuscript.utils.polygon_to_bbox
+
+.. autofunction:: manuscript.utils.crop_axis_aligned
+
+.. autofunction:: manuscript.utils.crop_polygon_mask
+
+.. autofunction:: manuscript.utils.order_quad_points
+
+.. autofunction:: manuscript.utils.warp_quad
+
+.. autofunction:: manuscript.utils.merge_polygons
+
+Visualization
+-------------
 
 .. autofunction:: manuscript.utils.visualize_page
+
+Training helper
+---------------
 
 .. autofunction:: manuscript.utils.set_seed

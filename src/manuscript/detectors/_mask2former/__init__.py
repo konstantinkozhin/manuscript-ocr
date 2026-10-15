@@ -13,10 +13,56 @@ from manuscript.utils.numerics import softmax, sigmoid
 
 
 class Mask2Former(BaseDetector):
-    """Mask2Former ONNX detector producing segmentation polygons.
+    """Initialize Mask2Former instance segmentation with ONNX Runtime.
 
-    Local weights require an explicit config; registry presets include it.
-    region_classes maps model class IDs to document element types.
+    Parameters
+    ----------
+    weights : str or Path, optional
+        Compatible ONNX model file or model registry key. Local files,
+        HTTP/HTTPS URLs, ``github://owner/repo/tag/file.onnx`` and
+        ``gdrive:FILE_ID`` are supported. ``None`` selects the default preset
+        ``mask2former_line_v0_prev`` and downloads its supporting artifacts.
+    config : dict, str or Path, optional
+        Inference configuration, or a path/identifier for its JSON/YAML file.
+        Required for local weights; registry presets supply their config.
+        ``region_classes`` maps output class IDs to document fields,
+        e.g. ``{0: {"type": "line"}}``. Image normalization, input size and
+        tensor names must match the exported graph. ``create_config()`` builds
+        a config dictionary with standard defaults and an explicit class mapping.
+    device : {"cuda", "coreml", "cpu"}, optional
+        Execution device. ``None`` selects CUDA when ONNX Runtime reports GPU
+        support, otherwise CPU. Select CoreML explicitly on supported macOS
+        installations. Default is ``None``.
+    force_download : bool, optional
+        Download artifacts again instead of reusing cached files.
+        Default is ``False``.
+    score_threshold : float or None, optional
+        Minimum confidence in [0, 1], applied to the class probability and the
+        final score (class probability times mean foreground-mask probability).
+        ``None`` uses the config value, or 0.15 when absent.
+    mask_logit_threshold : float or None, optional
+        Finite logit threshold for creating binary masks, before sigmoid.
+        ``None`` uses the config value, or 0.0 when absent.
+    nms_iou_threshold : float or None, optional
+        Mask IoU threshold in [0, 1] for suppressing overlapping detections
+        of the same class. ``None`` uses the config value, or 0.5 when absent.
+    min_mask_area : int or None, optional
+        Minimum foreground area in source-image pixels; must be a positive
+        integer. ``None`` uses the config value, or 16 when absent.
+    **kwargs
+        Additional options passed to ``BaseArtifactModel``.
+
+    Examples
+    --------
+    Load the text-line preset:
+
+    >>> from manuscript.detectors._mask2former import Mask2Former
+    >>> detector = Mask2Former(weights="mask2former_line_v0_prev", device="cpu")
+    >>> page = detector.predict("document.jpg")
+
+    Load compatible local weights with their matching config:
+
+    >>> detector = Mask2Former(weights="model.onnx", config="config.json")
     """
 
     default_weights_name = "mask2former_line_v0_prev"

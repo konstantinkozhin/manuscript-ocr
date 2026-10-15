@@ -26,20 +26,6 @@ class ReadingSorting(BaseLayout):
         Default is False. In containment mode, also create column blocks
         when the input has no Page-level text blocks.
 
-    Notes
-    -----
-    Modifies and returns the supplied Page. Containment is inferred between
-    direct Page children; existing subtrees are retained and sorted recursively.
-    Words prefer qualifying lines over blocks. Within the same parent type,
-    highest coverage wins, then smallest area, then original list order.
-    Detected blocks are not nested inside other blocks.
-
-    Geometry orders rows top to bottom and regions within rows left to right.
-    Regions without polygons sort last. Table cells sort by row and column.
-    In sort mode, inferred containment guides Page-level order without reparenting.
-    Original polygons, text and confidence values are preserved. New column
-    blocks receive bounding rectangles and no text or confidence.
-
     Examples
     --------
     >>> from manuscript.layouts import ReadingSorting

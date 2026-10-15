@@ -14,7 +14,57 @@ from manuscript.utils.geometry import repair_detection_polygon
 
 
 class PPOCR(BaseDetector):
-    """ONNX inference for PP-OCR detectors with DB probability-map outputs."""
+    """Initialize a PP-OCR DB text detector with ONNX Runtime.
+
+    Parameters
+    ----------
+    weights : str or Path
+        Compatible ONNX model file or model registry key. Local files,
+        HTTP/HTTPS URLs, ``github://owner/repo/tag/file.onnx`` and
+        ``gdrive:FILE_ID`` are supported. There is no default preset.
+    config : dict, str or Path, optional
+        DB inference configuration, or a path/identifier for its JSON/YAML
+        file. Required for local weights; registry presets supply their config.
+        Must contain ``schema_version=1``, ``task="text_detection"``,
+        ``algorithm="DB"``, and matching ``preprocess``/``postprocess`` settings.
+        ``region_classes`` must map foreground class 0 to document fields,
+        e.g. ``{0: {"type": "line"}}``. Use ``create_config()`` to prepare a
+        config from a supported Paddle inference YAML or exported JSON.
+    device : {"cuda", "coreml", "cpu"}, optional
+        Execution device. ``None`` selects CUDA when ONNX Runtime reports GPU
+        support, otherwise CPU. Select CoreML explicitly on supported macOS
+        installations. Default is ``None``.
+    threshold : float or None, optional
+        Pixel probability threshold in [0, 1] for forming foreground contours.
+        ``None`` uses ``postprocess.threshold`` from the config.
+    box_threshold : float or None, optional
+        Minimum mean probability within a candidate polygon, in [0, 1].
+        ``None`` uses ``postprocess.box_threshold`` from the config.
+    unclip_ratio : float or None, optional
+        Nonnegative polygon expansion ratio. Larger values expand detected
+        regions further. ``None`` uses ``postprocess.unclip_ratio``.
+    limit_side_len : int or None, optional
+        Resize reference length in pixels; must be at least 32. Its meaning
+        depends on ``limit_type``. ``None`` uses ``preprocess.limit_side_len``.
+    limit_type : {"min", "max", "resize_long"} or None, optional
+        Resize rule: ``"min"`` enlarges a short side below the reference;
+        ``"max"`` shrinks a long side above it; ``"resize_long"`` scales the
+        long side to the reference. ``None`` uses ``preprocess.limit_type``.
+    force_download : bool, optional
+        Download artifacts again instead of reusing cached files.
+        Default is ``False``.
+
+    Examples
+    --------
+    Load compatible local weights and adjust detection thresholds:
+
+    >>> from manuscript.detectors._ppocr import PPOCR
+    >>> detector = PPOCR(
+    ...     weights="model.onnx", config="config.json",
+    ...     threshold=0.3, box_threshold=0.6, device="cpu",
+    ... )
+    >>> page = detector.predict("document.jpg")
+    """
 
     registry_model_class = "PPOCR"
 

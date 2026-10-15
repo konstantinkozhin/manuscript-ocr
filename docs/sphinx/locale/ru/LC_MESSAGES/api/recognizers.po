@@ -7,1158 +7,1030 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-06 15:57+0700\n"
-"PO-Revision-Date: 2026-10-06 00:00+0700\n"
+"POT-Creation-Date: 2026-10-15 20:55+0700\n"
+"PO-Revision-Date: 2026-10-15 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
 "Language-Team: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || "
+"n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: 8a4b746600a049c79d3a24254c402cae api/recognizers.rst:2
+#: ../../api/recognizers.rst:2 51587ed785954ea88b81a74e2d101373
 msgid "Recognizers"
 msgstr "Распознаватели"
 
-#: api/recognizers.rst:4 f8532bcdb6e143c19ba206b7ffd9293d
-msgid "Text recognition models."
-msgstr "Модели распознавания текста."
+#: ../../api/recognizers.rst:4 4a9c5ec47e914a04b602005d2090813e
+msgid "Supported recognizers:"
+msgstr "Поддерживаемые распознаватели:"
 
-#: api/recognizers.rst:7 cf1c441f4c9445cb8cf3b6f5a097ce87
-msgid "Batch size"
-msgstr "Размер батча"
+#: ../../api/recognizers.rst:6 9917e4e8faa5413bb417f16f1ab872d2
+msgid ":class:`~manuscript.recognizers.TRBA`"
+msgstr ":class:`~manuscript.recognizers.TRBA`"
 
-#: 54a422ed5eae4d3ebe6e5e4cc4d2e6ae api/recognizers.rst:9
-msgid ""
-"``TRBA(batch_size=128)`` sets the default inference batch size. An explicit "
-"``predict(..., batch_size=...)`` overrides it; Pipeline uses the configured "
-"recognizer value. The last incomplete ONNX batch is padded internally and "
-"only the original predictions are returned. Fixed-batch models may restrict "
-"the effective batch size."
-msgstr ""
-"``TRBA(batch_size=128)`` задаёт размер батча для инференса по умолчанию. "
-"Явный ``predict(..., batch_size=...)`` переопределяет его; Pipeline "
-"использует значение из конфигурации распознавателя. Последний неполный "
-"ONNX-батч дополняется внутри модели, а возвращаются только исходные "
-"предсказания. Модели с фиксированным батчем могут ограничивать его "
-"эффективный размер."
+#: ../../api/recognizers.rst:7 f2146e4ecba04599b684819cd90b5026
+msgid ":class:`~manuscript.recognizers.PPOCRRec`"
+msgstr ":class:`~manuscript.recognizers.PPOCRRec`"
 
-#: ab418e2a03a24e69a5868ad76cba53f8 api/recognizers.rst:16
-msgid "Training architecture"
-msgstr "Архитектура при обучении"
+#: ../../api/recognizers.rst:8 82c6040d445545668100feb7d84664d3
+msgid ":class:`~manuscript.recognizers.TrOCR`"
+msgstr ":class:`~manuscript.recognizers.TrOCR`"
 
-#: 17f79dc2d2544fb5bcadf9fccfb5118d api/recognizers.rst:18
-msgid "Pass architecture options through ``TRBA.train(..., **extra_config)``:"
-msgstr "Передавайте параметры архитектуры через ``TRBA.train(..., **extra_config)``:"
+#: ../../api/recognizers.rst:9 197e83e67ef54e76996092ad08391c24
+msgid ":class:`~manuscript.recognizers.MajorityVotingRecognizer`"
+msgstr ":class:`~manuscript.recognizers.MajorityVotingRecognizer`"
 
-#: a1bbdc65b4e64ddb9260c07593933be6 api/recognizers.rst:24
-msgid "Option"
-msgstr "Параметр"
+#: ../../api/recognizers.rst:10 56721d2d9eff4195a68154d8fa9e6506
+msgid ":class:`~manuscript.recognizers.MedoidRecognizer`"
+msgstr ":class:`~manuscript.recognizers.MedoidRecognizer`"
 
-#: 894487e529494668b5455c7806474a76 api/recognizers.rst:25
-msgid "Default"
-msgstr "По умолчанию"
+#: ../../api/recognizers.rst:23 e7adecd1198c41cd8c395e1f7e019206
+msgid "TRBA"
+msgstr "TRBA"
 
-#: a238ffe332864542949993b207bf7084 api/recognizers.rst:26
-msgid "Meaning"
-msgstr "Назначение"
-
-#: api/recognizers.rst:27 b78dc322d32a4a4d882f5aad439f6c31
-msgid "``decoder_type``"
-msgstr "``decoder_type``"
-
-#: 822dc8d8769644cea7335c26a5c76c20 api/recognizers.rst:28
-msgid "``\"attention\"``"
-msgstr "``\"attention\"``"
-
-#: api/recognizers.rst:29 e5dac3d92a844b7caf3229a3abd4acdd
-msgid ""
-"Choose ``\"attention\"`` or ``\"parseq\"``. ``parseq_linear`` is an "
-"experiment configuration name."
-msgstr ""
-"Выберите ``\"attention\"`` или ``\"parseq\"``. ``parseq_linear`` — имя "
-"экспериментальной конфигурации."
-
-#: 8e51283598634505a89cb9da0e1670d4 api/recognizers.rst:30
-msgid "``cnn_backbone``"
-msgstr "``cnn_backbone``"
-
-#: 02ae53efdaa04bec9c38d47cefdbd10e api/recognizers.rst:31
-msgid "``\"seresnet31\"``"
-msgstr "``\"seresnet31\"``"
-
-#: api/recognizers.rst:32 c0dd890bb48946dfa1288b04a889585b
-msgid "``\"seresnetlite31v2\"`` selects SEResNet31LiteV2."
-msgstr "``\"seresnetlite31v2\"`` выбирает SEResNet31LiteV2."
-
-#: 76cfb3ff837e4d509ba07872ecfdae9a api/recognizers.rst:33
-msgid "``transformation``"
-msgstr "``transformation``"
-
-#: a68d98315ac44c638343e7c515279a01 api/recognizers.rst:34
-msgid "``\"none\"``"
-msgstr "``\"none\"``"
-
-#: a582cd6518744f81ac75d8141dec2ef8 api/recognizers.rst:35
-msgid "``\"tps\"`` enables input rectification."
-msgstr "``\"tps\"`` включает выпрямление входного изображения."
-
-#: 2805d9c6d31f420988a53d18d704df3c api/recognizers.rst:36
-msgid "``tps_num_fiducial``"
-msgstr "``tps_num_fiducial``"
-
-#: 59e1c1768a0f40968a5121bbd50335ce api/recognizers.rst:37
-msgid "``20``"
-msgstr "``20``"
-
-#: 4da9c75b3a1c47a6978abf5674d97353 api/recognizers.rst:38
-msgid "Number of TPS control points; must be even and at least 4."
-msgstr "Число контрольных точек TPS; должно быть чётным и не меньше 4."
-
-#: 8a2a70c1540c4972aa7160cf10bc3689 api/recognizers.rst:39
-msgid "``decoder_layers``, ``decoder_heads``, ``decoder_ffn``, ``decoder_dropout``"
-msgstr "``decoder_layers``, ``decoder_heads``, ``decoder_ffn``, ``decoder_dropout``"
-
-#: 52f50f163a404a5286f6a7748c71a667 api/recognizers.rst:40
-msgid "``2``, ``8``, ``1024``, ``0.1``"
-msgstr "``2``, ``8``, ``1024``, ``0.1``"
-
-#: 423c72b3242b435fbbba24b078b73874 api/recognizers.rst:41
-msgid ""
-"PARSeq decoder settings. Hidden size must be divisible by the number of "
-"heads."
-msgstr ""
-"Параметры декодера PARSeq. Размер скрытого состояния должен делиться на "
-"число голов внимания."
-
-#: 1d757906796246d68f1645185e8c028e api/recognizers.rst:42
-msgid "``parseq_permutations``, ``parseq_refine_iters``"
-msgstr "``parseq_permutations``, ``parseq_refine_iters``"
-
-#: 101348ea2e27467a8c7cee829e83ff82 api/recognizers.rst:43
-msgid "``6``, ``1``"
-msgstr "``6``, ``1``"
-
-#: 7388a0d62de344fc9db6f93fd86db2ee api/recognizers.rst:44
-msgid "PARSeq training permutations and inference refinement iterations."
-msgstr "Число перестановок при обучении PARSeq и итераций уточнения при инференсе."
-
-#: api/recognizers.rst:65 fd49ffb066bd442ab63c89a26d8bf5b6
-msgid ""
-"Training saves architecture settings for export. TPS export uses ONNX opset "
-"16 or newer for GridSample; the exporter raises the requested opset when "
-"needed. The default ``pretrain_weights=\"default\"`` (or ``True``) downloads"
-" the ``trba_lite_g1`` checkpoint through the registry. ``None`` or ``False``"
-" trains from scratch. To use another preset, download its ``checkpoint`` "
-"artifact and pass that path; local paths and custom weight URLs are also "
-"supported. Resuming from a checkpoint skips pretraining. Compatibility "
-"loading may skip layers with different shapes, so inspect its messages when "
-"changing architectures."
-msgstr ""
-"Обучение сохраняет параметры архитектуры для экспорта. Экспорт TPS "
-"использует ONNX opset 16 или новее для GridSample; при необходимости "
-"экспортёр повышает запрошенный opset. Значение по умолчанию "
-"``pretrain_weights=\"default\"`` (или ``True``) загружает чекпоинт "
-"``trba_lite_g1`` через реестр. ``None`` или ``False`` запускает обучение с "
-"нуля. Для другого пресета скачайте его артефакт ``checkpoint`` и передайте "
-"путь; также поддерживаются локальные пути и URL пользовательских весов. При "
-"возобновлении из чекпоинта предобученные веса не загружаются. Совместимая "
-"загрузка может пропускать слои с другими формами, поэтому проверяйте "
-"сообщения при изменении архитектуры."
-
-#: c4f7fbdfcec54a4895a77cdf30d9c985 manuscript.recognizers._trba.TRBA:1 of
+#: 3f51a00153454347ada3b5b1107b2324 ac11fea973024773a7a120cdf7bef903
+#: manuscript.recognizers._ppocr_rec.PPOCRRec:1 manuscript.recognizers._trba.TRBA:1
+#: manuscript.recognizers._trocr.TrOCR:1 of
 msgid "Bases: :py:class:`~manuscript.api.recognizer.BaseRecognizer`"
 msgstr "Базовые классы: :py:class:`~manuscript.api.recognizer.BaseRecognizer`"
 
-#: 007f9453edb24e11abbdb1ed857fadbc manuscript.recognizers._trba.TRBA:2 of
+#: 17ed2e695114429babc440b399dd3c78 manuscript.recognizers._trba.TRBA:2 of
 msgid "Initialize TRBA text recognition model with ONNX Runtime."
-msgstr "Инициализация модели распознавания текста TRBA с использованием ONNX Runtime."
+msgstr "Модель распознавания текста TRBA на ONNX Runtime."
 
-#: 1b7005d21e004fcb9d394b0977ea2831 36955d1704e34cf0a7a77ad3e9e7e033
-#: 775215aa6ae644bb99e4a7f26a886453 8adb52a6668d4fd684472016b08f000e
-#: api/recognizers.rst ec1a4904297d4b8ebcd4cf519847945e
+#: ../../api/recognizers.rst 002a9a697152412b9168e709e364764c 074ba911663f4ff9a17c4c2204711bab
+#: 305965378cb54ea68d2d683070e97921 af0924f23f92463b99c7408cea771b59 fa53c4ec393b47d19a4adcf37372493a
 msgid "Parameters"
 msgstr "Параметры"
 
-#: 7fa4cf2faf9a4284b4a5801719370123 manuscript.recognizers._trba.TRBA:5 of
+#: 2e80bc7e71f341ca9888fb8e883e437e manuscript.recognizers._trba.TRBA:5 of
 msgid ""
 "Path or identifier for ONNX model weights. Supports:  - Local file path: "
-"``\"path/to/model.onnx\"`` - HTTP/HTTPS URL: "
-"``\"https://example.com/model.onnx\"`` - GitHub release: "
-"``\"github://owner/repo/tag/file.onnx\"`` - Google Drive: "
-"``\"gdrive:FILE_ID\"`` - Preset name: ``\"trba_lite_g1\"`` or "
-"``\"trba_base_g1\"`` (from pretrained_registry) - ``None``: auto-downloads "
-"default preset (trba_lite_g1)"
+"``\"path/to/model.onnx\"`` - HTTP/HTTPS URL: ``\"https://example.com/model.onnx\"`` - GitHub "
+"release: ``\"github://owner/repo/tag/file.onnx\"`` - Google Drive: ``\"gdrive:FILE_ID\"`` - "
+"Preset name: ``\"trba_lite_g1\"`` or ``\"trba_base_g1\"`` (from the model registry) - ``None``: "
+"auto-downloads default preset (trba_lite_g1)"
 msgstr ""
-"Путь или идентификатор весов ONNX-модели. Поддерживаются:  - локальный путь "
-"к файлу: ``\"path/to/model.onnx\"``  - HTTP/HTTPS URL: "
-"``\"https://example.com/model.onnx\"``  - релиз GitHub: "
-"``\"github://owner/repo/tag/file.onnx\"``  - Google Drive: "
-"``\"gdrive:FILE_ID\"``  - имя пресета: ``\"trba_lite_g1\"`` или "
-"``\"trba_base_g1\"`` (из pretrained_registry)  - ``None``: автоматическая "
-"загрузка пресета по умолчанию (trba_lite_g1)"
+"Путь или идентификатор весов ONNX-модели. Поддерживаются:  - Локальный файл: "
+"``\"path/to/model.onnx\"`` - HTTP/HTTPS URL: ``\"https://example.com/model.onnx\"`` - Релиз "
+"GitHub: ``\"github://owner/repo/tag/file.onnx\"`` - Google Drive: ``\"gdrive:FILE_ID\"`` - Имя "
+"пресета: ``\"trba_lite_g1\"`` или ``\"trba_base_g1\"`` (из реестра моделей) - ``None``: "
+"автоматически скачивается пресет по умолчанию (trba_lite_g1)"
 
-#: bc57d95dfe6544f8a66263ef8698067d manuscript.recognizers._trba.TRBA:5 of
+#: 847e6ff541a345758ad29514b71003e9 manuscript.recognizers._trba.TRBA:5 of
 msgid "Path or identifier for ONNX model weights. Supports:"
-msgstr "Путь или идентификатор для весов модели ONNX. Поддерживает:"
+msgstr "Путь или идентификатор весов ONNX-модели. Поддерживаются:"
 
-#: 059cef110b3e4fc7b8c8a496fb9630b5 manuscript.recognizers._trba.TRBA:7 of
+#: 93456a1d322a469c98520bccedd588f0 manuscript.recognizers._trba.TRBA:7 of
 msgid "Local file path: ``\"path/to/model.onnx\"``"
 msgstr "Локальный путь: ``\"path/to/model.onnx\"``"
 
-#: eb4fa3af918f4300adaf19f71bfe6693 manuscript.recognizers._trba.TRBA:8 of
+#: cbdb06e58ba6467bbb21bee4a90dac44 manuscript.recognizers._trba.TRBA:8 of
 msgid "HTTP/HTTPS URL: ``\"https://example.com/model.onnx\"``"
 msgstr "HTTP/HTTPS URL: ``\"https://example.com/model.onnx\"``"
 
-#: 6d999fa3a7744212a8b476949d351b4e manuscript.recognizers._trba.TRBA:9 of
+#: 6b0fc38d998c4f11abd0f6d5f105ade5 manuscript.recognizers._trba.TRBA:9 of
 msgid "GitHub release: ``\"github://owner/repo/tag/file.onnx\"``"
-msgstr "GitHub release: ``\"github://owner/repo/tag/file.onnx\"``"
+msgstr "Релиз GitHub: ``\"github://owner/repo/tag/file.onnx\"``"
 
-#: 85580a7425bf47efbf67b3dd05010768 manuscript.recognizers._trba.TRBA:10 of
+#: 08149a026c5d418587f9b5d5d5928ad0 manuscript.recognizers._trba.TRBA:10 of
 msgid "Google Drive: ``\"gdrive:FILE_ID\"``"
 msgstr "Google Drive: ``\"gdrive:FILE_ID\"``"
 
-#: 84bade3548f949fba72ec653a5edfb22 manuscript.recognizers._trba.TRBA:11 of
-msgid ""
-"Preset name: ``\"trba_lite_g1\"`` or ``\"trba_base_g1\"`` (from "
-"pretrained_registry)"
-msgstr ""
-"Имя пресета: ``\"trba_lite_g1\"`` или ``\"trba_base_g1\"`` (из "
-"pretrained_registry)"
+#: 322e8d0fef50471a919f024a81c85239 manuscript.recognizers._trba.TRBA:11 of
+msgid "Preset name: ``\"trba_lite_g1\"`` or ``\"trba_base_g1\"`` (from the model registry)"
+msgstr "Имя пресета: ``\"trba_lite_g1\"`` или ``\"trba_base_g1\"`` (из реестра моделей)"
 
-#: 3d093bbcea9143aaa1ea77f2b50e2ca5 manuscript.recognizers._trba.TRBA:12 of
+#: 0f3ee702ce054b5c96e44b8f97117061 manuscript.recognizers._trba.TRBA:12 of
 msgid "``None``: auto-downloads default preset (trba_lite_g1)"
 msgstr "``None``: автоматически загружает пресет по умолчанию (trba_lite_g1)"
 
-#: 36c1d398463644c69ebb7923f8dc8401 manuscript.recognizers._trba.TRBA:15 of
+#: 4339cfce4373424cae6819f7f6c06ef2 manuscript.recognizers._trba.TRBA:15 of
 msgid ""
-"Path or identifier for model configuration JSON. Same URL schemes as "
-"``weights``. If ``None``, attempts to infer from weights location or uses "
-"default config for preset models."
+"Path or identifier for model configuration JSON. Same URL schemes as ``weights``. Required for "
+"local weights; registry presets supply their own config artifact. The config must include "
+"``recognition_levels``, e.g. ``[\"word\"]``. Pass ``recognition_levels=[\"word\"]`` to override "
+"this selection explicitly."
 msgstr ""
-"Путь или идентификатор JSON-конфигурации модели. Поддерживает те же схемы, "
-"что и ``weights``. Если ``None``, конфигурация определяется по расположению "
-"весов или используется конфигурация по умолчанию для пресетов."
+"Путь или идентификатор JSON-конфигурации модели. Те же схемы URL, что и для ``weights``. "
+"Обязателен для локальных весов; пресеты предоставляют свою конфигурацию. Она должна содержать "
+"``recognition_levels``, например ``[\"word\"]``. Передайте ``recognition_levels=[\"word\"]``, "
+"чтобы явно переопределить выбор."
 
-#: 064711ca2c1749459d59f071fd7fc683 manuscript.recognizers._trba.TRBA:20 of
+#: bc8b735d36fc4b5bbe5998890a7e0d43 manuscript.recognizers._trba.TRBA:22 of
 msgid ""
-"Path or identifier for character set file. If ``None``, attempts to find "
-"charset near weights or falls back to package default."
+"Path or identifier for character set file. Required for local weights; registry presets supply "
+"their own charset artifact."
 msgstr ""
-"Путь или идентификатор файла набора символов. Если ``None``, набор символов "
-"ищется рядом с весами или используется вариант по умолчанию из пакета."
+"Путь или идентификатор файла набора символов. Обязателен для локальных весов; пресеты "
+"предоставляют свой файл набора символов."
 
-#: 155b3bda13a04a069200de8c1ea1c147 manuscript.recognizers._trba.TRBA:24 of
+#: 601be278694e4e6b8a99185865cd1eb8 manuscript.recognizers._trba.TRBA:26 of
 msgid ""
-"Compute device. If ``None``, automatically selects CPU. For GPU/CoreML "
-"acceleration:  - CUDA (NVIDIA): ``pip install onnxruntime-gpu`` - CoreML "
-"(Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``  Default is "
-"``None`` (CPU)."
+"Compute device. If ``None``, selects CUDA when ONNX Runtime reports GPU support, otherwise CPU. "
+"For GPU/CoreML acceleration:  - CUDA (NVIDIA): ``pip install onnxruntime-gpu`` - CoreML (Apple "
+"Silicon): included in standard macOS ONNX Runtime wheels;   select ``device=\"coreml\"`` "
+"explicitly.  Default is ``None`` (automatic selection)."
 msgstr ""
-"Устройство вычислений. Если ``None``, автоматически выбирается CPU. Для "
-"ускорения GPU/CoreML:  - CUDA (NVIDIA): ``pip install onnxruntime-gpu``  - "
-"CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``  По "
-"умолчанию ``None`` (CPU)."
+"Устройство для выполнения модели. При ``None`` выбирается CUDA, если ONNX Runtime сообщает о "
+"поддержке GPU, иначе CPU. Для ускорения GPU/CoreML:  - CUDA (NVIDIA): ``pip install onnxruntime-"
+"gpu`` - CoreML (Apple Silicon): входит в стандартные пакеты ONNX Runtime для macOS;   явно "
+"задайте ``device=\"coreml\"``.  По умолчанию ``None`` (автоматический выбор)."
 
-#: 78e89aa269a04c46b4c8b494b35bd14c manuscript.recognizers._trba.TRBA:24 of
+#: 4f4bff7efbe34f579daea11cfb3d3005 manuscript.recognizers._trba.TRBA:26 of
 msgid ""
-"Compute device. If ``None``, automatically selects CPU. For GPU/CoreML "
-"acceleration:"
+"Compute device. If ``None``, selects CUDA when ONNX Runtime reports GPU support, otherwise CPU. "
+"For GPU/CoreML acceleration:"
 msgstr ""
-"Устройство вычислений. Если ``None``, автоматически выбирается CPU. Для "
-"ускорения GPU/CoreML:"
+"Устройство для выполнения модели. При ``None`` выбирается CUDA, если ONNX Runtime сообщает о "
+"поддержке GPU, иначе CPU. Для ускорения GPU/CoreML:"
 
-#: f20e6dc3a7614843ab857b2dfd6c92ab manuscript.recognizers._trba.TRBA:27 of
+#: a4b0cc5abf2044b696139a154fcd6838 manuscript.recognizers._trba.TRBA:29 of
 msgid "CUDA (NVIDIA): ``pip install onnxruntime-gpu``"
 msgstr "CUDA (NVIDIA): ``pip install onnxruntime-gpu``"
 
-#: c49b42ea0fda4254b09fffb8260082c5 manuscript.recognizers._trba.TRBA:28 of
-msgid "CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``"
-msgstr "CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``"
-
-#: d1106129ba7c4f05a015e9c479e51de3 manuscript.recognizers._trba.TRBA:30 of
-msgid "Default is ``None`` (CPU)."
-msgstr "По умолчанию ``None`` (CPU)."
-
-#: 2432441eb1744dd9addc98ff323be81b manuscript.recognizers._trba.TRBA:33 of
+#: 80857c80f341414eba8d29aa7dd23318 manuscript.recognizers._trba.TRBA:30 of
 msgid ""
-"Aspect-ratio threshold for rotating vertical text-span crops before "
-"recognition. If ``height > width * rotate_threshold``, crop is rotated 90 "
-"degrees clockwise. Set to ``0`` or ``None`` to disable. Default is ``1.5``."
+"CoreML (Apple Silicon): included in standard macOS ONNX Runtime wheels; select "
+"``device=\"coreml\"`` explicitly."
 msgstr ""
-"Порог соотношения сторон для поворота вертикальных кропов текстовых областей"
-" перед распознаванием. Если ``height > width * rotate_threshold``, кроп "
-"поворачивается на 90 градусов по часовой стрелке. Установите ``0`` или "
-"``None`` для отключения. По умолчанию ``1.5``."
+"CoreML (Apple Silicon): входит в стандартные пакеты ONNX Runtime для macOS; явно задайте "
+"``device=\"coreml\"``."
 
-#: 6b6f4a39e5e146c9b7ea56ee0801637b manuscript.recognizers._trba.TRBA:39 of
+#: d1ea01ab91c94ea9ad26ca4ba43099ea manuscript.recognizers._trba.TRBA:33 of
+msgid "Default is ``None`` (automatic selection)."
+msgstr "По умолчанию ``None`` (автоматический выбор)."
+
+#: 4408659694c044f584cb88fcaea0d124 manuscript.recognizers._trba.TRBA:36 of
 msgid ""
-"Strategy used to convert ``Page`` polygons into recognition crops. "
-"``\"bbox\"`` extracts axis-aligned bounding boxes for arbitrary polygons. "
-"``\"polygon_mask\"`` masks pixels outside the polygon inside a tight crop "
-"and also supports arbitrary polygons. ``\"quad_warp\"`` rectifies only "
-"4-point polygons with a perspective transform before recognition. A custom "
-"callable may also be provided and should return a list of prepared text "
-"regions. Default is ``\"bbox\"``."
+"Aspect-ratio threshold for rotating vertical text-span crops before recognition. If ``height > "
+"width * rotate_threshold``, crop is rotated 90 degrees clockwise. Set to ``0`` or ``None`` to "
+"disable. Default is ``1.5``."
 msgstr ""
-"Стратегия преобразования полигонов ``Page`` в кропы для распознавания. "
-"``\"bbox\"`` извлекает выровненные по осям ограничивающие прямоугольники для"
-" произвольных полигонов. ``\"polygon_mask\"`` маскирует пиксели за пределами"
-" полигона внутри плотного кропа и также поддерживает произвольные полигоны. "
-"``\"quad_warp\"`` выпрямляет только 4-точечные полигоны с помощью "
-"перспективного преобразования перед распознаванием. Можно передать "
-"пользовательский callable, возвращающий список подготовленных текстовых "
-"областей. По умолчанию ``\"bbox\"``."
+"Порог соотношения сторон для поворота вертикальных фрагментов текстовых областей перед "
+"распознаванием. Если ``height > width * rotate_threshold``, фрагмент поворачивается на 90 "
+"градусов по часовой стрелке. Установите ``0`` или ``None`` для отключения. По умолчанию ``1.5``."
 
-#: 9e43e2550bf646f3871e17bf47b63044 manuscript.recognizers._trba.TRBA:48 of
+#: 426046cfb1d542a2a3debe113280c701 manuscript.recognizers._trba.TRBA:42 of
 msgid ""
-"Optional configuration for built-in region preparers. Defaults to ``None``. "
-"Typical options are ``pad`` for ``\"bbox\"`` and ``\"polygon_mask\"``, or "
-"``output_size=(width, height)`` for ``\"quad_warp\"``. Non-quad polygons "
-"passed to ``\"quad_warp\"`` fall back to bbox crops by default."
+"Strategy used to convert ``Page`` polygons into recognition crops. ``\"bbox\"`` extracts axis-"
+"aligned bounding boxes for arbitrary polygons. ``\"polygon_mask\"`` masks pixels outside the "
+"polygon inside a tight crop and also supports arbitrary polygons. ``\"quad_warp\"`` rectifies "
+"only 4-point polygons with a perspective transform before recognition. A custom callable may also"
+" be provided and should return a list of prepared text regions. Default is ``\"bbox\"``."
 msgstr ""
-"Необязательная конфигурация встроенных обработчиков областей. По умолчанию "
-"``None``. Типичные параметры: ``pad`` для ``\"bbox\"`` и "
-"``\"polygon_mask\"`` или ``output_size=(width, height)`` для "
-"``\"quad_warp\"``. Полигоны без четырёх вершин в ``\"quad_warp\"`` по "
-"умолчанию обрабатываются как bbox-кропы."
+"Способ вырезания регионов ``Page`` для распознавания. ``\"bbox\"`` вырезает ограничивающий "
+"прямоугольник со сторонами вдоль осей. ``\"polygon_mask\"`` дополнительно скрывает пиксели за "
+"пределами полигона. Оба способа работают с произвольными полигонами. ``\"quad_warp\"`` выпрямляет"
+" четырёхугольник с помощью перспективного преобразования. Можно также передать свою функцию, "
+"которая возвращает список подготовленных текстовых регионов. По умолчанию ``\"bbox\"``."
 
-#: 79b91dabbc544ce8976bba8a15679dec manuscript.recognizers._trba.TRBA:55 of
+#: bc7f4f66d99e40debf505332eb185b4f manuscript.recognizers._trba.TRBA:51 of
 msgid ""
-"Minimum crop width/height in pixels to run recognition for a text span. Text"
-" spans below this threshold are skipped. Default is ``5``."
+"Optional configuration for built-in region preparers. Defaults to ``None``. Typical options are "
+"``pad`` for ``\"bbox\"`` and ``\"polygon_mask\"``, or ``output_size=(width, height)`` for "
+"``\"quad_warp\"``. Non-quad polygons passed to ``\"quad_warp\"`` fall back to bbox crops by "
+"default."
 msgstr ""
-"Минимальная ширина/высота кропа в пикселях для распознавания текстовой "
-"области. Области ниже порога пропускаются. По умолчанию ``5``."
+"Настройки встроенных способов вырезания регионов. По умолчанию ``None``. Например, ``pad`` задаёт"
+" отступ для ``\"bbox\"`` и ``\"polygon_mask\"``, а ``output_size=(width, height)`` — размер "
+"результата для ``\"quad_warp\"``. Если у полигона не четыре вершины, ``\"quad_warp\"`` по "
+"умолчанию вырезает его ограничивающий прямоугольник."
 
-#: b540da0a8a3d4008bb78fa63c9e44481 manuscript.recognizers._trba.TRBA:59 of
+#: 9efb086edeba4c8280fff729c9948ea0 manuscript.recognizers._trba.TRBA:58 of
 msgid ""
-"Default inference batch size used when ``predict(..., batch_size=...)`` is "
-"not provided. Default is ``128``."
+"Minimum width and height of the region's axis-aligned bounding box in source-image pixels, "
+"checked before padding, clipping or warping. Regions below this threshold are skipped. Default is"
+" ``5``."
 msgstr ""
-"Размер батча для инференса по умолчанию, используемый, когда ``predict(..., "
-"batch_size=...)`` не задан. По умолчанию ``128``."
+"Минимальные ширина и высота ограничивающего прямоугольника региона вдоль осей в пикселях "
+"исходного изображения. Проверяются до добавления полей, обрезки по границам и преобразования "
+"перспективы. Регионы меньше порога пропускаются. По умолчанию ``5``."
 
-#: f7b86ff19c374b7e90ab08ea4b5ce823 manuscript.recognizers._trba.TRBA:63 of
-msgid "Additional configuration options (reserved for future use)."
+#: 974dacca5e52464492d9cb9261b0405c manuscript.recognizers._trba.TRBA:63 of
+msgid ""
+"Default inference batch size used when ``predict(..., batch_size=...)`` is not provided. Default "
+"is ``128``."
 msgstr ""
-"Дополнительные параметры конфигурации (зарезервированы для будущего "
-"использования)."
+"Размер батча при распознавании, если в ``predict(..., batch_size=...)`` не указано другое "
+"значение. По умолчанию ``128``."
 
-#: 0ee0fc16237845dc8f52ff609bd4daec 99a4f4687e984753959080a15ef0d666
-#: api/recognizers.rst
+#: 2db75ca9518b4a68a82059f7f1b7bf17 manuscript.recognizers._trba.TRBA:66 of
+msgid ""
+"Word, line or block regions to recognize. Overrides the levels in the model config; passed "
+"through ``**kwargs``."
+msgstr ""
+"Регионы word, line или block для распознавания. Переопределяет уровни конфигурации модели; "
+"передаётся через ``**kwargs``."
+
+#: 3e93b51720004eefaad716e7d439f46c manuscript.recognizers._trba.TRBA:69 of
+msgid ""
+"Compensate known region orientation before recognition. Default is ``True``; passed through "
+"``**kwargs``. Known angles take precedence over the aspect-ratio heuristic. Set "
+"``rotate_threshold=None`` separately to disable that heuristic for regions with unknown "
+"orientation."
+msgstr ""
+"Компенсировать известную ориентацию региона перед распознаванием. По умолчанию ``True``; "
+"передаётся через ``**kwargs``. Известный угол имеет приоритет перед эвристикой пропорций. Чтобы "
+"отключить эвристику для неизвестной ориентации, отдельно задайте ``rotate_threshold=None``."
+
+#: 551d2217677d4689a96f55cbc8fa3c10 manuscript.recognizers._trba.TRBA:75 of
+msgid "Additional options forwarded to the shared recognizer workflow."
+msgstr "Дополнительные параметры общего процесса распознавания."
+
+#: ../../api/recognizers.rst 4dc02567848a47eb95590987077ca7fe 754d0d0f476f4d8fa49afbfc39383b19
+#: df2aaa00c81e441cb23016943673c608
 msgid "Raises"
 msgstr "Вызывает исключения"
 
-#: 84f0b3109c8d4266b4fa88551c4dccb4 manuscript.recognizers._trba.TRBA:65 of
+#: 2d24a6f6610848e9aa64f077cbe82f72 manuscript.recognizers._trba.TRBA:77 of
 msgid "If specified files do not exist."
 msgstr "Если указанные файлы не существуют."
 
-#: c1b8dc4255bf44aaa59b7b4bf4bface1 manuscript.recognizers._trba.TRBA:66 of
+#: 07497b84e173439ea8b08d17b0d93568 manuscript.recognizers._trba.TRBA:78 of
 msgid "If weights format is invalid."
 msgstr "Если формат весов некорректен."
 
-#: 3952da89920d452b9669cd3dc1c5fe7a ce7b0d747d0c4d1a94188315ef8447cc
-#: manuscript.recognizers._trba.TRBA:69
-#: manuscript.recognizers._trba.TRBA.export:38 of
-msgid "Notes"
-msgstr "Примечания"
-
-#: 11036e8541e746ebbdc6e0b2138e987f manuscript.recognizers._trba.TRBA:70 of
-msgid "The class provides three main public methods:"
-msgstr "Класс предоставляет три основных публичных метода:"
-
-#: 0e2649a65e1a488da2a68909dbab32c8 manuscript.recognizers._trba.TRBA:72 of
-msgid "``predict`` - run recognition over text spans in a ``Page`` object."
-msgstr "``predict`` — распознавание текстовых областей объекта ``Page``."
-
-#: afce45b1152243b88b79bc1dbee2ee5c manuscript.recognizers._trba.TRBA:73 of
-msgid ""
-"``train`` - high-level training entrypoint to train a TRBA model on custom "
-"datasets."
-msgstr ""
-"``train`` — высокоуровневая точка входа для обучения TRBA на "
-"пользовательских наборах данных."
-
-#: 0ea9d5b7bf354ebc96f173e793c0d7c8 manuscript.recognizers._trba.TRBA:75 of
-msgid "``export`` - static method to export PyTorch model to ONNX format."
-msgstr "``export`` — статический метод экспорта модели PyTorch в ONNX."
-
-#: 2e245f26fe3a42a2bd33059bc45ae53f manuscript.recognizers._trba.TRBA:77 of
-msgid ""
-"Model uses ONNX Runtime for fast inference on CPU and GPU. For GPU "
-"acceleration, install: ``pip install onnxruntime-gpu``"
-msgstr ""
-"Модель использует ONNX Runtime для быстрого инференса на CPU и GPU. Для "
-"ускорения на GPU установите: ``pip install onnxruntime-gpu``"
-
-#: 8aa74dfed7b44331b29a95256fa2151d 9ebe8c2f9fe4448b9c039d6d87dbe37c
-#: bd3675896e4e471e94b3e0ec2d13fdcd manuscript.recognizers._trba.TRBA:81
-#: manuscript.recognizers._trba.TRBA.export:56
-#: manuscript.recognizers._trba.TRBA.train:153 of
+#: 6ce24fa3a5f3409a9dd62e4b8cd9bcdb 6d5cb6cb5546403ca381fe36a460e7fc a66a6e04d09d48e895b31730d8c9f162
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer:17
+#: manuscript.recognizers._medoid.MedoidRecognizer:15 manuscript.recognizers._trba.TRBA:81
+#: manuscript.recognizers._trba.TRBA.export:39 manuscript.recognizers._trba.TRBA.train:184
+#: manuscript.recognizers._trocr.TrOCR:58 of
 msgid "Examples"
 msgstr "Примеры"
 
-#: 9af718f3aac74657b5516973e7e9199c manuscript.recognizers._trba.TRBA:82 of
+#: c932a41169874c95a908eb187bc32dfd manuscript.recognizers._trba.TRBA:82 of
 msgid "Create recognizer with default preset (auto-downloads):"
 msgstr "Создание распознавателя с пресетом по умолчанию (автозагрузка):"
 
-#: b8533153a07140718d9602d9a49647d4 manuscript.recognizers._trba.TRBA:87 of
+#: d244b11e63e44882a66a1c83537d7f1f manuscript.recognizers._trba.TRBA:87 of
 msgid "Load from local ONNX file:"
 msgstr "Загрузка из локального ONNX-файла:"
 
-#: e719def2ca6c4ddfad91136eb2ba5593 manuscript.recognizers._trba.TRBA:91 of
+#: 8e0eb3023ff64a4dbe05c596f9662625 manuscript.recognizers._trba.TRBA:94 of
 msgid "Load from GitHub release:"
 msgstr "Загрузка из релиза GitHub:"
 
-#: 7e06d972d11047e4b91922b6de19e4c5 manuscript.recognizers._trba.TRBA:98 of
+#: c374da3044fd4e988d5c9cb46fdb8620 manuscript.recognizers._trba.TRBA:102 of
 msgid "Force CPU execution:"
 msgstr "Принудительное выполнение на CPU:"
 
-#: b389a7b339f746e8803ddec894d4cab8 manuscript.recognizers._trba.TRBA:105 of
-msgid "Methods"
-msgstr "Методы"
-
-#: de222f749067416f8589f8952c3ad023
-#: manuscript.recognizers._trba.TRBA:124:<autosummary>:1 of
-msgid ""
-":py:obj:`__call__ <manuscript.recognizers.TRBA.__call__>`\\ \\(\\*args\\, "
-"\\*\\*kwargs\\)"
-msgstr ""
-":py:obj:`__call__ <manuscript.recognizers.TRBA.__call__>`\\ \\(\\*args\\, "
-"\\*\\*kwargs\\)"
-
-#: a9a896577c51442995a7e774ffacc077
-#: manuscript.recognizers._trba.TRBA:124:<autosummary>:1 of
-msgid "Call self as a function."
-msgstr "Вызов объекта как функции."
-
-#: 45b3df7e5bb4427380c198b3425c4685
-#: manuscript.recognizers._trba.TRBA:124:<autosummary>:1 of
-msgid ""
-":py:obj:`export <manuscript.recognizers.TRBA.export>`\\ \\(weights\\_path\\,"
-" config\\_path\\, ...\\[\\, ...\\]\\)"
-msgstr ""
-":py:obj:`export <manuscript.recognizers.TRBA.export>`\\ \\(weights\\_path\\,"
-" config\\_path\\, ...\\[\\, ...\\]\\)"
-
-#: 018d62a41272465ca1f1ecaf91040202 fd789084e53e430383e7992254661e30
-#: manuscript.recognizers._trba.TRBA.export:2
-#: manuscript.recognizers._trba.TRBA:124:<autosummary>:1 of
-msgid "Export TRBA PyTorch model to ONNX format."
-msgstr "Экспортировать модель TRBA из PyTorch в формат ONNX."
-
-#: 830673528bda46c0acf4349995424976
-#: manuscript.recognizers._trba.TRBA:124:<autosummary>:1 of
-msgid ""
-":py:obj:`predict <manuscript.recognizers.TRBA.predict>`\\ \\(page\\[\\, "
-"image\\, batch\\_size\\, ...\\]\\)"
-msgstr ""
-":py:obj:`predict <manuscript.recognizers.TRBA.predict>`\\ \\(page\\[\\, "
-"image\\, batch\\_size\\, ...\\]\\)"
-
-#: 7b1ec962ec3044bdaa4e4287d111db48 e042333c551e48aab04753e1d13f1ddc
-#: manuscript.recognizers._trba.TRBA.predict:2
-#: manuscript.recognizers._trba.TRBA:124:<autosummary>:1 of
-msgid "Recognize text for text spans in a ``Page`` and return updated ``Page``."
-msgstr ""
-"Распознаёт текст в текстовых областях ``Page`` и возвращает обновлённый "
-"``Page``."
-
-#: 6f305cf6231942dbbadbef3396d4a742
-#: manuscript.recognizers._trba.TRBA:124:<autosummary>:1 of
-msgid ""
-":py:obj:`runtime_providers "
-"<manuscript.recognizers.TRBA.runtime_providers>`\\ \\(\\)"
-msgstr ""
-":py:obj:`runtime_providers "
-"<manuscript.recognizers.TRBA.runtime_providers>`\\ \\(\\)"
-
-#: 99ae645ac93b43539a281f887db0ae86
-#: manuscript.recognizers._trba.TRBA:124:<autosummary>:1 of
-msgid "Get ONNX Runtime execution providers based on device."
-msgstr "Получение провайдеров выполнения ONNX Runtime в зависимости от устройства."
-
-#: 509b6de7c4624afab97709c36f09c2c1
-#: manuscript.recognizers._trba.TRBA:124:<autosummary>:1 of
-msgid ""
-":py:obj:`train <manuscript.recognizers.TRBA.train>`\\ \\(train\\_csvs\\, "
-"train\\_roots\\[\\, val\\_csvs\\, ...\\]\\)"
-msgstr ""
-":py:obj:`train <manuscript.recognizers.TRBA.train>`\\ \\(train\\_csvs\\, "
-"train\\_roots\\[\\, val\\_csvs\\, ...\\]\\)"
-
-#: b5df6cb2e9ef461794fbb5a797b36dc0 bb0f25a18d774444b6b74ed74143011a
-#: manuscript.recognizers._trba.TRBA.train:2
-#: manuscript.recognizers._trba.TRBA:124:<autosummary>:1 of
+#: 887b2100d7094999b79257975af97f5a manuscript.recognizers._trba.TRBA.train:2 of
 msgid "Train TRBA text recognition model on custom datasets."
 msgstr "Обучить модель распознавания текста TRBA на пользовательских датасетах."
 
-#: 55a8df76648f4dceb2ce5f63547e09ba manuscript.recognizers._trba.TRBA.predict:5 of
-msgid "Page object with detected text-span polygons."
-msgstr "Объект Page с обнаруженными полигонами текстовых областей."
-
-#: 74367c22db9b4876ab3c9ae164de23f1 manuscript.recognizers._trba.TRBA.predict:8 of
+#: 66b251982e88465e934b18e50bc7d43a manuscript.recognizers._trba.TRBA.train:5 of
 msgid ""
-"Source page image used to extract text regions. If ``None``, recognition is "
-"skipped and a deep copy of ``page`` is returned."
+"Path(s) to training CSV or TSV files. The first two columns contain the image path (relative to "
+"``train_roots``) and ground truth text. Use ``filename,text`` as a CSV header, or omit the "
+"header. Delimiters are detected automatically; ``.tsv`` files use tabs."
 msgstr ""
-"Исходное изображение страницы для извлечения текстовых областей. При "
-"``None`` распознавание пропускается и возвращается глубокая копия ``page``."
+"Пути к обучающим CSV- или TSV-файлам. Первые два столбца содержат путь изображения (относительно "
+"``train_roots``) и эталонный текст. Для CSV используйте заголовок ``filename,text`` либо не "
+"указывайте заголовок. Разделители определяются автоматически; в файлах ``.tsv`` используется "
+"табуляция."
 
-#: 4bf41922def14711a09caeedb4512bbe manuscript.recognizers._trba.TRBA.predict:12
-#: of
-msgid ""
-"Number of prepared text regions to process simultaneously. If ``None``, uses"
-" ``batch_size`` provided to the constructor."
+#: 6753bb9d41254de8b5ba38cdd0446393 manuscript.recognizers._trba.TRBA.train:11 of
+msgid "Root directory/directories containing training images. Must have same length as ``train_csvs``."
 msgstr ""
-"Число подготовленных текстовых областей, обрабатываемых одновременно. При "
-"``None`` используется ``batch_size`` из конструктора."
+"Каталог обучающих изображений или список каталогов. Число каталогов должно совпадать с числом "
+"файлов в ``train_csvs``."
 
-#: be9d5759376f430d9e476e3614a4d308 manuscript.recognizers._trba.TRBA.predict:16
-#: of
+#: bca62a39e8e94300a0c1d701674caf1c manuscript.recognizers._trba.TRBA.train:15 of
 msgid ""
-"If provided, saves the prepared recognition crops to this directory as "
-"``*.png`` files together with ``index.json``. Crops are saved after "
-"``region_preparer`` and auto-rotation, i.e. in the same orientation that "
-"goes into recognizer inference."
+"Path(s) to validation CSV files with same format as ``train_csvs``. If ``None``, validation "
+"samples are split from each training dataset using ``val_size``. A ``None`` entry in a supplied "
+"list uses this fallback for the corresponding training dataset. Default is ``None``."
 msgstr ""
-"Если задан, сохраняет подготовленные кропы для распознавания в этот каталог "
-"как ``*.png`` вместе с ``index.json``. Кропы сохраняются после "
-"``region_preparer`` и автоматического поворота, то есть в ориентации, "
-"используемой при инференсе распознавателя."
+"Пути к валидационным CSV-файлам того же формата, что и ``train_csvs``. При ``None`` валидационные"
+" примеры выделяются из каждого обучающего набора по ``val_size``. Элемент ``None`` в списке "
+"включает такой способ для соответствующего набора. По умолчанию ``None``."
 
-#: 307a012979da4e78bce945adbff1fca7 api/recognizers.rst
-#: f999b63bb1d94d88b854814cf7bc356f fc81d08384704fb68d7646b830f28345
-msgid "Returns"
-msgstr "Возвращает"
-
-#: fca3d55003ee439497eae69ffcf6b654 manuscript.recognizers._trba.TRBA.predict:22
-#: of
+#: bed40a03733e4bd3b1dfdfe5c4b6dce5 manuscript.recognizers._trba.TRBA.train:21 of
 msgid ""
-"New Page object with recognized ``text`` and ``recognition_confidence`` "
-"filled for processed text spans."
-msgstr ""
-"Новый объект Page с заполненными ``text`` и ``recognition_confidence`` для "
-"обработанных текстовых областей."
-
-#: 6be4cf9ae46745a59dd9121d61ea9e0a api/recognizers.rst
-#: bc432ff1790f44ff8a196751fd804fcc f61d8466705d45c48ba8032b774cfd9c
-msgid "Return type"
-msgstr "Тип возвращаемого значения"
-
-#: 1bbfedb3c8b04bc490448c7a33526626 manuscript.recognizers._trba.TRBA.train:5 of
-msgid ""
-"Path(s) to training CSV files. Each CSV should have columns: ``image_path`` "
-"(relative to ``train_roots``) and ``text`` (ground truth transcription)."
-msgstr ""
-"Путь или пути к CSV-файлам обучения. Каждый CSV должен содержать столбцы: "
-"``image_path`` (относительно ``train_roots``) и ``text`` (эталонная "
-"транскрипция)."
-
-#: 4f4374ef11c244b79b6aadab04122e1d manuscript.recognizers._trba.TRBA.train:10 of
-msgid ""
-"Root directory/directories containing training images. Must have same length"
-" as ``train_csvs``."
-msgstr ""
-"Корневая директория или директории, содержащие обучающие изображения. Должны"
-" иметь ту же длину, что и ``train_csvs``."
-
-#: 0e88a2aa8e26409091e99c3c5c5e7d81 manuscript.recognizers._trba.TRBA.train:14 of
-msgid ""
-"Path(s) to validation CSV files with same format as ``train_csvs``. If "
-"``None``, no validation is performed. Default is ``None``."
-msgstr ""
-"Путь или пути к CSV-файлам валидации с тем же форматом, что и "
-"``train_csvs``. Если ``None``, валидация не выполняется. По умолчанию "
-"``None``."
-
-#: dcca33f24c2f487b9f9de9efcdfafb3d manuscript.recognizers._trba.TRBA.train:18 of
-msgid ""
-"Root directory/directories for validation images. Must match length of "
-"``val_csvs`` if provided. Default is ``None``."
-msgstr ""
-"Корневая директория или директории для изображений валидации. Должны "
-"соответствовать длине ``val_csvs``, если они указаны. По умолчанию ``None``."
-
-#: b43256c6cb524097b53d776967647825 manuscript.recognizers._trba.TRBA.train:22 of
-msgid ""
-"Experiment directory where checkpoints and logs will be saved. If ``None``, "
-"auto-generated based on timestamp. Default is ``None``."
-msgstr ""
-"Директория эксперимента, в которую будут сохраняться чекпойнты и логи. Если "
-"``None``, автоматически создаётся на основе временной метки. По умолчанию "
-"``None``."
-
-#: 7755e74987dc45608c25dfe05c63d11e manuscript.recognizers._trba.TRBA.train:26 of
-msgid ""
-"Path to character set file. If ``None``, uses default charset from package. "
+"Root directory/directories for validation images. Must match length of ``val_csvs`` if provided. "
 "Default is ``None``."
 msgstr ""
-"Путь к файлу набора символов. Если ``None``, используется набор символов по "
-"умолчанию из пакета. По умолчанию ``None``."
+"Каталог валидационных изображений или список каталогов. Если задан ``val_csvs``, число каталогов "
+"должно совпадать с числом файлов в нём. По умолчанию ``None``."
 
-#: 5de089372c964a09b5dd29da3bc46e6a manuscript.recognizers._trba.TRBA.train:30 of
+#: 82194c63ad25476698433fa2e65ff016 manuscript.recognizers._trba.TRBA.train:25 of
+msgid ""
+"Experiment directory where checkpoints and logs will be saved. If ``None``, uses the first "
+"available directory named ``exp1``, ``exp2``, and so on. Default is ``None``."
+msgstr ""
+"Каталог эксперимента для чекпоинтов и журналов. При ``None`` используется первый свободный "
+"каталог с именем ``exp1``, ``exp2`` и далее. По умолчанию ``None``."
+
+#: f8766fe72e6a444a82e8de8c28e9262f manuscript.recognizers._trba.TRBA.train:30 of
+msgid "Path to character set file. If ``None``, uses default charset from package. Default is ``None``."
+msgstr ""
+"Путь к файлу набора символов. Если ``None``, используется набор символов по умолчанию из пакета. "
+"По умолчанию ``None``."
+
+#: 92c64fed57e2461f87bf5773494c05c1 manuscript.recognizers._trba.TRBA.train:34 of
 msgid "Text encoding for reading CSV files. Default is ``\"utf-8\"``."
 msgstr "Кодировка текста для чтения CSV-файлов. По умолчанию ``\"utf-8\"``."
 
-#: 54e32e251d1944c19543a187d15d6f12 manuscript.recognizers._trba.TRBA.train:33 of
+#: bdbea5e18bfa430ab4b3d7c2a1b717af manuscript.recognizers._trba.TRBA.train:37 of
 msgid "Target height for input images (pixels). Default is 64."
 msgstr "Целевая высота входных изображений (в пикселях). По умолчанию 64."
 
-#: 1890cef19b2b496da974a262f6491a9f manuscript.recognizers._trba.TRBA.train:36 of
+#: 2a0488fe97cc493f94a03349ee364d2e manuscript.recognizers._trba.TRBA.train:40 of
 msgid "Target width for input images (pixels). Default is 256."
 msgstr "Целевая ширина входных изображений (в пикселях). По умолчанию 256."
 
-#: 0fb649d0c3d946daa10fb71833776da7 manuscript.recognizers._trba.TRBA.train:39 of
+#: 1de73d38480548da88ba815328324f04 manuscript.recognizers._trba.TRBA.train:43 of
 msgid "Maximum sequence length for text recognition. Default is 25."
-msgstr ""
-"Максимальная длина последовательности для распознавания текста. По умолчанию"
-" 25."
+msgstr "Максимальная длина последовательности для распознавания текста. По умолчанию 25."
 
-#: 12358aa2f1a14649a2f5ec5a5ddaf046 manuscript.recognizers._trba.TRBA.train:42 of
+#: 032e9bcae1464ac1b8d06e74ba718d85 manuscript.recognizers._trba.TRBA.train:46 of
 msgid "Hidden dimension size for RNN encoder/decoder. Default is 256."
 msgstr "Размер скрытого слоя RNN-энкодера/декодера. По умолчанию 256."
 
-#: 8c2479e83c0244a0bc1daef445fe1020 manuscript.recognizers._trba.TRBA.train:45 of
-msgid "Number of Bidirectional LSTM layers in the encoder. Default is 2."
-msgstr "Количество двунаправленных LSTM-слоёв в энкодере. По умолчанию 2."
+#: 51954c4749724fee84005a169339884f manuscript.recognizers._trba.TRBA.train:49 of
+msgid "Number of Bidirectional LSTM layers in the encoder. Default is 3."
+msgstr "Число двунаправленных слоёв LSTM в кодировщике. По умолчанию 3."
 
-#: 79bf3f4ad87a4d529c8902610da8088c manuscript.recognizers._trba.TRBA.train:48 of
+#: 456b36c7651149708c87dcc9c210b01b manuscript.recognizers._trba.TRBA.train:52 of
 msgid ""
-"Number of input channels for CNN backbone (3 for RGB, 1 for grayscale). "
-"Default is 3."
+"Number of input channels for CNN backbone. The standard training transforms and inference "
+"workflow use three-channel RGB images; keep this at 3 when using those workflows. Default is 3."
 msgstr ""
-"Количество входных каналов для CNN-бэкбона (3 для RGB, 1 для оттенков "
-"серого). По умолчанию 3."
+"Число входных каналов CNN-backbone. Стандартные обучающие преобразования и инференс используют "
+"трёхканальные RGB-изображения; для них оставляйте 3. По умолчанию 3."
 
-#: 18406de83d264e6ba3eacf077c644ff0 manuscript.recognizers._trba.TRBA.train:51 of
+#: 3425e39e7ed84a9f9703a51034836837 manuscript.recognizers._trba.TRBA.train:57 of
 msgid "Number of output channels from CNN backbone. Default is 512."
 msgstr "Количество выходных каналов CNN-бэкбона. По умолчанию 512."
 
-#: faf73813d1e84347a06b0a5371fcfd66 manuscript.recognizers._trba.TRBA.train:54 of
+#: f3ea42f342ea402cbf70770ddd7fddcc manuscript.recognizers._trba.TRBA.train:60 of
 msgid ""
-"CNN backbone variant. ``\"seresnet31\"`` keeps the standard SE-ResNet-31, "
-"while ``\"seresnet31-lite\"`` enables a depthwise-lite version. Default is "
-"``\"seresnet31\"``."
+"CNN backbone variant. ``\"seresnet31\"`` keeps the standard SE-ResNet-31, while "
+"``\"seresnet31-lite\"`` enables a depthwise-lite version and ``\"seresnetlite31v2\"`` selects "
+"SEResNet31LiteV2. Default is ``\"seresnet31\"``."
 msgstr ""
-"Вариант CNN-бэкбона. ``\"seresnet31\"`` использует стандартный SE-ResNet-31,"
-" а ``\"seresnet31-lite\"`` включает облегчённую depthwise-версию. По "
+"Вариант CNN-backbone. ``\"seresnet31\"`` задаёт стандартный SE-ResNet-31, ``\"seresnet31-lite\"``"
+" — облегчённый вариант с depthwise-свёртками, ``\"seresnetlite31v2\"`` — SEResNet31LiteV2. По "
 "умолчанию ``\"seresnet31\"``."
 
-#: 3f596e4c3e3f4dd09c88cad786e7499d manuscript.recognizers._trba.TRBA.train:58 of
+#: a487e45c06914635a7c5f855eff1c2b3 manuscript.recognizers._trba.TRBA.train:66 of
 msgid ""
-"Initial weight for CTC loss during training (CTC always used for stability):"
-" ``loss = attn_loss * (1 - ctc_weight) + ctc_loss * ctc_weight``. CTC weight"
-" decays over epochs. Default is 0.3."
+"Initial weight for CTC loss during training (CTC always used for stability): ``loss = attn_loss *"
+" (1 - ctc_weight) + ctc_loss * ctc_weight``. CTC weight decays over epochs. Default is 0.3."
 msgstr ""
-"Начальный вес CTC-функции потерь во время обучения (CTC всегда используется "
-"для стабильности): ``loss = attn_loss * (1 - ctc_weight) + ctc_loss * "
-"ctc_weight``. Вес CTC уменьшается по эпохам. По умолчанию 0.3."
+"Начальный вес CTC-функции потерь во время обучения (CTC всегда используется для стабильности): "
+"``loss = attn_loss * (1 - ctc_weight) + ctc_loss * ctc_weight``. Вес CTC уменьшается по эпохам. "
+"По умолчанию 0.3."
 
-#: 35cfe894e8f94bf1b910dce790ee620c manuscript.recognizers._trba.TRBA.train:63 of
+#: eacd1233d6e24caa910a5b25aed9698d manuscript.recognizers._trba.TRBA.train:71 of
 msgid "Number of epochs for CTC weight to decay to minimum. Default is 50."
 msgstr "Количество эпох, за которые вес CTC уменьшается до минимума. По умолчанию 50."
 
-#: 43ce12fea95c47dfabccaf3079c79bb7 manuscript.recognizers._trba.TRBA.train:66 of
+#: c120484a478a4923bea9a398ff7c52bf manuscript.recognizers._trba.TRBA.train:74 of
 msgid "Minimum value for CTC weight after decay. Default is 0.0."
 msgstr "Минимальное значение веса CTC после уменьшения. По умолчанию 0.0."
 
-#: 4675aa7b68af4206b16a1f2cec658d08 manuscript.recognizers._trba.TRBA.train:69 of
-msgid ""
-"Maximum gradient norm for clipping (prevents gradient explosion/NaN). "
-"Default is 5.0."
-msgstr ""
-"Максимальная норма градиента для клиппинга (предотвращает взрыв "
-"градиентов/NaN). По умолчанию 5.0."
+#: f8052f3e3c1044fe8cbf9235fb9efee7 manuscript.recognizers._trba.TRBA.train:77 of
+msgid "Maximum gradient norm for clipping (prevents gradient explosion/NaN). Default is 5.0."
+msgstr "Максимальная норма градиента для клиппинга (предотвращает взрыв градиентов/NaN). По умолчанию 5.0."
 
-#: 2cec34f409b346b7847150bc4f957db2 manuscript.recognizers._trba.TRBA.train:73 of
+#: b9dfe0bbc0c24546a17c3ec3415d87d3 manuscript.recognizers._trba.TRBA.train:81 of
 msgid "Training batch size. Default is 32."
 msgstr "Размер батча обучения. По умолчанию 32."
 
-#: fcaa350b59324dcb908be5dbaeeafe4b manuscript.recognizers._trba.TRBA.train:76 of
+#: 616879e9f64b4dc7a01813882970fe83 manuscript.recognizers._trba.TRBA.train:84 of
 msgid "Number of training epochs. Default is 20."
 msgstr "Количество эпох обучения. По умолчанию 20."
 
-#: 93e9e69dd48b432c9fdbef6590ad24cb manuscript.recognizers._trba.TRBA.train:79 of
+#: 3a5cee7a1dfd4fdfbd6b3c45eeca5599 manuscript.recognizers._trba.TRBA.train:87 of
 msgid "Learning rate. Default is 1e-3."
 msgstr "Скорость обучения. По умолчанию 1e-3."
 
-#: 18cd6ed99a8248f586271aeb71287844 manuscript.recognizers._trba.TRBA.train:82 of
+#: 03c2870393114524b86f7ecb50ae557d manuscript.recognizers._trba.TRBA.train:90 of
 msgid "Optimizer type. Default is ``\"AdamW\"``."
 msgstr "Тип оптимизатора. По умолчанию ``\"AdamW\"``."
 
-#: f2a885223efa4ee3a9284e1031e052d9 manuscript.recognizers._trba.TRBA.train:85 of
+#: 0ea66e2192eb4191a1a98f7d80bc7b29 manuscript.recognizers._trba.TRBA.train:93 of
 msgid ""
-"Learning rate scheduler type:  - ``\"OneCycleLR\"`` - one-cycle policy with "
-"cosine annealing (default, recommended) - ``\"ReduceLROnPlateau\"`` - reduce"
-" LR on validation loss plateau - ``\"CosineAnnealingLR\"`` - cosine "
-"annealing over epochs - ``\"None\"`` or ``None`` - constant learning rate  "
-"Default is ``\"OneCycleLR\"``."
+"Learning rate scheduler type:  - ``\"OneCycleLR\"`` - one-cycle policy with cosine annealing "
+"(default, recommended) - ``\"ReduceLROnPlateau\"`` - reduce LR on validation loss plateau - "
+"``\"CosineAnnealingLR\"`` - cosine annealing over epochs - ``\"None\"`` or ``None`` - constant "
+"learning rate  Default is ``\"OneCycleLR\"``."
 msgstr ""
-"Тип планировщика скорости обучения:  - ``\"OneCycleLR\"`` — одноцикловая "
-"политика с косинусным отжигом (рекомендуется, по умолчанию) - "
-"``\"ReduceLROnPlateau\"`` — снижение LR при плато валидационной ошибки - "
-"``\"CosineAnnealingLR\"`` — косинусный отжиг по эпохам - ``\"None\"`` или "
+"Тип планировщика скорости обучения:  - ``\"OneCycleLR\"`` — одноцикловая политика с косинусным "
+"отжигом (рекомендуется, по умолчанию) - ``\"ReduceLROnPlateau\"`` — снижение LR при плато "
+"валидационной ошибки - ``\"CosineAnnealingLR\"`` — косинусный отжиг по эпохам - ``\"None\"`` или "
 "``None`` — постоянная скорость обучения  По умолчанию ``\"OneCycleLR\"``."
 
-#: 722c47875114427ca482a95799f6c25a manuscript.recognizers._trba.TRBA.train:85 of
+#: c7ad6c33d7c3470bb816fc319f77fb8f manuscript.recognizers._trba.TRBA.train:93 of
 msgid "Learning rate scheduler type:"
 msgstr "Тип планировщика скорости обучения:"
 
-#: 997de954486244e1ac13cf12ad52b777 manuscript.recognizers._trba.TRBA.train:87 of
-msgid ""
-"``\"OneCycleLR\"`` - one-cycle policy with cosine annealing (default, "
-"recommended)"
-msgstr ""
-"``\"OneCycleLR\"`` — одноцикловая политика с косинусным отжигом "
-"(рекомендуется, по умолчанию)"
+#: f157eba3d5d9431a80a71f3ba902c1e4 manuscript.recognizers._trba.TRBA.train:95 of
+msgid "``\"OneCycleLR\"`` - one-cycle policy with cosine annealing (default, recommended)"
+msgstr "``\"OneCycleLR\"`` — одноцикловая политика с косинусным отжигом (рекомендуется, по умолчанию)"
 
-#: 97ace9580cae4890868647d9e7b0368d manuscript.recognizers._trba.TRBA.train:88 of
+#: 9dd41d69f34349d29b0cca63b80b4940 manuscript.recognizers._trba.TRBA.train:96 of
 msgid "``\"ReduceLROnPlateau\"`` - reduce LR on validation loss plateau"
 msgstr "``\"ReduceLROnPlateau\"`` — снижение LR при плато валидационной ошибки"
 
-#: dff7268119b14bcc9312de7244925a2b manuscript.recognizers._trba.TRBA.train:89 of
+#: dbf65a34aa264805b7b04107c39e4c45 manuscript.recognizers._trba.TRBA.train:97 of
 msgid "``\"CosineAnnealingLR\"`` - cosine annealing over epochs"
 msgstr "``\"CosineAnnealingLR\"`` — косинусный отжиг по эпохам"
 
-#: f5d0a9f044c44babae39a23582807825 manuscript.recognizers._trba.TRBA.train:90 of
+#: cacafe5ce49e44659f5a61f226b6d6ff manuscript.recognizers._trba.TRBA.train:98 of
 msgid "``\"None\"`` or ``None`` - constant learning rate"
 msgstr "``\"None\"`` или ``None`` — постоянная скорость обучения"
 
-#: 860a618d65494b65a991c354ef3608da manuscript.recognizers._trba.TRBA.train:92 of
+#: f99fbb2c19dc4056aa380309134f337f manuscript.recognizers._trba.TRBA.train:100 of
 msgid "Default is ``\"OneCycleLR\"``."
 msgstr "По умолчанию ``\"OneCycleLR\"``."
 
-#: 869409685f084dff906ddee706b7b13e manuscript.recognizers._trba.TRBA.train:95 of
+#: 7cc10763d8f748409c2493fb26266ad0 manuscript.recognizers._trba.TRBA.train:103 of
 msgid "L2 weight decay coefficient. Default is 0.0."
 msgstr "Коэффициент L2-регуляризации (weight decay). По умолчанию 0.0."
 
-#: eb32c18524594b27a31836c4076b77c6 manuscript.recognizers._trba.TRBA.train:98 of
+#: 3a6478f53fa54d9dbe4876be5f3de0d0 manuscript.recognizers._trba.TRBA.train:106 of
 msgid "Momentum for SGD optimizer. Default is 0.9."
 msgstr "Параметр momentum для оптимизатора SGD. По умолчанию 0.9."
 
-#: 48c8c96a9a864e59821d00ead9fbe1e4 manuscript.recognizers._trba.TRBA.train:101 of
+#: 47fca31a32c641adbd2490a9d442cec8 manuscript.recognizers._trba.TRBA.train:109 of
 msgid "Perform validation every N epochs. Default is 1."
 msgstr "Выполнять валидацию каждые N эпох. По умолчанию 1."
 
-#: e7701bdb604044ea950af7258ba79b30 manuscript.recognizers._trba.TRBA.train:104 of
-msgid "Maximum number of validation samples to use. Default is 3000."
-msgstr "Максимальное количество примеров для валидации. По умолчанию 3000."
-
-#: ad223fb1951d4a6f98a6a67e7e539031 manuscript.recognizers._trba.TRBA.train:107 of
+#: 60becd17f1184a8c8c969b17a6a7162e manuscript.recognizers._trba.TRBA.train:112 of
 msgid ""
-"Sampling proportions for multiple training datasets. Must sum to 1.0 and "
-"match length of ``train_csvs``. If ``None``, datasets are concatenated "
-"equally. Default is ``None``."
+"Number of samples held out from each training dataset when no separate validation set is supplied"
+" for it. Each such dataset must have more than ``val_size`` valid samples to leave training data."
+" Separate validation sets are used in full. Default is 3000."
 msgstr ""
-"Доли выборки для нескольких обучающих датасетов. Должны суммироваться до 1.0"
-" и соответствовать длине ``train_csvs``. Если ``None``, датасеты "
-"объединяются с равными весами. По умолчанию ``None``."
+"Число примеров, выделяемых из каждого обучающего набора, для которого нет отдельной валидации. В "
+"каждом таком наборе должно быть больше ``val_size`` допустимых примеров, чтобы остались данные "
+"для обучения. Отдельные валидационные наборы используются целиком. По умолчанию 3000."
 
-#: 8cd87e4a12b74e589f2b2605776cb8d2 manuscript.recognizers._trba.TRBA.train:112 of
+#: d147677a28d94ba29e4e0a717fd09ed5 manuscript.recognizers._trba.TRBA.train:118 of
+msgid ""
+"Sampling proportions for multiple training datasets, matching the length of ``train_csvs``. "
+"Values are normalized to sum to 1.0. If ``None``, datasets are concatenated and shuffled, so "
+"their contributions follow their sizes. Default is ``None``."
+msgstr ""
+"Пропорции выборки из нескольких обучающих наборов; длина должна совпадать с ``train_csvs``. "
+"Значения нормализуются до суммы 1.0. При ``None`` наборы объединяются и перемешиваются, поэтому "
+"их вклад зависит от размера. По умолчанию ``None``."
+
+#: c29e96ac795f480993ec56a690285a7c manuscript.recognizers._trba.TRBA.train:124 of
 msgid "Number of data loading workers. Default is 0."
 msgstr "Количество рабочих процессов для загрузки данных. По умолчанию 0."
 
-#: d6ef2c1fdb4a4cc9b71a7cba73796d00 manuscript.recognizers._trba.TRBA.train:115 of
+#: 3804787896a84d1d9a8b7d650a789fab manuscript.recognizers._trba.TRBA.train:127 of
 msgid "Random seed for reproducibility. Default is 42."
-msgstr "Случайное зерно (seed) для воспроизводимости результатов. По умолчанию 42."
-
-#: 3304f5635d274c768b635de83dc77fdf manuscript.recognizers._trba.TRBA.train:118 of
-msgid "Path to checkpoint file to resume training from. Default is ``None``."
-msgstr "Путь к файлу чекпойнта для возобновления обучения. По умолчанию ``None``."
-
-#: 6ffb5a41a28a477388141db82307887e manuscript.recognizers._trba.TRBA.train:121 of
-msgid ""
-"Save checkpoint every N epochs. If ``None``, only saves best model. Default "
-"is ``None``."
 msgstr ""
-"Сохранять чекпойнт каждые N эпох. Если ``None``, сохраняется только лучшая "
-"модель. По умолчанию ``None``."
+"Начальное состояние генераторов случайных чисел (seed) для воспроизводимости результатов. По "
+"умолчанию 42."
 
-#: 4bd11174f31f4e54813dca5d9e8d43af manuscript.recognizers._trba.TRBA.train:125 of
+#: 7f46261b4020487787746283d8f9c26e manuscript.recognizers._trba.TRBA.train:130 of
+msgid "Path to checkpoint file to resume training from. Default is ``None``."
+msgstr "Путь к файлу чекпоинта для возобновления обучения. По умолчанию ``None``."
+
+#: a5061eb4e8094ddb928a350717d7ecc9 manuscript.recognizers._trba.TRBA.train:133 of
+msgid ""
+"Save the latest checkpoint every N epochs and on the final epoch. None follows validation. Best "
+"checkpoints always follow validation."
+msgstr ""
+"Сохранять последний чекпоинт каждые N эпох и на последней эпохе. При None сохранение следует за "
+"валидацией. Лучшие чекпоинты всегда сохраняются по результатам валидации."
+
+#: 9f60f1f67f6c4290a09a08da2b99abb7 manuscript.recognizers._trba.TRBA.train:137 of
 msgid "Training device. Default is ``\"cuda\"``."
 msgstr "Устройство для обучения. По умолчанию ``\"cuda\"``."
 
-#: c08b201783b2468a97c87c4ce446be09 manuscript.recognizers._trba.TRBA.train:128 of
-msgid "CNN freezing policy. Default is ``\"none\"``."
-msgstr "Политика заморозки CNN. По умолчанию ``\"none\"``."
-
-#: f43c2a60a4e7419889ca6720b6cf3f6d manuscript.recognizers._trba.TRBA.train:131 of
-msgid "Encoder RNN freezing policy. Default is ``\"none\"``."
-msgstr "Политика заморозки RNN-энкодера. По умолчанию ``\"none\"``."
-
-#: 096c06c4afb84cb495baf0447c0ff331 manuscript.recognizers._trba.TRBA.train:134 of
-msgid "Attention module freezing policy. Default is ``\"none\"``."
-msgstr "Политика заморозки модуля внимания (attention). По умолчанию ``\"none\"``."
-
-#: 2cea7a6081e343c5995fdee3cf0aab04 manuscript.recognizers._trba.TRBA.train:137 of
+#: 14f92c0242bb49f79b8375d2d01ecf1c manuscript.recognizers._trba.TRBA.train:140 of
 msgid ""
-"Pretrained weights to initialize from:  - ``\"default\"`` or ``True`` - use "
-"the registry checkpoint for ``trba_lite_g1`` - ``None`` or ``False`` - train"
-" from scratch - str/Path - path or URL to custom weights file  Default is "
-"``\"default\"``."
+"CNN freezing policy. ``\"partial\"`` freezes conv0 and layers 1-3; layer4 and conv_out remain "
+"trainable. ``\"full\"`` freezes the entire CNN; ``\"all\"`` is an alias. Default is ``\"none\"``."
 msgstr ""
-"Предобученные веса для инициализации:  - ``\"default\"`` или ``True`` — "
-"использовать чекпоинт ``trba_lite_g1`` из реестра - ``None`` или ``False`` —"
-" обучение с нуля - str/Path — путь или URL пользовательских весов  По "
-"умолчанию ``\"default\"``."
+"Политика заморозки CNN. ``\"partial\"`` замораживает conv0 и слои 1–3; layer4 и conv_out остаются"
+" обучаемыми. ``\"full\"`` замораживает всю CNN; ``\"all\"`` — его синоним. По умолчанию "
+"``\"none\"``."
 
-#: 206fca19288045d5ab716a57019e882e manuscript.recognizers._trba.TRBA.train:137 of
+#: 494759b5441f47a7b3893c4c37da1259 manuscript.recognizers._trba.TRBA.train:145 of
+msgid ""
+"Encoder RNN freezing policy. ``\"partial\"`` freezes the first BiLSTM block. ``\"full\"`` freezes"
+" the entire encoder RNN; ``\"all\"`` is an alias. Default is ``\"none\"``."
+msgstr ""
+"Политика заморозки RNN-кодировщика. ``\"partial\"`` замораживает первый блок BiLSTM. ``\"full\"``"
+" замораживает весь RNN-кодировщик; ``\"all\"`` — его синоним. По умолчанию ``\"none\"``."
+
+#: 5296564af0f641c78277365ebcf59841 manuscript.recognizers._trba.TRBA.train:150 of
+msgid ""
+"Attention module freezing policy. ``\"partial\"`` freezes attention_cell for the attention "
+"decoder; for PARSeq it freezes all decoder parameters except generator. ``\"full\"`` freezes the "
+"entire module; ``\"all\"`` is an alias. Default is ``\"none\"``."
+msgstr ""
+"Политика заморозки модуля внимания. ``\"partial\"`` замораживает attention_cell у "
+"attention-декодера; для PARSeq — все параметры декодера, кроме generator. ``\"full\"`` "
+"замораживает весь модуль; ``\"all\"`` — его синоним. По умолчанию ``\"none\"``."
+
+#: 7c373e9e7f8349f384160189d903278c manuscript.recognizers._trba.TRBA.train:157 of
+msgid ""
+"Pretrained weights to initialize from:  - ``\"default\"`` or ``True`` - use the registry "
+"checkpoint for ``trba_lite_g1`` - ``None`` or ``False`` - train from scratch - str/Path - path or"
+" URL to custom weights file  Default is ``\"default\"``."
+msgstr ""
+"Начальные предобученные веса:  - ``\"default\"`` или ``True`` — использовать чекпоинт "
+"``trba_lite_g1`` из реестра - ``None`` или ``False`` — обучение с нуля - str/Path — путь или URL "
+"пользовательских весов  По умолчанию ``\"default\"``."
+
+#: 2845710d20cc47d7904e9062244cdd95 manuscript.recognizers._trba.TRBA.train:157 of
 msgid "Pretrained weights to initialize from:"
-msgstr "Предобученные веса для инициализации:"
+msgstr "Начальные предобученные веса:"
 
-#: 6aad62323b394cc7a48a423343c74b34 manuscript.recognizers._trba.TRBA.train:139 of
-msgid ""
-"``\"default\"`` or ``True`` - use the registry checkpoint for "
-"``trba_lite_g1``"
-msgstr ""
-"``\"default\"`` или ``True`` — использовать чекпоинт ``trba_lite_g1`` из "
-"реестра"
+#: bbc2249ef86945b6ae58c1e15b1d6b79 manuscript.recognizers._trba.TRBA.train:159 of
+msgid "``\"default\"`` or ``True`` - use the registry checkpoint for ``trba_lite_g1``"
+msgstr "``\"default\"`` или ``True`` — использовать чекпоинт ``trba_lite_g1`` из реестра"
 
-#: 80c3a397f6bb498a8df9bd7fc966d826 manuscript.recognizers._trba.TRBA.train:140 of
+#: 25db45a50c9c43028033fdefb1a8df71 manuscript.recognizers._trba.TRBA.train:160 of
 msgid "``None`` or ``False`` - train from scratch"
 msgstr "``None`` или ``False`` — обучение с нуля"
 
-#: ed04cf50d40846159cf169b1f04d8239 manuscript.recognizers._trba.TRBA.train:141 of
+#: 2288592a27f64388b199e89a9b0230e7 manuscript.recognizers._trba.TRBA.train:161 of
 msgid "str/Path - path or URL to custom weights file"
 msgstr "str/Path — путь или URL пользовательских весов"
 
-#: 08459faefafe432ea833887a9fed5536 manuscript.recognizers._trba.TRBA.train:143 of
+#: e3615decfcad46f28d1eb6c891503f84 manuscript.recognizers._trba.TRBA.train:163 of
 msgid "Default is ``\"default\"``."
 msgstr "По умолчанию ``\"default\"``."
 
-#: 6c3ea478017c4b34bce00f874573419b manuscript.recognizers._trba.TRBA.train:146 of
+#: 9b9fd8ba0c9248babd559d0ac315ef0e manuscript.recognizers._trba.TRBA.train:166 of
+msgid ""
+"Word, line or block regions to recognize during inference. Saved in the model config; does not "
+"change the training samples or create region geometry. Default is ``(\"word\",)``."
+msgstr ""
+"Регионы word, line или block для распознавания при инференсе. Сохраняются в конфигурации модели; "
+"не меняют обучающие примеры и не создают геометрию регионов. По умолчанию ``(\"word\",)``."
+
+#: 0e9add82fede4bcf8890518eec0b77fd manuscript.recognizers._trba.TRBA.train:171 of
+msgid ""
+"Simplify the automatically exported ONNX graph with onnxsim. Default is False: native simplifier "
+"crashes in some environments cannot be caught as Python exceptions. Model validation remains "
+"enabled."
+msgstr ""
+"Упростить автоматически экспортированный ONNX-граф с помощью onnxsim. По умолчанию False: "
+"нативное падение упрощателя в некоторых окружениях нельзя перехватить как исключение Python. "
+"Проверка модели остаётся включённой."
+
+#: 416b652b431847e9b080f4187d1bebd3 manuscript.recognizers._trba.TRBA.train:176 of
 msgid "Additional configuration parameters passed to training config."
 msgstr "Дополнительные параметры конфигурации, передаваемые в настройки обучения."
 
-#: d53b7189ffcd4d2cab44c2a8a06d8b66 manuscript.recognizers._trba.TRBA.train:149 of
-msgid "Path to the best model checkpoint saved during training."
-msgstr "Путь к лучшему чекпойнту модели, сохранённому в ходе обучения."
+#: ../../api/recognizers.rst 128dccc8d45e46e481cea3e1cd4c80d9 45573d0fd32742498c5853011a7b5ec9
+#: 5bb83eea4a5d445697108fa6f32caaec
+msgid "Returns"
+msgstr "Возвращает"
 
-#: 45925e18baa340e6a8c408ebf7b78230 manuscript.recognizers._trba.TRBA.train:154 of
+#: f0aa0595b508464f9981c755afd8e6a8 manuscript.recognizers._trba.TRBA.train:179 of
+msgid ""
+"Best validation metrics (``val_acc`` and ``val_loss``) and ``exp_dir``. Saved weights and "
+"resumable checkpoints are written to ``exp_dir``."
+msgstr ""
+"Лучшие валидационные метрики (``val_acc`` и ``val_loss``) и ``exp_dir``. Веса и чекпоинты для "
+"возобновления обучения записываются в ``exp_dir``."
+
+#: ../../api/recognizers.rst 85207d9e8b434ea79dee93c84f82b2b3 ad549a865cda487d9cdb71d47b1d4e6b
+#: df0e48dca84c46499920f05fed43b62a
+msgid "Return type"
+msgstr "Тип возвращаемого значения"
+
+#: 93ce4153617449a780973aaae487544a manuscript.recognizers._trba.TRBA.train:185 of
 msgid "Train on single dataset with validation:"
 msgstr "Обучение на одном датасете с валидацией:"
 
-#: fc6059f059c04a98944cf271b2569b0d manuscript.recognizers._trba.TRBA.train:171 of
+#: 688ac231755f4f0e9271964bfa98a8cc manuscript.recognizers._trba.TRBA.train:202 of
 msgid "Train on multiple datasets with custom proportions:"
 msgstr "Обучение на нескольких датасетах с пользовательскими пропорциями:"
 
-#: 4eb846a509e94e7cb470e98551f42fac manuscript.recognizers._trba.TRBA.train:189 of
+#: e54cbf245b0946dc850ea79db58564ff manuscript.recognizers._trba.TRBA.train:220 of
 msgid "Resume training from checkpoint:"
-msgstr "Возобновление обучения из чекпойнта:"
+msgstr "Возобновление обучения из чекпоинта:"
 
-#: cfd95ece48354d12b82b6dffd163bb27 manuscript.recognizers._trba.TRBA.train:198 of
+#: a21cce4f7c5c43c3a94b97aff1f46460 manuscript.recognizers._trba.TRBA.train:229 of
 msgid "Fine-tune from pretrained weights with frozen CNN:"
 msgstr "Дообучение с предобученных весов с замороженным CNN:"
 
-#: 394f62011b0c40b3bfc3a5e4c8cf62d2 manuscript.recognizers._trba.TRBA.train:209 of
+#: e62d66c53cdc43ea820c7c92aa6652ee manuscript.recognizers._trba.TRBA.train:240 of
 msgid "Train with CTC for stability (always enabled):"
 msgstr "Обучение с использованием CTC для стабильности (всегда включено):"
 
-#: f768e5103fa440caa2d7d227c4a6f80d manuscript.recognizers._trba.TRBA.export:4 of
-msgid ""
-"This method converts a trained TRBA model from PyTorch to ONNX format, which"
-" can be used for faster inference with ONNX Runtime. The exported model can "
-"be loaded using ``TRBA(weights=\"model.onnx\")``."
-msgstr ""
-"Этот метод преобразует обученную модель TRBA из PyTorch в формат ONNX, "
-"который может использоваться для более быстрого инференса с ONNX Runtime. "
-"Экспортированная модель может быть загружена с помощью "
-"``TRBA(weights=\"model.onnx\")``."
+#: 4d7b658d5089444b9d78411406d9e7a9 manuscript.recognizers._trba.TRBA.export:2 of
+msgid "Export TRBA PyTorch model to ONNX format."
+msgstr "Экспортировать модель TRBA из PyTorch в формат ONNX."
 
-#: c94f610cea584942a7c3975c0fd1e733 manuscript.recognizers._trba.TRBA.export:9 of
+#: db57373458584e8caa36d1db51856d22 manuscript.recognizers._trba.TRBA.export:4 of
+msgid ""
+"This method converts a trained TRBA model from PyTorch to ONNX format, which can be used for "
+"faster inference with ONNX Runtime. The exported model must be loaded with its matching "
+"configuration and charset: ``TRBA(weights=\"model.onnx\", config=\"config.json\", "
+"charset=\"charset.txt\")``."
+msgstr ""
+"Метод преобразует обученную модель TRBA из PyTorch в ONNX для ускоренного инференса через ONNX "
+"Runtime. Экспортированную модель нужно загружать с соответствующими конфигурацией и набором "
+"символов: ``TRBA(weights=\"model.onnx\", config=\"config.json\", charset=\"charset.txt\")``."
+
+#: 13a07dda47884a709d0df4859ecdd412 manuscript.recognizers._trba.TRBA.export:10 of
 msgid "Path to the PyTorch model weights file (.pth)."
 msgstr "Путь к файлу весов модели PyTorch (.pth)."
 
-#: 5600fa5c65d44989b29b10dc43a7b443 manuscript.recognizers._trba.TRBA.export:12 of
+#: 18effd09d59a4b3ca529f33314eda937 manuscript.recognizers._trba.TRBA.export:13 of
 msgid ""
-"Path to the model configuration JSON file. Used to determine model "
-"architecture (img_h, img_w, max_len, hidden_size, etc.)."
+"Path to the model configuration JSON file. Used to determine model architecture (img_h, img_w, "
+"max_len, hidden_size, etc.)."
 msgstr ""
-"Путь к JSON-файлу конфигурации модели. Используется для определения "
-"архитектуры модели (img_h, img_w, max_len, hidden_size и т. д.)."
+"Путь к JSON-файлу конфигурации модели. Используется для определения архитектуры модели (img_h, "
+"img_w, max_len, hidden_size и т. д.)."
 
-#: d27d411a5e194ed1beeb1b7df6903b5e manuscript.recognizers._trba.TRBA.export:16 of
-msgid ""
-"Path to the charset file (charset.txt). Used to determine num_classes for "
-"the model."
+#: f02852845d2744a9b235c7f5f724605e manuscript.recognizers._trba.TRBA.export:17 of
+msgid "Path to the charset file (charset.txt). Used to determine num_classes for the model."
 msgstr ""
-"Путь к файлу набора символов (charset.txt). Используется для определения "
-"количества классов модели."
+"Путь к файлу набора символов (charset.txt). Используется для определения количества классов "
+"модели."
 
-#: a9294a4d9b5f4e34984b1e2c96a5a69b manuscript.recognizers._trba.TRBA.export:20 of
+#: 83373007aefe482dabaa6face4b101c0 manuscript.recognizers._trba.TRBA.export:21 of
 msgid "Path where the ONNX model will be saved (.onnx)."
-msgstr "Путь, по которому будет сохранена модель ONNX (.onnx)."
+msgstr "Путь для сохранения ONNX-модели (.onnx)."
 
-#: 2094b600a8d04c969fa07f5aa085f537 manuscript.recognizers._trba.TRBA.export:23 of
+#: eefc5505d18b48efbb08f0da4db5b3e8 manuscript.recognizers._trba.TRBA.export:24 of
 msgid "ONNX opset version to use for export. Default is 14."
 msgstr "Версия opset ONNX для экспорта. По умолчанию 14."
 
-#: ca8afe516c504b2681bda6931cdf00b0 manuscript.recognizers._trba.TRBA.export:26 of
+#: d5dcddec424f4fffad5504448722a210 manuscript.recognizers._trba.TRBA.export:27 of
 msgid ""
-"If True, applies ONNX graph simplification using onnx-simplifier to optimize"
-" the model. Requires ``onnx-simplifier`` package. Default is True."
+"If True, applies ONNX graph simplification using onnx-simplifier to optimize the model. Requires "
+"``onnx-simplifier`` package. Default is True."
 msgstr ""
-"Если True, применяется упрощение графа ONNX с помощью onnx-simplifier для "
-"оптимизации модели. Требуется пакет ``onnx-simplifier``. По умолчанию True."
+"Если True, применяется упрощение графа ONNX с помощью onnx-simplifier для оптимизации модели. "
+"Требуется пакет ``onnx-simplifier``. По умолчанию True."
 
-#: 46b8cc2c46304a49a38dfa870fa68022 manuscript.recognizers._trba.TRBA.export:31 of
+#: 74effdffca4f40109f8ad0fa79f0cdd1 manuscript.recognizers._trba.TRBA.export:32 of
 msgid "The ONNX model is saved to ``output_path``."
 msgstr "Модель ONNX сохраняется в ``output_path``."
 
-#: 373a858674bf406fad800b7d88c8a0be manuscript.recognizers._trba.TRBA.export:34 of
+#: c84fe561d9014b3a890f80d6b0c9bf2f manuscript.recognizers._trba.TRBA.export:35 of
 msgid "If required packages (torch, onnx) are not installed."
 msgstr "Если необходимые пакеты (torch, onnx) не установлены."
 
-#: db80ed6d93f54a3481812bb2a9a55a72 manuscript.recognizers._trba.TRBA.export:35 of
+#: 100ffdd9270f4c7db00c79300b32a23a manuscript.recognizers._trba.TRBA.export:36 of
 msgid "If ``weights_path`` or ``config_path`` do not exist."
 msgstr "Если ``weights_path`` или ``config_path`` не существуют."
 
-#: 4019a582b57b4b6eb41e8010945226d1 manuscript.recognizers._trba.TRBA.export:39 of
-msgid "The exported ONNX model has one output:"
-msgstr "Экспортированная ONNX-модель имеет один выход:"
-
-#: 9d7a5901607f49d5bf9cc8843f1d657b manuscript.recognizers._trba.TRBA.export:41 of
-msgid ""
-"``logits``: Character predictions with shape ``(batch, max_length+1, "
-"num_classes)``"
-msgstr ""
-"``logits``: предсказания символов с формой ``(batch, max_length+1, "
-"num_classes)``"
-
-#: d8569e84c5b44be6a1b2f962419b3e44 manuscript.recognizers._trba.TRBA.export:43 of
-msgid ""
-"The model uses greedy decoding (argmax) and supports dynamic batch size. The"
-" sequence length is fixed to ``max_length + 1`` from the config (same as "
-"PyTorch inference mode for compatibility)."
-msgstr ""
-"Модель использует жадное декодирование (argmax) и поддерживает динамический "
-"размер батча. Длина последовательности зафиксирована как ``max_length + 1`` "
-"из конфигурации (аналогично режиму инференса PyTorch для совместимости)."
-
-#: 6b05fd7d83354867ba8cd2337d9f8760 manuscript.recognizers._trba.TRBA.export:47 of
-msgid ""
-"Architecture exported: - CNN backbone (SE-ResNet-31 or SE-ResNet-31-Lite) - "
-"Bidirectional LSTM encoder - Attention decoder (greedy decoding)"
-msgstr ""
-"Экспортируемая архитектура:  - CNN-бэкбон (SE-ResNet-31 или SE-"
-"ResNet-31-Lite)  - двунаправленный LSTM-энкодер  - декодер внимания (жадное "
-"декодирование)"
-
-#: 9f12faa11e37452c825f76c7d91debcf manuscript.recognizers._trba.TRBA.export:52 of
-msgid ""
-"Note: Only the attention decoder is exported. CTC head is used only during "
-"training and is not included in the ONNX model."
-msgstr ""
-"Примечание: экспортируется только декодер внимания. CTC-голова используется "
-"только во время обучения и не включена в ONNX-модель."
-
-#: 7d4d651fbf7a4227ae641fa4ac14bc19 manuscript.recognizers._trba.TRBA.export:57 of
+#: 1232effabb144b4eac65d571c35e28b6 manuscript.recognizers._trba.TRBA.export:40 of
 msgid "Export TRBA model to ONNX:"
 msgstr "Экспорт модели TRBA в ONNX:"
 
-#: 5a12bbb11ba544a0af2306f7418d0c61 manuscript.recognizers._trba.TRBA.export:72 of
+#: a5062d963e564c709e97e13aa38a57c3 manuscript.recognizers._trba.TRBA.export:55 of
 msgid "Export with custom opset:"
 msgstr "Экспорт с пользовательским opset:"
 
-#: c521169fdef84396ab3c668fdfa4ba9f manuscript.recognizers._trba.TRBA.export:83 of
+#: 712429975ef0491c9d994361058dc009 manuscript.recognizers._trba.TRBA.export:66 of
 msgid "Use the exported model for inference:"
 msgstr "Использование экспортированной модели для инференса:"
 
-#: fd86fa7ef6d440d289f715a99d1e1afe manuscript.recognizers._trba.TRBA.export:94 of
+#: 37c228dae3684f76a13d25a02a119962 manuscript.recognizers._trba.TRBA.export:80 of
 msgid ":py:obj:`TRBA.__init__`"
 msgstr ":py:obj:`TRBA.__init__`"
 
-#: d8087ea1f5154f9e9f051621435a2a7d manuscript.recognizers._trba.TRBA.export:95 of
+#: e75c0ccc567e40408828f849c6d11c58 manuscript.recognizers._trba.TRBA.export:81 of
 msgid "Initialize TRBA recognizer with ONNX model."
 msgstr "Инициализация распознавателя TRBA с ONNX-моделью."
 
-#~ msgid "Bases: :py:class:`~manuscript.api.base.BaseModel`"
-#~ msgstr "Базовый класс: :py:class:`~manuscript.api.base.BaseModel`"
+#: a3451fefecd045c49dd133678934364e manuscript.api.recognizer.BaseRecognizer.predict:2 of
+msgid "Return a Page copy with recognized text and confidence for its regions."
+msgstr "Вернуть копию Page с распознанным текстом и уверенностью для его регионов."
 
-#~ msgid ""
-#~ "Aspect-ratio threshold for rotating "
-#~ "vertical word crops before recognition. If"
-#~ " ``height > width * rotate_threshold``, "
-#~ "crop is rotated 90 degrees clockwise. "
-#~ "Set to ``0`` or ``None`` to disable."
-#~ " Default is ``1.5``."
-#~ msgstr ""
-#~ "Порог отношения сторон для поворота "
-#~ "вертикальных кропов слов перед распознаванием."
-#~ " Если ``height > width * "
-#~ "rotate_threshold``, кроп поворачивается на 90 "
-#~ "градусов по часовой стрелке. Чтобы "
-#~ "отключить поворот, установите ``0`` или "
-#~ "``None``. По умолчанию ``1.5``."
+#: 805f9406524440cbb9d9b4c283266558 manuscript.api.recognizer.BaseRecognizer.predict:4 of
+msgid ""
+"Without an image, return an unchanged copy. Debug crops are saved after region preparation and "
+"rotation, before model preprocessing. With return_raw=True, return a dictionary containing the "
+"Page and per-region predictions with model-specific metadata."
+msgstr ""
+"Если изображение не передано, возвращает копию страницы без изменений. Отладочные фрагменты "
+"сохраняются после вырезания и поворота, до подготовки входа модели. При return_raw=True "
+"возвращает словарь с Page, результатами распознавания регионов и метаданными модели."
 
-#~ msgid "``predict`` — run text recognition inference on cropped word images."
-#~ msgstr "``predict`` — запуск распознавания текста на обрезанных изображениях слов."
+#: 40e21774fa1c4514be1d4a0b8f6eac3f manuscript.api.recognizer.BaseRecognizer.predict:23 of
+msgid ""
+":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Union\\`\\\\ "
+"\\\\\\[\\:py\\:class\\:\\`\\~manuscript.data.tree.Page\\`\\, "
+"\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ \\\\\\[\\:py\\:class\\:\\`str\\`\\, "
+"\\:py\\:data\\:\\`\\~typing.Any\\`\\]\\]`"
+msgstr ""
+":sphinx_autodoc_typehints_type:`\\:py\\:data\\:\\`\\~typing.Union\\`\\\\ "
+"\\\\\\[\\:py\\:class\\:\\`\\~manuscript.data.tree.Page\\`\\, "
+"\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ \\\\\\[\\:py\\:class\\:\\`str\\`\\, "
+"\\:py\\:data\\:\\`\\~typing.Any\\`\\]\\]`"
 
-#~ msgid ""
-#~ "``train`` — high-level training entrypoint"
-#~ " to train a TRBA model on custom"
-#~ " datasets."
-#~ msgstr ""
-#~ "``train`` — высокоуровневая точка входа для"
-#~ " обучения модели TRBA на пользовательских "
-#~ "датасетах."
+#: ../../api/recognizers.rst:32 61526d045c404ede9040d7093f5cb1f1
+msgid "PPOCRRec"
+msgstr "PPOCRRec"
 
-#~ msgid "``export`` — static method to export PyTorch model to ONNX format."
-#~ msgstr "``export`` — статический метод экспорта модели PyTorch в формат ONNX."
+#: 72a08f2345614957afd0c78e2d850ffa manuscript.recognizers._ppocr_rec.PPOCRRec:2 of
+msgid "Recognize Page text regions with configurable CTC ONNX models."
+msgstr "Распознаёт текстовые регионы Page с помощью CTC-моделей ONNX."
 
-#~ msgid ""
-#~ ":py:obj:`predict <manuscript.recognizers.TRBA.predict>`\\ "
-#~ "\\(images\\[\\, batch\\_size\\]\\)"
-#~ msgstr ""
-#~ ":py:obj:`predict <manuscript.recognizers.TRBA.predict>`\\ "
-#~ "\\(images\\[\\, batch\\_size\\]\\)"
+#: 2f2a6f650bbc45df931d920135f4871c manuscript.recognizers._ppocr_rec.PPOCRRec.create_config:2 of
+msgid "Create an inference JSON config; new bundles recognize lines by default."
+msgstr "Создаёт JSON-конфигурацию для запуска модели. По умолчанию выбирается распознавание строк."
 
-#~ msgid "Run text recognition on one or more word images."
-#~ msgstr "Запуск распознавания текста на одном или нескольких изображениях слов."
+#: ../../api/recognizers.rst:41 7a1f02f3c46947fe951969249e166030
+msgid "TrOCR"
+msgstr "TrOCR"
 
-#~ msgid ""
-#~ "Single image or list of images to "
-#~ "recognize. Each image can be:  - Path"
-#~ " to image file (str or Path) - "
-#~ "RGB numpy array with shape ``(H, W,"
-#~ " 3)`` in ``uint8`` - PIL Image "
-#~ "object"
-#~ msgstr ""
-#~ "Одно изображение или список изображений для"
-#~ " распознавания. Каждое изображение может быть:"
-#~ "  - путем к файлу изображения (str "
-#~ "или Path)  - RGB-массивом numpy формы "
-#~ "``(H, W, 3)`` в формате ``uint8``  -"
-#~ " объектом PIL Image"
+#: 1c1ed490a4d644cb8e77c2e6942b514b manuscript.recognizers._trocr.TrOCR:2 of
+msgid "Recognize text regions using an ONNX encoder/decoder bundle."
+msgstr "Распознаёт текст с помощью ONNX-моделей энкодера и декодера."
 
-#~ msgid "Single image or list of images to recognize. Each image can be:"
-#~ msgstr ""
-#~ "Одно изображение или список изображений для"
-#~ " распознавания. Каждое изображение может быть:"
+#: 06ffdfab53e641f284779b4efb2d89f1 manuscript.recognizers._trocr.TrOCR:5 of
+msgid "Encoder ONNX file, URL or registry model key. No default preset."
+msgstr "ONNX-файл энкодера, URL или ключ модели в реестре. Пресета по умолчанию нет."
 
-#~ msgid "Path to image file (str or Path)"
-#~ msgstr "Путь к файлу изображения (str или Path)"
+#: 52c047df0e174ec6958b7f550a06b766 manuscript.recognizers._trocr.TrOCR:8 of
+msgid ""
+"Bundle configuration with preprocessing, generation and companion-file paths. Required for local "
+"weights; otherwise taken from the registry."
+msgstr ""
+"Конфигурация модели: подготовка изображений, параметры генерации и пути к сопутствующим файлам. "
+"Для локальных весов её нужно указать явно; для моделей из реестра она загружается автоматически."
 
-#~ msgid "RGB numpy array with shape ``(H, W, 3)`` in ``uint8``"
-#~ msgstr "RGB-массив numpy формы ``(H, W, 3)`` в формате ``uint8``"
+#: 11faeea374ba46ce80b35256218ea8fb manuscript.recognizers._trocr.TrOCR:12 of
+msgid "Decoder ONNX file or URL. Defaults to the bundle's decoder artifact."
+msgstr ""
+"Путь или URL ONNX-файла декодера. По умолчанию используется файл decoder из конфигурации или "
+"реестра."
 
-#~ msgid "PIL Image object"
-#~ msgstr "Объект PIL Image"
+#: aa818e7084094f2284f064f5b0ed7b8e manuscript.recognizers._trocr.TrOCR:15 of
+msgid ""
+"Tokenizer JSON file or URL. Defaults to the bundle's tokenizer artifact. Requires the "
+"``manuscript-ocr[trocr]`` extra."
+msgstr ""
+"Путь или URL JSON-файла токенизатора. По умолчанию используется файл tokenizer из конфигурации "
+"или реестра. Для работы нужен пакет с дополнительными зависимостями ``manuscript-ocr[trocr]``."
 
-#~ msgid ""
-#~ "Number of images to process simultaneously."
-#~ " Larger batches are faster but require"
-#~ " more memory. Default is 32."
-#~ msgstr ""
-#~ "Количество изображений, обрабатываемых одновременно."
-#~ " Большие батчи работают быстрее, но "
-#~ "требуют больше памяти. По умолчанию 32."
+#: 0aa3d57eeeba48c5b834d28a8e182588 manuscript.recognizers._trocr.TrOCR:19 of
+msgid "Runtime device, for example ``\"cpu\"`` or ``\"cuda\"``. Selected automatically when omitted."
+msgstr ""
+"Устройство для выполнения модели, например ``\"cpu\"`` или ``\"cuda\"``. Если не задано, "
+"выбирается автоматически."
 
-#~ msgid ""
-#~ "Recognition results as list of "
-#~ "dictionaries, each containing:  - ``\"text\"``"
-#~ " : str — recognized text - "
-#~ "``\"confidence\"`` : float — recognition "
-#~ "confidence in [0, 1]  If input is "
-#~ "a single image, returns a list with"
-#~ " one element."
-#~ msgstr ""
-#~ "Результаты распознавания в виде списка "
-#~ "словарей, каждый из которых содержит:  -"
-#~ " ``\"text\"`` : str — распознанный текст"
-#~ "  - ``\"confidence\"`` : float — "
-#~ "уверенность распознавания в диапазоне [0, "
-#~ "1]. Если входом является одно изображение,"
-#~ " возвращается список из одного элемента."
+#: e9211611ff5c4337a3605986709ef11c manuscript.recognizers._trocr.TrOCR:23 of
+msgid "Download remote artifacts again even when cached."
+msgstr "Скачивать удалённые артефакты заново, даже если они есть в кеше."
 
-#~ msgid "Recognition results as list of dictionaries, each containing:"
-#~ msgstr ""
-#~ "Результаты распознавания в виде списка "
-#~ "словарей, каждый из которых содержит:"
+#: 24a0eff3047a48d99cfcc5b2e7ca8e6f manuscript.recognizers._trocr.TrOCR:26 of
+msgid ""
+"Rotate crops whose height exceeds width times this threshold. ``None`` disables this shape "
+"heuristic; known orientation is still used."
+msgstr ""
+"Поворачивать фрагменты, высота которых превышает ширину, умноженную на этот порог. ``None`` "
+"отключает эту эвристику; известная ориентация по-прежнему учитывается."
 
-#~ msgid "``\"text\"`` : str — recognized text"
-#~ msgstr "``\"text\"`` : str — распознанный текст"
+#: a60df6f53e6d42f282ae663212e235a2 manuscript.recognizers._trocr.TrOCR:30 of
+msgid "Crop strategy: ``\"bbox\"``, ``\"polygon_mask\"``, ``\"quad_warp\"`` or a custom callable."
+msgstr ""
+"Способ вырезания регионов: ``\"bbox\"``, ``\"polygon_mask\"``, ``\"quad_warp\"`` или "
+"пользовательская функция."
 
-#~ msgid "``\"confidence\"`` : float — recognition confidence in [0, 1]"
-#~ msgstr "``\"confidence\"`` : float — уверенность распознавания в диапазоне [0, 1]"
+#: 199f5577f5814474a791280dbd253164 manuscript.recognizers._trocr.TrOCR:33 of
+msgid "Additional options for the crop preparer."
+msgstr "Дополнительные параметры подготовки фрагментов."
 
-#~ msgid "If input is a single image, returns a list with one element."
-#~ msgstr ""
-#~ "Если на вход подается одно изображение, "
-#~ "возвращается список из одного элемента."
+#: cd834aa249db446e8894bcc941e2d551 manuscript.recognizers._trocr.TrOCR:36 of
+msgid "Minimum crop side length in pixels; smaller crops are skipped."
+msgstr "Минимальная длина стороны фрагмента в пикселях; меньшие фрагменты пропускаются."
 
-#~ msgid "Recognize single image:"
-#~ msgstr "Распознавание одного изображения:"
+#: e9386c22eddd49158abd97db8e05f0b3 manuscript.recognizers._trocr.TrOCR:39 of
+msgid "Requested crop batch size, subject to the ONNX graphs' batch dimensions."
+msgstr "Размер батча фрагментов. Фактический размер зависит от ограничений ONNX-графов."
 
-#~ msgid "Process numpy arrays:"
-#~ msgstr "Обработка массивов numpy:"
+#: 848e6d0288b94190b961c211479f61dc manuscript.recognizers._trocr.TrOCR:42 of
+msgid ""
+"Region types to recognize: ``\"word\"``, ``\"line\"`` or ``\"block\"``. Defaults to "
+"``recognition_levels`` from the bundle configuration."
+msgstr ""
+"Типы регионов для распознавания: ``\"word\"``, ``\"line\"`` или ``\"block\"``. По умолчанию "
+"используются ``recognition_levels`` из конфигурации модели."
 
-#~ msgid ""
-#~ "Learning rate scheduler type:  - "
-#~ "``\"OneCycleLR\"`` — one-cycle policy with"
-#~ " cosine annealing (default, recommended) - "
-#~ "``\"ReduceLROnPlateau\"`` — reduce LR on "
-#~ "validation loss plateau - "
-#~ "``\"CosineAnnealingLR\"`` — cosine annealing over"
-#~ " epochs - ``\"None\"`` or ``None`` — "
-#~ "constant learning rate  Default is "
-#~ "``\"OneCycleLR\"``."
-#~ msgstr ""
-#~ "Тип планировщика скорости обучения:  - "
-#~ "``\"OneCycleLR\"`` — one-cycle политика с"
-#~ " косинусным затуханием (по умолчанию, "
-#~ "рекомендуется)  - ``\"ReduceLROnPlateau\"`` — "
-#~ "уменьшение LR при плато валидационной "
-#~ "ошибки  - ``\"CosineAnnealingLR\"`` — косинусное"
-#~ " затухание по эпохам  - ``\"None\"`` или"
-#~ " ``None`` — постоянная скорость обучения  "
-#~ "По умолчанию ``\"OneCycleLR\"``."
+#: 4aa3ddfb0fa24c33b0574587f8e3fc17 manuscript.recognizers._trocr.TrOCR:46 of
+msgid ""
+"Override generation settings: ``num_beams``, ``max_length``, ``length_penalty``, "
+"``no_repeat_ngram_size`` and ``early_stopping``."
+msgstr ""
+"Переопределение параметров генерации: ``num_beams``, ``max_length``, ``length_penalty``, "
+"``no_repeat_ngram_size`` и ``early_stopping``."
 
-#~ msgid ""
-#~ "``\"OneCycleLR\"`` — one-cycle policy with"
-#~ " cosine annealing (default, recommended)"
-#~ msgstr ""
-#~ "``\"OneCycleLR\"`` — one-cycle политика с"
-#~ " косинусным затуханием (по умолчанию, "
-#~ "рекомендуется)"
+#: 368d91d95d474c67bcddac8d1164ac59 manuscript.recognizers._trocr.TrOCR:50 of
+msgid ""
+"Cached decoder ONNX file or URL for a ``kv_cache`` bundle. Defaults to the companion artifact "
+"declared by the bundle."
+msgstr ""
+"Путь или URL ONNX-файла декодера с кешем для модели ``kv_cache``. По умолчанию используется файл "
+"из конфигурации или реестра."
 
-#~ msgid "``\"ReduceLROnPlateau\"`` — reduce LR on validation loss plateau"
-#~ msgstr "``\"ReduceLROnPlateau\"`` — уменьшение LR при плато валидационной ошибки"
+#: b2eb2f612cda416ab010aea8ec2b0462 manuscript.recognizers._trocr.TrOCR:54 of
+msgid "Additional base recognizer options, such as ``use_orientation`` and ``debug_save_dir``."
+msgstr ""
+"Дополнительные параметры базового распознавателя, например ``use_orientation`` и "
+"``debug_save_dir``."
 
-#~ msgid "``\"CosineAnnealingLR\"`` — cosine annealing over epochs"
-#~ msgstr "``\"CosineAnnealingLR\"`` — косинусное затухание по эпохам"
+#: d689c55d064c46f8930a5a03ba3e61c7 manuscript.recognizers._trocr.TrOCR.create_config:2 of
+msgid "Set recognition levels in an existing bundle configuration."
+msgstr "Задаёт уровни распознавания в существующей конфигурации модели."
 
-#~ msgid "``\"None\"`` or ``None`` — constant learning rate"
-#~ msgstr "``\"None\"`` или ``None`` — постоянная скорость обучения"
+#: c17471c5f1604e06b638b37e5ca6d49d manuscript.recognizers._trocr.TrOCR.create_config:5 of
+msgid "Bundle configuration dictionary or path to its JSON file."
+msgstr "Словарь конфигурации модели или путь к JSON-файлу."
 
-#~ msgid ""
-#~ "Pretrained weights to initialize from:  -"
-#~ " ``\"default\"`` or ``True`` — use "
-#~ "release weights - ``None`` or ``False`` "
-#~ "— train from scratch - str/Path — "
-#~ "path or URL to custom weights file"
-#~ "  Default is ``\"default\"``."
-#~ msgstr ""
-#~ "Предобученные веса для инициализации:  - "
-#~ "``\"default\"`` или ``True`` — использовать "
-#~ "релизные веса  - ``None`` или ``False`` "
-#~ "— обучение с нуля  - str/Path — "
-#~ "путь или URL к пользовательскому файлу "
-#~ "весов  По умолчанию ``\"default\"``."
+#: 0cf70423a4704cc0b592bfa77fcd0da8 manuscript.recognizers._trocr.TrOCR.create_config:8 of
+msgid ""
+"Region types: ``\"word\"``, ``\"line\"`` or ``\"block\"``. Uses the source value when omitted, or"
+" ``[\"line\"]`` if the source has no value."
+msgstr ""
+"Типы регионов: ``\"word\"``, ``\"line\"`` или ``\"block\"``. Если не заданы, используется "
+"значение из исходной конфигурации, а при его отсутствии — ``[\"line\"]``."
 
-#~ msgid "``\"default\"`` or ``True`` — use release weights"
-#~ msgstr "``\"default\"`` или ``True`` — использовать релизные веса"
+#: 289272435cef4796b109f3901c992076 manuscript.recognizers._trocr.TrOCR.create_config:12 of
+msgid "Save the resulting configuration to this JSON file."
+msgstr "Сохранить полученную конфигурацию в этот JSON-файл."
 
-#~ msgid "``None`` or ``False`` — train from scratch"
-#~ msgstr "``None`` или ``False`` — обучение с нуля"
+#: 6a623c9f87c54cdcbd9f452e4c6fc561 manuscript.recognizers._trocr.TrOCR.create_config:15 of
+msgid "Updated configuration copy; the source dictionary is unchanged."
+msgstr "Копия конфигурации с новыми настройками. Исходный словарь не меняется."
 
-#~ msgid "str/Path — path or URL to custom weights file"
-#~ msgstr "str/Path — путь или URL к пользовательскому файлу весов"
+#: ../../api/recognizers.rst:50 2664c513bb164cf4865fe629ce241211
+msgid "MajorityVotingRecognizer"
+msgstr "MajorityVotingRecognizer"
 
-#~ msgid ":obj:`TRBA.__init__`"
-#~ msgstr ":obj:`TRBA.__init__`"
+#: dfd061ee6f75489495d4124e73ce38b1 manuscript.recognizers._majority_voting.MajorityVotingRecognizer:1
+#: of
+msgid "Bases: :py:class:`object`"
+msgstr "Базовый класс: :py:class:`object`"
+
+#: 59a4a4ed00ec473183d8ee328f9fe7a5 manuscript.recognizers._majority_voting.MajorityVotingRecognizer:2
+#: of
+msgid "Combine independent recognizers by whole-region plurality voting."
+msgstr ""
+"Объединяет ответы независимых распознавателей: для каждого региона выбирает самый частый "
+"текстовый ответ."
+
+#: 59ecb72fd44249448567022112404367 manuscript.recognizers._majority_voting.MajorityVotingRecognizer:5
+#: of
+msgid ""
+"Nonempty ordered collection implementing predict(page, image=None). Each model receives an "
+"independent Page copy. Only TextRegion text and recognition_confidence may change; tree "
+"structure, child order, geometry and other fields must remain unchanged."
+msgstr ""
+"Список из одной или нескольких моделей с predict(page, image=None). Каждая получает свою копию "
+"Page и может менять только text и recognition_confidence у TextRegion. Структура дерева, порядок "
+"элементов, геометрия и остальные поля должны оставаться прежними."
+
+#: 0ddceb2e27894c80af90f09355a8dcb2 manuscript.recognizers._majority_voting.MajorityVotingRecognizer:11
+#: of
+msgid ""
+"Run models concurrently in threads if True; default is False. Completion order does not change "
+"tie priority. Participants share the image array and must not modify it."
+msgstr ""
+"При True модели запускаются параллельно в потоках. По умолчанию False. Если голоса равны, "
+"приоритет определяется порядком моделей в списке, а не временем завершения. Модели получают общий"
+" массив изображения и не должны его менять."
+
+#: 20ed7c92affb44229b6fe4d103d828aa manuscript.recognizers._majority_voting.MajorityVotingRecognizer:25
+#: of
+msgid ":py:obj:`manuscript.recognizers.MedoidRecognizer`"
+msgstr ":py:obj:`manuscript.recognizers.MedoidRecognizer`"
+
+#: 7cbfb40189a644a2bf0bd53c484fdbf3 manuscript.recognizers._majority_voting.MajorityVotingRecognizer:26
+#: of
+msgid "Select by summed edit distance."
+msgstr "Выбирает ответ с наименьшей суммой расстояний редактирования до остальных."
+
+#: ec4e21ff9e294d17a16656ff41be6537 manuscript.recognizers._majority_voting.MajorityVotingRecognizer:28
+#: of
+msgid ":py:obj:`manuscript.Stack`"
+msgstr ":py:obj:`manuscript.Stack`"
+
+#: 0a7081c8e05140c5808da6f780393f47 manuscript.recognizers._majority_voting.MajorityVotingRecognizer:29
+#: of
+msgid "Apply models sequentially to preceding results."
+msgstr "Последовательно применить модели к предыдущим результатам."
+
+#: 0d18db39e54d4e4da51b0192aa4499f4
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer.predict:2 of
+msgid "Return a Page copy with aggregated recognition results."
+msgstr "Вернуть копию Page с объединёнными результатами распознавания."
+
+#: ef727699d7f242cc9ba18cec7995c9dc
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer.predict:5 of
+msgid "Document tree to recognize; the supplied object is not modified."
+msgstr "Дерево документа для распознавания; исходный объект не изменяется."
+
+#: 49016c0ba99f4ab19c71182935e30348
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer.predict:8 of
+msgid "Original image, loaded once for models accepting image."
+msgstr "Исходное изображение, загружаемое один раз для моделей, принимающих image."
+
+#: 503b9dce90604a799e7002d8835e42cd
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer.predict:11 of
+msgid "Override participant batch sizes. None preserves model defaults."
+msgstr "Размер батча для всех моделей. При None используются их собственные настройки."
+
+#: 92c74ad297874a5591011227ef175276
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer.predict:14 of
+msgid "Return a dictionary with page and per-region voting records if True."
+msgstr "При True вернуть словарь с page и записями голосования по регионам."
+
+#: 5907a4f87db64e709056a840ccd79e7f
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer.predict:17 of
+msgid "Forward supported predict options; participants use return_raw=False."
+msgstr "Передать поддерживаемые параметры predict; участники используют return_raw=False."
+
+#: 50e8c81123ed463283f42d1040efd404
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer.predict:19 of
+#, python-brace-format
+msgid ""
+"Aggregated Page, or {\"page\": Page, \"voting\": records}. Records contain path, type, "
+"candidates, votes, winner, winning_votes, participating_models and total_models. Candidates "
+"contain model_index, text, normalized_text and confidence. Missing answers are omitted; winner is"
+" None without votes. Model tensors are not included."
+msgstr ""
+"Итоговый Page или {\"page\": Page, \"voting\": records}. Записи содержат path, type, candidates, "
+"votes, winner, winning_votes, participating_models и total_models. Кандидаты содержат "
+"model_index, text, normalized_text и confidence. Отсутствующие ответы исключаются; без голосов "
+"winner равен None. Тензоры моделей не включаются."
+
+#: 2f14b3d0cfa94c42b2db551b47139dc6
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer.predict:26 of
+msgid "If the input or a participant result is not a Page."
+msgstr "Если вход или результат участника не является Page."
+
+#: a4ece43f8be74e8c91413ae095fa1a57
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer.predict:27 of
+msgid ""
+"If a tree is invalid or a participant changes forbidden fields. Contract errors identify the "
+"model, node path and changed field."
+msgstr ""
+"Если дерево некорректно или участник меняет запрещённые поля. Ошибка контракта указывает модель, "
+"путь узла и изменённое поле."
+
+#: c81ec590b4354d60aee3bf359bc45208
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer.predict:31 of
+msgid "Notes"
+msgstr "Примечания"
+
+#: 14a8ec7f487944beb828d81e5205466b
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer.predict:32 of
+msgid ""
+"Participant exceptions abort aggregation. Models may target different levels; parent and "
+"descendant texts are aggregated independently."
+msgstr ""
+"Ошибка в любой модели прерывает объединение результатов. Модели могут распознавать разные уровни "
+"дерева; результаты для родительских и дочерних регионов объединяются отдельно."
+
+#: ../../api/recognizers.rst:57 7a3d6e28a724487d80708baf2575a59e
+msgid "MedoidRecognizer"
+msgstr "MedoidRecognizer"
+
+#: d2e0a73e14914a4f9ce75ab789aabfe3 manuscript.recognizers._medoid.MedoidRecognizer:1 of
+msgid "Bases: :py:class:`~manuscript.recognizers._majority_voting.MajorityVotingRecognizer`"
+msgstr "Базовые классы: :py:class:`~manuscript.recognizers._majority_voting.MajorityVotingRecognizer`"
+
+#: 92dd361eea6c4e218f48849aff5f0c34 manuscript.recognizers._medoid.MedoidRecognizer:2 of
+msgid "Select the existing text hypothesis closest to all model responses."
+msgstr "Выбирает из ответов моделей тот, который ближе всего к остальным."
+
+#: 83ef67cdbd434752b4debbf251873d6f manuscript.recognizers._medoid.MedoidRecognizer:5 of
+msgid ""
+"Nonempty ordered collection implementing predict(page, image=None). Each model receives an "
+"independent Page copy. Only TextRegion text and recognition_confidence may change; other changes "
+"raise an error."
+msgstr ""
+"Список из одной или нескольких моделей с predict(page, image=None). Каждая получает свою копию "
+"Page и может менять только text и recognition_confidence у TextRegion. Остальные изменения "
+"вызывают ошибку."
+
+#: cc1055c0801b410eab97aaf32ad0f04f manuscript.recognizers._medoid.MedoidRecognizer:10 of
+msgid ""
+"Run models concurrently in threads if True; default is False. List order determines tie priority "
+"regardless of completion order."
+msgstr ""
+"При True модели запускаются параллельно в потоках. По умолчанию False. При равных результатах "
+"приоритет определяется порядком моделей в списке."
+
+#: e9ee227f6eb04e8cb48be77563a4c579 manuscript.recognizers._medoid.MedoidRecognizer:22 of
+msgid ":py:obj:`MajorityVotingRecognizer`"
+msgstr ":py:obj:`MajorityVotingRecognizer`"
+
+#: c025415df5c645aeb5cef1871bceef8b manuscript.recognizers._medoid.MedoidRecognizer:23 of
+msgid "Vote by exact whole-string agreement."
+msgstr "Выбирает самый частый текстовый ответ по точному совпадению."

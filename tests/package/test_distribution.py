@@ -18,6 +18,9 @@ def test_wheel_excludes_caches_and_runs_installed_pipeline(tmp_path):
     for name in ("pyproject.toml", "MANIFEST.in", "README.md", "LICENSE", "registry.json"):
         shutil.copy2(root / name, project / name)
     shutil.copytree(root / "src/manuscript", project / "src/manuscript")
+    scripts = project / "scripts"
+    scripts.mkdir()
+    (scripts / "export_example.py").write_text("import export_only_dependency\n")
     cache = project / "src/manuscript/__pycache__"
     cache.mkdir(exist_ok=True)
     for name in ("local.pyc", "local.nbc", "local.nbi"):
@@ -38,6 +41,7 @@ def test_wheel_excludes_caches_and_runs_installed_pipeline(tmp_path):
     assert result.returncode == 0, result.stdout + result.stderr
     with open_tar(next((project / "dist").glob("*.tar.gz"))) as archive:
         assert not any(name.endswith("/registry.json") for name in archive.getnames())
+        assert not any("/scripts/" in name for name in archive.getnames())
     wheel = next((project / "dist").glob("*.whl"))
     with ZipFile(wheel) as archive:
         names = archive.namelist()
@@ -46,6 +50,7 @@ def test_wheel_excludes_caches_and_runs_installed_pipeline(tmp_path):
             for name in names
         )
         assert not any(name.endswith("registry.json") for name in names)
+        assert not any(name.startswith("scripts/") for name in names)
         assert "manuscript/recognizers/_trba/configs/charset.txt" in names
     target = tmp_path / "installed"
     with ZipFile(wheel) as archive:

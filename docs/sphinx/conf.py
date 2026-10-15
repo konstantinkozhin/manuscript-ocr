@@ -4,10 +4,11 @@
 # https://www.sphinx-doc.org/en/master/usage/configuration.html
 
 import os
+import inspect
 import sys
 
 # Add source directory to path for autodoc
-sys.path.insert(0, os.path.abspath("../../src"))
+sys.path.insert(0, os.path.abspath(os.path.join(os.path.dirname(__file__), "../../src")))
 
 # -- Project information -----------------------------------------------------
 project = "manuscript-ocr"
@@ -42,13 +43,16 @@ html_js_files = ["language_switcher.js", "version_sidebar.js"]
 
 # autodoc settings
 autodoc_default_options = {
-    "members": True,
     "member-order": "bysource",
-    "special-members": "__init__",
     "undoc-members": True,
-    "exclude-members": "__weakref__",
+    "exclude-members": (
+        "__weakref__, default_weights_name, registry_model_class, "
+        "pretrained_registry, config_registry, charset_registry, registry"
+    ),
     "show-inheritance": True,
 }
+# Keep constructor documentation under the class's single signature.
+autoclass_content = "both"
 autodoc_typehints = "description"
 autodoc_mock_imports = [
     "torch",
@@ -60,7 +64,6 @@ autodoc_mock_imports = [
     "shapely",
     "skimage",
     "numba",
-    "pydantic",
     "tqdm",
     "gdown",
     "openai",
@@ -78,7 +81,7 @@ suppress_warnings = ["autodoc.import_object"]
 autosummary_generate = True
 
 # numpydoc settings
-numpydoc_show_class_members = True
+numpydoc_show_class_members = False
 numpydoc_class_members_toctree = False
 
 # napoleon settings (backup for docstrings)
@@ -112,3 +115,63 @@ master_doc = "index"
 locale_dirs = ["locale/"]
 gettext_compact = False
 gettext_uuid = True
+
+
+def data_class_signature(app, what, name, obj, options, signature, return_annotation):
+    """Expose public parameters without Pydantic or Pipeline internals."""
+    from manuscript.data import Element
+
+    if what == "class" and name == "manuscript.Pipeline":
+        return (
+            "(detector=<default>, layout=<default>, recognizer=<default>, "
+            "corrector=None, layout_after='detector')", None,
+        )
+
+    if what == "class" and inspect.isclass(obj) and issubclass(obj, Element):
+        model_signature = inspect.signature(obj)
+        parameters = [
+            parameter.replace(annotation=inspect.Parameter.empty)
+            for parameter in model_signature.parameters.values()
+        ]
+        return str(model_signature.replace(
+            parameters=parameters, return_annotation=inspect.Signature.empty,
+        )), None
+
+
+def setup(app):
+    app.connect("autodoc-process-signature", data_class_signature, priority=100)
+    app.connect("autodoc-process-docstring", data_class_docstring, priority=100)
+    app.connect("doctree-resolved", localize_mermaid_labels)
+
+
+def data_class_docstring(app, what, name, obj, options, lines):
+    """Keep data API docs without module or inherited constructor introductions."""
+    if what == "module" and name == "manuscript.data":
+        lines.clear()
+        return
+
+    from manuscript.data import Element
+
+    if what == "class" and inspect.isclass(obj) and issubclass(obj, Element):
+        # With autoclass_content="both", Sphinx processes the class and
+        # inherited Pydantic constructor docstrings separately.
+        if inspect.cleandoc("\n".join(lines)) == inspect.getdoc(obj.__init__):
+            lines.clear()
+        else:
+            lines[:] = inspect.cleandoc(obj.__doc__ or "").splitlines()
+
+
+def localize_mermaid_labels(app, doctree, docname):
+    """Translate diagram prose, which Mermaid does not expose to gettext."""
+    if app.config.language != "ru":
+        return
+    from sphinxcontrib.mermaid import mermaid
+
+    labels = {
+        "Registry and artifact cache": "Реестр и кеш артефактов",
+        "Base classes and protocols": "Базовые классы и протоколы",
+        "type: word / line / block": "тип: word / line / block",
+    }
+    for node in doctree.findall(mermaid):
+        for source, translation in labels.items():
+            node["code"] = node["code"].replace(source, translation)

@@ -81,12 +81,13 @@ class EAST(BaseDetector):
 
     device : str, optional
         Compute device: ``"cuda"``, ``"coreml"``, or ``"cpu"``. If None,
-        automatically selects CPU. For GPU/CoreML acceleration:
+        selects CUDA when ONNX Runtime reports GPU support, otherwise CPU. For GPU/CoreML acceleration:
 
         - CUDA (NVIDIA): ``pip install onnxruntime-gpu``
-        - CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``
+        - CoreML (Apple Silicon): included in standard macOS ONNX Runtime wheels;
+          select ``device="coreml"`` explicitly.
 
-        Default is ``None`` (CPU).
+        Default is ``None`` (automatic selection).
     config : dict or path, optional
         Region mapping configuration. Required key ``region_classes`` maps
         class IDs to element fields, e.g. ``{"0": {"type": "word"}}``.
@@ -97,24 +98,24 @@ class EAST(BaseDetector):
         ``(target_size, target_size)``. Default is 1280.
     expand_ratio_w : float, optional
         Horizontal expansion factor applied to detected boxes after NMS.
-        Default is 0.7.
+        Default is 1.4.
     expand_ratio_h : float, optional
         Vertical expansion factor applied to detected boxes after NMS.
-        Default is 0.7.
+        Default is 1.5.
     expand_power : float, optional
         Power for non-linear box expansion. Controls how expansion scales with box size.
         - 1.0 = linear (small and large boxes expand equally)
         - <1.0 = small boxes expand more (e.g., 0.5, recommended for character-level detection)
         - >1.0 = large boxes expand more
-        Default is 0.5.
+        Default is 0.6.
     score_thresh : float, optional
         Confidence threshold for selecting candidate detections before NMS.
-        Default is 0.7.
+        Default is 0.6.
     iou_threshold : float, optional
-        IoU threshold for locality-aware NMS merging phase. Default is 0.2.
+        IoU threshold for locality-aware NMS merging phase. Default is 0.05.
     iou_threshold_standard : float, optional
         IoU threshold for standard NMS after locality-aware merging.
-        If None, uses the same value as iou_threshold. Default is None.
+        If None, uses the same value as iou_threshold. Default is 0.05.
     score_geo_scale : float, optional
         Scale factor for decoding geometry/score maps. Default is 0.25.
     quantization : int, optional
@@ -133,23 +134,14 @@ class EAST(BaseDetector):
         Default is 30.
     use_tta : bool, optional
         Enable Test-Time Augmentation (TTA). When enabled, inference is run
-        on both the original and horizontally flipped image, and results are
-        merged. This can improve detection of partially visible or edge text.
+        on both the original and horizontally flipped image. Only original
+        detections with a matching box in the flipped view are retained.
         Default is False.
     tta_iou_thresh : float, optional
-        IoU threshold for merging boxes from original and flipped images
-        during TTA. Boxes with IoU > threshold are considered matches and
-        merged. Default is 0.1.
+        IoU threshold for matching boxes from original and flipped images
+        during TTA. An original detection is retained when a flipped-view
+        box has IoU > threshold. Default is 0.1.
 
-    Notes
-    -----
-    The class provides two main public methods:
-
-    - ``predict`` — run inference on a single image and return detections.
-    - ``train`` — high-level training entrypoint to train an EAST model on custom datasets.
-
-    The detector uses ONNX Runtime for fast inference on CPU and GPU.
-    For GPU acceleration, install: ``pip install onnxruntime-gpu``
     """
 
     default_weights_name = "east_50_g1"
@@ -464,29 +456,8 @@ class EAST(BaseDetector):
         -------
         Page
             Detection result as a flat document tree of configured text regions.
-            Each region has polygon
-            coordinates, confidence score, and sequential ``order`` index.
-
-        Notes
-        -----
-        The method performs:
-        (1) image loading, (2) resizing and normalization, (3) model inference,
-        (4) quad decoding, (5) NMS, (6) box expansion, (7) scaling coordinates
-        back to original size.
-
-        **Test-Time Augmentation (TTA):**
-
-        When ``use_tta=True`` is set during initialization, the method runs
-        inference on both the original and horizontally flipped image, then
-        merges results. Boxes from both views are matched by IoU and merged
-        by taking the union of coordinates with averaged scores. This can
-        improve detection of text near image edges or partially visible text.
-
-        For visualization, use the external ``visualize_page`` utility:
-
-        >>> from manuscript.utils import visualize_page
-        >>> page = model.predict(img_path)
-        >>> vis_img = visualize_page(img, page)
+            Each region has polygon coordinates and a detection confidence score.
+            Child sequence defines order; a layout stage can establish reading order.
 
         Examples
         --------
@@ -496,9 +467,9 @@ class EAST(BaseDetector):
         >>> model = EAST()
         >>> img_path = r"example/ocr_example_image.jpg"
         >>> page = model.predict(img_path)
-        >>> # Access first line's first text span
-        >>> first_text_span = page.blocks[0].lines[0].text_spans[0]
-        >>> print(f"Confidence: {first_text_span.detection_confidence}")
+        >>> # Access the first detected region, when present
+        >>> for region in page.children[:1]:
+        ...     print(f"Confidence: {region.detection_confidence}")
 
         Visualize results separately:
 
@@ -689,9 +660,10 @@ class EAST(BaseDetector):
         pretrained_backbone : bool, optional
             Use ImageNet-pretrained backbone weights. Default ``True``.
         freeze_first : bool, optional
-            Freeze lowest layers of the backbone. Default ``True``.
+            Freeze lowest layers of the backbone. Default ``False``.
         target_size : int, optional
-            Resize shorter side of images to this size. Default ``1024``.
+            Resize images to ``(target_size, target_size)`` without preserving
+            aspect ratio. Default ``1024``.
         score_geo_scale : float, optional
             Multiplier to recover original coordinates from score/geo maps.
             If None, automatically taken from the model. Default ``None``.
@@ -711,7 +683,7 @@ class EAST(BaseDetector):
 
             Default is ``1`` (no accumulation).
         lr : float, optional
-            Learning rate. Default ``1e-3``.
+            Learning rate. Default ``1e-4``.
         lr_scheduler : {"cosine_restart", "cosine", "linear", "step", "exponential", "plateau", "none"}, optional
             Learning rate scheduler type. Default ``"cosine_restart"``.
         lr_scheduler_params : dict, optional
@@ -749,17 +721,17 @@ class EAST(BaseDetector):
             Patience (epochs without improvement) for early stopping.
             Default ``100``.
         use_sam : bool, optional
-            Enable SAM optimizer. Default ``True``.
+            Enable SAM optimizer. Default ``False``.
         sam_type : {"sam", "asam"}, optional
             Variant of SAM to use. Default ``"asam"``.
         use_lookahead : bool, optional
-            Wrap optimizer with Lookahead. Default ``True``.
+            Wrap optimizer with Lookahead. Default ``False``.
         use_ema : bool, optional
             Maintain EMA version of model weights. Default ``False``.
         use_multiscale : bool, optional
             Random multi-scale training. Default ``True``.
         use_ohem : bool, optional
-            Online Hard Example Mining. Default ``True``.
+            Online Hard Example Mining. Default ``False``.
         ohem_ratio : float, optional
             Ratio of hard negatives for OHEM. Default ``0.5``.
         use_focal_geo : bool, optional
@@ -789,7 +761,10 @@ class EAST(BaseDetector):
         Returns
         -------
         torch.nn.Module
-            Best model weights (EMA if enabled, otherwise base model).
+            Model after the last completed training epoch (EMA if enabled,
+            otherwise base model). Best validation weights are saved separately
+            as ``best_loss.pth`` and ``best_dice.pth`` in the experiment's
+            ``checkpoints`` directory.
 
         Examples
         --------
@@ -814,7 +789,7 @@ class EAST(BaseDetector):
         ...     "/data/ddi/test.json"
         ... ]
         >>>
-        >>> best_model = EAST.train(
+        >>> trained_model = EAST.train(
         ...     train_images=train_images,
         ...     train_anns=train_anns,
         ...     val_images=val_images,
@@ -827,7 +802,7 @@ class EAST(BaseDetector):
         ...     freeze_first=False,
         ...     val_interval=3,
         ... )
-        >>> print("Best checkpoint loaded:", best_model)
+        >>> print("Model after the last completed epoch:", trained_model)
 
         Configure augmentations via ``augmentation_config``:
 
@@ -854,7 +829,7 @@ class EAST(BaseDetector):
         ...     "downscale_range": (0.7, 0.95),
         ...     "negative_prob": 0.05,
         ... }
-        >>> best_model = EAST.train(
+        >>> trained_model = EAST.train(
         ...     train_images=train_images,
         ...     train_anns=train_anns,
         ...     val_images=val_images,
@@ -1136,7 +1111,9 @@ class EAST(BaseDetector):
 
         This method converts a trained EAST model from PyTorch to ONNX format,
         which can be used for faster inference with ONNX Runtime. The exported
-        model can be loaded using ``EAST(weights_path="model.onnx", use_onnx=True)``.
+        model can be loaded using
+        ``EAST(weights="model.onnx", config="model.json")``. The exporter
+        writes the matching configuration alongside the ONNX graph.
 
         Parameters
         ----------
@@ -1185,9 +1162,9 @@ class EAST(BaseDetector):
 
         **Automatic Backbone Detection:**
 
-        The method automatically detects the backbone architecture from the checkpoint
-        by analyzing the number of parameters in layer4. This prevents mismatches between
-        checkpoint and architecture that could lead to incorrect exports.
+        The method checks the checkpoint's ``backbone.extractor.layer3`` keys
+        for ``layer3.10``. Its presence selects ResNet-101; otherwise, the
+        exporter selects ResNet-50.
 
         Examples
         --------
@@ -1215,15 +1192,15 @@ class EAST(BaseDetector):
         Use the exported model for inference:
 
         >>> detector = EAST(
-        ...     weights_path="east_model.onnx",
-        ...     use_onnx=True,
+        ...     weights="east_model.onnx",
+        ...     config="east_model.json",
         ...     device="cuda"
         ... )
         >>> result = detector.predict("image.jpg")
 
         See Also
         --------
-        EAST.__init__ : Initialize EAST detector with ONNX support using ``use_onnx=True``.
+        EAST.__init__ : Initialize EAST with ONNX weights and matching configuration.
         """
         _ensure_torch_dependencies()
 

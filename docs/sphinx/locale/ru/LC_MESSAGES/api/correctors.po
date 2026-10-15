@@ -7,650 +7,381 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-06 15:49+0700\n"
-"PO-Revision-Date: 2026-10-06 00:00+0700\n"
+"POT-Creation-Date: 2026-10-15 20:25+0700\n"
+"PO-Revision-Date: 2026-10-15 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
 "Language-Team: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || "
+"n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: 271ac36ac70e4fc4b6785c26f7f3076e api/correctors.rst:2
+#: ../../api/correctors.rst:2 7860343e7f7248ef9d11cb71c92c1f5b
 msgid "Correctors"
 msgstr "Корректоры"
 
-#: api/correctors.rst:4 d3cfa124ded348299fd457926306c0c0
-msgid "Character-level text corrector for post-processing OCR results."
-msgstr "Символьный корректор текста для постобработки результатов OCR."
-
-#: api/correctors.rst:7 bb2efd3fb655409d94a19a2640b3e970
-msgid "``CharLM``"
-msgstr "``CharLM``"
-
-#: eb3b438ddc3541f7b4f333d6929401c5 manuscript.correctors._charlm.CharLM:1 of
+#: 098eed6f5290424293efd0c647dded8d manuscript.correctors._charlm.CharLM:1 of
 msgid "Bases: :py:class:`~manuscript.api.corrector.BaseCorrector`"
 msgstr "Базовые классы: :py:class:`~manuscript.api.corrector.BaseCorrector`"
 
-#: 9af154394caa47f98fac039189a92363 manuscript.correctors._charlm.CharLM:2 of
+#: fe7948612a9e41549eba1b706a0c88ba manuscript.correctors._charlm.CharLM:2 of
 msgid "Character-level language model corrector using ONNX Runtime."
-msgstr "Символьная языковая модель-корректор на базе ONNX Runtime."
+msgstr "Символьная языковая модель для исправления текста. Работает через ONNX Runtime."
 
-#: a9424f96bf4e4abc8fc54d09f837cf7d manuscript.correctors._charlm.CharLM:4 of
+#: 6be3685471854ce3a5b696689fc85e55 manuscript.correctors._charlm.CharLM:4 of
 msgid ""
-"CharLM uses a Transformer-based masked language model to correct OCR errors "
-"at the character level. It analyzes character confidence and applies "
-"corrections based on learned substitution patterns."
+"CharLM uses a Transformer-based masked language model to correct OCR substitution errors. It "
+"estimates each character's probability from its masked context; recognition_confidence from OCR "
+"is not used."
 msgstr ""
-"CharLM использует маскированную языковую модель на основе Transformer для "
-"исправления OCR-ошибок на уровне символов. Анализирует уверенность в "
-"символах и применяет исправления на основе выученных шаблонов замен."
+"CharLM исправляет ошибки замены символов с помощью языковой модели Transformer. Для проверки "
+"символ временно скрывается, а модель оценивает его вероятность по окружающему тексту. Значение "
+"recognition_confidence от распознавателя не используется."
 
-#: 0e94b7588b3a489999dbadbd55b15218 29c63a4844874ff9aafec26c1e2b74f5
-#: 8a37c9f8bf22488da4a4052c8ddce2e6 api/correctors.rst
-#: d54c53ef5cfb4c458f694d4deaa2aa29 e9bb11e5dfcd44089769469ab869e6e8
+#: ../../api/correctors.rst 0377c7b5c5074d1583507b3b7a1a1d3f 6c12723dc9214e529e0b13efa9082322
+#: 6eb93f3f2f354306b024dbd74ad2ff6d eeddaecf70664f8ea28d5279f26a6819
 msgid "Parameters"
 msgstr "Параметры"
 
-#: fa1b1f5549284d05b5af8930bdc82a89 manuscript.correctors._charlm.CharLM:9 of
+#: c5c4d3bde2fc4560b867f8a1bdde94e6 manuscript.correctors._charlm.CharLM:9 of
 msgid ""
 "Path or identifier for ONNX model weights. Supports:  - Local file path: "
-"``\"path/to/model.onnx\"`` - HTTP/HTTPS URL: "
-"``\"https://example.com/model.onnx\"`` - GitHub release: "
-"``\"github://owner/repo/tag/file.onnx\"`` - Google Drive: "
-"``\"gdrive:FILE_ID\"`` - Preset name: ``\"prereform_charlm_g1\"`` or "
-"``\"modern_charlm_g1\"`` (from pretrained_registry) - ``None``: auto-"
-"downloads default preset (prereform_charlm_g1)"
+"``\"path/to/model.onnx\"`` - HTTP/HTTPS URL: ``\"https://example.com/model.onnx\"`` - GitHub "
+"release: ``\"github://owner/repo/tag/file.onnx\"`` - Google Drive: ``\"gdrive:FILE_ID\"`` - "
+"Preset name: ``\"prereform_charlm_g1\"`` or ``\"modern_charlm_g1\"`` (from the model registry) - "
+"``None``: auto-downloads default preset (prereform_charlm_g1)"
 msgstr ""
-"Путь или идентификатор для весов модели ONNX. Поддерживает: локальный путь, "
-"HTTP/HTTPS URL, GitHub release, Google Drive, имя пресета "
-"(``\"prereform_charlm_g1\"`` или ``\"modern_charlm_g1\"``), ``None`` — "
-"автозагрузка пресета по умолчанию (prereform_charlm_g1)"
+"Путь или идентификатор весов ONNX-модели. Поддерживаются:  - Локальный файл: "
+"``\"path/to/model.onnx\"`` - HTTP/HTTPS URL: ``\"https://example.com/model.onnx\"`` - Релиз "
+"GitHub: ``\"github://owner/repo/tag/file.onnx\"`` - Google Drive: ``\"gdrive:FILE_ID\"`` - Имя "
+"пресета: ``\"prereform_charlm_g1\"`` или ``\"modern_charlm_g1\"`` (из реестра моделей) - "
+"``None``: автоматически скачивается пресет по умолчанию (prereform_charlm_g1)"
 
-#: 26ebae8a56dd45de912e6675a4fbd04a manuscript.correctors._charlm.CharLM:9 of
+#: 59bdc3aeb7464c539b9907341f3668df manuscript.correctors._charlm.CharLM:9 of
 msgid "Path or identifier for ONNX model weights. Supports:"
-msgstr "Путь или идентификатор для весов модели ONNX. Поддерживает:"
+msgstr "Путь или идентификатор весов ONNX-модели. Поддерживаются:"
 
-#: d723615597f84626bd8b3f2f3606041d manuscript.correctors._charlm.CharLM:11 of
+#: 723593dec25a489295eb381c7cfc992b manuscript.correctors._charlm.CharLM:11 of
 msgid "Local file path: ``\"path/to/model.onnx\"``"
 msgstr "Локальный путь: ``\"path/to/model.onnx\"``"
 
-#: 2a2aaa14ec5b419da5298f74196ee515 manuscript.correctors._charlm.CharLM:12 of
+#: 39841e3768644a8ca2a6a41b4f4eac59 manuscript.correctors._charlm.CharLM:12 of
 msgid "HTTP/HTTPS URL: ``\"https://example.com/model.onnx\"``"
 msgstr "HTTP/HTTPS URL: ``\"https://example.com/model.onnx\"``"
 
-#: 0699760b8bc94f6980ab770474278614 manuscript.correctors._charlm.CharLM:13 of
+#: 965c669e1eb44596a3f43587defdbc2a manuscript.correctors._charlm.CharLM:13 of
 msgid "GitHub release: ``\"github://owner/repo/tag/file.onnx\"``"
-msgstr "GitHub release: ``\"github://owner/repo/tag/file.onnx\"``"
+msgstr "Релиз GitHub: ``\"github://owner/repo/tag/file.onnx\"``"
 
-#: 014e9cd894ba4e2aada664c28f8d74b3 manuscript.correctors._charlm.CharLM:14 of
+#: 8c209d0125e14b9792a907e0e8a2f935 manuscript.correctors._charlm.CharLM:14 of
 msgid "Google Drive: ``\"gdrive:FILE_ID\"``"
 msgstr "Google Drive: ``\"gdrive:FILE_ID\"``"
 
-#: aa5fa0889c084ba68185fc88696266e3 manuscript.correctors._charlm.CharLM:15 of
-msgid ""
-"Preset name: ``\"prereform_charlm_g1\"`` or ``\"modern_charlm_g1\"`` (from "
-"pretrained_registry)"
-msgstr ""
-"Имя пресета: ``\"prereform_charlm_g1\"`` или ``\"modern_charlm_g1\"`` (из "
-"pretrained_registry)"
+#: a92ec7d4b2d64f5684a74180654cd663 manuscript.correctors._charlm.CharLM:15 of
+msgid "Preset name: ``\"prereform_charlm_g1\"`` or ``\"modern_charlm_g1\"`` (from the model registry)"
+msgstr "Имя пресета: ``\"prereform_charlm_g1\"`` или ``\"modern_charlm_g1\"`` (из реестра моделей)"
 
-#: 8c28d4ba6ae244fab0e07a482ca358f2 manuscript.correctors._charlm.CharLM:16 of
+#: 3bac73f93c1c472abddf420c86418dad manuscript.correctors._charlm.CharLM:16 of
 msgid "``None``: auto-downloads default preset (prereform_charlm_g1)"
 msgstr "``None``: автозагрузка пресета по умолчанию (prereform_charlm_g1)"
 
-#: 65906ce22e7040a38ddc6be6d91ca62f manuscript.correctors._charlm.CharLM:19 of
-msgid "Path to vocabulary JSON file. If None, inferred from weights location."
-msgstr "Путь к JSON-файлу словаря. Если None, определяется из расположения весов."
+#: 6d90832111c34179a90cb91352180ef8 manuscript.correctors._charlm.CharLM:19 of
+msgid ""
+"Path to vocabulary JSON file. Required for local weights; registry presets supply their own "
+"vocabulary artifact."
+msgstr ""
+"Путь к JSON-файлу словаря символов. Обязателен для локальных весов; пресеты из реестра "
+"предоставляют свой файл словаря."
 
-#: 4e583806dfe84f5b96ec157a54613b16 manuscript.correctors._charlm.CharLM:22 of
+#: d19115e2aebd4461a93f75d3755b978a manuscript.correctors._charlm.CharLM:23 of
 #, python-brace-format
 msgid ""
 "Word list for dictionary-based validation. Supports:  - Local file path: "
-"``\"path/to/words.txt\"`` - Preset name: ``\"prereform_words\"`` or "
-"``\"modern_words\"`` (from lexicon_registry) - Python set: ``{\"word1\", "
-"\"word2\", ...}`` - ``None``: auto-downloads default lexicon for model "
-"preset   (prereform_words for prereform_charlm_g1, modern_words for "
-"modern_charlm_g1)"
+"``\"path/to/words.txt\"`` - Model registry key: ``\"prereform_charlm_g1\"`` or "
+"``\"modern_charlm_g1\"``   (loads its lexicon artifact) - Python set: ``{\"word1\", \"word2\", "
+"...}`` - ``None``: auto-downloads default lexicon for model preset   (prereform_words for "
+"prereform_charlm_g1, modern_words for modern_charlm_g1)"
 msgstr ""
-"Список слов для валидации по словарю. Поддерживает: локальный путь, имя "
-"пресета (``\"prereform_words\"`` или ``\"modern_words\"``), Python set, "
-"``None`` — автозагрузка лексикона для пресета модели (prereform_words для "
-"prereform_charlm_g1, modern_words для modern_charlm_g1)"
+"Список слов для проверки по словарю. Поддерживаются:  - Локальный файл: ``\"path/to/words.txt\"``"
+" - Ключ реестра моделей: ``\"prereform_charlm_g1\"`` или ``\"modern_charlm_g1\"``   (загружается "
+"артефакт lexicon) - Множество Python: ``{\"word1\", \"word2\", ...}`` - ``None``: автоматически "
+"скачивается словарь слов для пресета   (prereform_words для prereform_charlm_g1, modern_words для"
+" modern_charlm_g1)"
 
-#: 411af14a39d440358af5449bf340f925 manuscript.correctors._charlm.CharLM:22 of
+#: 918a8e22c2584ea28ee86ba0a8f94d8f manuscript.correctors._charlm.CharLM:23 of
 msgid "Word list for dictionary-based validation. Supports:"
-msgstr "Список слов для валидации по словарю. Поддерживает:"
+msgstr "Словарь для проверки слов. Можно передать:"
 
-#: 0b050b6f4cba42bfb927d4194229949b manuscript.correctors._charlm.CharLM:24 of
+#: fb21005d85104c73a0d0f1f34f10e047 manuscript.correctors._charlm.CharLM:25 of
 msgid "Local file path: ``\"path/to/words.txt\"``"
 msgstr "Локальный путь: ``\"path/to/words.txt\"``"
 
-#: d7f508552c1d49658c7b27d2e245b770 manuscript.correctors._charlm.CharLM:25 of
+#: 8b43ccbf96264ec18d6c69f262d5b8bb manuscript.correctors._charlm.CharLM:26 of
 msgid ""
-"Preset name: ``\"prereform_words\"`` or ``\"modern_words\"`` (from "
-"lexicon_registry)"
+"Model registry key: ``\"prereform_charlm_g1\"`` or ``\"modern_charlm_g1\"`` (loads its lexicon "
+"artifact)"
 msgstr ""
-"Имя пресета: ``\"prereform_words\"`` или ``\"modern_words\"`` (из "
-"lexicon_registry)"
+"Ключ реестра моделей: ``\"prereform_charlm_g1\"`` или ``\"modern_charlm_g1\"`` (загружается "
+"артефакт lexicon)"
 
-#: 4a396965fe0c429a84e8a5d9f4296a4e manuscript.correctors._charlm.CharLM:26 of
+#: edb932245c0242a4a1c6012b59c47a21 manuscript.correctors._charlm.CharLM:28 of
 #, python-brace-format
 msgid "Python set: ``{\"word1\", \"word2\", ...}``"
 msgstr "Множество Python: ``{\"word1\", \"word2\", ...}``"
 
-#: d5c18113a35e44078bdf7bd18353a244 manuscript.correctors._charlm.CharLM:27 of
+#: 7ce10769eb934e9b85e43b87d9290e83 manuscript.correctors._charlm.CharLM:29 of
 msgid ""
-"``None``: auto-downloads default lexicon for model preset (prereform_words "
-"for prereform_charlm_g1, modern_words for modern_charlm_g1)"
+"``None``: auto-downloads default lexicon for model preset (prereform_words for "
+"prereform_charlm_g1, modern_words for modern_charlm_g1)"
 msgstr ""
-"``None``: автозагрузка лексикона для пресета модели (prereform_words для "
-"prereform_charlm_g1, modern_words для modern_charlm_g1)"
+"``None``: автозагрузка лексикона для пресета модели (prereform_words для prereform_charlm_g1, "
+"modern_words для modern_charlm_g1)"
 
-#: a82987446e834ec98379e4cb0f20b978 manuscript.correctors._charlm.CharLM:31 of
-msgid "Compute device. Default is auto-detected."
-msgstr "Вычислительное устройство. По умолчанию определяется автоматически."
-
-#: afb57d426827410194caf19d7ec730df manuscript.correctors._charlm.CharLM:34 of
+#: 76c88c0fce3842819ff3cbdb426eb25c manuscript.correctors._charlm.CharLM:33 of
 msgid ""
-"Confidence threshold below which characters are considered for correction. "
-"Default is 0.05."
+"Compute device. If None, selects CUDA when ONNX Runtime reports GPU support, otherwise CPU. "
+"Select CoreML explicitly with ``device=\"coreml\"``."
 msgstr ""
-"Порог уверенности, ниже которого символы рассматриваются для исправления. По"
-" умолчанию 0.05."
+"Устройство для выполнения модели. При None используется CUDA, если ONNX Runtime поддерживает GPU,"
+" иначе CPU. Для CoreML задайте ``device=\"coreml\"``."
 
-#: b2f9da81ea854015a3ada8935c6b24af manuscript.correctors._charlm.CharLM:38 of
+#: e1ba345b56a84af7bbba49a189649a4d manuscript.correctors._charlm.CharLM:37 of
+msgid "Confidence threshold below which characters are considered for correction. Default is 0.05."
+msgstr "Символы с уверенностью ниже этого порога проверяются на ошибки. По умолчанию 0.05."
+
+#: 584e21b853d042dabea7601d3a87801e manuscript.correctors._charlm.CharLM:41 of
 msgid "Minimum model confidence required to apply a correction. Default is 0.95."
-msgstr "Минимальная уверенность модели для применения исправления. По умолчанию 0.95."
+msgstr "Минимальная уверенность модели, при которой применяется исправление. По умолчанию 0.95."
 
-#: ddba4f3e280d4f89a676341c5fc373cd manuscript.correctors._charlm.CharLM:41 of
+#: e3917a46387044b78027661d8822264c manuscript.correctors._charlm.CharLM:44 of
 msgid "Maximum number of edits per word. Default is 2."
 msgstr "Максимальное количество правок на слово. По умолчанию 2."
 
-#: d4e15f5a631b44dcb333090d768e728e manuscript.correctors._charlm.CharLM:44 of
+#: e297f438ba65466aad6d3c86371bae83 manuscript.correctors._charlm.CharLM:47 of
 msgid "Minimum word length to attempt correction. Default is 4."
-msgstr "Минимальная длина слова для попытки исправления. По умолчанию 4."
+msgstr "Минимальная длина слова, которое нужно проверять. По умолчанию 4."
 
-#: d33f557c2fe54f60a2fdcb01d3f434ac manuscript.correctors._charlm.CharLM:47 of
+#: 3177de4c06b84e28841ecab1fa5dc5aa manuscript.correctors._charlm.CharLM:50 of
+msgid "Model context length. Longer words are preserved. Default is 32."
+msgstr "Длина контекста модели. Более длинные слова остаются без изменений. По умолчанию 32."
+
+#: 9fdeca9e96114db694637574a08c1563 manuscript.correctors._charlm.CharLM:53 of
+msgid ""
+"TextRegion levels to correct: word, line or block. Default is (\"word\",). Text is split into "
+"words while preserving case and separators."
+msgstr ""
+"Уровни TextRegion для коррекции: word, line или block. По умолчанию (\"word\",). Текст "
+"разбивается на слова с сохранением регистра и разделителей."
+
+#: f66446beea3741ac919e973115dcb79d manuscript.correctors._charlm.CharLM:57 of
 msgid "Additional configuration options."
-msgstr "Дополнительные опции конфигурации."
+msgstr "Дополнительные параметры конфигурации."
 
-#: f01b34b1e0444a5b8d03843c90b7a479 manuscript.correctors._charlm.CharLM:50 of
+#: 4e4fdc85ba4044e583d18681dc6e6bec manuscript.correctors._charlm.CharLM:60 of
 msgid "Examples"
 msgstr "Примеры"
 
-#: e5060ddff7254c5880a393f4f7783f86 manuscript.correctors._charlm.CharLM:58 of
-msgid "Methods"
-msgstr "Методы"
-
-#: e32a39f99e9446f08cd7d2e795936633
-#: manuscript.correctors._charlm.CharLM:77:<autosummary>:1 of
-msgid ""
-":py:obj:`__call__ <manuscript.correctors.CharLM.__call__>`\\ \\(\\*args\\, "
-"\\*\\*kwargs\\)"
-msgstr ""
-":py:obj:`__call__ <manuscript.correctors.CharLM.__call__>`\\ \\(\\*args\\, "
-"\\*\\*kwargs\\)"
-
-#: f08fb9b767be450b9be9fb8610060fda
-#: manuscript.correctors._charlm.CharLM:77:<autosummary>:1 of
-msgid "Call self as a function."
-msgstr "Вызов объекта как функции."
-
-#: f2458e4fea80445794b93f605a871637
-#: manuscript.correctors._charlm.CharLM:77:<autosummary>:1 of
-msgid ""
-":py:obj:`export <manuscript.correctors.CharLM.export>`\\ "
-"\\(weights\\_path\\, vocab\\_path\\, output\\_path\\)"
-msgstr ""
-":py:obj:`export <manuscript.correctors.CharLM.export>`\\ "
-"\\(weights\\_path\\, vocab\\_path\\, output\\_path\\)"
-
-#: 1e5b43a1b9984cbeacb376faf8bce07f 70fedccb5f9448ce8787e0644c1ccbf8
-#: manuscript.correctors._charlm.CharLM.export:2
-#: manuscript.correctors._charlm.CharLM:77:<autosummary>:1 of
-msgid "Export CharLM PyTorch model to ONNX format."
-msgstr "Экспорт модели CharLM из PyTorch в формат ONNX."
-
-#: c2a6589be2154c15b7212be99956f1ad
-#: manuscript.correctors._charlm.CharLM:77:<autosummary>:1 of
-msgid ""
-":py:obj:`predict <manuscript.correctors.CharLM.predict>`\\ \\(page\\[\\, "
-"image\\]\\)"
-msgstr ""
-":py:obj:`predict <manuscript.correctors.CharLM.predict>`\\ \\(page\\[\\, "
-"image\\]\\)"
-
-#: 0ef4972897934889ba039bfdaaa10615 2fbf0e82cf214684a2b8447e6bb0c549
-#: manuscript.correctors._charlm.CharLM.predict:2
-#: manuscript.correctors._charlm.CharLM:77:<autosummary>:1 of
+#: e61ecd9d8e9746829ea1591635c2a020 manuscript.correctors._charlm.CharLM.predict:2 of
 msgid "Apply character-level correction to a Page."
-msgstr "Применить символьное исправление к странице Page."
+msgstr "Исправляет ошибки в тексте страницы Page."
 
-#: 85e8af42c9124737ae84bb52e7a9e2b9
-#: manuscript.correctors._charlm.CharLM:77:<autosummary>:1 of
-msgid ""
-":py:obj:`runtime_providers "
-"<manuscript.correctors.CharLM.runtime_providers>`\\ \\(\\)"
-msgstr ""
-":py:obj:`runtime_providers "
-"<manuscript.correctors.CharLM.runtime_providers>`\\ \\(\\)"
-
-#: a77f6527aee846deb155db18361110ca
-#: manuscript.correctors._charlm.CharLM:77:<autosummary>:1 of
-msgid "Get ONNX Runtime execution providers based on device."
-msgstr "Получение провайдеров выполнения ONNX Runtime в зависимости от устройства."
-
-#: e038417a6e9643f8b6aee74222e43c2c
-#: manuscript.correctors._charlm.CharLM:77:<autosummary>:1 of
-msgid ""
-":py:obj:`train <manuscript.correctors.CharLM.train>`\\ \\(\\[words\\_path\\,"
-" text\\_path\\, pairs\\_path\\, ...\\]\\)"
-msgstr ""
-":py:obj:`train <manuscript.correctors.CharLM.train>`\\ \\(\\[words\\_path\\,"
-" text\\_path\\, pairs\\_path\\, ...\\]\\)"
-
-#: 5dfbd52e747b4e168d7023aafe9cad75 ab39b7a1bacb4937b49ec69b423001a6
-#: manuscript.correctors._charlm.CharLM.train:2
-#: manuscript.correctors._charlm.CharLM:77:<autosummary>:1 of
-msgid "Train CharLM character-level language model."
-msgstr "Обучить символьную языковую модель CharLM."
-
-#: 0bcb2f5cc7854810a24e79daf99391a5 manuscript.correctors._charlm.CharLM.predict:5
-#: of
+#: 3b4abaae3338462a9d6cc1f4843f997e manuscript.correctors._charlm.CharLM.predict:5 of
 msgid "Input Page object with recognized text."
 msgstr "Входной объект Page с распознанным текстом."
 
-#: 7d4de4fc67a2426bb139535ec2323455 manuscript.correctors._charlm.CharLM.predict:8
-#: of
+#: 937326af2301462b901fdcc93cde3d88 manuscript.correctors._charlm.CharLM.predict:8 of
 msgid ""
-"Optional source image associated with ``page``. Reserved for integrations "
-"that may pass the original image to correctors. ``CharLM`` does not use this"
-" argument."
+"Optional source image associated with ``page``. Reserved for integrations that may pass the "
+"original image to correctors. ``CharLM`` does not use this argument."
 msgstr ""
-"Необязательное исходное изображение, связанное с ``page``. Зарезервировано "
-"для интеграций, которые могут передавать оригинальное изображение "
-"корректорам. ``CharLM`` не использует этот аргумент."
+"Исходное изображение страницы ``page``. Аргумент предусмотрен для совместимости с другими "
+"компонентами; ``CharLM`` его не использует."
 
-#: 5fa789f441174e73b5e726646d9b237a 9ea76bf2a7e347cd856a4825e55a0701
-#: api/correctors.rst
+#: ../../api/correctors.rst 7b5911013d4e4dfa833b0b4f7bec18d0 ecfd4e729cac43d6aca79d8c34efc6b6
 msgid "Returns"
 msgstr "Возвращает"
 
-#: f8ad2d3fe8214cb08e6610d92f4cd405
-#: manuscript.correctors._charlm.CharLM.predict:13 of
-msgid "Corrected Page object with updated text-span texts."
-msgstr "Исправленный объект Page с обновлёнными текстами text span-ов."
+#: 086950b4ca9445bb80411ab383c29f5d manuscript.correctors._charlm.CharLM.predict:13 of
+msgid "Page copy with corrected text at the selected levels."
+msgstr "Копия Page с исправленным текстом на выбранных уровнях."
 
-#: 6e699e4347574f74970a9aa99fa3803e api/correctors.rst
-#: b68ad453a10843ab83fa02a7c6bc99b8 f70f3b45ccde4bc986128b9b84d55e2d
+#: ../../api/correctors.rst 11e583c658574cf8adfba97a4a7cd78c a41f233c8ba242068fe260f3165b4559
+#: f7a7fda0915045d2b0945735f5af6531
 msgid "Return type"
 msgstr "Тип возвращаемого значения"
 
-#: 8957a185e28f492cb10a880dd20fd9ed manuscript.correctors._charlm.CharLM.train:5
-#: of
+#: 9e8b14ee53ce4f199b9ae9d1ebedb04b manuscript.correctors._charlm.CharLM.train:2 of
+msgid "Train CharLM character-level language model."
+msgstr "Обучить символьную языковую модель CharLM."
+
+#: 0affde080b5948b4bfe14128451fe64d manuscript.correctors._charlm.CharLM.train:5 of
 msgid "Path to words file (one word per line)."
 msgstr "Путь к файлу слов (одно слово на строку)."
 
-#: 136896f701ad4ccea293990cf924f5d6 manuscript.correctors._charlm.CharLM.train:8
-#: of
+#: 099221ead1a04f3c9f49b119d317ba0b manuscript.correctors._charlm.CharLM.train:8 of
 msgid "Path to text file for n-gram dataset."
 msgstr "Путь к текстовому файлу для n-граммового датасета."
 
-#: 99b85f8055fe4db195fecc7cd1b955b2 manuscript.correctors._charlm.CharLM.train:11
-#: of
+#: f015e4a6df584ef39bff829ed76ec9ff manuscript.correctors._charlm.CharLM.train:11 of
 msgid "Path to CSV file with incorrect/correct pairs."
-msgstr "Путь к CSV-файлу с парами неправильный/правильный."
+msgstr "Путь к CSV-файлу с парами ошибочных и правильных слов."
 
-#: 0c13010f7f564bfb89e0c609b972d319 manuscript.correctors._charlm.CharLM.train:14
-#: of
+#: a63ffa19045d483db5feb3bcffaaf136 manuscript.correctors._charlm.CharLM.train:14 of
 msgid "Path to charset file (allowed characters)."
-msgstr "Путь к файлу набора символов (допустимые символы)."
+msgstr "Путь к файлу с допустимыми символами."
 
-#: 4501f2c9309b4fc99edba2ea40500f64 manuscript.correctors._charlm.CharLM.train:17
-#: of
+#: 4f150a8178c446d8b4014f046f2449bc manuscript.correctors._charlm.CharLM.train:17 of
 msgid "Experiment directory. Default is \"exp_charlm\"."
-msgstr "Директория эксперимента. По умолчанию \"exp_charlm\"."
+msgstr "Каталог эксперимента. По умолчанию \"exp_charlm\"."
 
-#: 441f6eaa42414de18e8e1567286c6b6f manuscript.correctors._charlm.CharLM.train:20
-#: of
+#: 15352fb33ca643a6ac4fd7a518056ec8 manuscript.correctors._charlm.CharLM.train:20 of
 msgid "Maximum words to use from words file. Default is 1_500_000."
 msgstr "Максимальное количество слов из файла. По умолчанию 1_500_000."
 
-#: 288165caab7b43a98aa33745cdbb3721 manuscript.correctors._charlm.CharLM.train:23
-#: of
+#: c408eb3043ea46418c606ed748f48b4b manuscript.correctors._charlm.CharLM.train:23 of
 msgid "Maximum number of character edits in pairs to include. Default is 3."
 msgstr "Максимальное количество символьных правок в парах. По умолчанию 3."
 
-#: dbc61fa4b0234fa3a41bc2fd9440dc9f ff520861f52f4dfd9dd40f6d6cc4f515
-#: manuscript.correctors._charlm.CharLM.export:14
-#: manuscript.correctors._charlm.CharLM.train:26 of
+#: 66ae994ccfc9427fbe0b8f745a2a6c8c 882045c64d0b428dbc7293bf707e32c4
+#: manuscript.correctors._charlm.CharLM.export:14 manuscript.correctors._charlm.CharLM.train:26 of
 msgid "Maximum sequence length. Default is 32."
 msgstr "Максимальная длина последовательности. По умолчанию 32."
 
-#: 036c55c25e14477690bc0064c4c8ffe3 6d0ce59589064c52bf3cd488a8ef3ba4
-#: manuscript.correctors._charlm.CharLM.export:17
-#: manuscript.correctors._charlm.CharLM.train:29 of
+#: 4ab07d793979415a886e808086107809 fe36b6ec53694a66ba555cab344a907b
+#: manuscript.correctors._charlm.CharLM.export:17 manuscript.correctors._charlm.CharLM.train:29 of
 msgid "Embedding size. Default is 192."
 msgstr "Размер эмбеддингов. По умолчанию 192."
 
-#: 07d1c588d555441d86f852d29ca485ca 7ecc3d30017c4cddb2a9ad82875ca6fc
-#: manuscript.correctors._charlm.CharLM.export:20
-#: manuscript.correctors._charlm.CharLM.train:32 of
+#: 154890fc1d4c4f088da582306597e6eb 9a575b34573a476f8109fe37c4cbdae3
+#: manuscript.correctors._charlm.CharLM.export:20 manuscript.correctors._charlm.CharLM.train:32 of
 msgid "Number of transformer layers. Default is 8."
 msgstr "Количество слоёв трансформера. По умолчанию 8."
 
-#: a28765c811e043d5aa179bb48aa25eec fbb284132fdc4ae8ad41b0ddf295ae0d
-#: manuscript.correctors._charlm.CharLM.export:23
-#: manuscript.correctors._charlm.CharLM.train:35 of
+#: 50f3bf038c564f9f887b7f4cfaf4101e a225889d0b33424983947e2da3076679
+#: manuscript.correctors._charlm.CharLM.export:23 manuscript.correctors._charlm.CharLM.train:35 of
 msgid "Number of attention heads. Default is 6."
 msgstr "Количество голов внимания. По умолчанию 6."
 
-#: 240a54a0f5e447dab781b4901c0106c8 e8c9ca8ec23c4047b9406821419f5655
-#: manuscript.correctors._charlm.CharLM.export:26
-#: manuscript.correctors._charlm.CharLM.train:38 of
+#: 9afece7f72f64e43af87c1ad0e7623a6 f12a325723b14deeb373752465064fb5
+#: manuscript.correctors._charlm.CharLM.export:26 manuscript.correctors._charlm.CharLM.train:38 of
 msgid "Feed-forward network size. Default is 1024."
 msgstr "Размер feed-forward сети. По умолчанию 1024."
 
-#: 569bac59bf8345d38e4e4bade559e48c manuscript.correctors._charlm.CharLM.train:41
-#: of
+#: 21802189e4c1483b8a1fb8708e33c515 manuscript.correctors._charlm.CharLM.train:41 of
 msgid "Dropout rate. Default is 0.1."
 msgstr "Коэффициент dropout. По умолчанию 0.1."
 
-#: 1eebed1a6c6349cdb7d17e1cf24cdb32 manuscript.correctors._charlm.CharLM.train:44
-#: of
+#: dd3c9026752e4e969be83786d844d0ca manuscript.correctors._charlm.CharLM.train:44 of
 msgid "Batch size. Default is 256."
 msgstr "Размер батча. По умолчанию 256."
 
-#: c75ba3ba048743a5b5290858685be5fe manuscript.correctors._charlm.CharLM.train:47
-#: of
+#: 106ab67e29714619a54df1f9d4123864 manuscript.correctors._charlm.CharLM.train:47 of
 msgid "Gradient accumulation steps. Default is 2."
 msgstr "Шаги накопления градиента. По умолчанию 2."
 
-#: f310c3515d824f21979833e254081fde manuscript.correctors._charlm.CharLM.train:50
-#: of
+#: 3be29961778f4f50a39da0c894a7f683 manuscript.correctors._charlm.CharLM.train:50 of
 msgid "Use automatic mixed precision (AMP). Default is True."
 msgstr "Использовать автоматическую смешанную точность (AMP). По умолчанию True."
 
-#: 42ba176895c74291b5d6b413efc6e49e manuscript.correctors._charlm.CharLM.train:53
-#: of
+#: 35a8c3e44dac4ff785c833fd922bbeba manuscript.correctors._charlm.CharLM.train:53 of
 msgid "Use torch.compile for faster training. Default is False."
 msgstr "Использовать torch.compile для ускорения обучения. По умолчанию False."
 
-#: ce8039a898594c8da3570608baf8c05c manuscript.correctors._charlm.CharLM.train:56
-#: of
+#: f263dd9ca102454c8af71416950c5b2e manuscript.correctors._charlm.CharLM.train:56 of
 msgid "Number of epochs. Default is 50."
 msgstr "Количество эпох. По умолчанию 50."
 
-#: 9611d720c86943c79f5fc5fa621f9a41 manuscript.correctors._charlm.CharLM.train:59
-#: of
+#: 70b3182b2d524e4f82ab7a4ef3131373 manuscript.correctors._charlm.CharLM.train:59 of
 msgid "Learning rate. Default is 1e-3."
 msgstr "Скорость обучения. По умолчанию 1e-3."
 
-#: 03c198cba11f4677aa4a2fe5bf42584d manuscript.correctors._charlm.CharLM.train:62
-#: of
+#: 193a83c4d35745c78ec6b431fd3fa630 manuscript.correctors._charlm.CharLM.train:62 of
 msgid "Weight decay. Default is 0.01."
-msgstr "Затухание весов. По умолчанию 0.01."
+msgstr "Коэффициент регуляризации весов (weight decay). По умолчанию 0.01."
 
-#: f45b0f17732a4215b57e51e851e41b06 manuscript.correctors._charlm.CharLM.train:65
-#: of
+#: e1633c74ef4241dfa94cbb71b27a4248 manuscript.correctors._charlm.CharLM.train:65 of
 msgid "Gradient clipping. Default is 1.0."
 msgstr "Отсечение градиента. По умолчанию 1.0."
 
-#: 2ac694032e3746689b3f5fbb47713fd9 manuscript.correctors._charlm.CharLM.train:68
-#: of
+#: 10ec4ac8b1a44e5a8a3d2b7ec71af3f7 manuscript.correctors._charlm.CharLM.train:68 of
 msgid "Minimum word length. Default is 3."
 msgstr "Минимальная длина слова. По умолчанию 3."
 
-#: e10031eb1d0c4f34ab0d95074fbb4784 manuscript.correctors._charlm.CharLM.train:71
-#: of
+#: 13c7646d6bef4aca9c41cd93b786471e manuscript.correctors._charlm.CharLM.train:71 of
 msgid "Probability of using span masking. Default is 0.3."
-msgstr "Вероятность использования span masking. По умолчанию 0.3."
+msgstr "Вероятность маскирования фрагментов текста (span masking). По умолчанию 0.3."
 
-#: 0ea43a4d81f845afb8650b18e2922774 manuscript.correctors._charlm.CharLM.train:74
-#: of
+#: 1f91c281a583465688482f7ad94b5c35 manuscript.correctors._charlm.CharLM.train:74 of
 msgid "Minimum span length for masking. Default is 1."
-msgstr "Минимальная длина span для маскирования. По умолчанию 1."
+msgstr "Минимальная длина маскируемого фрагмента. По умолчанию 1."
 
-#: 09f1411521f74d939b1c67a038cef195 manuscript.correctors._charlm.CharLM.train:77
-#: of
+#: 9958a64aa30d4c17b53c1e6a8c6b3cab manuscript.correctors._charlm.CharLM.train:77 of
 msgid "Maximum span length for masking. Default is 3."
-msgstr "Максимальная длина span для маскирования. По умолчанию 3."
+msgstr "Максимальная длина маскируемого фрагмента. По умолчанию 3."
 
-#: 5a715bba73be413cb5dc9fca5e22c50b manuscript.correctors._charlm.CharLM.train:80
-#: of
+#: 01b99fa9c3cd4d049f7749ddf77d374f manuscript.correctors._charlm.CharLM.train:80 of
 msgid "Minimum number of spans. Default is 1."
-msgstr "Минимальное количество span. По умолчанию 1."
+msgstr "Минимальное число маскируемых фрагментов. По умолчанию 1."
 
-#: 3932e0a68aab4aef87b3d6d407a1ec0d manuscript.correctors._charlm.CharLM.train:83
-#: of
+#: c17aad1580fa446dbe12554feb1a948a manuscript.correctors._charlm.CharLM.train:83 of
 msgid "Maximum number of spans. Default is 2."
-msgstr "Максимальное количество span. По умолчанию 2."
+msgstr "Максимальное число маскируемых фрагментов. По умолчанию 2."
 
-#: 66a761627467430b9e2f950be66b6e87 manuscript.correctors._charlm.CharLM.train:86
-#: of
-msgid ""
-"Ratio of OCR pairs in mixed dataset (0.8 = 80% pairs, 20% ngrams). Default "
-"is 0.8."
-msgstr ""
-"Соотношение OCR-пар в смешанном датасете (0.8 = 80% пар, 20% n-грамм). По "
-"умолчанию 0.8."
+#: 5a7011d4eff34a539fab5a38a706e22d manuscript.correctors._charlm.CharLM.train:86 of
+msgid "Ratio of OCR pairs in mixed dataset (0.8 = 80% pairs, 20% ngrams). Default is 0.8."
+msgstr "Соотношение OCR-пар в смешанном датасете (0.8 = 80% пар, 20% n-грамм). По умолчанию 0.8."
 
-#: a15023552f0045f8bb7569ba74c771b7 manuscript.correctors._charlm.CharLM.train:89
-#: of
+#: 2ab0d64c246f4abc966027d28f75365b manuscript.correctors._charlm.CharLM.train:89 of
 msgid "Evaluation set ratio. Default is 0.01."
 msgstr "Доля валидационного набора. По умолчанию 0.01."
 
-#: efdd06eaaa4c41398171a998442101b0 manuscript.correctors._charlm.CharLM.train:92
-#: of
+#: 1e400c2c5a574e6796f65d3462662378 manuscript.correctors._charlm.CharLM.train:92 of
 msgid "Random seed. Default is 42."
-msgstr "Случайное зерно. По умолчанию 42."
+msgstr "Начальное состояние генераторов случайных чисел (seed). По умолчанию 42."
 
-#: 7d4db7004df34cb29c824a42c139a659 manuscript.correctors._charlm.CharLM.train:95
-#: of
+#: 812c1b9f5b4046faa474d85211300f46 manuscript.correctors._charlm.CharLM.train:95 of
 msgid "Path to checkpoint to resume from."
 msgstr "Путь к чекпоинту для продолжения обучения."
 
-#: 0c19d02f02ed47ccb7afe9ffebbcf74f manuscript.correctors._charlm.CharLM.train:98
-#: of
+#: 4cd149933fa54aaab01a00977a803c62 manuscript.correctors._charlm.CharLM.train:98 of
 msgid "Additional config options."
-msgstr "Дополнительные опции конфигурации."
+msgstr "Дополнительные параметры конфигурации."
 
-#: 653f7bab8da74840a69ebaeca85fe77e manuscript.correctors._charlm.CharLM.train:100
-#: of
+#: 6e602aad495d4d6c9c765986eae93204 manuscript.correctors._charlm.CharLM.train:100 of
 msgid ""
-"Path to the final checkpoint. After training, CharLM also attempts to export"
-" the final checkpoint to ONNX in ``exp_dir``."
+"Path to the final checkpoint. After training, CharLM also attempts to export the final checkpoint"
+" to ONNX in ``exp_dir``."
 msgstr ""
-"Путь к финальному чекпоинту. После обучения CharLM также пытается "
-"экспортировать финальный чекпоинт в ONNX в директорию ``exp_dir``."
+"Путь к финальному чекпоинту. После обучения CharLM также пытается экспортировать финальный "
+"чекпоинт в ONNX в каталог ``exp_dir``."
 
-#: 199a730935c24f7c8a347be9a838c7c9 manuscript.correctors._charlm.CharLM.export:5
-#: of
+#: 1caa313ef3db48c4aee6143f1fa6a1c1 manuscript.correctors._charlm.CharLM.export:2 of
+msgid "Export CharLM PyTorch model to ONNX format."
+msgstr "Экспорт модели CharLM из PyTorch в формат ONNX."
+
+#: 778b7a80b6af4a7291c88b6bd910a5f1 manuscript.correctors._charlm.CharLM.export:5 of
 msgid "Path to PyTorch checkpoint (.pt file)."
 msgstr "Путь к чекпоинту PyTorch (.pt файл)."
 
-#: ee84c5422ff44bdd9bedfac8f1065e76 manuscript.correctors._charlm.CharLM.export:8
-#: of
+#: 3265d3a408014e02924ed45cb0d63d26 manuscript.correctors._charlm.CharLM.export:8 of
 msgid "Path to vocabulary JSON file."
 msgstr "Путь к JSON-файлу словаря."
 
-#: 5db127023fca402890c42ea56b58f45b manuscript.correctors._charlm.CharLM.export:11
-#: of
+#: 30ca0bf57eca4dbfb80c2117ed03e59a manuscript.correctors._charlm.CharLM.export:11 of
 msgid "Path to save ONNX model."
 msgstr "Путь для сохранения модели ONNX."
 
-#: 92b5d656ccf4445f9d96bd4ac503bc8f manuscript.correctors._charlm.CharLM.export:29
-#: of
+#: 850e4d7267fd44f993933bc18dd0d7db manuscript.correctors._charlm.CharLM.export:29 of
 msgid "ONNX opset version. Default is 14."
 msgstr "Версия opset ONNX. По умолчанию 14."
 
-#: 6c61a89e9131464c9bd1b52f6ad411d0 manuscript.correctors._charlm.CharLM.export:32
-#: of
+#: dbfca17d2df64f54a19a729207c5f786 manuscript.correctors._charlm.CharLM.export:32 of
 msgid "Apply ONNX simplification. Default is True."
 msgstr "Применить упрощение ONNX. По умолчанию True."
 
-#: 11ff64d5d3b641a69399e5d725d6518a manuscript.correctors._charlm.CharLM.export:48
-#: of
+#: 9b3e709f713549718bfa7d47db36e406 manuscript.correctors._charlm.CharLM.export:48 of
 msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
 msgstr ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
-
-#: api/correctors.rst:15 e2be51ea62354d9ca9f96ea0075cc114
-msgid "Overview"
-msgstr "Обзор"
-
-#: 1b72002c3f3e4cbbb80fb8b34c88e4f1 api/correctors.rst:17
-msgid ""
-"``CharLM`` is a character-level masked language model corrector that uses a "
-"Transformer architecture to fix OCR errors. It analyzes character-level "
-"context and applies corrections based on learned patterns."
-msgstr ""
-"``CharLM`` — это символьный корректор на основе маскированной языковой "
-"модели, использующий архитектуру Transformer для исправления OCR-ошибок. "
-"Анализирует контекст на уровне символов и применяет исправления на основе "
-"выученных паттернов."
-
-#: 9ee02ed3c84146a9aca181d1212a3b43 api/correctors.rst:21
-msgid "**Key features:**"
-msgstr "**Ключевые возможности:**"
-
-#: 252dba8462c04041b57a7c19a42c5219 api/correctors.rst:23
-msgid "Character-level Transformer-based correction"
-msgstr "Исправление на символьном уровне на основе Transformer"
-
-#: 6b6ee6330a0c4f95a5b9b1f65e353082 api/correctors.rst:24
-msgid "Configurable confidence thresholds"
-msgstr "Настраиваемые пороги уверенности"
-
-#: api/correctors.rst:25 ec5022ff107a420582aa2255a2ded1c6
-msgid "Support for custom vocabularies and lexicons"
-msgstr "Поддержка пользовательских словарей и лексиконов"
-
-#: 0d1c90cca4384636a00eb6808ab6078d api/correctors.rst:26
-msgid "ONNX Runtime inference for fast correction"
-msgstr "Инференс через ONNX Runtime для быстрого исправления"
-
-#: api/correctors.rst:27 d5074664d6ad43498aa56db1b2db1ccd
-msgid "Optional lexicon filtering to preserve known words"
-msgstr "Опциональная фильтрация лексиконом для сохранения известных слов"
-
-#: 9c6347b8c2d94ab39dab7efa746ec547 api/correctors.rst:30
-msgid "Available Presets"
-msgstr "Доступные пресеты"
-
-#: api/correctors.rst:32 cedc19f81c254f56836d415f261111ab
-msgid "The following pretrained models are available:"
-msgstr "Доступны следующие предобученные модели:"
-
-#: 3d40e6355a484b3ca6bbab4b14914eaa api/correctors.rst:38
-msgid "Preset Name"
-msgstr "Имя пресета"
-
-#: 9059c66ac82146f9bc25509fefcc4c9b api/correctors.rst:39
-msgid "Description"
-msgstr "Описание"
-
-#: 82af62016c374c42860015d68b1639eb api/correctors.rst:40
-msgid "``prereform_charlm_g1``"
-msgstr "``prereform_charlm_g1``"
-
-#: api/correctors.rst:41 eadff2c9c0784990b12f29b852ba106d
-msgid "Pre-reform Russian text (default)"
-msgstr "Дореформенный русский текст (по умолчанию)"
-
-#: 071d05ec5ce24d3e9d1a6f014bb2664f api/correctors.rst:42
-msgid "``modern_charlm_g1``"
-msgstr "``modern_charlm_g1``"
-
-#: api/correctors.rst:43 fdb6c485ac134bb5a6b646eb468eb62c
-msgid "Modern Russian text"
-msgstr "Современный русский текст"
-
-#: api/correctors.rst:46 da48a291d6ee4447903b81d83e518249
-msgid "Quick Example"
-msgstr "Быстрый пример"
-
-#: 31a9a6c0a6354e9487369e6eeee49677 api/correctors.rst:48
-msgid "Use ``create_page_from_text`` to quickly test correction on text:"
-msgstr ""
-"Используйте ``create_page_from_text`` для быстрой проверки исправления "
-"текста:"
-
-#: 32a56679d06046efb89f1648a6453f3b api/correctors.rst:72
-msgid "Basic Usage"
-msgstr "Базовое использование"
-
-#: api/correctors.rst:90 fe3a86dda725418f920bdf2d21e3cf8e
-msgid "Advanced Configuration"
-msgstr "Расширенная конфигурация"
-
-#: abb37625011442078cdfa2f0cde58445 api/correctors.rst:107
-msgid "Using Custom Lexicon"
-msgstr "Использование пользовательского лексикона"
-
-#: api/correctors.rst:109 e3e7056a60ce4fb69ca7353f4d792aff
-msgid "You can provide a lexicon (word list) to prevent corrections of known words:"
-msgstr ""
-"Вы можете предоставить лексикон (список слов) для предотвращения исправления"
-" известных слов:"
-
-#: 83b0bbbef4a54f63831b81687521e2d6 api/correctors.rst:135
-msgid "Training Custom Model"
-msgstr "Обучение пользовательской модели"
-
-#: api/correctors.rst:137 eb29edef63314a9eb9609410ba57e867
-msgid "You can train CharLM on your own data:"
-msgstr "Вы можете обучить CharLM на своих данных:"
-
-#: api/correctors.rst:159 e77e1012c25246d6b98b165838597ab1
-msgid ""
-"After training, ``CharLM.train()`` also attempts to export the final "
-"checkpoint to ONNX automatically and saves it as "
-"``<exp_dir>/charlm_epoch_<epochs>.onnx``. You can still export manually to "
-"customize the output path or export settings:"
-msgstr ""
-"После обучения ``CharLM.train()`` также пытается автоматически "
-"экспортировать финальный чекпойнт в ONNX и сохраняет его как "
-"``<exp_dir>/charlm_epoch_<epochs>.onnx``. При необходимости модель можно "
-"экспортировать вручную, чтобы задать собственный путь сохранения или "
-"параметры экспорта:"
-
-#: 5e0a826fcf0b45a680db2a977f4547fe api/correctors.rst:164
-msgid "Export to ONNX"
-msgstr "Экспорт в ONNX"
-
-#~ msgid ""
-#~ "Path to ONNX model weights. Supports "
-#~ "local path, URL, or preset name. If"
-#~ " None, uses default preset."
-#~ msgstr ""
-#~ "Путь к весам модели ONNX. Поддерживает "
-#~ "локальный путь, URL или имя пресета. "
-#~ "Если None, используется пресет по "
-#~ "умолчанию."
-
-#~ msgid "Path to substitutions JSON file. If None, inferred from weights location."
-#~ msgstr "Путь к JSON-файлу замен. Если None, определяется из расположения весов."
-
-#~ msgid ""
-#~ "Minimum substitution count in training data"
-#~ " to allow correction. Default is 100."
-#~ msgstr ""
-#~ "Минимальное количество замен в обучающих "
-#~ "данных для разрешения исправления. По "
-#~ "умолчанию 100."
-
-#~ msgid "Bases: :py:class:`~manuscript.api.base.BaseModel`"
-#~ msgstr "Базовый класс: :py:class:`~manuscript.api.base.BaseModel`"
-
-#~ msgid ":py:obj:`predict <manuscript.correctors.CharLM.predict>`\\ \\(page\\)"
-#~ msgstr ":py:obj:`predict <manuscript.correctors.CharLM.predict>`\\ \\(page\\)"
-
-#~ msgid "Corrected Page object with updated word texts."
-#~ msgstr "Исправленный объект Page с обновлёнными текстами слов."
-
-#~ msgid "Path to the final checkpoint."
-#~ msgstr "Путь к финальному чекпоинту."

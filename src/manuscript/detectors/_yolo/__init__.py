@@ -39,20 +39,21 @@ class YOLO(BaseDetector):
         or oriented detections in ``cx, cy, w, h, score, class_id, angle``
         format with shape ``[N, 7]`` / ``[1, N, 7]``.
     config : dict, str or Path, optional
-        Path or identifier for model configuration YAML. Same URL schemes
-        as ``weights``. If ``None``, attempts to infer a YAML file next to
-        the weights or uses the config artifact from the model registry.
+        Dictionary, path or identifier for model configuration JSON/YAML. Same URL schemes
+        as ``weights``. If ``None``, uses the config artifact from the model
+        registry. Local weights require an explicit config.
         Required ``region_classes`` maps model class IDs to element fields,
         e.g. ``{0: {"type": "word"}, 1: {"type": "table"}}``.
         Detections are returned as flat page children; layout establishes hierarchy.
     device : str, optional
         Compute device: ``"cuda"``, ``"coreml"``, or ``"cpu"``. If None,
-        automatically selects CPU. For GPU/CoreML acceleration:
+        selects CUDA when ONNX Runtime reports GPU support, otherwise CPU. For GPU/CoreML acceleration:
 
         - CUDA (NVIDIA): ``pip install onnxruntime-gpu``
-        - CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``
+        - CoreML (Apple Silicon): included in standard macOS ONNX Runtime wheels;
+          select ``device="coreml"`` explicitly.
 
-        Default is ``None`` (CPU).
+        Default is ``None`` (automatic selection).
     score_thresh : float, optional
         Confidence threshold applied to model outputs after ONNX inference and
         before the additional containment cleanup pass. Default is ``0.1``.
@@ -62,14 +63,15 @@ class YOLO(BaseDetector):
     target_size : int or None, optional
         Square inference size used for letterbox preprocessing. Images are
         resized into ``(target_size, target_size)`` before ONNX inference.
-        If ``None``, the detector tries to read ``imgsz`` from a YAML config
-        located next to the weights or downloaded from the preset registry.
+        If ``None``, reads ``imgsz`` from the explicitly supplied config or
+        the preset's config artifact. Neighboring files are not discovered.
         Configurations without ``imgsz`` fall back to ``1280``.
     axis_aligned_output : bool, optional, deprecated
         Deprecated. If explicitly ``True``, OBB detections are converted to standard
-        axis-aligned rectangles. By default, OBB detections are returned as
-        rotated polygons via ``page`` / ``polygons`` and as
-        ``cx, cy, w, h, score, class_id, angle`` rows in ``boxes``.
+        axis-aligned rectangles in the Page. By default, Page regions retain
+        rotated polygons. With ``return_raw=True``, each entry in
+        ``detections`` retains its native ``polygon`` and a ``box`` row in
+        ``cx, cy, w, h, score, class_id, angle`` format.
         For non-OBB models this flag has no effect.
     containment_threshold : float or None, optional
         Removes a smaller box when at least this fraction of its area is
@@ -77,16 +79,6 @@ class YOLO(BaseDetector):
         contained by ``90%`` or more. Set to ``None`` to disable this extra
         cleanup. Default is ``0.9``.
 
-    Notes
-    -----
-    The class provides one main public method:
-
-    - ``predict`` - run inference on a single image and return detections.
-
-    Available presets:
-
-    - ``"yolo26s_obb_text_g1"`` - YOLO26-S OBB text detector
-    - ``"yolo26x_obb_text_g1"`` - YOLO26-X OBB text detector
     """
 
     default_weights_name = "yolo26x_obb_text_g1"
@@ -557,12 +549,20 @@ class YOLO(BaseDetector):
         img_or_path : str or pathlib.Path or numpy.ndarray
             Path to an image file or an RGB image provided as a NumPy array
             with shape ``(H, W, 3)`` in ``uint8`` format.
+        return_raw : bool, optional
+            Return a dictionary with the Page and decoded detections.
+        return_masks : bool, optional
+            Enable dictionary output. YOLO does not generate masks.
+        return_outputs : bool, optional
+            Include original named ONNX output tensors and enable dictionary output.
 
         Returns
         -------
-        Page
+        Page or dict
             Flat document tree with original image dimensions and elements
-            whose types and labels come from ``region_classes``.
+            whose types and labels come from ``region_classes``. With any
+            result flag enabled, returns ``page``, ``detections``, ``image_size``
+            and ``metadata``, plus ``outputs`` when requested.
 
         Examples
         --------

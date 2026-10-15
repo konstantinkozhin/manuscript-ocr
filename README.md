@@ -1,5 +1,5 @@
 
-<img width="2028" height="496" alt="Frame 8" src="docs\logo.png" />
+<img width="2028" height="496" alt="Frame 8" src="docs/logo.png" />
 
 # Manuscript OCR
 
@@ -23,7 +23,7 @@ pip install manuscript-ocr
 ```python
 from manuscript import Pipeline
 
-# Инициализация с моделями по умолчанию (CPU)
+# Инициализация с моделями и автоматическим выбором устройства
 pipeline = Pipeline()
 
 # Обработка изображения
@@ -43,30 +43,25 @@ print(text)
 pip uninstall onnxruntime
 
 # Установите GPU-версию
-pip install onnxruntime-gpu
+pip install "onnxruntime-gpu[cuda,cudnn]"
 ```
 
-### Для Apple Silicon (M1/M2/M3) с CoreML
+### Для Apple Silicon с CoreML
 
-```bash
-# Удалите стандартную версию
-pip uninstall onnxruntime
-
-# Установите версию для Apple Silicon
-pip install onnxruntime-silicon
-```
+Стандартный пакет `onnxruntime` для macOS включает CoreML. Дополнительная
+установка не требуется; передайте `device="coreml"` компонентам пайплайна.
 
 ### Dev-установка с обучением моделей
 
 ```bash
-pip install manuscript-ocr[dev]
+pip install "manuscript-ocr[dev]"
 ```
 
 ### Dev-установка для обучения на GPU (NVIDIA CUDA)
 
 ```bash
 # Сначала установите manuscript-ocr[dev]
-pip install manuscript-ocr[dev]
+pip install "manuscript-ocr[dev]"
 
 # Затем обновите PyTorch на GPU версию
 pip install --upgrade torch torchvision --index-url https://download.pytorch.org/whl/cu118

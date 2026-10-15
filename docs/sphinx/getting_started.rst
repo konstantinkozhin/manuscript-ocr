@@ -4,40 +4,15 @@ Getting Started
 Installation
 ------------
 
-Minimum System Requirements
-^^^^^^^^^^^^^^^^^^^^^^^^^^^
-
-- Linux (Ubuntu 20.04+), Windows 10+, or macOS 11+
-- at least 2 CPU cores
-- at least 8 GB RAM
-- 16 GB RAM or more is recommended for model training
-- NVIDIA GPU with CUDA support is recommended for acceleration
-- at least 4 GB VRAM is recommended for GPU execution
-
-CPU-only execution is supported, but performance may be significantly lower
-than on GPU. Model training currently targets CUDA-capable NVIDIA GPUs and
-falls back to CPU when CUDA is unavailable.
-
-**Basic installation** (inference only):
+Basic installation (inference only)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 .. code-block:: bash
 
     pip install manuscript-ocr
 
-**Installation with training support** (includes PyTorch):
-
-.. code-block:: bash
-
-    pip install manuscript-ocr[dev]
-
-This installs additional dependencies for model training:
-
-- PyTorch and TorchVision
-- ONNX export tools
-- Training utilities (albumentations, tensorboard, etc.)
-- Development tools (pytest, black, flake8, etc.)
-
-**GPU acceleration** (NVIDIA CUDA):
+GPU acceleration (NVIDIA CUDA)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
 If you are switching an existing installation from CPU to GPU:
 
@@ -46,7 +21,7 @@ If you are switching an existing installation from CPU to GPU:
 .. code-block:: bash
 
     pip uninstall onnxruntime
-    pip install onnxruntime-gpu
+    pip install "onnxruntime-gpu[cuda,cudnn]"
 
 2. If you are working in Jupyter Notebook, JupyterLab, VS Code notebooks, or
    Google Colab, restart the kernel or runtime after installation.
@@ -67,59 +42,6 @@ for CPU:
     recognizer = TRBA(device="cuda")
     corrector = CharLM(device="cuda")
 
-Diagnostics
-^^^^^^^^^^^
-
-If the pipeline still does not switch to GPU, first run:
-
-.. code-block:: python
-
-    import onnxruntime as ort
-
-    print(ort.get_available_providers())
-
-Case 1. ``"CUDAExecutionProvider"`` is missing
-
-Install additional CUDA/cuDNN runtime packages:
-
-.. code-block:: bash
-
-    pip install nvidia-cudnn-cu12 nvidia-cublas-cu12 nvidia-cuda-runtime-cu12 nvidia-cufft-cu12
-
-Then restart the kernel or runtime and create the ``Pipeline`` again.
-
-If ONNX Runtime appears to be installed but still behaves incorrectly in a
-notebook environment, perform a clean GPU reinstall:
-
-.. code-block:: bash
-
-    pip uninstall -y onnxruntime
-    pip install --no-cache-dir --force-reinstall onnxruntime-gpu==1.24.4
-    pip install --no-cache-dir nvidia-cudnn-cu12 nvidia-cublas-cu12 nvidia-cuda-runtime-cu12 nvidia-cufft-cu12
-
-After that, restart the kernel or runtime again and re-import ``manuscript``.
-
-Case 2. ``"CUDAExecutionProvider"`` is present, but the models still fall back to CPU
-
-In some notebook environments, ONNX Runtime may require an explicit preload
-step before importing ``manuscript``:
-
-.. code-block:: python
-
-    import onnxruntime as ort
-    ort.preload_dlls(directory="")
-
-After that, import ``manuscript`` and create the ``Pipeline`` again.
-
-**Apple Silicon acceleration** (CoreML):
-
-.. code-block:: bash
-
-    pip install manuscript-ocr
-    pip install onnxruntime-silicon
-
-Then use ``device="coreml"`` for the relevant models or pipeline components.
-
 Quick Start
 -----------
 
@@ -139,43 +61,65 @@ Basic usage example:
     text = pipeline.get_text(result["page"])
     print(text)
 
+For stage configuration, custom processors, ensembles and result handling,
+see :doc:`pipeline_usage`.
+
+.. _example-notebooks:
+
 Example Notebooks
 -----------------
 
-Current example notebooks are available in the repository ``notebooks``
-folder:
+Notebooks for version 0.1.13:
 
-- `End-to-end inference <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B8%D0%BD%D1%84%D0%B5%D1%80%D0%B5%D0%BD%D1%81%D0%B0_endtoend.ipynb>`_
-- `Pipeline with YOLO detector <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yolo.ipynb>`_
-- `Pipeline with TrOCR recognizer <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_trocr.ipynb>`_
-- `Pipeline with Yandex Speller <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_pipeline_%D1%81_yandex_speller.ipynb>`_
-- `Gradio demo launch <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%B4%D0%B5%D0%BC%D0%BE.ipynb>`_
-- `Detector training launch <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D0%B4%D0%B5%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_
-- `Recognition training launch <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D0%BD%D0%B8%D1%8F.ipynb>`_
-- `Corrector training launch <https://github.com/konstantinkozhin/manuscript-ocr/blob/main/notebooks/%D0%9F%D1%80%D0%B8%D0%BC%D0%B5%D1%80_%D0%B7%D0%B0%D0%BF%D1%83%D1%81%D0%BA%D0%B0_%D0%BE%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D1%8F_%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0.ipynb>`_
+- `Training the EAST detector <https://github.com/konstantinkozhin/manuscript-ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%9E%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B4%D0%B5%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0_EAST.ipynb>`_.
+- `Training the TRBA recognizer <https://github.com/konstantinkozhin/manuscript-ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%9E%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8F_TRBA.ipynb>`_.
+- `Integrating a custom detector into the pipeline <https://github.com/konstantinkozhin/manuscript-ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%98%D0%BD%D1%82%D0%B5%D0%B3%D1%80%D0%B0%D1%86%D0%B8%D1%8F_%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%B4%D0%B5%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0_%D0%B2_%D0%BF%D0%B0%D0%B9%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD.ipynb>`_.
+- `Integrating a custom recognizer into the pipeline <https://github.com/konstantinkozhin/manuscript-ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%98%D0%BD%D1%82%D0%B5%D0%B3%D1%80%D0%B0%D1%86%D0%B8%D1%8F_%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8F_%D0%B2_%D0%BF%D0%B0%D0%B9%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD.ipynb>`_.
+- `Integrating a custom corrector into the pipeline <https://github.com/konstantinkozhin/manuscript-ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%98%D0%BD%D1%82%D0%B5%D0%B3%D1%80%D0%B0%D1%86%D0%B8%D1%8F_%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0_%D0%B2_%D0%BF%D0%B0%D0%B9%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD.ipynb>`_.
+- `Combining models and building ensembles <https://github.com/konstantinkozhin/manuscript-ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%9E%D0%B1%D1%8A%D0%B5%D0%B4%D0%B8%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B8_%D0%B0%D0%BD%D1%81%D0%B0%D0%BC%D0%B1%D0%BB%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5_%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D0%B5%D0%B9.ipynb>`_.
+- `Exporting and using yolov8m-historical-line-segmenter <https://github.com/konstantinkozhin/manuscript-ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%AD%D0%BA%D1%81%D0%BF%D0%BE%D1%80%D1%82_%D0%B8_%D0%BF%D0%BE%D0%B4%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_yolov8m-historical-line-segmenter.ipynb>`_.
+- `Exporting and using cyrillic PP-OCRv5 mobile recognition <https://github.com/konstantinkozhin/manuscript-ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%AD%D0%BA%D1%81%D0%BF%D0%BE%D1%80%D1%82_%D0%B8_%D0%BF%D0%BE%D0%B4%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_cyrillic_PP-OCRv5_mobile_rec.ipynb>`_.
 
-Main Components
----------------
+Additional installation options
+-------------------------------
 
-- :class:`~manuscript.Pipeline` - High-level OCR pipeline
-- :class:`~manuscript.detectors.YOLO` - ONNX text detector for YOLO-family models
-- :class:`~manuscript.detectors.EAST` - Text detector
-- :class:`~manuscript.layouts.SimpleSorting` - Layout ordering model
-- :class:`~manuscript.recognizers.TRBA` - Text recognizer
-- :class:`~manuscript.correctors.CharLM` - Character-level text corrector
-- :class:`~manuscript.data.Page` - Page data structure
-- :class:`~manuscript.data.Block` - Block data structure
-- :class:`~manuscript.data.Line` - Line data structure
-- :class:`~manuscript.data.TextSpan` - Smallest OCR text region
+Apple Silicon acceleration (CoreML)
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-Model Zoo
----------
+.. code-block:: bash
 
-For the list of built-in presets and release artifacts documented for this
-documentation version, see :doc:`model_zoo`.
+    pip install manuscript-ocr
 
-Related Work
-------------
+Official macOS ``onnxruntime`` wheels include the CoreML execution provider;
+a separate ``onnxruntime-silicon`` package is not needed. Use
+``device="coreml"`` for the relevant models or pipeline components. See the
+`ONNX Runtime CoreML documentation <https://onnxruntime.ai/docs/execution-providers/CoreML-ExecutionProvider.html>`_.
 
-For publications related to the project and its manuscript OCR experiments,
-see :doc:`related_work`.
+Installation with training support
+^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
+
+.. code-block:: bash
+
+    pip install "manuscript-ocr[dev]"
+
+This installs additional dependencies for model training:
+
+- PyTorch and TorchVision
+- ONNX export tools
+- Training utilities (albumentations, tensorboard, etc.)
+- Development tools (pytest, black, flake8, etc.)
+
+Minimum System Requirements
+---------------------------
+
+- Python 3.9.2 or newer
+- Linux (Ubuntu 20.04+), Windows 10+, or macOS 11+
+- at least 2 CPU cores
+- at least 8 GB RAM
+- 16 GB RAM or more is recommended for model training
+- NVIDIA GPU with CUDA support is recommended for acceleration
+- at least 4 GB VRAM is recommended for GPU execution
+
+CPU-only execution is supported, but performance may be significantly lower
+than on GPU. Model training currently targets CUDA-capable NVIDIA GPUs and
+falls back to CPU when CUDA is unavailable.

@@ -22,22 +22,6 @@ class MajorityVotingRecognizer:
         Completion order does not change tie priority. Participants share
         the image array and must not modify it.
 
-    Notes
-    -----
-    Each response has one vote after NFC normalization, lowercasing and strip.
-    The most frequent whole string wins; ties prefer the first supporting
-    model. An absolute majority is not required. Confidence does not affect
-    selection; the normalized winner receives recognition_confidence=None.
-
-    Participant copies have text/confidence cleared before inference. None
-    abstains; an empty string votes. Regions without responses retain their
-    input values. Word, line and block regions are aggregated independently.
-
-    Returned trees are checked against the input. A violation aborts the call
-    with the model, node path and field; otherwise matching uses tree position.
-    Swaps of indistinguishable nodes cannot be detected without stable IDs.
-    In parallel mode, already running calls cannot be forcibly stopped.
-
     Examples
     --------
     >>> from manuscript import Pipeline
