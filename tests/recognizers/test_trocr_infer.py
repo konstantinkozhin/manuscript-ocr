@@ -250,7 +250,7 @@ def test_create_config_levels(tmp_path):
     config = TrOCR.create_config(source, output_path=target)
     assert config["recognition_levels"] == ["line"]
     assert "recognition_levels" not in source
-    assert json.loads(target.read_text()) == config
+    assert json.loads(target.read_text(encoding="utf-8")) == config
     assert TrOCR.create_config(config, recognition_levels=["word"])["recognition_levels"] == ["word"]
     with pytest.raises(ValueError, match="levels"):
         TrOCR.create_config(source, recognition_levels=["cell"])

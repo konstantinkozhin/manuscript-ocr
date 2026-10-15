@@ -12,7 +12,7 @@ def isolated_artifacts(tmp_path, monkeypatch):
 
     def expanduser(path):
         value = str(path)
-        if value == "~" or value.startswith("~/"):
+        if value == "~" or value.startswith(("~/", "~\\")):
             return home / value[2:] if value != "~" else home
         return original_expanduser(path)
 

@@ -220,7 +220,7 @@ def test_new_alias_integrates_with_base(tmp_path, monkeypatch):
 
 
 def test_repository_registry_valid():
-    data = m._validate(json.loads((Path(__file__).resolve().parents[2] / 'registry.json').read_text()))
+    data = m._validate(json.loads((Path(__file__).resolve().parents[2] / 'registry.json').read_text(encoding="utf-8")))
     assert 'trba_lite_g3_prt' in data['models']
     for entry in data['models'].values():
         assert entry['library_version'] is None

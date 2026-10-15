@@ -244,7 +244,7 @@ def test_create_config_defaults_to_lines_and_preserves_source(bundle, tmp_path):
     config = PPOCRRec.create_config(source, output_path=output)
     assert config["recognition_levels"] == ["line"]
     assert "recognition_levels" not in source
-    assert json.loads(output.read_text()) == config
+    assert json.loads(output.read_text(encoding="utf-8")) == config
     with pytest.raises(ValueError, match="levels"):
         PPOCRRec.create_config(source, recognition_levels=["cell"])
 
