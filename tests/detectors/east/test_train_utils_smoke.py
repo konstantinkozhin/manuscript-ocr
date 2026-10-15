@@ -158,6 +158,7 @@ class TestRunTraining:
             use_focal_geo=False,
             focal_gamma=2.0,
             log_collage=False,
+            detection_level="line",
         )
 
         exp_dir = tmp_path / "exp"
@@ -176,6 +177,8 @@ class TestRunTraining:
         assert (ckpt_dir / "last_state.pt").exists()
         assert (ckpt_dir / "best_model.onnx").exists()
         assert export_calls and export_calls[0]["weights_path"].endswith("best_loss.pth")
+        assert export_calls[0]["detection_level"] == "line"
+        assert json.loads((exp_dir / "training_config.json").read_text())["region_classes"] == {"0": {"type": "line"}}
 
     def test_run_training_resume_missing_state_raises(self, monkeypatch, tmp_path):
         _patch_runtime(monkeypatch)

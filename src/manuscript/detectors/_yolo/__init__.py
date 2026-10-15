@@ -1,17 +1,17 @@
 import warnings
+import json
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import cv2
 import numpy as np
 import onnxruntime as ort
-import yaml
 from shapely.geometry import Polygon
 
 from manuscript.api.detector import BaseDetector
 
-from ...data import Block, Line, Page, TextSpan
-from ...utils import order_quad_points, read_image
+from ...data import Page
+from ...utils import read_image
 from ...utils.geometry import (
     boxes_to_polygons, clip_polygons, polygon_areas,
     box_intersection_area, polygons_to_boxes,
@@ -38,10 +38,13 @@ class YOLO(BaseDetector):
         ``xyxy, score, class_id`` format with shape ``[N, 6]`` / ``[1, N, 6]``
         or oriented detections in ``cx, cy, w, h, score, class_id, angle``
         format with shape ``[N, 7]`` / ``[1, N, 7]``.
-    config : str or Path, optional
+    config : dict, str or Path, optional
         Path or identifier for model configuration YAML. Same URL schemes
         as ``weights``. If ``None``, attempts to infer a YAML file next to
         the weights or uses the config artifact from the model registry.
+        Required ``region_classes`` maps model class IDs to element fields,
+        e.g. ``{0: {"type": "word"}, 1: {"type": "table"}}``.
+        Detections are returned as flat page children; layout establishes hierarchy.
     device : str, optional
         Compute device: ``"cuda"``, ``"coreml"``, or ``"cpu"``. If None,
         automatically selects CPU. For GPU/CoreML acceleration:
@@ -61,7 +64,7 @@ class YOLO(BaseDetector):
         resized into ``(target_size, target_size)`` before ONNX inference.
         If ``None``, the detector tries to read ``imgsz`` from a YAML config
         located next to the weights or downloaded from the preset registry.
-        Unknown/custom weights without YAML fall back to ``1280``.
+        Configurations without ``imgsz`` fall back to ``1280``.
     axis_aligned_output : bool, optional, deprecated
         Deprecated. If explicitly ``True``, OBB detections are converted to standard
         axis-aligned rectangles. By default, OBB detections are returned as
@@ -70,7 +73,7 @@ class YOLO(BaseDetector):
         For non-OBB models this flag has no effect.
     containment_threshold : float or None, optional
         Removes a smaller box when at least this fraction of its area is
-        covered by a larger box. For example, ``0.9`` removes boxes that are
+        covered by a larger box of the same class. For example, ``0.9`` removes boxes that are
         contained by ``90%`` or more. Set to ``None`` to disable this extra
         cleanup. Default is ``0.9``.
 
@@ -92,7 +95,7 @@ class YOLO(BaseDetector):
     def __init__(
         self,
         weights: Optional[Union[str, Path]] = None,
-        config: Optional[Union[str, Path]] = None,
+        config: Optional[Union[Dict[str, Any], str, Path]] = None,
         device: Optional[str] = None,
         force_download: bool = False,
         *,
@@ -113,12 +116,15 @@ class YOLO(BaseDetector):
         self.onnx_session = None
         self.score_thresh = float(score_thresh)
         self.class_ids = None if class_ids is None else {int(v) for v in class_ids}
-        self.config_path = self._resolve_model_config(weights=weights, config=config)
+        values, self.config_path = self._load_detector_config(config)
+        self._configure_region_types(values)
         self.target_size = int(
-            self._resolve_default_target_size()
+            self._parse_imgsz(values.get("imgsz", self.default_target_size))
             if target_size is None
             else target_size
         )
+        if self.target_size <= 0:
+            raise ValueError("target_size must be positive")
         if axis_aligned_output is not None:
             warnings.warn("axis_aligned_output is deprecated; configure recognition crops instead",
                           DeprecationWarning, stacklevel=2)
@@ -130,18 +136,47 @@ class YOLO(BaseDetector):
         )
         self._output_layout = "detect"
 
-    def _resolve_default_target_size(self) -> int:
-        if self.config_path is not None:
-            return self._load_target_size_from_config(self.config_path)
-        return self.default_target_size
+    @staticmethod
+    def create_config(
+        source=None, *, imgsz=None, region_classes=None, output_path=None,
+    ) -> Dict[str, Any]:
+        """Build an inference JSON config from training YAML/JSON or explicit values.
 
-    def _resolve_model_config(
-        self,
-        weights: Optional[Union[str, Path]],
-        config: Optional[Union[str, Path]] = None,
-    ) -> Optional[str]:
-        _, path = self._load_detector_config(config, suffixes=(".yaml", ".yml"), required=False)
-        return path
+        Only input size and class mapping are retained. Class 0 defaults to
+        words; provide ``region_classes`` for other models. Returns a dictionary
+        usable as ``YOLO(config=...)`` and optionally saves it to ``output_path``.
+
+        Example::
+
+            YOLO.create_config("args.yaml", output_path="model.json")
+            YOLO.create_config(imgsz=1024,
+                               region_classes={0: {"type": "line"}})
+        """
+        if source is None:
+            values = {}
+        elif isinstance(source, dict):
+            values = source
+        else:
+            with open(source, encoding="utf-8") as stream:
+                if Path(source).suffix.lower() in (".yaml", ".yml"):
+                    import yaml
+                    values = yaml.safe_load(stream)
+                else:
+                    values = json.load(stream)
+        if not isinstance(values, dict):
+            raise ValueError("YOLO configuration source must be an object")
+        size = YOLO._parse_imgsz(
+            imgsz if imgsz is not None else values.get("imgsz", YOLO.default_target_size))
+        if size <= 0:
+            raise ValueError("imgsz must be positive")
+        mapping = region_classes if region_classes is not None else values.get(
+            "region_classes", {0: {"type": "word"}})
+        mapping = BaseDetector._validate_region_types({"region_classes": mapping})
+        config = {"imgsz": size, "region_classes": {str(key): fields for key, fields in mapping.items()}}
+        if output_path is not None:
+            Path(output_path).write_text(
+                json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        return config
 
     @staticmethod
     def _parse_imgsz(value: Any) -> int:
@@ -170,20 +205,6 @@ class YOLO(BaseDetector):
             )
 
         raise ValueError(f"imgsz must be an integer or square pair, got: {value!r}")
-
-    def _load_target_size_from_config(self, config_path: Union[str, Path]) -> int:
-        with open(config_path, "r", encoding="utf-8") as f:
-            config = yaml.safe_load(f) or {}
-
-        if not isinstance(config, dict):
-            raise ValueError(
-                f"YOLO config must be a mapping, got: {type(config).__name__}"
-            )
-
-        if "imgsz" not in config:
-            raise ValueError(f"YOLO config does not define imgsz: {config_path}")
-
-        return self._parse_imgsz(config["imgsz"])
 
     def _initialize_session(self):
         if self.onnx_session is not None:
@@ -347,11 +368,12 @@ class YOLO(BaseDetector):
         pt2 = ctr + vec1 - vec2
         pt3 = ctr - vec1 - vec2
         pt4 = ctr - vec1 + vec2
-        polygons = np.stack([pt1, pt2, pt3, pt4], axis=1).astype(np.float32)
-        return np.stack(
-            [order_quad_points(polygon) for polygon in polygons],
-            axis=0,
-        ).astype(np.float32)
+        # Corners are already cyclic. Rotate their sequence without independently
+        # selecting extrema, which can select the same corner twice at 45 degrees.
+        polygons = np.stack([pt3, pt2, pt1, pt4], axis=1).astype(np.float32)
+        starts = polygons.sum(axis=2).argmin(axis=1)
+        indices = (starts[:, None] + np.arange(4)) % 4
+        return np.take_along_axis(polygons, indices[:, :, None], axis=1)
 
 
     @staticmethod
@@ -434,6 +456,7 @@ class YOLO(BaseDetector):
             return rows, polygons
 
         rows = self._scale_boxes(rows, image_hw=image_hw, ratio=ratio, pad=pad)
+        rows = rows[(rows[:, 2] > rows[:, 0]) & (rows[:, 3] > rows[:, 1])]
         rows = self._suppress_contained_boxes(rows)
         rows[:, 4] = np.clip(rows[:, 4], 0.0, 1.0)
         return rows, boxes_to_polygons(rows)
@@ -461,6 +484,8 @@ class YOLO(BaseDetector):
 
             for inner_idx in area_order[outer_pos + 1 :]:
                 if not keep[inner_idx]:
+                    continue
+                if boxes[outer_idx, 5] != boxes[inner_idx, 5]:
                     continue
 
                 inner_area = areas[inner_idx]
@@ -505,6 +530,8 @@ class YOLO(BaseDetector):
             for inner_idx in area_order[outer_pos + 1 :]:
                 if not keep[inner_idx]:
                     continue
+                if rows[outer_idx, 5] != rows[inner_idx, 5]:
+                    continue
 
                 inner_area = areas[inner_idx]
                 if outer_area <= inner_area:
@@ -515,14 +542,6 @@ class YOLO(BaseDetector):
                     keep[inner_idx] = False
 
         return rows[keep], polygons[keep]
-
-    def _polygons_to_page(
-        self,
-        polygons: np.ndarray,
-        scores: np.ndarray,
-    ) -> Page:
-        return self._page_from_regions(polygons, scores, ordered=True)
-
 
     def predict(
         self,
@@ -542,8 +561,8 @@ class YOLO(BaseDetector):
         Returns
         -------
         Page
-            Parsed detection result as a Page object containing a single
-            Block with a single Line of TextSpan objects.
+            Flat document tree with original image dimensions and elements
+            whose types and labels come from ``region_classes``.
 
         Examples
         --------
@@ -552,8 +571,7 @@ class YOLO(BaseDetector):
         >>> from manuscript.detectors import YOLO
         >>> model = YOLO(weights="yolo26x_obb_text_g1")
         >>> page = model.predict("page.jpg")
-        >>> first_text_span = page.blocks[0].lines[0].text_spans[0]
-        >>> print(first_text_span.detection_confidence)
+        >>> print(page.children[0].detection_confidence)
         """
         if self.onnx_session is None:
             self._initialize_session()
@@ -574,7 +592,7 @@ class YOLO(BaseDetector):
         page_polygons = polygons
         if self._output_layout == "obb" and self.axis_aligned_output:
             page_polygons = boxes_to_polygons(polygons_to_boxes(polygons))
-        page = self._polygons_to_page(page_polygons, boxes[:, 4])
+        page = self._tree_from_regions(page_polygons, boxes[:, 4], boxes[:, 5], image.shape[:2])
         if return_raw or return_masks or return_outputs:
             detections = []
             for row, polygon in zip(boxes, polygons):

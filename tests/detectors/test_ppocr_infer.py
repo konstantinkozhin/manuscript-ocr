@@ -14,6 +14,7 @@ from manuscript.detectors._ppocr import PPOCR
 @pytest.fixture
 def config():
     return {
+        "region_classes": {"0": {"type": "line"}},
         "schema_version": 1, "task": "text_detection", "algorithm": "DB",
         "preprocess": {
             "color_order": "BGR", "scale": 1 / 255,
@@ -39,7 +40,7 @@ def test_sidecar_normalization_and_constructor_overrides(weights, config):
     config["preprocess"].update(limit_type="min", limit_side_len=64)
     config["postprocess"].update(threshold=0.2, box_threshold=0.4)
     weights.with_suffix(".json").write_text(json.dumps(config))
-    model = PPOCR(weights, box_threshold=0.5)
+    model = PPOCR(weights, config=weights.with_suffix(".json"), box_threshold=0.5)
     assert isinstance(model, BaseDetector)
     assert model._resize_shape(32, 48) == (64, 96)
     image = np.full((32, 48, 3), [255, 128, 0], dtype=np.uint8)
@@ -73,15 +74,15 @@ def test_predict_uses_graph_names_precision_and_fixed_shape(weights, monkeypatch
             return [result]
 
     monkeypatch.setattr("manuscript.detectors._ppocr.ort.InferenceSession", lambda *a, **kw: Session())
-    model = PPOCR(weights, unclip_ratio=0)
+    model = PPOCR(weights, config=weights.with_suffix(".json"), unclip_ratio=0)
     page = model.predict(np.zeros((128, 192, 3), np.uint8))
     assert isinstance(page, Page)
-    spans = page.blocks[0].lines[0].text_spans
+    spans = page.children
     assert len(spans) == 1
     assert spans[0].detection_confidence == pytest.approx(0.9)
     np.testing.assert_allclose(spans[0].polygon, [[40, 32], [136, 32], [136, 76], [40, 76]])
     raw = model.predict(np.zeros((128, 192, 3), np.uint8), return_raw=True, return_outputs=True)
-    assert raw["page"] == page
+    assert raw["page"].to_tree_dict() == page.to_tree_dict()
     assert raw["outputs"]["maps"].shape == (1, 1, 32, 48)
     assert len(raw["detections"]) == 1
     assert raw["image_size"] == {"height": 128, "width": 192}
@@ -97,33 +98,33 @@ def test_predict_uses_graph_names_precision_and_fixed_shape(weights, monkeypatch
     pipeline_page = Pipeline(detector=model, layout=None, recognizer=None).predict(
         np.zeros((128, 192, 3), np.uint8)
     )["page"]
-    assert len(pipeline_page.blocks[0].lines[0].text_spans) == 1
+    assert len(pipeline_page.children) == 1
 
 
 def test_db_score_filtering_unclip_and_polygon_mode(weights):
     maps = np.zeros((1, 1, 64, 96), np.float32)
     maps[0, 0, 12:26, 20:70] = 0.9
     maps[0, 0, 40:50, 5:20] = 0.4
-    model = PPOCR(weights, box_threshold=0.6, unclip_ratio=1.5)
+    model = PPOCR(weights, config=weights.with_suffix(".json"), box_threshold=0.6, unclip_ratio=1.5)
     page = model._postprocess(maps, (128, 192))
-    spans = page.blocks[0].lines[0].text_spans
+    spans = page.children
     assert len(spans) == 1
     assert min(x for x, _ in spans[0].polygon) < 40
     assert max(x for x, _ in spans[0].polygon) > 138
-    poly = model._postprocess(maps, (128, 192)).blocks[0].lines[0].text_spans[0].polygon
+    poly = model._postprocess(maps, (128, 192)).children[0].polygon
     assert len(poly) > 4
     assert all(0 <= x <= 192 and 0 <= y <= 128 for x, y in poly)
 
 
 def test_empty_output_and_invalid_maps(weights):
-    model = PPOCR(weights)
-    assert model._postprocess(np.zeros((1, 1, 64, 64)), (64, 64)).blocks[0].lines[0].text_spans == []
+    model = PPOCR(weights, config=weights.with_suffix(".json"))
+    assert model._postprocess(np.zeros((1, 1, 64, 64)), (64, 64)).children == ()
     for value in [np.ones((2, 1, 64, 64)), np.full((64, 64), np.nan), np.full((64, 64), 2.0)]:
         with pytest.raises(ValueError):
             model._postprocess(value, (64, 64))
     model.postprocess["output_is_logits"] = True
     result = model._postprocess(np.full((64, 64), -10.0), (64, 64))
-    assert result.blocks[0].lines[0].text_spans == []
+    assert result.children == ()
 
 
 @pytest.mark.parametrize("invalid", [
@@ -203,7 +204,63 @@ def test_overrides_do_not_mutate_config(weights, config):
 def test_exactly_45_degree_regions_keep_four_distinct_vertices(weights):
     maps = np.zeros((64, 64), np.float32)
     cv2.fillPoly(maps, [np.array([[32, 8], [56, 32], [32, 56], [8, 32]], np.int32)], 0.9)
-    model = PPOCR(weights, unclip_ratio=0)
-    spans = model._postprocess(maps, (64, 64)).blocks[0].lines[0].text_spans
+    model = PPOCR(weights, config=weights.with_suffix(".json"), unclip_ratio=0)
+    spans = model._postprocess(maps, (64, 64)).children
     assert len(spans) == 1
     assert len(set(spans[0].polygon)) == 4
+
+
+def test_create_config_preserves_inference_settings_and_changes_level(tmp_path,config):
+    original=json.loads(json.dumps(config))
+    output=tmp_path/'config.json'
+    result=PPOCR.create_config(config,region_classes={0:{'type':'word'}},output_path=output)
+    assert result['region_classes']=={'0':{'type':'word'}}
+    assert 'box_type' not in result['postprocess']
+    assert result['preprocess']==original['preprocess']
+    assert config==original
+    assert PPOCR.create_config(output)==result
+    with pytest.raises(ValueError,match='foreground class 0'):
+        PPOCR.create_config(config,region_classes={1:{'type':'line'}})
+
+
+def test_db_tree_polygon_and_raw_class(weights):
+    model=PPOCR(weights, config=weights.with_suffix(".json"))
+    maps=np.zeros((1,1,64,64),np.float32);maps[0,0,10:30,10:50]=.9
+    raw=model._postprocess(maps,(128,128),return_raw=True)
+    page=raw['page']
+    assert page.image_width==128 and page.image_height==128
+    assert page.children[0].type=='line'
+    assert page.children[0].parent is page
+    assert raw['detections'][0]['class_id']==0
+    assert raw['detections'][0]['polygon']==[list(p) for p in page.children[0].polygon]
+    assert len(page.children[0].polygon)>4
+    assert Page.from_tree_dict(page.to_tree_dict()).to_dict()==page.to_dict()
+
+
+def test_pixel_contour_with_retraced_spur_is_not_discarded(weights, monkeypatch):
+    # A one-pixel appendage can cause cv2 to retrace an edge, making the
+    # raw contour invalid for Shapely even though the text area is usable.
+    contour = np.array([[20, 20], [70, 20], [70, 40], [45, 40],
+                        [45, 45], [45, 40], [20, 40]], np.int32)[:, None, :]
+    monkeypatch.setattr(cv2, "findContours", lambda *args: ([contour], None))
+    model = PPOCR(weights, config=weights.with_suffix(".json"))
+    page = model._postprocess(np.full((1, 1, 80, 100), 0.9, np.float32), (80, 100))
+    assert len(page.children) == 1
+    from shapely.geometry import Polygon
+    polygon = np.asarray(page.children[0].polygon)
+    assert Polygon(polygon).is_valid
+    assert np.any(polygon != np.rint(polygon))
+    assert page.children[0].detection_confidence == pytest.approx(0.9)
+
+
+def test_empty_contour_repair_falls_back_to_rectangle(weights, monkeypatch):
+    from shapely.geometry import Polygon
+    contour = np.array([[20, 20], [70, 20], [70, 40], [20, 40],
+                        [70, 40], [70, 20], [20, 20]], np.int32)[:, None, :]
+    assert Polygon(contour[:, 0]).buffer(0).is_empty
+    monkeypatch.setattr(cv2, "findContours", lambda *args: ([contour], None))
+    model = PPOCR(weights, config=weights.with_suffix(".json"))
+    page = model._postprocess(np.full((1, 1, 80, 100), 0.9, np.float32), (80, 100))
+    assert len(page.children) == 1
+    assert Polygon(page.children[0].polygon).is_valid
+    assert page.children[0].detection_confidence == pytest.approx(0.9)

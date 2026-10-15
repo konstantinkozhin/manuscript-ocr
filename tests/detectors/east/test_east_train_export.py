@@ -1,3 +1,4 @@
+from tests.support.modules import patch_modules
 """Tests for EAST train/export orchestration."""
 
 import json
@@ -324,9 +325,7 @@ class TestEASTExport:
         ):
             with patch.object(east_module, "EASTModel", return_value=FakeEastModel()):
                 with patch.object(east_module.torch.onnx, "export", side_effect=_write_onnx) as mock_export:
-                    with patch.dict(
-                        sys.modules,
-                        {
+                    with patch_modules({
                             "onnx": fake_onnx,
                             "onnxsim": fake_onnxsim,
                             "onnxruntime": fake_onnxruntime,
@@ -385,9 +384,7 @@ class TestEASTExport:
         ):
             with patch.object(east_module, "EASTModel", return_value=FakeEastModel()):
                 with patch.object(east_module.torch.onnx, "export", side_effect=_write_onnx):
-                    with patch.dict(
-                        sys.modules,
-                        {
+                    with patch_modules({
                             "onnx": fake_onnx,
                             "onnxsim": fake_onnxsim,
                             "onnxruntime": fake_onnxruntime,

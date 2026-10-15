@@ -3,6 +3,65 @@ Recognizers
 
 Text recognition models.
 
+Medoid ensemble
+---------------
+
+.. autoclass:: manuscript.recognizers.MedoidRecognizer
+   :members:
+   :show-inheritance:
+
+.. code-block:: python
+
+    from manuscript.recognizers import MedoidRecognizer
+
+    recognizer = MedoidRecognizer([model_a, model_b, model_c], parallel=False)
+    page = recognizer.predict(page, image=image)
+
+The winner minimizes the sum of unit-cost character Levenshtein distances to
+all available normalized predictions. Repeated predictions retain their weight.
+Ties prefer the earliest model. No new text is generated and confidence is not
+used. Normalization and strict tree validation match MajorityVotingRecognizer.
+None abstains, empty strings participate, and regions without answers preserve
+their input text. Output confidence is None for an aggregated region.
+
+For every text region, predictions longer than max(512, 8 times median length)
+are excluded if at least three answers remain, including words, lines and blocks.
+Raw ``voting`` records retain all original candidates and add ``distance_sums``,
+``winning_distance_sum``, ``used_models``, ``excluded_model_indices`` and
+``length_limit``. Distances use RapidFuzz, included in the runtime dependencies.
+
+Majority voting
+---------------
+
+.. autoclass:: manuscript.recognizers.MajorityVotingRecognizer
+   :members:
+   :show-inheritance:
+
+.. code-block:: python
+
+    from manuscript.recognizers import MajorityVotingRecognizer
+
+    recognizer = MajorityVotingRecognizer([model_a, model_b, model_c], parallel=False)
+    page = recognizer.predict(page, image=image)
+    raw = recognizer.predict(page, image=image, return_raw=True)
+
+Participants receive independent copies with cleared text/confidence. Their
+returned trees must preserve every field, geometry, node class, child count
+and child order, except TextRegion text/recognition_confidence. Violations
+raise an error naming the participant, node path and field. Position in the
+unchanged tree identifies a region; word/line/block votes are separate.
+
+Whole strings are normalized with NFC, lowercasing and strip. The most frequent
+string wins; ties use the first supporting model in list order. Confidence
+does not weight votes. Empty strings vote; None abstains. Regions without votes
+keep their input text/confidence. Winners receive normalized text and confidence
+None. Raw output contains ``page`` and per-region ``voting`` records with paths,
+candidates, normalized strings, counts and the winner, without model tensors.
+
+``parallel=True`` runs participants in threads. It keeps the same tie priority;
+users should choose sequential execution for models sharing constrained device
+memory. Per-model batch sizes are preserved unless explicitly overridden.
+
 Batch size
 ----------
 

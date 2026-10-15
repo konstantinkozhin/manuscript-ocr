@@ -8,3 +8,7 @@ The main high-level interface for OCR processing.
    :undoc-members:
    :show-inheritance:
 
+.. automodule:: manuscript._stack
+   :members:
+   :show-inheritance:
+

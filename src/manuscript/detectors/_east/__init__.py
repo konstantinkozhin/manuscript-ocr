@@ -87,6 +87,11 @@ class EAST(BaseDetector):
         - CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``
 
         Default is ``None`` (CPU).
+    config : dict or path, optional
+        Region mapping configuration. Required key ``region_classes`` maps
+        class IDs to element fields, e.g. ``{"0": {"type": "word"}}``.
+        If omitted, uses a registry
+        config artifact. Local weights require an explicit config path.
     target_size : int, optional
         Input image size for inference. Images are resized to
         ``(target_size, target_size)``. Default is 1280.
@@ -157,6 +162,7 @@ class EAST(BaseDetector):
         device: Optional[str] = None,
         force_download: bool = False,
         *,
+        config=None,
         target_size: int = 1280,
         expand_ratio_w: float = 1.4,
         expand_ratio_h: float = 1.5,
@@ -182,6 +188,8 @@ class EAST(BaseDetector):
         )
 
         self.onnx_session = None
+        values, self.config_path = self._load_detector_config(config)
+        self._configure_region_types(values)
 
         self.target_size = target_size
         self.expand_ratio_w = expand_ratio_w
@@ -455,8 +463,8 @@ class EAST(BaseDetector):
         Returns
         -------
         Page
-            Parsed detection result as a Page object containing a single
-            Block with a single Line of TextSpan objects. Each TextSpan has polygon
+            Detection result as a flat document tree of configured text regions.
+            Each region has polygon
             coordinates, confidence score, and sequential ``order`` index.
 
         Notes
@@ -599,11 +607,13 @@ class EAST(BaseDetector):
             else processed_quads
         )
 
-        page = self._page_from_regions(output_quads[:, :8].reshape(-1, 4, 2),
-                                       np.clip(output_quads[:, 8], 0, 1), ordered=True)
+        page = self._tree_from_regions(output_quads[:, :8].reshape(-1, 4, 2),
+                                      np.clip(output_quads[:, 8], 0, 1),
+                                      np.zeros(len(output_quads), dtype=int), (orig_h, orig_w))
         if return_raw or return_masks or return_outputs:
             detections = [{"polygon": quad[:8].reshape(4, 2).astype(float).tolist(),
-                           "confidence": float(np.clip(quad[8], 0, 1))} for quad in processed_quads]
+                           "confidence": float(np.clip(quad[8], 0, 1)),
+                           "class_id": 0} for quad in processed_quads]
             return self._raw_result(page, raw_outputs, detections, (orig_h, orig_w),
                                     model_image_size=[self.target_size, self.target_size])
         return page
@@ -645,6 +655,7 @@ class EAST(BaseDetector):
         val_interval: int = 1,
         num_workers: int = 0,
         log_collage: bool = True,
+        detection_level: str = "word",
         device: Optional["torch.device"] = None,
     ) -> "torch.nn.Module":
         """
@@ -1106,6 +1117,7 @@ class EAST(BaseDetector):
             score_map_shrink_ratio=score_map_shrink_ratio,
             augmentation_config=aug_cfg,
             log_collage=log_collage,
+            detection_level=detection_level,
         )
         return best_model
 
@@ -1117,6 +1129,7 @@ class EAST(BaseDetector):
         input_size: int = 1280,
         opset_version: int = 14,
         simplify: bool = True,
+        detection_level: str = "word",
     ) -> None:
         """
         Export EAST PyTorch model to ONNX format.
@@ -1375,6 +1388,13 @@ class EAST(BaseDetector):
             print(f"  Install with: pip install onnxruntime")
         except Exception as e:
             print(f"[WARNING] ONNX inference test failed: {e}")
+
+        from manuscript.data import TextRegion
+        TextRegion(type=detection_level)
+        import json
+        Path(output_path).with_suffix(".json").write_text(
+            json.dumps({"region_classes": {"0": {"type": detection_level}}}, indent=2) + "\n",
+            encoding="utf-8")
 
         file_size_mb = Path(output_path).stat().st_size / (1024 * 1024)
         print(f"\n[OK] Export complete! Model size: {file_size_mb:.1f} MB")

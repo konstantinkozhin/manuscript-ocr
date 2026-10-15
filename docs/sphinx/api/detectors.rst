@@ -3,6 +3,25 @@ Detectors
 
 Text detection models.
 
+``DocUFCN`` supports ONNX semantic segmentation with native class-probability
+maps. Its generic-page configuration represents the foreground ``page`` class
+as a ``block`` with ``label="block"``; background is excluded. Raw detections
+use the configured name ``block`` and foreground ID 1. Load its weights/config through
+a local model folder in the demo.
+
+.. autoclass:: manuscript.detectors.DocUFCN
+   :members:
+   :show-inheritance:
+
+``RTDETR`` also supports document layout detection, including the local ONNX
+export of Docling Heron. Its config preserves native model class names as
+element types and labels. Use ``visualize_page(..., show_labels=True)`` to
+display them; OCR recognition levels still select word/line/block regions.
+
+.. autoclass:: manuscript.detectors.RTDETR
+   :members:
+   :show-inheritance:
+
 All detectors return a ``Page`` by default. Use ``predict(image, return_raw=True)``
 for compact decoded results:
 

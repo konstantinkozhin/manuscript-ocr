@@ -1,4 +1,6 @@
 from pathlib import Path
+import json
+from copy import deepcopy
 from typing import Optional, Union
 
 import cv2
@@ -7,8 +9,8 @@ import onnxruntime as ort
 from shapely.geometry import Polygon
 
 from manuscript.api.detector import BaseDetector
-from manuscript.data import TextSpan
 from manuscript.utils import read_image
+from manuscript.utils.geometry import repair_detection_polygon
 
 
 class PPOCR(BaseDetector):
@@ -25,6 +27,9 @@ class PPOCR(BaseDetector):
             raise ValueError("PPOCR requires explicit ONNX weights")
         super().__init__(weights=str(weights), device=device, force_download=force_download)
         config, self.config_path = self._load_detector_config(config)
+        self._configure_region_types(config)
+        if set(self.region_classes) != {0}:
+            raise ValueError("PPOCR DB requires exactly foreground class 0")
         if config.get("schema_version") != 1:
             raise ValueError("Unsupported PPOCR config schema_version")
         if config.get("task") != "text_detection" or config.get("algorithm") != "DB":
@@ -63,7 +68,10 @@ class PPOCR(BaseDetector):
         self._validate_config()
 
     def _validate_config(self):
-        pre, post = self.preprocess, self.postprocess
+        self._validate_pre_post(self.preprocess, self.postprocess)
+
+    @staticmethod
+    def _validate_pre_post(pre, post):
         if pre["color_order"] not in ("RGB", "BGR"):
             raise ValueError("color_order must be RGB or BGR")
         if pre["limit_type"] not in ("min", "max", "resize_long"):
@@ -191,7 +199,7 @@ class PPOCR(BaseDetector):
         values = np.clip(values, 0, 1)
         mask = (values > self.postprocess["threshold"]).astype(np.uint8) * 255
         contours = cv2.findContours(mask, cv2.RETR_LIST, cv2.CHAIN_APPROX_SIMPLE)[-2]
-        spans, detections = [], []
+        polygons, scores, detections = [], [], []
         map_h, map_w = values.shape
         image_h, image_w = image_hw
         for contour in contours[:self.postprocess["max_candidates"]]:
@@ -199,38 +207,44 @@ class PPOCR(BaseDetector):
             if min(rect[1]) < self.postprocess["min_size"]:
                 continue
             polygon = contour.reshape(-1, 2)
-            if len(polygon) < 4:
+            if len(polygon) < 3:
                 continue
             score = self._score(values, polygon)
             if score < self.postprocess["box_threshold"]:
                 continue
-            geometry = Polygon(polygon)
-            if not geometry.is_valid or geometry.area <= 0 or geometry.length <= 0:
+            recovered = repair_detection_polygon(polygon)
+            if recovered is None:
                 continue
+            geometry = Polygon(recovered)
             distance = geometry.area * self.postprocess["unclip_ratio"] / geometry.length
             expanded = geometry.buffer(distance, join_style=1 if self.postprocess["unclip_join"] == "round" else 2)
             if expanded.is_empty or expanded.geom_type != "Polygon":
-                continue
+                # Preserve the detection when polygon recovery fails.
+                expanded = Polygon(cv2.boxPoints(rect)).buffer(distance)
+                if expanded.is_empty or expanded.geom_type != "Polygon":
+                    continue
             points = np.asarray(expanded.exterior.coords[:-1], np.float32)
             expanded_rect = cv2.minAreaRect(points)
             if min(expanded_rect[1]) < self.postprocess["min_size"] + 2:
                 continue
-            points[:, 0] = np.clip(np.rint(points[:, 0] * image_w / map_w), 0, image_w)
-            points[:, 1] = np.clip(np.rint(points[:, 1] * image_h / map_h), 0, image_h)
-            final_polygon = Polygon(points)
-            if len(np.unique(points, axis=0)) < 4 or not final_polygon.is_valid or final_polygon.area <= 0:
+            # Keep subpixel coordinates: rounding can collapse nearby vertices
+            # and introduce self-intersections in the expanded contour.
+            points[:, 0] = np.clip(points[:, 0] * image_w / map_w, 0, image_w)
+            points[:, 1] = np.clip(points[:, 1] * image_h / map_h, 0, image_h)
+            points = repair_detection_polygon(points)
+            if points is None:
                 continue
+            final_polygon = Polygon(points)
             # Public geometry convention is clockwise in image coordinates.
             if not final_polygon.exterior.is_ccw:
                 points = points[::-1]
-            detections.append({"polygon": points.astype(float).tolist(), "confidence": score,
-                               "contour": (polygon * [image_w / map_w, image_h / map_h]).tolist()})
             if len(points) == 4:
                 points = self._order_quad(points)
-            spans.append(TextSpan(polygon=[(float(x), float(y)) for x, y in points],
-                                  detection_confidence=float(np.clip(score, 0, 1))))
-        page = self._page_from_regions([span.polygon for span in spans],
-                                       [span.detection_confidence for span in spans])
+            detections.append({"class_id": 0, "polygon": points.astype(float).tolist(), "confidence": score,
+                               "contour": (polygon * [image_w / map_w, image_h / map_h]).tolist()})
+            polygons.append(points)
+            scores.append(float(np.clip(score, 0, 1)))
+        page = self._tree_from_regions(polygons, scores, [0] * len(scores), image_hw)
         if return_raw or return_masks or return_outputs:
             result = self._raw_result(page, {self._output_name or "probability_map": output} if return_outputs else None, detections, image_hw)
             if return_masks:
@@ -239,7 +253,7 @@ class PPOCR(BaseDetector):
         return page
 
     def predict(self, img_or_path, return_raw=False, *, return_masks=False, return_outputs=False):
-        """Detect text in an image/path and return Page with one TextSpan per region."""
+        """Return flat configured regions with full DB polygons in original image coordinates."""
         if self.session is None:
             self._initialize_session()
         image = read_image(img_or_path)
@@ -248,12 +262,52 @@ class PPOCR(BaseDetector):
         return self._postprocess(output, image.shape[:2], return_raw=return_raw,
                                  return_masks=return_masks, return_outputs=return_outputs)
 
+
     @staticmethod
-    def export(model_dir, output_dir, model_id=None, revision=None):
-        """Export a compatible source model to an ONNX bundle with configuration.
+    def create_config(source, *, region_classes=None, output_path=None):
+        """Create inference JSON from an existing config or a local HF model folder.
 
-        Export dependencies are imported only when this method is called.
+        DB exposes one foreground class (0), defaulting to ``line``. Supply
+        ``region_classes={0: {"type": "word"}}`` for word-oriented models.
+        Training dependencies are not needed to create the configuration.
         """
-        from .export import export
-
-        return export(model_dir, output_dir, model_id=model_id, revision=revision)
+        if isinstance(source, dict):
+            config = deepcopy(source)
+        else:
+            source = Path(source).expanduser()
+            if source.is_dir():
+                import yaml
+                inference = yaml.safe_load((source / "inference.yml").read_text(encoding="utf-8"))
+                processor = json.loads((source / "preprocessor_config.json").read_text(encoding="utf-8"))
+                db = inference["PostProcess"]
+                config = {
+                    "schema_version": 1, "task": "text_detection", "algorithm": "DB",
+                    "model_name": inference["Global"]["model_name"],
+                    "input_name": "images", "output_name": "probability_map",
+                    "preprocess": {
+                        "color_order": "BGR", "scale": processor["rescale_factor"],
+                        "mean": processor["image_mean"][::-1], "std": processor["image_std"][::-1],
+                        "limit_side_len": processor["limit_side_len"], "limit_type": processor["limit_type"],
+                        "max_side_limit": processor["max_side_limit"],
+                    },
+                    "postprocess": {
+                        "threshold": db["thresh"], "box_threshold": db["box_thresh"],
+                        "unclip_ratio": db["unclip_ratio"], "min_size": 3,
+                        "max_candidates": db["max_candidates"], "unclip_join": "round",
+                        "output_is_logits": False, "output_channel": 0,
+                    },
+                }
+            else:
+                config = json.loads(source.read_text(encoding="utf-8"))
+        if not isinstance(config, dict) or config.get("schema_version") != 1 or config.get("task") != "text_detection" or config.get("algorithm") != "DB":
+            raise ValueError("Expected a schema_version=1 DB text-detection config")
+        mapping = region_classes if region_classes is not None else config.get("region_classes", {0: {"type": "line"}})
+        mapping = BaseDetector._validate_region_types({"region_classes": mapping})
+        if set(mapping) != {0}:
+            raise ValueError("PPOCR DB requires exactly foreground class 0")
+        config["region_classes"] = {str(key): fields for key, fields in mapping.items()}
+        config["postprocess"].pop("box_type", None)
+        PPOCR._validate_pre_post(config["preprocess"], config["postprocess"])
+        if output_path is not None:
+            Path(output_path).write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        return config

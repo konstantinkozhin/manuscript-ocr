@@ -12,7 +12,9 @@ from manuscript.detectors._rfdetr import RFDETR
 @pytest.fixture
 def class_config():
     return {
-        "text_class_ids": [2, 3, 4, 5],
+        "region_classes": {"1": {"type": "block"}, "2": {"type": "line", "orientation": 0},
+                           "3": {"type": "line", "orientation": 180}, "4": {"type": "line", "orientation": 90},
+                           "5": {"type": "line", "orientation": -90}},
         "class_names": {
             "1": "text_region", "2": "text_line_upright",
             "3": "text_line_upside_down", "4": "text_line_rotated_cw",
@@ -48,10 +50,10 @@ def outputs():
 
 
 def test_four_orientations_become_text_and_full_mode_keeps_region(weights):
-    model = RFDETR(weights)
+    model = RFDETR(weights, config=weights.with_suffix(".json"))
     page = model._postprocess(*outputs(), (100, 200))
     assert isinstance(page, Page)
-    assert len(page.blocks[0].lines[0].text_spans) == 4
+    assert len(page.children) == 5
     result = model._postprocess(*outputs(), (100, 200), return_raw=True)
     assert [row["class_id"] for row in result["detections"]] == [1, 2, 3, 4, 5]
     assert [row["class_name"] for row in result["detections"]] == list(
@@ -60,21 +62,21 @@ def test_four_orientations_become_text_and_full_mode_keeps_region(weights):
     np.testing.assert_allclose(
         result["detections"][1]["bbox"], [40, 20, 160, 30], atol=1e-5
     )
-    assert len(result["page"].blocks[0].lines[0].text_spans) == 4
+    assert len(result["page"].children) == 5
     assert result["image_size"] == {"height": 100, "width": 200}
 
 
 def test_custom_classes_do_not_change_full_result(weights):
-    model = RFDETR(weights, class_ids=[1], score_thresh=0.95)
+    model = RFDETR(weights, config=weights.with_suffix(".json"), class_ids=[1], score_thresh=0.95)
     result = model._postprocess(*outputs(), (100, 200), return_raw=True)
     assert [row["class_id"] for row in result["detections"]] == [1, 2, 3, 4]
-    assert len(result["page"].blocks[0].lines[0].text_spans) == 1
+    assert len(result["page"].children) == 1
 
 
 def test_topk_is_global_stable_and_no_nms(weights, class_config):
     class_config["num_select"] = 2
     weights.with_suffix(".json").write_text(json.dumps(class_config))
-    model = RFDETR(weights)
+    model = RFDETR(weights, config=weights.with_suffix(".json"))
     boxes = np.array([[[0.5, 0.5, 0.5, 0.5]]], np.float32)
     logits = np.full((1, 1, 6), -100, np.float32)
     logits[:, :, 2:4] = 5
@@ -84,7 +86,7 @@ def test_topk_is_global_stable_and_no_nms(weights, class_config):
 
 
 def test_boxes_are_clipped_invalid_and_empty_are_removed(weights):
-    model = RFDETR(weights)
+    model = RFDETR(weights, config=weights.with_suffix(".json"))
     boxes = np.array([[[0, 0, 1, 1], [0.5, 0.5, -1, 1], [3, 3, 1, 1]]], np.float32)
     logits = np.full((1, 3, 6), -100, np.float32)
     logits[:, :, 2] = 10
@@ -93,9 +95,7 @@ def test_boxes_are_clipped_invalid_and_empty_are_removed(weights):
     assert result["detections"][0]["bbox"] == [0, 0, 60, 40]
     assert (
         not model._postprocess(np.empty((1, 0, 4)), np.empty((1, 0, 6)), (80, 120))
-        .blocks[0]
-        .lines[0]
-        .text_spans
+        .children
     )
 
 
@@ -126,18 +126,18 @@ def test_public_predict_and_pipeline_use_fixed_graph_shape(weights, monkeypatch,
     monkeypatch.setattr(
         "manuscript.detectors._rfdetr.ort.InferenceSession", lambda *a, **kw: Session()
     )
-    model = RFDETR(weights)
+    model = RFDETR(weights, config=weights.with_suffix(".json"))
     image = np.zeros((100, 200, 3), np.uint8)
     assert len(model.predict(image, return_raw=True)["detections"]) == 5
     page = Pipeline(detector=model, recognizer=None, layout=None).predict(image)["page"]
-    assert len(page.blocks[0].lines[0].text_spans) == 4
+    assert len(page.children) == 5
 
 
 def test_future_registry_and_explicit_config_priority(weights, tmp_path, monkeypatch):
     config = tmp_path / "registry.json"
     config.write_text(
         json.dumps(
-            {"score_thresh": 0.7, "text_class_ids": [7], "class_names": {"7": "line"}}
+            {"score_thresh": 0.7, "region_classes": {"7": {"type": "line"}}, "class_names": {"7": "line"}}
         )
     )
     calls = []
@@ -151,7 +151,7 @@ def test_future_registry_and_explicit_config_priority(weights, tmp_path, monkeyp
     assert calls == [("future_rf_model", "RFDETR", True)]
     assert model.class_ids == (7,)
     assert model.class_names == {7: "line"}
-    assert RFDETR("future_rf_model", config={"text_class_ids": [9], "class_names": {"9": "custom"}}).class_ids == (9,)
+    assert RFDETR("future_rf_model", config={"region_classes": {"9": {"type": "line"}}, "class_names": {"9": "custom"}}).class_ids == (9,)
 
 
 @pytest.mark.parametrize(
@@ -159,7 +159,7 @@ def test_future_registry_and_explicit_config_priority(weights, tmp_path, monkeyp
     [
         {"score_thresh": -1},
         {"std": [0, 1, 1]},
-        {"text_class_ids": [-1]},
+        {"class_ids": [-1]},
         {"target_size": 0},
         {"schema_version": 2},
         {"activation": "invalid"},
@@ -172,7 +172,7 @@ def test_invalid_configuration(weights, config, class_config):
 
 
 def test_invalid_outputs_fail_explicitly(weights):
-    model = RFDETR(weights)
+    model = RFDETR(weights, config=weights.with_suffix(".json"))
     with pytest.raises(ValueError, match="non-finite"):
         model._postprocess(np.ones((1, 2, 4)), np.full((1, 2, 6), np.nan), (100, 100))
     with pytest.raises(ValueError, match="boxes"):
@@ -187,13 +187,13 @@ def test_segmentation_preserves_contours_holes_and_masks(weights):
     masks[:, :, 5:25, 5:25] = 10
     masks[:, :, 10:15, 10:15] = -10  # retain holes in the full result
     masks[:, :, 27:30, 27:30] = 10  # retain disconnected components
-    model = RFDETR(weights)
+    model = RFDETR(weights, config=weights.with_suffix(".json"))
     result = model._postprocess(
         boxes, logits, (32, 32), True, masks=masks, return_masks=True, return_outputs=True
     )
     compact = model._postprocess(boxes, logits, (32, 32), return_raw=True, masks=masks)
     assert "outputs" not in compact and all("mask" not in row for row in compact["detections"])
-    assert compact["page"] == result["page"]
+    assert compact["page"].to_tree_dict() == result["page"].to_tree_dict()
     assert [row["polygon"] for row in compact["detections"]] == [row["polygon"] for row in result["detections"]]
     only_masks = model._postprocess(boxes, logits, (32, 32), masks=masks, return_masks=True)
     assert "outputs" not in only_masks and "mask" in only_masks["detections"][0]
@@ -204,7 +204,7 @@ def test_segmentation_preserves_contours_holes_and_masks(weights):
     assert len(row["contours"]) == 3
     assert any(item[3] >= 0 for item in row["contour_hierarchy"])
     np.testing.assert_array_equal(row["mask"], masks[0, 1] > 0)
-    assert len(result["page"].blocks[0].lines[0].text_spans) == 4
+    assert len(result["page"].children) == 5
     assert result["outputs"]["pred_masks"] is masks
     with pytest.raises(ValueError, match="masks"):
         model._postprocess(boxes, logits, (32, 32), masks=np.zeros((1, 4, 32, 32)))
@@ -217,11 +217,11 @@ def test_missing_config_fails(weights):
 
 
 @pytest.mark.parametrize("config,match", [
-    ({"text_class_ids": [0]}, "class_names"),
-    ({"class_names": {"0": "arbitrary"}}, "text_class_ids"),
-    ({"class_names": {"0": ""}, "text_class_ids": [0]}, "nonempty strings"),
-    ({"class_names": {"-1": "bad"}, "text_class_ids": []}, "nonnegative"),
-    ({"class_names": {"0": "arbitrary"}, "text_class_ids": [1]}, "selected class_id"),
+    ({"region_classes": {"0": {"type": "line"}}}, "class_names"),
+    ({"class_names": {"0": "arbitrary"}}, "region_classes"),
+    ({"class_names": {"0": ""}, "region_classes": {"0": {"type": "line"}}}, "nonempty strings"),
+    ({"class_names": {"-1": "bad"}, "region_classes": {"1": {"type": "line"}}}, "nonnegative"),
+    ({"class_names": {"0": "arbitrary"}, "region_classes": {"1": {"type": "line"}}}, "selected class_id"),
 ])
 def test_invalid_class_metadata(weights, config, match):
     with pytest.raises(ValueError, match=match):
@@ -229,10 +229,26 @@ def test_invalid_class_metadata(weights, config, match):
 
 
 def test_arbitrary_class_metadata_and_explicit_selection(weights):
-    config = {"class_names": {"1": "table", "2": "formula"}, "text_class_ids": [1]}
+    config = {"class_names": {"1": "table", "2": "formula"}, "region_classes": {"1": {"type": "table"}, "2": {"type": "image"}}, "class_ids": [1]}
     model = RFDETR(weights, config=config, class_ids=[2])
     result = model._postprocess(*outputs(), (100, 200), return_raw=True)
     assert result["detections"][0]["class_name"] == "table"
     assert result["detections"][1]["class_name"] == "formula"
-    assert len(result["page"].blocks[0].lines[0].text_spans) == 1
-    assert config["text_class_ids"] == [1]
+    assert len(result["page"].children) == 1
+    assert config["class_ids"] == [1]
+
+
+def test_region_types_orientation_and_config_generation(weights,class_config,tmp_path):
+    original=json.loads(json.dumps(class_config))
+    original['text_class_ids']=[2,3,4,5]
+    config=RFDETR.create_config(original,output_path=tmp_path/'generated.json')
+    assert 'text_class_ids' not in config
+    assert original['text_class_ids']==[2,3,4,5]
+    model=RFDETR(weights,config=config)
+    page=model._postprocess(*outputs(),(100,200))
+    assert [node.type for node in page.children]==['block','line','line','line','line']
+    assert [node.orientation for node in page.children]==[None,0,180,90,-90]
+    assert all(node.parent is page for node in page.children)
+    path=tmp_path/'page.json';page.save(path)
+    assert Page.load(path).to_tree_dict()==page.to_tree_dict()
+    assert model.class_ids==(1,2,3,4,5)

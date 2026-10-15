@@ -67,6 +67,59 @@ Basic Usage
     text = pipeline.get_text(result["page"])
     print(text)
 
+Compose Processors with Stack
+-----------------------------
+
+``Stack`` runs processors in order and can occupy any pipeline slot:
+
+.. code-block:: python
+
+    from manuscript import Pipeline, Stack
+
+    pipeline = Pipeline(
+        detector=Stack([block_detector, line_detector]),
+        recognizer=Stack([word_recognizer, line_recognizer]),
+        corrector=Stack([corrector_a, corrector_b]),
+    )
+
+Image processors implement ``predict(image, ...)``. Page processors declare
+their first parameter as ``page`` (or annotate it as ``Page``), optionally
+accepting ``image``. Stack selects the input automatically. Each page processor
+receives the preceding Page result. Member defaults such as recognition batch
+size are preserved unless explicitly overridden in ``Stack.predict``.
+
+Detectors run on the whole image and their regions are appended to the current
+Page. Stack does not deduplicate regions or infer parents; a layout processor
+can build containment and reading order afterwards. Recognition is sequential:
+later processors may overwrite text on the same regions; there is no voting.
+
+Stacks can also be nested or called directly:
+
+.. code-block:: python
+
+    page = Stack([detector, layout, recognizer]).predict(image)
+    page = Stack([corrector_a, corrector_b]).predict(page)
+
+``Stack([detector_a, detector_b], parallel=True)`` runs independent image
+detectors concurrently and adds results in list order. This option rejects
+page processors, including those inside nested stacks. It defaults to False.
+Recognition voting uses ``MajorityVotingRecognizer`` instead of sequential Stack:
+
+.. code-block:: python
+
+    from manuscript.recognizers import MajorityVotingRecognizer
+
+    pipeline = Pipeline(
+        detector=Stack([detector_a, detector_b], parallel=True),
+        recognizer=MajorityVotingRecognizer([model_a, model_b], parallel=False),
+    )
+
+``return_raw=True`` returns the final ``page``, combined ``detections``,
+``image_size``, and model-specific dictionaries under ``detector_results``.
+Masks and original outputs are requested only with ``return_masks=True`` and
+``return_outputs=True``. Compatible page processors receive the combined
+dictionary as ``detector_result``.
+
 Disable Stages
 --------------
 

@@ -10,9 +10,10 @@ from manuscript.detectors import EAST, YOLO
 def test_axis_aligned_option_is_deprecated(detector_class, tmp_path):
     weights = tmp_path / "model.onnx"
     weights.write_bytes(b"test")
+    config = {"region_classes": {0: {"type": "word"}}}
     with pytest.warns(DeprecationWarning, match="axis_aligned_output"):
-        detector_class(weights=str(weights), axis_aligned_output=True)
-    assert not detector_class(weights=str(weights)).axis_aligned_output
+        detector_class(weights=str(weights), config=config, axis_aligned_output=True)
+    assert not detector_class(weights=str(weights), config=config).axis_aligned_output
 
 
 def test_east_raw_preserves_native_quads_and_model_outputs(tmp_path, monkeypatch):
@@ -20,7 +21,8 @@ def test_east_raw_preserves_native_quads_and_model_outputs(tmp_path, monkeypatch
     weights.write_bytes(b"test")
     with pytest.warns(DeprecationWarning):
         model = EAST(weights=str(weights), target_size=100, axis_aligned_output=True,
-                     expand_ratio_w=0, expand_ratio_h=0)
+                     expand_ratio_w=0, expand_ratio_h=0,
+                     config={"region_classes": {0: {"type": "word"}}})
     model.onnx_session = object()
     quad = np.array([[10, 10, 60, 20, 55, 40, 5, 30, .9]], np.float32)
     score_map, geo_map = np.zeros((25, 25)), np.zeros((5, 25, 25))
@@ -32,7 +34,7 @@ def test_east_raw_preserves_native_quads_and_model_outputs(tmp_path, monkeypatch
     polygon = np.asarray(raw["detections"][0]["polygon"])
     assert len(set(polygon[:, 1])) > 2
     assert raw["outputs"]["score_map"] is score_map
-    assert raw["page"] == model.predict(np.zeros((100, 100, 3), np.uint8))
+    assert raw["page"].to_tree_dict() == model.predict(np.zeros((100, 100, 3), np.uint8)).to_tree_dict()
 
 
 def test_yolo_raw_preserves_obb_angle_and_all_outputs(tmp_path, monkeypatch):
@@ -46,7 +48,8 @@ def test_yolo_raw_preserves_obb_angle_and_all_outputs(tmp_path, monkeypatch):
         run=lambda *args: [output, auxiliary],
     )
     with pytest.warns(DeprecationWarning):
-        model = YOLO(weights=str(weights), axis_aligned_output=True)
+        model = YOLO(weights=str(weights), axis_aligned_output=True,
+                     config={"region_classes": {2: {"type": "word"}}})
     model.onnx_session = session
     model._output_layout = "obb"
     monkeypatch.setattr(model, "_preprocess", lambda image: (image, 1., (0., 0.)))

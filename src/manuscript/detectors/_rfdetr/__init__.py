@@ -1,12 +1,16 @@
 from pathlib import Path
+import json
+from copy import deepcopy
 
 import cv2
 import numpy as np
 import onnxruntime as ort
 
 from manuscript.api.detector import BaseDetector
-from manuscript.data import TextSpan
 from manuscript.utils import read_image
+from manuscript.utils.geometry import repair_detection_polygon
+from manuscript.utils.masks import contours_to_polygon
+from manuscript.utils.numerics import softmax, sigmoid
 
 
 class RFDETR(BaseDetector):
@@ -30,6 +34,7 @@ class RFDETR(BaseDetector):
             weights=str(weights), device=device, force_download=force_download
         )
         config, self.config_path = self._load_detector_config(config)
+        self._configure_region_types(config)
         if config.get("schema_version", 1) != 1:
             raise ValueError("Unsupported RFDETR config schema_version")
         if config.get("task", "object_detection") != "object_detection":
@@ -37,8 +42,6 @@ class RFDETR(BaseDetector):
         self.score_thresh = float(
             config.get("score_thresh", 0.5) if score_thresh is None else score_thresh
         )
-        if class_ids is None and "text_class_ids" not in config:
-            raise ValueError("RFDETR config requires text_class_ids or explicit class_ids")
         names = config.get("class_names")
         if not isinstance(names, dict) or not names:
             raise ValueError("RFDETR config requires a nonempty class_names object")
@@ -55,7 +58,7 @@ class RFDETR(BaseDetector):
             if not isinstance(name, str) or not name.strip():
                 raise ValueError("class_names values must be nonempty strings")
             self.class_names[class_id] = name
-        selected = config["text_class_ids"] if class_ids is None else class_ids
+        selected = config.get("class_ids", list(self.region_classes)) if class_ids is None else class_ids
         if not isinstance(selected, (list, tuple)) or any(
             isinstance(value, bool) or not isinstance(value, int) or value < 0
             for value in selected
@@ -64,6 +67,8 @@ class RFDETR(BaseDetector):
         self.class_ids = tuple(selected)
         if any(class_id not in self.class_names for class_id in self.class_ids):
             raise ValueError("Every selected class_id must be defined in class_names")
+        if any(class_id not in self.region_classes for class_id in self.class_ids):
+            raise ValueError("Every selected class_id must be defined in region_classes")
         self.num_select = int(config.get("num_select", 300))
         self.target_size = (
             target_size if target_size is not None else config.get("target_size")
@@ -185,11 +190,9 @@ class RFDETR(BaseDetector):
         if not np.isfinite(boxes).all() or not np.isfinite(logits).all():
             raise ValueError("RFDETR outputs contain non-finite values")
         if self.activation == "sigmoid":
-            exp = np.exp(-np.abs(logits))
-            scores = np.where(logits >= 0, 1 / (1 + exp), exp / (1 + exp))
+            scores = sigmoid(logits)
         elif self.activation == "softmax":
-            scores = np.exp(logits - logits.max(axis=2, keepdims=True))
-            scores /= scores.sum(axis=2, keepdims=True)
+            scores = softmax(logits, axis=2)
         else:
             scores = logits
             if np.any(scores < 0) or np.any(scores > 1):
@@ -209,7 +212,7 @@ class RFDETR(BaseDetector):
                 )
         threshold = getattr(self, "mask_threshold", 0.5)
         mask_cache = {}
-        detections, spans = [], []
+        detections, polygons, confidences, region_ids = [], [], [], []
         for index in indices:
             score = float(scores.ravel()[index])
             if score < self.score_thresh:
@@ -232,6 +235,7 @@ class RFDETR(BaseDetector):
                 (float(right), float(bottom)),
                 (float(left), float(bottom)),
             ]
+            bbox_polygon = polygon
             extra = {"geometry_source": "bbox"}
             if masks is not None:
                 if query not in mask_cache:
@@ -250,11 +254,6 @@ class RFDETR(BaseDetector):
                         if len(contour) >= 3 and cv2.contourArea(contour) > 0
                     ]
                     outer = [i for i in valid if hierarchy[0, i, 3] == -1]
-                    main = (
-                        max(outer, key=lambda i: cv2.contourArea(contours[i]))
-                        if outer
-                        else None
-                    )
                     info = {
                         "contours": [
                             contours[i][:, 0].astype(float).tolist() for i in valid
@@ -265,14 +264,14 @@ class RFDETR(BaseDetector):
                     if return_masks:
                         info["mask"] = binary
                     mask_cache[query] = (
-                        contours[main] if main is not None else None,
-                        info,
+                        contours_to_polygon([contours[i] for i in outer]), info,
                     )
-                contour, info = mask_cache[query]
+                outline, info = mask_cache[query]
                 extra.update(info)
-                if contour is not None and len(contour) >= 4:
-                    polygon = contour[:, 0].astype(float).tolist()
+                if outline is not None:
+                    polygon = outline.tolist()
                     extra["geometry_source"] = "mask_polygon"
+            polygon = repair_detection_polygon(polygon, fallback=bbox_polygon).tolist()
             detections.append(
                 {
                     "class_id": class_id,
@@ -285,9 +284,10 @@ class RFDETR(BaseDetector):
                 }
             )
             if class_id in self.class_ids:
-                spans.append(TextSpan(polygon=polygon, detection_confidence=score))
-        page = self._page_from_regions([span.polygon for span in spans],
-                                       [span.detection_confidence for span in spans])
+                polygons.append(polygon)
+                confidences.append(score)
+                region_ids.append(class_id)
+        page = self._tree_from_regions(polygons, confidences, region_ids, image_hw)
         if return_raw or return_masks or return_outputs:
             return self._raw_result(page, raw_outputs, detections, image_hw,
                                     class_names=self.class_names.copy())
@@ -312,12 +312,20 @@ class RFDETR(BaseDetector):
             return_masks=return_masks, return_outputs=return_outputs,
         )
 
+
     @staticmethod
-    def export(source, output, images):
-        """Export a compatible source model to an ONNX bundle with configuration.
+    def create_config(source, *, region_classes=None, output_path=None):
+        """Preserve inference settings and add structural classes and angles.
 
-        Export dependencies are imported only when this method is called.
+        Class semantics are supplied explicitly, not inferred from class names.
+        The deprecated text-only filter is removed; all mapped classes are
+        included unless the source has an explicit ``class_ids`` filter.
         """
-        from .export import export
-
-        return export(source, output, images=images)
+        config = deepcopy(source) if isinstance(source, dict) else json.loads(Path(source).read_text(encoding="utf-8"))
+        mapping = region_classes if region_classes is not None else config.get("region_classes")
+        mapping = BaseDetector._validate_region_types({"region_classes": mapping})
+        config["region_classes"] = {str(key): fields for key, fields in mapping.items()}
+        config.pop("text_class_ids", None)
+        if output_path is not None:
+            Path(output_path).write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        return config
