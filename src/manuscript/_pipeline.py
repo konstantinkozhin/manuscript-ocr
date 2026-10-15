@@ -1,4 +1,5 @@
 import time
+import warnings
 from pathlib import Path
 from typing import Any, Dict, Optional, Union
 
@@ -16,7 +17,7 @@ from .api.protocols import (
     LayoutProtocol,
     RecognizerProtocol,
 )
-from .data import Page
+from .data import Page, TextRegion
 from .detectors import YOLO
 from .layouts import SimpleSorting
 from .recognizers import TRBA
@@ -66,6 +67,10 @@ class Pipeline:
         layout_after : {"detector", "recognizer", "corrector"}, optional
             Slot where layout stage is executed. Default is ``"detector"``.
         """
+        if layout_after not in _VALID_LAYOUT_AFTER:
+            raise ValueError(
+                f"layout_after must be one of {_VALID_LAYOUT_AFTER}, got: {layout_after}"
+            )
         if detector is _DEFAULT:
             self.detector = YOLO(weights="yolo26x_obb_text_g1")
         elif detector is None:
@@ -85,16 +90,13 @@ class Pipeline:
 
         self.corrector = corrector
 
-        if layout_after not in _VALID_LAYOUT_AFTER:
-            raise ValueError(
-                f"layout_after must be one of {_VALID_LAYOUT_AFTER}, got: {layout_after}"
-            )
         self.layout_after = layout_after
 
         self._last_detection_page: Optional[Page] = None
         self._last_layout_page: Optional[Page] = None
         self._last_recognition_page: Optional[Page] = None
         self._last_correction_page: Optional[Page] = None
+        self._last_timings: Dict[str, float] = {}
 
     def predict(
         self,
@@ -118,7 +120,8 @@ class Pipeline:
         or original tensors. Layout/recognizer/corrector stages accepting
         detector_result receive that same dictionary for this call only.
         """
-        start_time = time.time()
+        start_time = time.perf_counter()
+        self._last_timings = {}
 
         self._last_detection_page = None
         self._last_layout_page = None
@@ -130,47 +133,56 @@ class Pipeline:
         def get_image_array() -> np.ndarray:
             nonlocal image_array_cache
             if image_array_cache is None:
-                t0 = time.time()
+                t0 = time.perf_counter()
                 image_array_cache = read_image(image)
+                self._last_timings["load_image"] = time.perf_counter() - t0
                 if profile:
-                    print(f"Load image: {time.time() - t0:.3f}s")
+                    print(f"Load image: {time.perf_counter() - t0:.3f}s")
             return image_array_cache
 
         def run_layout_slot(anchor: str, page: Page) -> Page:
             if self.layout is None or self.layout_after != anchor:
                 return page
 
-            t0 = time.time()
+            t0 = time.perf_counter()
+            load_before = self._last_timings.get("load_image", 0.0)
             layout_kwargs: Dict[str, Any] = {}
             if detector_result is not None:
                 layout_kwargs["detector_result"] = detector_result
             if accepts_predict_kwarg(self.layout, "image"):
                 layout_kwargs["image"] = get_image_array()
             page = call_page_stage(self.layout, page, **layout_kwargs)
-            self._last_layout_page = page.model_copy(deep=True)
+            self._last_layout_page = page.clone()
+            self._last_timings["layout"] = (time.perf_counter() - t0
+                - (self._last_timings.get("load_image", 0.0) - load_before))
             if profile:
-                print(f"Layout ({anchor}): {time.time() - t0:.3f}s")
+                print(f"Layout ({anchor}): {self._last_timings['layout']:.3f}s")
             return page
 
         # Detection
-        t0 = time.time()
+        t0 = time.perf_counter()
         detection = self.detector.predict(image, **filter_predict_kwargs(self.detector, {
             "return_raw": True, "return_masks": False, "return_outputs": False,
         }))
         detector_result = detection if isinstance(detection, dict) else None
-        page = detection["page"] if detector_result is not None else detection
+        page = detection.get("page") if detector_result is not None else detection
         if not isinstance(page, Page):
             raise TypeError("Detector must return Page or a result dictionary containing Page")
-        self._last_detection_page = page.model_copy(deep=True)
+        page.validate_tree()
+        if isinstance(image, (str, Path)) and not page.file_name:
+            page.file_name = Path(image).name
+        self._last_detection_page = page.clone()
+        self._last_timings["detector"] = time.perf_counter() - t0
         if profile:
-            print(f"Detection: {time.time() - t0:.3f}s")
+            print(f"Detection: {time.perf_counter() - t0:.3f}s")
 
         # After detector slot
         page = run_layout_slot("detector", page)
 
         # Recognition slot
         if self.recognizer is not None:
-            t0 = time.time()
+            t0 = time.perf_counter()
+            load_before = self._last_timings.get("load_image", 0.0)
             recognizer_kwargs = filter_predict_kwargs(
                 self.recognizer,
                 {
@@ -181,55 +193,83 @@ class Pipeline:
             if accepts_predict_kwarg(self.recognizer, "image"):
                 recognizer_kwargs["image"] = get_image_array()
             page = call_page_stage(self.recognizer, page, **recognizer_kwargs)
-            self._last_recognition_page = page.model_copy(deep=True)
+            self._last_recognition_page = page.clone()
+            self._last_timings["recognizer"] = (time.perf_counter() - t0
+                - (self._last_timings.get("load_image", 0.0) - load_before))
             if profile:
-                print(f"Recognition: {time.time() - t0:.3f}s")
+                print(f"Recognition: {self._last_timings['recognizer']:.3f}s")
 
         # After recognizer slot
         page = run_layout_slot("recognizer", page)
 
         # Correction slot
         if self.corrector is not None:
-            t0 = time.time()
+            t0 = time.perf_counter()
+            load_before = self._last_timings.get("load_image", 0.0)
             corrector_kwargs: Dict[str, Any] = {}
             if detector_result is not None:
                 corrector_kwargs["detector_result"] = detector_result
             if accepts_predict_kwarg(self.corrector, "image"):
                 corrector_kwargs["image"] = get_image_array()
             page = call_page_stage(self.corrector, page, **corrector_kwargs)
-            self._last_correction_page = page.model_copy(deep=True)
+            self._last_correction_page = page.clone()
+            self._last_timings["corrector"] = (time.perf_counter() - t0
+                - (self._last_timings.get("load_image", 0.0) - load_before))
             if profile:
-                print(f"Correction: {time.time() - t0:.3f}s")
+                print(f"Correction: {self._last_timings['corrector']:.3f}s")
 
         # After corrector slot
         page = run_layout_slot("corrector", page)
         # Only Page snapshots persist between calls; no detector arrays are cached.
         detector_result = detection = None
 
-        if profile:
-            print(f"Pipeline total: {time.time() - start_time:.3f}s")
+        if any(isinstance(node, TextRegion) and node.text
+               and any(isinstance(parent, TextRegion) and parent.text
+                       for parent in node.ancestors)
+               for node in page.descendants):
+            warnings.warn(
+                "Recognized text is present on both parent and child regions; "
+                "multiple text levels may contain duplicate recognition results.",
+                UserWarning, stacklevel=2,
+            )
 
         result: Dict[str, Page] = {"page": page}
 
         if not vis:
+            self._last_timings["total"] = time.perf_counter() - start_time
+            if profile:
+                print(f"Pipeline total: {self._last_timings['total']:.3f}s")
             return result
 
         image_array = get_image_array()
         pil_img = image if isinstance(image, Image.Image) else Image.fromarray(image_array)
-        vis_img = visualize_page(pil_img, page, show_order=True)
+        t0 = time.perf_counter()
+        vis_img = visualize_page(pil_img, page)
+        self._last_timings["visualization"] = time.perf_counter() - t0
+        self._last_timings["total"] = time.perf_counter() - start_time
+        if profile:
+            print(f"Visualization: {self._last_timings['visualization']:.3f}s")
+            print(f"Pipeline total: {self._last_timings['total']:.3f}s")
         return result, vis_img
 
-    def get_text(self, page: Page) -> str:
+    def get_text(self, page: Page, format="plain", *, separators=None, separator_priorities=None) -> str:
+        """Delegate text serialization to Page.get_text."""
+        return page.get_text(format=format, separators=separators,
+                             separator_priorities=separator_priorities)
+
+    @property
+    def last_timings(self) -> Dict[str, float]:
+        """Return elapsed seconds for the last predict call as a dictionary copy.
+
+        Keys: detector, layout, recognizer, corrector, load_image, visualization
+        and total. Only executed stages are present. Stage times include tree
+        validation/snapshots and lazy model initialization. Explicit image loading
+        by Pipeline is recorded separately and subtracted from page-stage times.
+        Loading performed inside a model remains part of that stage's time.
+        Total includes orchestration and optional visualization. On failure,
+        completed stage timings remain available without a total entry.
         """
-        Extract plain text from ``Page`` object.
-        """
-        lines = []
-        for block in page.blocks:
-            for line in block.lines:
-                texts = [span.text for span in line.text_spans if span.text]
-                if texts:
-                    lines.append(" ".join(texts))
-        return "\n".join(lines)
+        return dict(self._last_timings)
 
     @property
     def last_detection_page(self) -> Optional[Page]:

@@ -1,50 +1,49 @@
+from tests.support.tree import make_page, make_region, sibling_index
 from typing import Any, List, Union
-
 import numpy as np
 import pytest
 from PIL import Image
-
 import manuscript._pipeline as pipeline_module
 from manuscript import Pipeline
-from manuscript.data import Block, Line, Page, TextSpan
+from manuscript.data import Page, TextRegion
 
 
 def _make_test_page() -> Page:
-    # Intentionally shuffled order by x to verify layout stage behavior.
     words = [
-        TextSpan(
+        make_region(
+            "word",
             polygon=[(210.0, 10.0), (300.0, 10.0), (300.0, 50.0), (210.0, 50.0)],
             detection_confidence=0.88,
-            order=2,
         ),
-        TextSpan(
+        make_region(
+            "word",
             polygon=[(10.0, 10.0), (100.0, 10.0), (100.0, 50.0), (10.0, 50.0)],
             detection_confidence=0.95,
-            order=0,
         ),
-        TextSpan(
+        make_region(
+            "word",
             polygon=[(110.0, 10.0), (200.0, 10.0), (200.0, 50.0), (110.0, 50.0)],
             detection_confidence=0.92,
-            order=1,
         ),
     ]
-    return Page(blocks=[Block(lines=[Line(text_spans=words, order=0)], order=0)])
+    return make_page(
+        children=[make_region("block", children=[make_region("line", children=words)])]
+    )
 
 
 class DummyDetector:
+
     def __init__(self, events: List[str] = None):
         self.events = events
 
-    def predict(
-        self,
-        img_or_path: Union[str, np.ndarray, Image.Image],
-    ) -> Page:
+    def predict(self, img_or_path: Union[str, np.ndarray, Image.Image]) -> Page:
         if self.events is not None:
             self.events.append("detector")
         return _make_test_page()
 
 
 class DummyLayout:
+
     def __init__(self, events: List[str] = None):
         self.events = events
         self.call_count = 0
@@ -55,17 +54,17 @@ class DummyLayout:
             self.events.append("layout")
         self.call_count += 1
         self.last_image = image
-
-        result = page.model_copy(deep=True)
-        for block in result.blocks:
-            for line in block.lines:
-                line.text_spans.sort(key=lambda w: min(p[0] for p in w.polygon))
-                for idx, text_span in enumerate(line.text_spans):
-                    text_span.order = idx
+        result = page.clone()
+        for block in result.children:
+            for line in block.children:
+                line.children = sorted(
+                    line.children, key=lambda w: min(p[0] for p in w.polygon)
+                )
         return result
 
 
 class DummyRecognizer:
+
     def __init__(self, events: List[str] = None, min_text_size: int = 5):
         self.events = events
         self.call_count = 0
@@ -91,36 +90,32 @@ class DummyRecognizer:
         self.last_batch_size = batch_size
         self.last_debug_save_dir = debug_save_dir
         self.last_min_text_size = self.min_text_size
-
-        result = page.model_copy(deep=True)
+        result = page.clone()
         self.last_orders = [
-            text_span.order
-            for block in result.blocks
-            for line in block.lines
-            for text_span in line.text_spans
+            sibling_index(text_span)
+            for block in result.children
+            for line in block.children
+            for text_span in line.children
         ]
-
         recognized_idx = 0
-        for block in result.blocks:
-            for line in block.lines:
-                for text_span in line.text_spans:
+        for block in result.children:
+            for line in block.children:
+                for text_span in line.children:
                     poly = np.array(text_span.polygon, dtype=np.float32)
                     x_min, y_min = np.min(poly, axis=0)
                     x_max, y_max = np.max(poly, axis=0)
                     width = x_max - x_min
                     height = y_max - y_min
-
                     if width < self.min_text_size or height < self.min_text_size:
                         continue
-
                     recognized_idx += 1
                     text_span.text = f"word{recognized_idx}"
                     text_span.recognition_confidence = 0.9 - (recognized_idx - 1) * 0.05
-
         return result
 
 
 class DummyRecognizerNoExtraArgs:
+
     def __init__(self):
         self.call_count = 0
         self.last_image = None
@@ -128,16 +123,17 @@ class DummyRecognizerNoExtraArgs:
     def predict(self, page: Page, image: np.ndarray = None) -> Page:
         self.call_count += 1
         self.last_image = image
-        result = page.model_copy(deep=True)
-        for block in result.blocks:
-            for line in block.lines:
-                for idx, text_span in enumerate(line.text_spans, start=1):
+        result = page.clone()
+        for block in result.children:
+            for line in block.children:
+                for idx, text_span in enumerate(line.children, start=1):
                     text_span.text = f"r{idx}"
                     text_span.recognition_confidence = 0.8
         return result
 
 
 class DummyCorrector:
+
     def __init__(self, events: List[str] = None):
         self.events = events
         self.call_count = 0
@@ -148,86 +144,61 @@ class DummyCorrector:
             self.events.append("corrector")
         self.call_count += 1
         self.last_image = image
-
-        result = page.model_copy(deep=True)
-        for block in result.blocks:
-            for line in block.lines:
-                for text_span in line.text_spans:
+        result = page.clone()
+        for block in result.children:
+            for line in block.children:
+                for text_span in line.children:
                     if text_span.text:
                         text_span.text = f"{text_span.text}_corr"
         return result
 
 
 class TestPipelineAPICompatibility:
+
     def test_pipeline_basic_usage(self):
         detector = DummyDetector()
         layout = DummyLayout()
         recognizer = DummyRecognizer()
         pipeline = Pipeline(detector=detector, layout=layout, recognizer=recognizer)
-
         img = np.zeros((100, 400, 3), dtype=np.uint8)
         result = pipeline.predict(img)
-
         assert isinstance(result, dict)
         assert "page" in result
         page = result["page"]
         assert isinstance(page, Page)
-
-        words = page.blocks[0].lines[0].text_spans
+        words = page.children[0].children[0].children
         assert [w.text for w in words] == ["word1", "word2", "word3"]
-        assert [w.order for w in words] == [0, 1, 2]
+        assert [sibling_index(w) for w in words] == [0, 1, 2]
         assert recognizer.last_orders == [0, 1, 2]
 
     def test_pipeline_uses_recognizer_batch_size_attribute(self):
         recognizer = DummyRecognizer()
         recognizer.batch_size = 64
         pipeline = Pipeline(
-            detector=DummyDetector(),
-            layout=DummyLayout(),
-            recognizer=recognizer,
+            detector=DummyDetector(), layout=DummyLayout(), recognizer=recognizer
         )
-
         pipeline.predict(np.zeros((100, 400, 3), dtype=np.uint8))
-
         assert recognizer.last_batch_size == 64
 
-    def test_pipeline_returns_dict_structure(self):
-        pipeline = Pipeline(
-            detector=DummyDetector(),
-            layout=DummyLayout(),
-            recognizer=DummyRecognizer(),
-        )
-        result = pipeline.predict(np.zeros((80, 120, 3), dtype=np.uint8))
-        assert isinstance(result, dict)
-        assert isinstance(result["page"], Page)
 
     def test_pipeline_without_recognizer(self):
         layout = DummyLayout()
-        pipeline = Pipeline(
-            detector=DummyDetector(),
-            layout=layout,
-            recognizer=None,
-        )
-
+        pipeline = Pipeline(detector=DummyDetector(), layout=layout, recognizer=None)
         result = pipeline.predict(np.zeros((100, 400, 3), dtype=np.uint8))
         page = result["page"]
-        words = page.blocks[0].lines[0].text_spans
-
+        words = page.children[0].children[0].children
         assert layout.call_count == 1
-        assert all(text_span.text is None for text_span in words)
+        assert all((text_span.text is None for text_span in words))
         assert pipeline.last_recognition_page is None
         assert pipeline.last_layout_page is not None
 
     def test_pipeline_without_layout(self):
         recognizer = DummyRecognizer()
         pipeline = Pipeline(
-            detector=DummyDetector(),
-            layout=None,
-            recognizer=recognizer,
+            detector=DummyDetector(), layout=None, recognizer=recognizer
         )
-
         result = pipeline.predict(np.zeros((100, 400, 3), dtype=np.uint8))
-        words = result["page"].blocks[0].lines[0].text_spans
+        words = result["page"].children[0].children[0].children
         assert recognizer.call_count == 1
         assert [w.text for w in words] == ["word1", "word2", "word3"]
         assert pipeline.last_layout_page is None
@@ -240,20 +211,16 @@ class TestPipelineAPICompatibility:
             recognizer=DummyRecognizer(),
             corrector=corrector,
         )
-
         result = pipeline.predict(np.zeros((100, 400, 3), dtype=np.uint8))
-        words = result["page"].blocks[0].lines[0].text_spans
+        words = result["page"].children[0].children[0].children
         assert [w.text for w in words] == ["word1_corr", "word2_corr", "word3_corr"]
         assert corrector.call_count == 1
         assert pipeline.last_correction_page is not None
 
     def test_pipeline_with_visualization(self):
         pipeline = Pipeline(
-            detector=DummyDetector(),
-            layout=DummyLayout(),
-            recognizer=DummyRecognizer(),
+            detector=DummyDetector(), layout=DummyLayout(), recognizer=DummyRecognizer()
         )
-
         result, vis_img = pipeline.predict(
             np.zeros((100, 400, 3), dtype=np.uint8), vis=True
         )
@@ -268,7 +235,6 @@ class TestPipelineAPICompatibility:
             recognizer=DummyRecognizer(),
             corrector=DummyCorrector(),
         )
-
         _ = pipeline.predict(np.zeros((100, 400, 3), dtype=np.uint8), profile=True)
         out = capsys.readouterr().out
         assert "Detection:" in out
@@ -278,9 +244,7 @@ class TestPipelineAPICompatibility:
 
     def test_pipeline_get_text(self):
         pipeline = Pipeline(
-            detector=DummyDetector(),
-            layout=DummyLayout(),
-            recognizer=DummyRecognizer(),
+            detector=DummyDetector(), layout=DummyLayout(), recognizer=DummyRecognizer()
         )
         result = pipeline.predict(np.zeros((100, 400, 3), dtype=np.uint8))
         text = pipeline.get_text(result["page"])
@@ -289,28 +253,38 @@ class TestPipelineAPICompatibility:
         assert "word3" in text
 
     def test_pipeline_min_text_size_filtering(self):
+
         class SmallBoxDetector(DummyDetector):
+
             def predict(self, img_or_path):
                 words = [
-                    TextSpan(
-                        polygon=[(10.0, 10.0), (12.0, 10.0), (12.0, 12.0), (10.0, 12.0)],
+                    make_region(
+                        "word",
+                        polygon=[
+                            (10.0, 10.0),
+                            (12.0, 10.0),
+                            (12.0, 12.0),
+                            (10.0, 12.0),
+                        ],
                         detection_confidence=0.95,
-                        order=0,
                     )
                 ]
-                page = Page(blocks=[Block(lines=[Line(text_spans=words, order=0)], order=0)])
+                page = make_page(
+                    children=[
+                        make_region(
+                            "block", children=[make_region("line", children=words)]
+                        )
+                    ]
+                )
                 return page
 
         recognizer = DummyRecognizer(min_text_size=5)
         pipeline = Pipeline(
-            detector=SmallBoxDetector(),
-            layout=DummyLayout(),
-            recognizer=recognizer,
+            detector=SmallBoxDetector(), layout=DummyLayout(), recognizer=recognizer
         )
-
         result = pipeline.predict(np.zeros((100, 400, 3), dtype=np.uint8))
         assert recognizer.call_count == 1
-        assert result["page"].blocks[0].lines[0].text_spans[0].text is None
+        assert result["page"].children[0].children[0].children[0].text is None
         assert recognizer.last_min_text_size == 5
 
     def test_pipeline_stage_image_forwarding(self):
@@ -323,21 +297,16 @@ class TestPipelineAPICompatibility:
             recognizer=recognizer,
             corrector=corrector,
         )
-
         image = np.zeros((40, 120, 3), dtype=np.uint8)
         _ = pipeline.predict(image)
-
         assert isinstance(layout.last_image, np.ndarray)
         assert isinstance(recognizer.last_image, np.ndarray)
         assert isinstance(corrector.last_image, np.ndarray)
 
     def test_pipeline_rejects_removed_recognizer_debug_dir(self):
         pipeline = Pipeline(
-            detector=DummyDetector(),
-            layout=DummyLayout(),
-            recognizer=DummyRecognizer(),
+            detector=DummyDetector(), layout=DummyLayout(), recognizer=DummyRecognizer()
         )
-
         with pytest.raises(TypeError, match="recognizer_debug_dir"):
             pipeline.predict(
                 np.zeros((40, 120, 3), dtype=np.uint8),
@@ -347,21 +316,16 @@ class TestPipelineAPICompatibility:
     def test_pipeline_recognizer_without_batch_min_text_signature(self):
         recognizer = DummyRecognizerNoExtraArgs()
         pipeline = Pipeline(
-            detector=DummyDetector(),
-            layout=DummyLayout(),
-            recognizer=recognizer,
+            detector=DummyDetector(), layout=DummyLayout(), recognizer=recognizer
         )
         result = pipeline.predict(np.zeros((60, 200, 3), dtype=np.uint8))
-        words = result["page"].blocks[0].lines[0].text_spans
+        words = result["page"].children[0].children[0].children
         assert recognizer.call_count == 1
         assert [w.text for w in words] == ["r1", "r2", "r3"]
 
     def test_pipeline_last_pages_when_stage_skipped(self):
         pipeline = Pipeline(
-            detector=DummyDetector(),
-            layout=None,
-            recognizer=None,
-            corrector=None,
+            detector=DummyDetector(), layout=None, recognizer=None, corrector=None
         )
         _ = pipeline.predict(np.zeros((100, 200, 3), dtype=np.uint8))
         assert pipeline.last_detection_page is not None
@@ -371,6 +335,7 @@ class TestPipelineAPICompatibility:
 
 
 class TestLayoutAfterRouting:
+
     def test_layout_after_detector(self):
         events: List[str] = []
         pipeline = Pipeline(
@@ -442,12 +407,15 @@ class TestLayoutAfterRouting:
 
 
 class TestPipelineInitialization:
+
     def test_detector_cannot_be_none(self):
         with pytest.raises(ValueError):
             Pipeline(detector=None)
 
     def test_pipeline_default_initialization(self, monkeypatch):
+
         class FakeYOLO:
+
             def __init__(self, weights=None):
                 self.weights = weights
 
@@ -455,10 +423,12 @@ class TestPipelineInitialization:
                 return _make_test_page()
 
         class FakeLayout:
+
             def predict(self, page, image=None):
                 return page
 
         class FakeTRBA:
+
             def __init__(self, weights=None):
                 self.weights = weights
 
@@ -468,7 +438,6 @@ class TestPipelineInitialization:
         monkeypatch.setattr(pipeline_module, "YOLO", FakeYOLO)
         monkeypatch.setattr(pipeline_module, "SimpleSorting", FakeLayout)
         monkeypatch.setattr(pipeline_module, "TRBA", FakeTRBA)
-
         pipeline = Pipeline()
         assert isinstance(pipeline.detector, FakeYOLO)
         assert pipeline.detector.weights == "yolo26x_obb_text_g1"
@@ -479,7 +448,9 @@ class TestPipelineInitialization:
         assert pipeline.layout_after == "detector"
 
     def test_pipeline_partial_initialization(self, monkeypatch):
+
         class FakeYOLO:
+
             def __init__(self, weights=None):
                 self.weights = weights
 
@@ -487,10 +458,12 @@ class TestPipelineInitialization:
                 return _make_test_page()
 
         class FakeLayout:
+
             def predict(self, page, image=None):
                 return page
 
         class FakeTRBA:
+
             def __init__(self, weights=None):
                 self.weights = weights
 
@@ -500,14 +473,12 @@ class TestPipelineInitialization:
         monkeypatch.setattr(pipeline_module, "YOLO", FakeYOLO)
         monkeypatch.setattr(pipeline_module, "SimpleSorting", FakeLayout)
         monkeypatch.setattr(pipeline_module, "TRBA", FakeTRBA)
-
         custom_detector = DummyDetector()
         pipeline1 = Pipeline(detector=custom_detector)
         assert pipeline1.detector is custom_detector
         assert isinstance(pipeline1.layout, FakeLayout)
         assert isinstance(pipeline1.recognizer, FakeTRBA)
         assert pipeline1.recognizer.weights == "trba_lite_g2"
-
         custom_recognizer = DummyRecognizer()
         pipeline2 = Pipeline(recognizer=custom_recognizer)
         assert isinstance(pipeline2.detector, FakeYOLO)
@@ -516,7 +487,7 @@ class TestPipelineInitialization:
         assert pipeline2.recognizer is custom_recognizer
 
 
-@pytest.mark.parametrize('layout_after', ['detector', 'recognizer', 'corrector'])
+@pytest.mark.parametrize("layout_after", ["detector", "recognizer", "corrector"])
 def test_compact_detector_result_reaches_stages_without_copy_or_retention(layout_after):
     import weakref
 
@@ -529,28 +500,49 @@ def test_compact_detector_result_reaches_stages_without_copy_or_retention(layout
         calls = 0
         result_ref = None
 
-        def predict(self, image, return_raw=False, *, return_masks=False, return_outputs=False):
+        def predict(
+            self, image, return_raw=False, *, return_masks=False, return_outputs=False
+        ):
             self.calls += 1
             assert (return_raw, return_masks, return_outputs) == (True, False, False)
-            result = Result(page=_make_test_page(), detections=[{'class_name': 'text_region'}],
-                            image_size={'height': 100, 'width': 300}, metadata={})
+            result = Result(
+                page=_make_test_page(),
+                detections=[{"class_name": "text_region"}],
+                image_size={"height": 100, "width": 300},
+                metadata={},
+            )
             self.result_ref = weakref.ref(result)
             return result
 
     class Consumer:
+
         def predict(self, page, detector_result=None):
-            assert detector_result['detections'][0]['class_name'] == 'text_region'
-            assert 'outputs' not in detector_result
+            assert detector_result["detections"][0]["class_name"] == "text_region"
+            assert "outputs" not in detector_result
             observations.append(id(detector_result))
-            return page.model_copy(deep=True)
+            return page.clone()
 
     detector = Detector()
-    pipeline = Pipeline(detector=detector, layout=Consumer(), recognizer=Consumer(),
-                        corrector=Consumer(), layout_after=layout_after)
+    pipeline = Pipeline(
+        detector=detector,
+        layout=Consumer(),
+        recognizer=Consumer(),
+        corrector=Consumer(),
+        layout_after=layout_after,
+    )
     result = pipeline.predict(np.zeros((100, 300, 3), np.uint8))
-    assert isinstance(result['page'], Page)
+    assert isinstance(result["page"], Page)
     assert detector.calls == 1
     assert len(observations) == 3 and len(set(observations)) == 1
     assert detector.result_ref() is None
-    assert all(isinstance(p, Page) for p in (pipeline.last_detection_page, pipeline.last_layout_page,
-                                           pipeline.last_recognition_page, pipeline.last_correction_page))
+    assert all(
+        (
+            isinstance(p, Page)
+            for p in (
+                pipeline.last_detection_page,
+                pipeline.last_layout_page,
+                pipeline.last_recognition_page,
+                pipeline.last_correction_page,
+            )
+        )
+    )

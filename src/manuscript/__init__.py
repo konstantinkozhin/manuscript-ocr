@@ -1,16 +1,19 @@
 from .utils import read_image, create_page_from_text, create_page_from_image
-from .data import TextSpan, Line, Block, Page
+from .data import Element, TextRegion, Table, Cell, Image, Page
 from .layouts import SimpleSorting
 
 __all__ = [
     "Pipeline",
+    "Stack",
     "visualize_page",
     "read_image",
     "create_page_from_text",
     "create_page_from_image",
-    "TextSpan",
-    "Line",
-    "Block",
+    "Element",
+    "TextRegion",
+    "Table",
+    "Cell",
+    "Image",
     "Page",
     "CharLM",
     "SimpleSorting",
@@ -18,6 +21,11 @@ __all__ = [
 
 
 def __getattr__(name):
+    if name == "Stack":
+        from ._stack import Stack
+
+        return Stack
+
     if name == "Pipeline":
         from ._pipeline import Pipeline
 
