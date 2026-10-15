@@ -1,3 +1,4 @@
+import sys
 import unicodedata
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
@@ -46,6 +47,8 @@ class MajorityVotingRecognizer:
         for model in self.models:
             if not callable(getattr(model, 'predict', None)):
                 raise TypeError('Voting participants must implement predict')
+        if parallel and sys.platform == "emscripten":
+            raise ValueError("Python thread parallelism is unavailable in Pyodide; use parallel=False.")
         self.parallel = parallel
 
     @staticmethod

@@ -73,7 +73,7 @@ def test_predict_uses_graph_names_precision_and_fixed_shape(weights, monkeypatch
             result[0, 0, 8:20, 10:35] = 0.9
             return [result]
 
-    monkeypatch.setattr("manuscript.detectors._ppocr.ort.InferenceSession", lambda *a, **kw: Session())
+    monkeypatch.setattr("onnxruntime.InferenceSession", lambda *a, **kw: Session())
     model = PPOCR(weights, config=weights.with_suffix(".json"), unclip_ratio=0)
     page = model.predict(np.zeros((128, 192, 3), np.uint8))
     assert isinstance(page, Page)
@@ -264,3 +264,10 @@ def test_empty_contour_repair_falls_back_to_rectangle(weights, monkeypatch):
     assert len(page.children) == 1
     assert Polygon(page.children[0].polygon).is_valid
     assert page.children[0].detection_confidence == pytest.approx(0.9)
+
+
+def test_browser_runtime_can_be_selected_explicitly(weights, config):
+    model = PPOCR(weights, config=config, runtime='web', device='gpu')
+    assert model.runtime == 'web'
+    assert model.device == 'gpu'
+    assert model.session is None

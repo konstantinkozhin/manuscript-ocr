@@ -5,8 +5,8 @@ from pathlib import Path
 from typing import Optional, Union
 
 import numpy as np
-import onnxruntime as ort
 
+from manuscript.api.base import managed_session_initialization
 from manuscript.api.corrector import BaseCorrector
 from manuscript.data import Page
 
@@ -181,6 +181,7 @@ class CharLM(BaseCorrector):
             words = set(line.strip().lower() for line in f if line.strip())
         self.lexicon = frozenset(words)
 
+    @managed_session_initialization
     def _initialize_session(self):
         """Initialize ONNX Runtime session (lazy loading)."""
         if self.onnx_session is not None:
@@ -189,10 +190,7 @@ class CharLM(BaseCorrector):
         if self.weights is None:
             raise ValueError("No weights provided for CharLM corrector")
 
-        self._prepare_runtime_dependencies()
-        providers = self.runtime_providers()
-        self.onnx_session = ort.InferenceSession(str(self.weights), providers=providers)
-        self._log_device_info(self.onnx_session)
+        self.onnx_session = self._create_onnx_session()
 
     def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
         """

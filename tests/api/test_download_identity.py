@@ -1,3 +1,4 @@
+import io
 from pathlib import Path
 from unittest.mock import patch
 
@@ -22,13 +23,14 @@ def test_http_cache_does_not_alias_distinct_urls(tmp_path):
     model.force_download = False
     calls = []
 
-    def download(url, filename, **kwargs):
+    def download(url, **kwargs):
         calls.append(url)
-        Path(filename).write_bytes(url.encode())
+        response = io.BytesIO(url.encode()); response.headers = {}
+        return response
 
     with (
         patch.object(base, "tqdm", None),
-        patch.object(base.urllib.request, "urlretrieve", download),
+        patch.object(base.http, "urlopen", download),
     ):
         first = model._download_http("https://host-a/model.onnx")
         second = model._download_http("https://host-b/model.onnx")
@@ -50,12 +52,13 @@ def test_url_cache_preserves_extension_and_identity(tmp_path, monkeypatch, secon
     model = _make_model(tmp_path)
     calls = []
 
-    def download(url, path):
+    def download(url, **kwargs):
         calls.append(url)
-        Path(path).write_text(url, encoding="utf-8")
+        response = io.BytesIO(url.encode()); response.headers = {}
+        return response
 
     monkeypatch.setattr(module, "tqdm", None)
-    monkeypatch.setattr(module.urllib.request, "urlretrieve", download)
+    monkeypatch.setattr(module.http, "urlopen", download)
     first = model._download_http("https://host/model.onnx?version=1")
     other = model._download_http(second)
     assert Path(first).suffix == Path(other).suffix == ".onnx"

@@ -5,9 +5,9 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 import cv2
 import numpy as np
 from manuscript.utils.numerics import softmax
-import onnxruntime as ort
 from PIL import Image
 
+from manuscript.api.base import managed_session_initialization
 from manuscript.api.recognizer import BaseRecognizer
 from manuscript.utils import read_image
 
@@ -191,6 +191,7 @@ class PPOCRRec(BaseRecognizer):
         )
 
 
+    @managed_session_initialization
     def _initialize_session(self) -> None:
         if self.onnx_session is not None:
             return

@@ -15,8 +15,15 @@ Manuscript OCR – открытый Python-фреймворк полного OCR
 ## Установка
 
 ```bash
-pip install manuscript-ocr
+pip install "manuscript-ocr[cpu]"
 ```
+
+Обычная установка `pip install manuscript-ocr` содержит общие компоненты без ONNX Runtime.
+Для выполнения моделей выберите `[cpu]`, `[gpu]` или браузерный `[web]`.
+Для TrOCR дополнительно нужен токенизатор: `pip install "manuscript-ocr[cpu,trocr]"`.
+
+В браузере Python работает через Pyodide, а ONNX Runtime Web подключает страница.
+Порядок подключения описан в [инструкции для веба](docs/WEB_RUNTIME.md).
 
 ## Минимальный пример
 
@@ -43,6 +50,8 @@ print(text)
 pip uninstall onnxruntime
 
 # Установите GPU-версию
+pip install "manuscript-ocr[gpu]"
+# Если библиотеки CUDA/cuDNN ещё не установлены:
 pip install "onnxruntime-gpu[cuda,cudnn]"
 ```
 
@@ -54,20 +63,20 @@ pip install "onnxruntime-gpu[cuda,cudnn]"
 ### Dev-установка с обучением моделей
 
 ```bash
-pip install "manuscript-ocr[dev]"
+pip install "manuscript-ocr[cpu,dev]"
 ```
 
 ### Dev-установка для обучения на GPU (NVIDIA CUDA)
 
 ```bash
-# Сначала установите manuscript-ocr[dev]
-pip install "manuscript-ocr[dev]"
+# Установите библиотеку с GPU Runtime и инструментами обучения
+pip install "manuscript-ocr[gpu,dev]"
 
 # Затем обновите PyTorch на GPU версию
 pip install --upgrade torch torchvision --index-url https://download.pytorch.org/whl/cu118
 ```
 
-> **Примечание:** GPU версии (ONNX Runtime GPU и PyTorch CUDA) пользователь устанавливает вручную по необходимости.
+Версию PyTorch выбирайте под свою CUDA. При переходе с CPU на GPU сначала удалите `onnxruntime`.
 
 ---
 

@@ -12,6 +12,7 @@ import warnings
 from importlib.metadata import version
 
 from packaging.version import Version
+from manuscript._internal.http import urlopen
 
 SOURCES = (
     'https://raw.githubusercontent.com/konstantinkozhin/manuscript-ocr/main/registry.json',
@@ -151,7 +152,7 @@ class Registry:
             group_cache = self.cache.parent / (hashlib.sha256(json.dumps(group).encode()).hexdigest() + '.json')
             for url in group:
                 try:
-                    with urllib.request.urlopen(_url(url), timeout=self.timeout) as response:
+                    with urlopen(_url(url), timeout=self.timeout) as response:
                         raw = response.read(8 * 1024 * 1024 + 1)
                     if len(raw) > 8 * 1024 * 1024:
                         raise ValueError('Registry exceeds 8 MiB')
@@ -256,7 +257,7 @@ class Registry:
                         with legacy.open('rb') as source:
                             shutil.copyfileobj(source, output)
                     else:
-                        with urllib.request.urlopen(url, timeout=self.timeout) as source:
+                        with urlopen(url, timeout=self.timeout) as source:
                             _download_with_progress(source, output, artifact)
                 if not _matches(Path(tmp), artifact):
                     raise ValueError('Downloaded artifact failed size/SHA-256 verification')

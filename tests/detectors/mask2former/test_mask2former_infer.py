@@ -79,7 +79,7 @@ def test_predict_returns_one_text_span_per_line(monkeypatch, tmp_path):
         return session
 
     monkeypatch.setattr(
-        "manuscript.detectors._mask2former.ort.InferenceSession",
+        "onnxruntime.InferenceSession",
         make_session,
     )
     detector = Mask2Former(weights=weights, config=config, device="cpu")
@@ -113,7 +113,7 @@ def test_default_preset_uses_registry_bundle(monkeypatch, tmp_path):
 def test_raw_preserves_model_tensors_masks_and_holes(monkeypatch, tmp_path):
     weights, config = _artifacts(tmp_path)
     session = _FakeSession()
-    monkeypatch.setattr("manuscript.detectors._mask2former.ort.InferenceSession",
+    monkeypatch.setattr("onnxruntime.InferenceSession",
                         lambda *args, **kwargs: session)
     model = Mask2Former(weights=weights, config=config)
     image = np.zeros((128, 256, 3), np.uint8)
@@ -143,7 +143,7 @@ def test_reordered_inputs_preserve_image_float16(monkeypatch, tmp_path):
                     _FakeIO("pixel_values", "tensor(float16)")]
 
     session = Session()
-    monkeypatch.setattr("manuscript.detectors._mask2former.ort.InferenceSession",
+    monkeypatch.setattr("onnxruntime.InferenceSession",
                         lambda *args, **kwargs: session)
     model = Mask2Former(weights=weights, config=config)
     model.predict(np.zeros((128, 256, 3), np.uint8))
@@ -170,7 +170,7 @@ def test_tree_serialization_and_line_recognition_levels(tmp_path,monkeypatch):
     from manuscript.api.recognizer import BaseRecognizer
     from manuscript.recognizers._common.region_types import RecognitionPrediction
     weights,config = _artifacts(tmp_path)
-    monkeypatch.setattr('manuscript.detectors._mask2former.ort.InferenceSession',lambda *a,**k:_FakeSession())
+    monkeypatch.setattr('onnxruntime.InferenceSession',lambda *a,**k:_FakeSession())
     detector=Mask2Former(weights=weights,config=config)
     image=np.zeros((400,600,3),np.uint8)
     page=detector.predict(image)

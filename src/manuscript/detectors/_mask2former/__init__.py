@@ -4,8 +4,8 @@ from typing import Dict, Optional, Union
 
 import cv2
 import numpy as np
-import onnxruntime as ort
 
+from manuscript.api.base import managed_session_initialization
 from manuscript.api.detector import BaseDetector
 from ...utils import read_image
 from manuscript.utils.masks import mask_iou, mask_to_polygon
@@ -152,12 +152,11 @@ class Mask2Former(BaseDetector):
         self.output_class_logits = values.get("output_class_logits", "class_queries_logits")
         self.output_mask_logits = values.get("output_mask_logits", "masks_queries_logits")
 
+    @managed_session_initialization
     def _initialize_session(self):
         if self.onnx_session is not None:
             return
-        session_options = ort.SessionOptions()
-        session_options.log_severity_level = 3
-        session = self._create_onnx_session(sess_options=session_options)
+        session = self._create_onnx_session(log_severity_level=3)
         inputs = {item.name: item for item in session.get_inputs()}
         if set(inputs) != {self.input_pixel_values, self.input_pixel_mask}:
             raise ValueError("Mask2Former requires configured image and pixel-mask inputs")

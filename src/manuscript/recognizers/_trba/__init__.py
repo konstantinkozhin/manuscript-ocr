@@ -5,9 +5,9 @@ from typing import Callable, List, Union, Optional, Sequence, Dict, Any
 
 import cv2
 import numpy as np
-import onnxruntime as ort
 from PIL import Image
 
+from manuscript.api.base import managed_session_initialization
 from manuscript.api.recognizer import BaseRecognizer
 from manuscript.utils import read_image
 
@@ -244,6 +244,7 @@ class TRBA(BaseRecognizer):
             return str(resolved)
         raise FileNotFoundError("TRBA requires a charset artifact or explicit charset")
 
+    @managed_session_initialization
     def _initialize_session(self):
         """Initialize ONNX Runtime session (lazy loading)."""
         if self.onnx_session is not None:
@@ -1054,7 +1055,8 @@ class TRBA(BaseRecognizer):
         torch_output = output.numpy()
 
         def _validate_exported_onnx(path: Path, label: str) -> None:
-            session = ort.InferenceSession(str(path), providers=["CPUExecutionProvider"])
+            from manuscript.runtimes import get_native_runtime
+            session = get_native_runtime().InferenceSession(str(path), providers=["CPUExecutionProvider"])
             input_name = "input"
             get_inputs = getattr(session, "get_inputs", None)
             supports_input_introspection = callable(get_inputs)

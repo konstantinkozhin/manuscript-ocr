@@ -203,7 +203,7 @@ def test_yolo_can_disable_containment_cleanup(monkeypatch, tmp_path):
 
     fake_session = _FakeSessionDetect()
     monkeypatch.setattr(
-        "manuscript.detectors._yolo.ort.InferenceSession",
+        "onnxruntime.InferenceSession",
         lambda *_args, **_kwargs: fake_session,
     )
 
@@ -243,7 +243,7 @@ def test_yolo_predict_returns_flat_tree_for_obb_by_default(
 
     fake_session = _FakeSessionOBB()
     monkeypatch.setattr(
-        "manuscript.detectors._yolo.ort.InferenceSession",
+        "onnxruntime.InferenceSession",
         lambda *_args, **_kwargs: fake_session,
     )
 
@@ -281,7 +281,7 @@ def test_yolo_predict_returns_rotated_rows_when_requested(monkeypatch, tmp_path)
 
     fake_session = _FakeSessionOBB()
     monkeypatch.setattr(
-        "manuscript.detectors._yolo.ort.InferenceSession",
+        "onnxruntime.InferenceSession",
         lambda *_args, **_kwargs: fake_session,
     )
 
@@ -313,7 +313,7 @@ def test_yolo_supports_legacy_axis_aligned_output_format(monkeypatch, tmp_path):
 
     fake_session = _FakeSessionDetect()
     monkeypatch.setattr(
-        "manuscript.detectors._yolo.ort.InferenceSession",
+        "onnxruntime.InferenceSession",
         lambda *_args, **_kwargs: fake_session,
     )
 
@@ -347,7 +347,7 @@ def test_yolo_supports_dynamic_onnx_input_with_default_1280(monkeypatch, tmp_pat
     model_path.with_suffix(".yaml").write_text("region_classes: {0: {type: word}, 1: {type: table}}\n", encoding="utf-8")
 
     monkeypatch.setattr(
-        "manuscript.detectors._yolo.ort.InferenceSession",
+        "onnxruntime.InferenceSession",
         lambda *_args, **_kwargs: _DynamicSession(),
     )
 
@@ -363,7 +363,7 @@ def test_yolo_rejects_static_shape_mismatch(monkeypatch, tmp_path):
     model_path.with_suffix(".yaml").write_text("region_classes: {0: {type: word}, 1: {type: table}}\n", encoding="utf-8")
 
     monkeypatch.setattr(
-        "manuscript.detectors._yolo.ort.InferenceSession",
+        "onnxruntime.InferenceSession",
         lambda *_args, **_kwargs: _FakeSessionOBB(),
     )
 
@@ -386,7 +386,7 @@ def test_float16_graph_uses_float16_input(monkeypatch, tmp_path):
         return items
 
     monkeypatch.setattr(session, "get_inputs", get_inputs)
-    monkeypatch.setattr("manuscript.detectors._yolo.ort.InferenceSession", lambda *a, **k: session)
+    monkeypatch.setattr("onnxruntime.InferenceSession", lambda *a, **k: session)
     model = YOLO(weights=model_path, config=model_path.with_suffix(".yaml"))
     model._initialize_session()
     tensor, _, _ = model._preprocess(np.zeros((20, 30, 3), np.uint8))
@@ -397,7 +397,7 @@ def test_yolo_multiclass_tree_and_raw_outputs(monkeypatch, tmp_path):
     model_path = tmp_path / 'model.onnx'
     model_path.write_bytes(b'fake')
     session = _FakeSessionDetect()
-    monkeypatch.setattr('manuscript.detectors._yolo.ort.InferenceSession', lambda *a, **k: session)
+    monkeypatch.setattr('onnxruntime.InferenceSession', lambda *a, **k: session)
     detector = YOLO(weights=model_path, config={'region_classes': {
         0: {'type': 'word', 'label': 'handwritten'}, 1: {'type': 'table'}}},
         score_thresh=.25, containment_threshold=None)
@@ -442,7 +442,7 @@ def test_yolo_empty_page_and_unconfigured_class(monkeypatch, tmp_path):
     model_path = tmp_path / 'model.onnx'
     model_path.write_bytes(b'fake')
     session = _FakeSessionDetect()
-    monkeypatch.setattr('manuscript.detectors._yolo.ort.InferenceSession', lambda *a, **k: session)
+    monkeypatch.setattr('onnxruntime.InferenceSession', lambda *a, **k: session)
     detector = YOLO(weights=model_path, config={'region_classes': {0: {'type': 'word'}}}, score_thresh=1)
     page = detector.predict(np.zeros((320,640,3), dtype=np.uint8))
     assert page.children == ()
@@ -458,7 +458,7 @@ def test_yolo_rotated_polygon_preserved_in_tree(monkeypatch, tmp_path):
     class Rotated(_FakeSessionOBB):
         def run(self, output_names, feed_dict):
             return [np.array([[[400,520,200,100,.9,0,np.pi/4]]], dtype=np.float32)]
-    monkeypatch.setattr('manuscript.detectors._yolo.ort.InferenceSession', lambda *a, **k: Rotated())
+    monkeypatch.setattr('onnxruntime.InferenceSession', lambda *a, **k: Rotated())
     detector = YOLO(weights=model_path, config={'region_classes': {0: {'type':'word'}}})
     image = np.zeros((320,640,3), dtype=np.uint8)
     raw = detector.predict(image, return_raw=True)

@@ -9,24 +9,29 @@ Basic installation (inference only)
 
 .. code-block:: bash
 
-    pip install manuscript-ocr
+    pip install "manuscript-ocr[cpu]"
+
+The base package (``pip install manuscript-ocr``) installs shared components
+without an inference runtime. Choose ``[cpu]``, ``[gpu]`` or ``[web]``;
+TrOCR additionally requires ``[trocr]``, for example ``[cpu,trocr]``.
 
 GPU acceleration (NVIDIA CUDA)
 ^^^^^^^^^^^^^^^^^^^^^^^^^^^^^^
 
-If you are switching an existing installation from CPU to GPU:
-
-1. Remove the CPU version of ONNX Runtime and install the GPU version:
+When switching from CPU, first remove ``onnxruntime``. Then install the GPU extra:
 
 .. code-block:: bash
 
     pip uninstall onnxruntime
+    pip install "manuscript-ocr[gpu]"
+
+If CUDA/cuDNN libraries are not installed, also run:
+
+.. code-block:: bash
+
     pip install "onnxruntime-gpu[cuda,cudnn]"
 
-2. If you are working in Jupyter Notebook, JupyterLab, VS Code notebooks, or
-   Google Colab, restart the kernel or runtime after installation.
-
-Reinstalling ``manuscript-ocr`` is not required.
+In notebooks, restart the kernel after installation.
 
 You can switch models and pipeline components explicitly with the ``device``
 parameter, for example ``device="cuda"`` for NVIDIA GPU or ``device="cpu"``
@@ -88,7 +93,7 @@ Apple Silicon acceleration (CoreML)
 
 .. code-block:: bash
 
-    pip install manuscript-ocr
+    pip install "manuscript-ocr[cpu]"
 
 Official macOS ``onnxruntime`` wheels include the CoreML execution provider;
 a separate ``onnxruntime-silicon`` package is not needed. Use
@@ -100,7 +105,7 @@ Installation with training support
 
 .. code-block:: bash
 
-    pip install "manuscript-ocr[dev]"
+    pip install "manuscript-ocr[cpu,dev]"
 
 This installs additional dependencies for model training:
 

@@ -1,14 +1,14 @@
 from collections import Counter
 from statistics import median
 
-from rapidfuzz.distance import Levenshtein
+from .._common.edit_distance import levenshtein_distance
 
 from .._majority_voting import MajorityVotingRecognizer
 
 
 def _distance(first, second):
-    """Unit-cost character Levenshtein using RapidFuzz."""
-    return Levenshtein.distance(first, second)
+    """Exact unit-cost character Levenshtein without native dependencies."""
+    return levenshtein_distance(first, second)
 
 
 class MedoidRecognizer(MajorityVotingRecognizer):

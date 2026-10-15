@@ -124,7 +124,7 @@ def test_public_predict_and_pipeline_use_fixed_graph_shape(weights, monkeypatch,
             return outputs()
 
     monkeypatch.setattr(
-        "manuscript.detectors._rfdetr.ort.InferenceSession", lambda *a, **kw: Session()
+        "onnxruntime.InferenceSession", lambda *a, **kw: Session()
     )
     model = RFDETR(weights, config=weights.with_suffix(".json"))
     image = np.zeros((100, 200, 3), np.uint8)

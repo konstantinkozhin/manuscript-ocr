@@ -52,6 +52,13 @@ def test_wheel_excludes_caches_and_runs_installed_pipeline(tmp_path):
         assert not any(name.endswith("registry.json") for name in names)
         assert not any(name.startswith("scripts/") for name in names)
         assert "manuscript/recognizers/_trba/configs/charset.txt" in names
+        assert "manuscript/runtimes/bridge.mjs" in names
+        from email.parser import BytesParser
+        from packaging.requirements import Requirement
+        metadata = BytesParser().parsebytes(archive.read(next(n for n in names if n.endswith(".dist-info/METADATA"))))
+        requirements = [Requirement(r) for r in metadata.get_all("Requires-Dist")]
+        assert all(r.marker is not None for r in requirements if r.name in {"onnxruntime", "onnxruntime-gpu"})
+        assert "web" in metadata.get_all("Provides-Extra")
     target = tmp_path / "installed"
     with ZipFile(wheel) as archive:
         archive.extractall(target)

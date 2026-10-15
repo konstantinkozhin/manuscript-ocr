@@ -1,5 +1,6 @@
 from tests.support.modules import patch_modules
 import builtins
+import io
 import importlib.util
 from pathlib import Path
 from types import SimpleNamespace
@@ -49,6 +50,9 @@ class _FakeTqdm:
 
     def __exit__(self, exc_type, exc, tb):
         return False
+
+    def close(self):
+        pass
 
     def update(self, amount):
         self.n += amount
@@ -116,7 +120,7 @@ class TestBaseArtifactModelRuntimeEdges:
                     create=True,
                 ):
                     with patch.object(
-                        base_module.ort, "preload_dlls", create=True
+                        base_module.get_native_runtime(), "preload_dlls", create=True
                     ) as mock_preload:
                         model._prepare_runtime_dependencies()
 
@@ -128,135 +132,54 @@ class TestBaseArtifactModelRuntimeEdges:
 
     def test_download_http_uses_progress_bar_when_tqdm_available(self, tmp_path):
         model = _make_model(tmp_path)
-        cache_root = tmp_path / "cache_home"
+        response = io.BytesIO(b'payload'); response.headers = {'content-length':'7'}
+        with patch.object(base_module.Path, 'home', return_value=tmp_path):
+            with patch.object(base_module, 'tqdm', _FakeTqdm), patch.object(base_module.http, 'urlopen', return_value=response):
+                result = model._download_http('https://example.com/model.onnx')
+        assert Path(result).read_bytes() == b'payload'
+        assert response.closed
 
-        def fake_urlretrieve(url, target, reporthook=None):
-            if reporthook is not None:
-                reporthook(1, 4, 10)
-                reporthook(2, 4, 10)
-            Path(target).write_text("payload", encoding="utf-8")
-
-        with patch.object(base_module.Path, "home", return_value=cache_root):
-            with patch.object(base_module, "tqdm", _FakeTqdm):
-                with patch(
-                    "manuscript.api.base.urllib.request.urlopen",
-                    return_value=_FakeUrlopenResponse(size=10),
-                ):
-                    with patch(
-                        "manuscript.api.base.urllib.request.urlretrieve",
-                        side_effect=fake_urlretrieve,
-                    ) as mock_urlretrieve:
-                        result = model._download_http("https://example.com/model.onnx")
-
-        assert Path(result).exists()
-        assert Path(result).read_text(encoding="utf-8") == "payload"
-        assert mock_urlretrieve.call_count == 1
-
-    def test_download_http_falls_back_when_progress_bar_setup_fails(
-        self, tmp_path, capsys
-    ):
+    def test_download_http_falls_back_when_progress_bar_setup_fails(self, tmp_path, capsys):
         model = _make_model(tmp_path)
-        cache_root = tmp_path / "cache_home"
+        response = io.BytesIO(b'payload'); response.headers = {}
+        with patch.object(base_module.Path, 'home', return_value=tmp_path):
+            with patch.object(base_module, 'tqdm', side_effect=RuntimeError('broken progress')), patch.object(base_module.http, 'urlopen', return_value=response) as open_url:
+                result = model._download_http('https://example.com/fallback.onnx')
+        assert Path(result).read_bytes() == b'payload'
+        assert open_url.call_count == 1
 
-        def fake_urlretrieve(url, target, reporthook=None):
-            assert reporthook is None
-            Path(target).write_text("payload", encoding="utf-8")
-
-        with patch.object(base_module.Path, "home", return_value=cache_root):
-            with patch.object(base_module, "tqdm", _FakeTqdm):
-                with patch(
-                    "manuscript.api.base.urllib.request.urlopen",
-                    side_effect=RuntimeError("broken progress setup"),
-                ):
-                    with patch(
-                        "manuscript.api.base.urllib.request.urlretrieve",
-                        side_effect=fake_urlretrieve,
-                    ):
-                        result = model._download_http(
-                            "https://example.com/fallback.onnx"
-                        )
-
-        captured = capsys.readouterr().out
-        assert "downloading without progress" in captured
-        assert Path(result).exists()
-
-    def test_download_http_without_tqdm_uses_plain_urlretrieve(self, tmp_path):
+    def test_download_http_without_tqdm_uses_plain_stream(self, tmp_path):
         model = _make_model(tmp_path)
-        cache_root = tmp_path / "cache_home"
+        response = io.BytesIO(b'payload'); response.headers = {}
+        with patch.object(base_module.Path, 'home', return_value=tmp_path):
+            with patch.object(base_module, 'tqdm', None), patch.object(base_module.http, 'urlopen', return_value=response) as open_url:
+                result = model._download_http('https://example.com/plain.onnx')
+        assert Path(result).read_bytes() == b'payload'
+        assert open_url.call_count == 1
 
-        def fake_urlretrieve(url, target):
-            Path(target).write_text("payload", encoding="utf-8")
-
-        with patch.object(base_module.Path, "home", return_value=cache_root):
-            with patch.object(base_module, "tqdm", None):
-                with patch(
-                    "manuscript.api.base.urllib.request.urlretrieve",
-                    side_effect=fake_urlretrieve,
-                ) as mock_urlretrieve:
-                    result = model._download_http("https://example.com/plain.onnx")
-
-        assert Path(result).exists()
-        assert mock_urlretrieve.call_count == 1
-
-    def test_download_http_retries_retryable_http_error_and_cleans_temp_file(
-        self, tmp_path
-    ):
+    def test_download_http_retries_retryable_http_error_and_cleans_temp_file(self, tmp_path):
         model = _make_model(tmp_path)
-        cache_root = tmp_path / "cache_home"
-        temp_file = tmp_path / "retry_http.tmp"
-        attempts = {"count": 0}
-
-        def fake_urlretrieve(url, target):
-            attempts["count"] += 1
-            Path(target).write_text("payload", encoding="utf-8")
-            if attempts["count"] == 1:
-                raise urllib.error.HTTPError(url, 429, "retry", None, None)
-
-        with patch.object(base_module.Path, "home", return_value=cache_root):
-            with patch.object(base_module, "tqdm", None):
-                with patch(
-                    "manuscript.api.base.tempfile.NamedTemporaryFile",
-                    return_value=SimpleNamespace(name=str(temp_file)),
-                ):
-                    with patch(
-                        "manuscript.api.base.urllib.request.urlretrieve",
-                        side_effect=fake_urlretrieve,
-                    ):
-                        with patch("manuscript.api.base.time.sleep") as mock_sleep:
-                            result = model._download_http(
-                                "https://example.com/retry.onnx"
-                            )
-
-        assert attempts["count"] == 2
-        assert mock_sleep.call_count == 1
-        assert not temp_file.exists()
-        assert Path(result).exists()
+        url = 'https://example.com/retry.onnx'
+        response = io.BytesIO(b'payload'); response.headers = {}
+        with patch.object(base_module.Path, 'home', return_value=tmp_path):
+            with patch.object(base_module.http, 'urlopen', side_effect=[urllib.error.HTTPError(url, 429, "retry", None, None), response]) as open_url, patch.object(base_module.http, 'sleep') as sleep:
+                result = model._download_http(url)
+        assert open_url.call_count == 2
+        sleep.assert_called_once_with(1)
+        assert Path(result).read_bytes() == b'payload'
+        assert not list(Path(result).parent.glob('*.part'))
 
     def test_download_http_retries_url_error(self, tmp_path):
         model = _make_model(tmp_path)
-        cache_root = tmp_path / "cache_home"
-        attempts = {"count": 0}
-
-        def fake_urlretrieve(url, target):
-            attempts["count"] += 1
-            if attempts["count"] == 1:
-                raise urllib.error.URLError("temporary outage")
-            Path(target).write_text("payload", encoding="utf-8")
-
-        with patch.object(base_module.Path, "home", return_value=cache_root):
-            with patch.object(base_module, "tqdm", None):
-                with patch(
-                    "manuscript.api.base.urllib.request.urlretrieve",
-                    side_effect=fake_urlretrieve,
-                ):
-                    with patch("manuscript.api.base.time.sleep") as mock_sleep:
-                        result = model._download_http(
-                            "https://example.com/retry-url-error.onnx"
-                        )
-
-        assert attempts["count"] == 2
-        assert mock_sleep.call_count == 1
-        assert Path(result).exists()
+        url = 'https://example.com/retry.onnx'
+        response = io.BytesIO(b'payload'); response.headers = {}
+        with patch.object(base_module.Path, 'home', return_value=tmp_path):
+            with patch.object(base_module.http, 'urlopen', side_effect=[urllib.error.URLError("temporary outage"), response]) as open_url, patch.object(base_module.http, 'sleep') as sleep:
+                result = model._download_http(url)
+        assert open_url.call_count == 2
+        sleep.assert_called_once_with(1)
+        assert Path(result).read_bytes() == b'payload'
+        assert not list(Path(result).parent.glob('*.part'))
 
     def test_download_gdrive_raises_when_gdown_returns_none(self, tmp_path):
         model = _make_model(tmp_path)
@@ -318,24 +241,14 @@ def test_base_module_falls_back_when_tqdm_is_missing(monkeypatch):
 def test_failed_refresh_preserves_cache_and_removes_partial_files(tmp_path, monkeypatch, status, attempts):
     model = _make_model(tmp_path)
     model.force_download = True
-    url = "https://example.com/model.onnx"
-    cached = model._http_cache_path(url)
-    cached.write_bytes(b"working weights")
-    temporary_files = []
-
-    def download(source, target):
-        temporary_files.append(Path(target))
-        Path(target).write_bytes(b"partial weights")
-        raise urllib.error.HTTPError(source, status, "unavailable", None, None)
-
-    monkeypatch.setattr(base_module, "tqdm", None)
-    monkeypatch.setattr(base_module.urllib.request, "urlretrieve", download)
-    with patch.object(base_module.time, "sleep") as sleep:
+    monkeypatch.setattr(type(model), '_cache_dir', property(lambda self: tmp_path / 'cache'))
+    url = 'https://example.com/model.onnx'
+    cache = model._http_cache_path(url); cache.write_bytes(b'working weights')
+    with patch.object(base_module.http, 'urlopen', side_effect=urllib.error.HTTPError(url, status, 'unavailable', None, None)) as open_url, patch.object(base_module.http, 'sleep') as sleep:
         with pytest.raises(urllib.error.HTTPError) as error:
             model._download_http(url)
     assert error.value.code == status
-    assert len(temporary_files) == attempts
+    assert open_url.call_count == attempts
     assert sleep.call_count == attempts - 1
-    assert cached.read_bytes() == b"working weights"
-    assert all(not path.exists() for path in temporary_files)
-    assert list(cached.parent.iterdir()) == [cached]
+    assert cache.read_bytes() == b'working weights'
+    assert not list(cache.parent.glob('*.part'))

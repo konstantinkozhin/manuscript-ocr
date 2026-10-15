@@ -1,13 +1,13 @@
 import warnings
 import json
 from pathlib import Path
-from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Optional, Sequence, Tuple, Union
 
 import cv2
 import numpy as np
-import onnxruntime as ort
 from shapely.geometry import Polygon
 
+from manuscript.api.base import managed_session_initialization
 from manuscript.api.detector import BaseDetector
 
 from ...data import Page
@@ -198,6 +198,7 @@ class YOLO(BaseDetector):
 
         raise ValueError(f"imgsz must be an integer or square pair, got: {value!r}")
 
+    @managed_session_initialization
     def _initialize_session(self):
         if self.onnx_session is not None:
             return

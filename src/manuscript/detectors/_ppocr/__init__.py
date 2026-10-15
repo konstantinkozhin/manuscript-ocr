@@ -5,9 +5,9 @@ from typing import Optional, Union
 
 import cv2
 import numpy as np
-import onnxruntime as ort
 from shapely.geometry import Polygon
 
+from manuscript.api.base import managed_session_initialization
 from manuscript.api.detector import BaseDetector
 from manuscript.utils import read_image
 from manuscript.utils.geometry import repair_detection_polygon
@@ -71,11 +71,12 @@ class PPOCR(BaseDetector):
     def __init__(
         self, weights: Union[str, Path], config=None, device: Optional[str] = None,
         threshold=None, box_threshold=None, unclip_ratio=None,
-        limit_side_len=None, limit_type=None, force_download=False,
+        limit_side_len=None, limit_type=None, force_download=False, *, runtime="auto", web_external_data=None,
     ):
         if weights is None:
             raise ValueError("PPOCR requires explicit ONNX weights")
-        super().__init__(weights=str(weights), device=device, force_download=force_download)
+        super().__init__(weights=str(weights), device=device, force_download=force_download, runtime=runtime,
+                         web_external_data=web_external_data)
         config, self.config_path = self._load_detector_config(config)
         self._configure_region_types(config)
         if set(self.region_classes) != {0}:
@@ -152,6 +153,7 @@ class PPOCR(BaseDetector):
         if not isinstance(post["output_is_logits"], bool):
             raise ValueError("output_is_logits must be boolean")
 
+    @managed_session_initialization
     def _initialize_session(self):
         if self.session is not None:
             return

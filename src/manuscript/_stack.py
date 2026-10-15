@@ -1,3 +1,4 @@
+import sys
 """Sequential composition of image and document-tree processors."""
 import inspect
 from concurrent.futures import ThreadPoolExecutor
@@ -46,6 +47,8 @@ class Stack:
                 raise TypeError("Stack processors must implement predict")
         if not isinstance(parallel, bool):
             raise TypeError("parallel must be a boolean")
+        if parallel and sys.platform == "emscripten":
+            raise ValueError("Python thread parallelism is unavailable in Pyodide; use parallel=False.")
         self.parallel = parallel
         if parallel:
             self._detector_stages()

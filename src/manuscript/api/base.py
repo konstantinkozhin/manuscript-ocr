@@ -10,17 +10,31 @@ import sys
 from typing import Dict, Optional
 import shutil
 import tempfile
-import time
 import urllib.error
-import urllib.request
 from urllib.parse import urlsplit
 
-import onnxruntime as ort
+from functools import wraps
+
+from manuscript.runtimes import create_session, get_native_runtime
+from manuscript._internal import http
 
 try:
     from tqdm import tqdm
 except ImportError:
     tqdm = None
+
+
+def managed_session_initialization(method):
+    """Release sessions created by a model initializer if validation fails."""
+    @wraps(method)
+    def initialize(self, *args, **kwargs):
+        previous = len(getattr(self, "_runtime_sessions", []))
+        try:
+            return method(self, *args, **kwargs)
+        except BaseException:
+            self._release_sessions(previous)
+            raise
+    return initialize
 
 
 class BaseArtifactModel(ABC):
@@ -47,9 +61,16 @@ class BaseArtifactModel(ABC):
         weights: Optional[str] = None,
         device: Optional[str] = None,
         force_download: bool = False,
+        runtime="auto",
+        web_external_data=None,
         **kwargs,
     ):
-        self.device = self._resolve_device(device)
+        if runtime not in ("auto", "native", "web"):
+            raise ValueError("runtime must be 'auto', 'native' or 'web'")
+        self.runtime = ("web" if sys.platform == "emscripten" else "native") if runtime == "auto" else runtime
+        self.device = (device or "cpu") if self.runtime == "web" else self._resolve_device(device)
+        self.web_external_data = web_external_data
+        self._runtime_sessions = []
         self.force_download = bool(force_download)
         self.weights = self._resolve_weights(weights)
         self.extra_config = kwargs
@@ -67,7 +88,7 @@ class BaseArtifactModel(ABC):
             return device
 
         try:
-            if ort.get_device().upper() == "GPU":
+            if get_native_runtime().get_device().upper() == "GPU":
                 return "cuda"
         except Exception:
             pass
@@ -142,6 +163,7 @@ class BaseArtifactModel(ABC):
                 messages.append("Failed to preload some NVIDIA DLLs:")
                 messages.extend(f"  {item}" for item in dll_load_errors)
 
+        ort = get_native_runtime()
         if not hasattr(ort, "preload_dlls"):
             if messages:
                 self._runtime_preload_message = "\n".join(messages)
@@ -321,88 +343,52 @@ class BaseArtifactModel(ABC):
         return directory / filename
 
     def _download_http(self, url: str) -> str:
-        """Download file from HTTP/HTTPS URL"""
+        """Cache an HTTP artifact atomically with shared native/browser behavior."""
         file = self._http_cache_path(url)
         if file.exists() and not self.force_download:
             return str(file)
-
-        action = "Re-downloading" if file.exists() else "Downloading"
-        print(f"{action} {Path(url).name} from {url}")
-        max_attempts = 5
-        retry_statuses = {429, 500, 502, 503, 504}
-        base_backoff_seconds = 1.0
-        last_error = None
-
-        for attempt in range(1, max_attempts + 1):
-            tmp = tempfile.NamedTemporaryFile(dir=file.parent, delete=False).name
-
+        for attempt in range(5):
+            fd, temporary = tempfile.mkstemp(dir=file.parent, suffix=".part")
             try:
-                if tqdm is not None:
+                with os.fdopen(fd, "wb") as output, http.urlopen(url, timeout=60) as source:
+                    total = int(source.headers.get("content-length") or 0)
+                    progress = None
+                    if tqdm is not None:
+                        try:
+                            progress = tqdm(total=total or None, unit="B", unit_scale=True, desc=file.name)
+                        except Exception:
+                            pass
                     try:
-                        # Get file size
-                        with urllib.request.urlopen(url) as response:
-                            total_size = int(response.headers.get("content-length", 0))
-
-                        with tqdm(
-                            total=total_size,
-                            unit="B",
-                            unit_scale=True,
-                            unit_divisor=1024,
-                            desc=Path(url).name,
-                            ncols=80,
-                        ) as pbar:
-
-                            def reporthook(block_num, block_size, total_size):
-                                downloaded = block_num * block_size
-                                if downloaded < total_size:
-                                    pbar.update(block_size)
-                                else:
-                                    pbar.update(total_size - pbar.n)
-
-                            urllib.request.urlretrieve(url, tmp, reporthook=reporthook)
-                    except Exception as e:
-                        # Fallback to simple download if progress bar fails
-                        print(f"Progress bar error ({e}), downloading without progress...")
-                        urllib.request.urlretrieve(url, tmp)
-                else:
-                    # No tqdm available, simple download
-                    urllib.request.urlretrieve(url, tmp)
-
-                os.replace(tmp, file)
-                print(f" Downloaded to {file}")
+                        while True:
+                            chunk = source.read(1024 * 1024)
+                            if not chunk:
+                                break
+                            output.write(chunk)
+                            if progress is not None:
+                                try:
+                                    progress.update(len(chunk))
+                                except Exception:
+                                    with contextlib.suppress(Exception):
+                                        progress.close()
+                                    progress = None
+                        if total and output.tell() != total:
+                            raise urllib.error.URLError("Downloaded artifact is truncated")
+                    finally:
+                        if progress is not None:
+                            with contextlib.suppress(Exception):
+                                progress.close()
+                os.replace(temporary, file)
                 return str(file)
-
-            except urllib.error.HTTPError as e:
-                last_error = e
-                if e.code not in retry_statuses or attempt == max_attempts:
+            except urllib.error.HTTPError as exc:
+                if exc.code not in {429, 500, 502, 503, 504} or attempt == 4:
                     raise
-                delay = base_backoff_seconds * (2 ** (attempt - 1))
-                print(
-                    f"Download failed with HTTP {e.code}. "
-                    f"Retrying in {delay:.1f}s ({attempt}/{max_attempts - 1})..."
-                )
-                time.sleep(delay)
-            except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
-                last_error = e
-                if attempt == max_attempts:
+                http.sleep(2 ** attempt)
+            except (urllib.error.URLError, TimeoutError, ConnectionError):
+                if attempt == 4:
                     raise
-                delay = base_backoff_seconds * (2 ** (attempt - 1))
-                print(
-                    f"Download failed ({e}). "
-                    f"Retrying in {delay:.1f}s ({attempt}/{max_attempts - 1})..."
-                )
-                time.sleep(delay)
+                http.sleep(2 ** attempt)
             finally:
-                tmp_path = Path(tmp)
-                if tmp_path.exists():
-                    try:
-                        tmp_path.unlink()
-                    except OSError:
-                        pass
-
-        if last_error is not None:
-            raise last_error
-        raise RuntimeError(f"Failed to download: {url}")
+                Path(temporary).unlink(missing_ok=True)
 
     def _download_github(self, spec: str) -> str:
         payload = spec.replace("github://", "").strip()
@@ -466,11 +452,54 @@ class BaseArtifactModel(ABC):
                 except OSError:
                     pass
 
-    def _create_onnx_session(self, weights=None, **kwargs):
-        self._prepare_runtime_dependencies()
-        session = ort.InferenceSession(str(self.weights if weights is None else weights), providers=self.runtime_providers(), **kwargs)
+    def _create_onnx_session(self, weights=None, *, log_severity_level=None, **options):
+        artifacts = getattr(self, "_resolved_model_artifacts", {})
+        external_data = self.web_external_data
+        if external_data is None and weights is None and artifacts.get("external_data"):
+            external_data = [artifacts["external_data"]]
+        if self.runtime == "native":
+            self._prepare_runtime_dependencies()
+        session = create_session(
+            self.weights if weights is None else weights,
+            runtime=self.runtime, device=self.device, providers=self.runtime_providers(),
+            log_severity_level=log_severity_level, external_data=external_data, **options,
+        )
+        self._runtime_sessions.append(session)
         self._log_device_info(session)
         return session
+
+    def _release_sessions(self, start=0):
+        sessions = getattr(self, "_runtime_sessions", [])[start:]
+        if not sessions:
+            return
+        errors, released = [], []
+        for session in reversed(sessions):
+            try:
+                close = getattr(session, "close", None)
+                if callable(close):
+                    close()
+                released.append(session)
+            except Exception as exc:
+                errors.append(exc)
+        for name, value in list(vars(self).items()):
+            if any(value is item for item in released):
+                setattr(self, name, None)
+        # Keep failed handles available so another close() can retry release.
+        self._runtime_sessions[start:] = [
+            session for session in sessions if not any(session is item for item in released)
+        ]
+        if errors:
+            logging.getLogger(__name__).warning("Failed to release runtime session: %s", errors[0])
+
+    def close(self):
+        """Release this model's sessions; a later prediction initializes them again."""
+        self._release_sessions()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
 
     # -------------------------------------------------------------------------
     # BACKEND INITIALIZATION

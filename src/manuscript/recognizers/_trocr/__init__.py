@@ -1,11 +1,13 @@
 """ONNX encoder/decoder OCR with local tokenizer and autoregressive generation."""
 
+
 import json
 from pathlib import Path
 
 import numpy as np
 from PIL import Image
 
+from manuscript.api.base import managed_session_initialization
 from manuscript.api.recognizer import BaseRecognizer
 from manuscript.utils import read_image
 from .._common.region_types import RecognitionPrediction
@@ -236,6 +238,7 @@ class TrOCR(BaseRecognizer):
                 raise ValueError("Unsupported generation parameter: " + key)
         self.onnx_session = self.decoder_session = self.decoder_with_past_session = self.tokenizer = None
 
+    @managed_session_initialization
     def _initialize_session(self):
         if self.onnx_session is not None:
             return

@@ -6,6 +6,7 @@ from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 import cv2
 import numpy as np
 
+from manuscript.api.base import managed_session_initialization
 from manuscript.api.detector import BaseDetector
 
 from ...utils import read_image
@@ -207,6 +208,7 @@ class EAST(BaseDetector):
         self.use_tta = use_tta
         self.tta_iou_thresh = tta_iou_thresh
 
+    @managed_session_initialization
     def _initialize_session(self):
         if self.onnx_session is not None:
             return

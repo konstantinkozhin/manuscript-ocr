@@ -3,6 +3,7 @@
 from tests.support.modules import patch_modules
 
 import pytest
+import io
 from pathlib import Path
 from unittest.mock import Mock, patch, MagicMock
 
@@ -215,12 +216,14 @@ class TestWeightResolution:
     def test_url_weights_download_to_cache(self, tmp_path, monkeypatch, url):
         calls = []
 
-        def download(source, target):
+        def download(source, timeout=None):
             calls.append(source)
-            Path(target).write_bytes(b"downloaded weights")
+            response = io.BytesIO(b"downloaded weights")
+            response.headers = {}
+            return response
 
         monkeypatch.setattr(base_module, "tqdm", None)
-        monkeypatch.setattr(base_module.urllib.request, "urlretrieve", download)
+        monkeypatch.setattr(base_module.http, "urlopen", download)
         model = ConcreteModel(weights=url)
         assert calls == [url]
         assert model.weights == str(model._http_cache_path(url))
@@ -487,81 +490,42 @@ class TestDownloadHelpers:
         # Progress and fallback behavior have dedicated tests in runtime_edges.
         monkeypatch.setattr(base_module, "tqdm", None)
     
-    @patch("urllib.request.urlretrieve")
-    def test_download_http_new_file(self, mock_urlretrieve, tmp_path):
-        """Test downloading a new file via HTTP."""
-        weights_file = tmp_path / "model.onnx"
-        weights_file.write_text("mock")
-        
-        url = "https://example.com/newfile.onnx"
-        
-        def fake_download(url, tmp_path):
-            Path(tmp_path).write_text("new content")
-        
-        mock_urlretrieve.side_effect = fake_download
-        
-        model = ConcreteModel(weights=str(weights_file))
-        
-        result = model._download_http(url)
-        
-        assert result == str(model._http_cache_path(url))
-        assert Path(result).read_text() == "new content"
-        assert mock_urlretrieve.call_count == 1
-        assert mock_urlretrieve.call_args.args[0] == url
-        assert not Path(mock_urlretrieve.call_args.args[1]).exists()
-    
-    @patch("urllib.request.urlretrieve")
-    def test_download_http_cached_file(self, mock_urlretrieve, tmp_path):
-        """Test using cached file instead of re-downloading."""
-        weights_file = tmp_path / "model.onnx"
-        weights_file.write_text("mock")
-        
-        url = "https://example.com/cached.onnx"
-        
-        # Pre-create cached file
-        model = ConcreteModel(weights=str(weights_file))
-        cached_file = model._http_cache_path(url)
-        
+    @patch("manuscript.api.base.http.urlopen")
+    def test_download_http_new_file(self, open_url, tmp_path):
+        weights = tmp_path / 'model.onnx'
+        weights.write_bytes(b'mock')
+        response = io.BytesIO(b'new content'); response.headers = {}
+        open_url.return_value = response
+        model = ConcreteModel(weights=weights)
+        result = model._download_http('https://example.com/newfile.onnx')
+        assert Path(result).read_bytes() == b'new content'
+        assert response.closed
+        open_url.assert_called_once_with('https://example.com/newfile.onnx', timeout=60)
+        assert not list(Path(result).parent.glob('*.part'))
+
+    @patch("manuscript.api.base.http.urlopen")
+    def test_download_http_cached_file(self, open_url, tmp_path):
+        weights = tmp_path / 'model.onnx'; weights.write_bytes(b'mock')
+        model = ConcreteModel(weights=weights)
+        cache = model._http_cache_path('https://example.com/cached.onnx')
+        cache.write_bytes(b'cached')
         try:
-            cached_file.write_text("already cached")
-            
-            model = ConcreteModel(weights=str(weights_file))
-            
-            result = model._download_http(url)
-            
-            # Should NOT download again
-            mock_urlretrieve.assert_not_called()
-            assert result == str(cached_file)
+            assert model._download_http('https://example.com/cached.onnx') == str(cache)
+            open_url.assert_not_called()
         finally:
-            if cached_file.exists():
-                cached_file.unlink()
+            cache.unlink()
 
     def test_download_http_force_download_replaces_cached_file(self, tmp_path):
-        """Test force_download refreshes an existing cached HTTP artifact."""
-        weights_file = tmp_path / "model.onnx"
-        weights_file.write_text("mock", encoding="utf-8")
-
-        cache_root = tmp_path / "cache_home"
-
-        def fake_urlretrieve(url, target):
-            Path(target).write_text("fresh", encoding="utf-8")
-
-        with patch.object(base_module.Path, "home", return_value=cache_root):
-            with patch(
-                "manuscript.api.base.urllib.request.urlretrieve",
-                side_effect=fake_urlretrieve,
-            ) as mock_urlretrieve:
-                model = ConcreteModel(
-                    weights=str(weights_file),
-                    force_download=True,
-                )
-                cached_file = model._http_cache_path("https://example.com/cached.onnx")
-                cached_file.write_text("stale", encoding="utf-8")
-                result = model._download_http("https://example.com/cached.onnx")
-
-        assert result == str(cached_file)
-        assert cached_file.read_text(encoding="utf-8") == "fresh"
-        assert mock_urlretrieve.call_count == 1
+        weights = tmp_path / 'model.onnx'; weights.write_bytes(b'mock')
+        with patch.object(base_module.Path, 'home', return_value=tmp_path):
+            model = ConcreteModel(weights=weights, force_download=True)
+            cache = model._http_cache_path('https://example.com/cached.onnx')
+            cache.write_bytes(b'stale')
+            response = io.BytesIO(b'fresh'); response.headers = {}
+            with patch.object(base_module.http, 'urlopen', return_value=response) as open_url:
+                assert model._download_http('https://example.com/cached.onnx') == str(cache)
+        assert cache.read_bytes() == b'fresh'
+        assert open_url.call_count == 1
     
     def test_download_gdrive_url_construction(self, tmp_path):
         """Test Google Drive download with gdown."""
@@ -717,7 +681,7 @@ def test_onnx_session_uses_providers_options_and_runtime_setup(tmp_path, monkeyp
     constructor = Mock(return_value=session)
     monkeypatch.setattr(model, "_prepare_runtime_dependencies", prepare)
     monkeypatch.setattr(model, "_log_device_info", log)
-    monkeypatch.setattr(base_module.ort, "InferenceSession", constructor)
+    monkeypatch.setattr(base_module.get_native_runtime(), "InferenceSession", constructor)
     options = object()
     assert model._create_onnx_session(sess_options=options) is session
     constructor.assert_called_once_with(str(weights), providers=["CPUExecutionProvider"], sess_options=options)

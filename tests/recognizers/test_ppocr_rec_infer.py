@@ -91,7 +91,7 @@ def test_mixed_width_batches_use_lengths_and_trim_ctc_output(bundle, monkeypatch
                 logits[index, :length, 1] = 10
             return [logits, lengths]
 
-    monkeypatch.setattr("manuscript.recognizers._ppocr_rec.ort.InferenceSession", lambda *a, **kw: Session())
+    monkeypatch.setattr("onnxruntime.InferenceSession", lambda *a, **kw: Session())
     model = PPOCRRec(str(bundle[0]), batch_size=2, config=Path(str(bundle[0])).with_suffix(".json"))
     images = [np.zeros((32, width, 3), np.uint8) for width in [80, 40, 64]]
     results = model._predict_word_images(images)
@@ -202,7 +202,7 @@ def test_invalid_graph_is_not_cached_after_failed_initialization(bundle, monkeyp
         attempts.append(1)
         return Session()
 
-    monkeypatch.setattr("manuscript.recognizers._ppocr_rec.ort.InferenceSession", create)
+    monkeypatch.setattr("onnxruntime.InferenceSession", create)
     model = PPOCRRec(str(bundle[0]), config=Path(str(bundle[0])).with_suffix(".json"))
     for _ in range(2):
         with pytest.raises(ValueError, match="float32/float16"):

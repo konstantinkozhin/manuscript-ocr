@@ -229,7 +229,7 @@ class TestTRBAExport:
                 ):
                     with patch.object(torch.onnx, "export", side_effect=_write_onnx) as mock_export:
                         with patch.object(
-                            trba_module.ort,
+                            __import__("onnxruntime"),
                             "InferenceSession",
                             return_value=FakeSession(),
                         ):

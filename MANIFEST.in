@@ -4,3 +4,4 @@ include src/manuscript/recognizers/_trba/configs/config.json
 include src/manuscript/recognizers/_trba/configs/charset.txt
 prune scripts
 global-exclude *.pyc *.pyo *.nbc *.nbi
+recursive-include src/manuscript/runtimes *.mjs

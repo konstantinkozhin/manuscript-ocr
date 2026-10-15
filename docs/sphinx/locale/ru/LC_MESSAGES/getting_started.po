@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-15 20:25+0700\n"
+"POT-Creation-Date: 2026-10-15 22:47+0700\n"
 "PO-Revision-Date: 2026-10-15 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
@@ -19,43 +19,45 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../getting_started.rst:2 7b41cfd2049e4993a93fd4060b269eb6
+#: ../../getting_started.rst:2 175d9d8634c74ceeb671cb22b8bb4c82
 msgid "Getting Started"
 msgstr "Начало работы"
 
-#: ../../getting_started.rst:5 a0c3c24163b3462388d768be33c904ae
+#: ../../getting_started.rst:5 895353f74a56407daa80d9a13533fec9
 msgid "Installation"
 msgstr "Установка"
 
-#: ../../getting_started.rst:8 c31020a10cad4da2be78b06cf6ad38c6
+#: ../../getting_started.rst:8 e4ca76c0325f4e97aeae946aec2f6a02
 msgid "Basic installation (inference only)"
 msgstr "Базовая установка (для запуска моделей)"
 
-#: ../../getting_started.rst:15 5e2762c81aa446988d7bc64774321a4f
+#: ../../getting_started.rst:14 88f0fe5de88c44efa1eb057c403020ac
+msgid ""
+"The base package (``pip install manuscript-ocr``) installs shared components without an inference"
+" runtime. Choose ``[cpu]``, ``[gpu]`` or ``[web]``; TrOCR additionally requires ``[trocr]``, for "
+"example ``[cpu,trocr]``."
+msgstr ""
+"Базовая установка (``pip install manuscript-ocr``) содержит общие компоненты без среды выполнения"
+" моделей. Выберите ``[cpu]``, ``[gpu]`` или ``[web]``. Для TrOCR дополнительно нужен ``[trocr]``,"
+" например ``[cpu,trocr]``."
+
+#: ../../getting_started.rst:19 45e111b2e5a24eac9204b8668ce997c9
 msgid "GPU acceleration (NVIDIA CUDA)"
 msgstr "Ускорение на GPU (NVIDIA CUDA)"
 
-#: ../../getting_started.rst:17 7fa16f7707214102af02cbae096135c1
-msgid "If you are switching an existing installation from CPU to GPU:"
-msgstr "Если библиотека уже установлена для работы на CPU:"
+#: ../../getting_started.rst:21 18f1ed08c59b44cfb0efd77fbd2dc7d4
+msgid "When switching from CPU, first remove ``onnxruntime``. Then install the GPU extra:"
+msgstr "При переходе с CPU сначала удалите ``onnxruntime``, затем установите вариант для GPU:"
 
-#: ../../getting_started.rst:19 5e98cb023e2d476da652c4c9281c3b50
-msgid "Remove the CPU version of ONNX Runtime and install the GPU version:"
-msgstr "Удалите CPU-версию ONNX Runtime и установите GPU-версию:"
+#: ../../getting_started.rst:28 a35fa7c4727b4643acdd0c70af3b062a
+msgid "If CUDA/cuDNN libraries are not installed, also run:"
+msgstr "Если библиотеки CUDA/cuDNN ещё не установлены, выполните также:"
 
-#: ../../getting_started.rst:26 6510ffca89d54482afbb8e0ba553b6c1
-msgid ""
-"If you are working in Jupyter Notebook, JupyterLab, VS Code notebooks, or Google Colab, restart "
-"the kernel or runtime after installation."
-msgstr ""
-"Если вы работаете в Jupyter Notebook, JupyterLab, блокнотах VS Code или Google Colab, после "
-"установки перезапустите ядро или среду выполнения."
+#: ../../getting_started.rst:34 c15557b1510e483184e45e0502ddf39f
+msgid "In notebooks, restart the kernel after installation."
+msgstr "Если работаете в ноутбуке, после установки перезапустите ядро."
 
-#: ../../getting_started.rst:29 9efc01d33dab426d888ff4395063f240
-msgid "Reinstalling ``manuscript-ocr`` is not required."
-msgstr "Переустанавливать ``manuscript-ocr`` не требуется."
-
-#: ../../getting_started.rst:31 2cc0a813918d424589e0060101061e04
+#: ../../getting_started.rst:36 93f094b4ebdb4f64bd40476849032b43
 msgid ""
 "You can switch models and pipeline components explicitly with the ``device`` parameter, for "
 "example ``device=\"cuda\"`` for NVIDIA GPU or ``device=\"cpu\"`` for CPU:"
@@ -63,15 +65,15 @@ msgstr ""
 "Устройство задаётся параметром ``device`` у каждой модели: ``device=\"cuda\"`` для NVIDIA GPU или"
 " ``device=\"cpu\"`` для CPU:"
 
-#: ../../getting_started.rst:46 654e905dc4214fa98427682c162c2963
+#: ../../getting_started.rst:51 7fa8ca766574484f950eacc11ab81049
 msgid "Quick Start"
 msgstr "Быстрый старт"
 
-#: ../../getting_started.rst:48 dc21f84f975a467684e1e2069709146e
+#: ../../getting_started.rst:53 100e34029d59486f9124a9f81aac3e6c
 msgid "Basic usage example:"
 msgstr "Простой пример:"
 
-#: ../../getting_started.rst:64 3e621f9ea542446e9abe4c12202347c3
+#: ../../getting_started.rst:69 ffe75db211a94de187405e75d852c476
 msgid ""
 "For stage configuration, custom processors, ensembles and result handling, see "
 ":doc:`pipeline_usage`."
@@ -79,15 +81,15 @@ msgstr ""
 "Настройка этапов, пользовательские обработчики, ансамбли и работа с результатами описаны в "
 ":doc:`pipeline_usage`."
 
-#: ../../getting_started.rst:70 30e5b326d9504bf5b9a9c5814c1bd3ff
+#: ../../getting_started.rst:75 0150a9dfc90041d78fc43001a370c916
 msgid "Example Notebooks"
 msgstr "Примеры в ноутбуках"
 
-#: ../../getting_started.rst:72 eec6bc7bd82b426b8f57a36fb431fba7
+#: ../../getting_started.rst:77 1fb6116326ff4acc8392ae979fd5dceb
 msgid "Notebooks for version 0.1.13:"
 msgstr "Ноутбуки для версии 0.1.13:"
 
-#: ../../getting_started.rst:74 1ce9e7b924704eb69fbad2cbe0a8c5e1
+#: ../../getting_started.rst:79 684865c99cee4c41b499effdb1ad745d
 #, python-format
 msgid ""
 "`Training the EAST detector <https://github.com/konstantinkozhin/manuscript-"
@@ -96,7 +98,7 @@ msgstr ""
 "`Обучение детектора EAST <https://github.com/konstantinkozhin/manuscript-"
 "ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%9E%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B4%D0%B5%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0_EAST.ipynb>`_."
 
-#: ../../getting_started.rst:75 d48d513e98f6469db99391ef072ff795
+#: ../../getting_started.rst:80 d12dacb6359641e18f7ec143186d0311
 #, python-format
 msgid ""
 "`Training the TRBA recognizer <https://github.com/konstantinkozhin/manuscript-"
@@ -105,7 +107,7 @@ msgstr ""
 "`Обучение распознавателя TRBA <https://github.com/konstantinkozhin/manuscript-"
 "ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%9E%D0%B1%D1%83%D1%87%D0%B5%D0%BD%D0%B8%D0%B5_%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8F_TRBA.ipynb>`_."
 
-#: ../../getting_started.rst:76 306a677624fe48f391186c7d3228aadf
+#: ../../getting_started.rst:81 cc185633f0f74d14a40e4e77601a69e0
 #, python-format
 msgid ""
 "`Integrating a custom detector into the pipeline <https://github.com/konstantinkozhin/manuscript-"
@@ -115,7 +117,7 @@ msgstr ""
 "/manuscript-"
 "ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%98%D0%BD%D1%82%D0%B5%D0%B3%D1%80%D0%B0%D1%86%D0%B8%D1%8F_%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%B4%D0%B5%D1%82%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0_%D0%B2_%D0%BF%D0%B0%D0%B9%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD.ipynb>`_."
 
-#: ../../getting_started.rst:77 181602c258f94318ae592e795d92d23e
+#: ../../getting_started.rst:82 ff14e32f6c614a14a20b4e258d688c95
 #, python-format
 msgid ""
 "`Integrating a custom recognizer into the pipeline <https://github.com/konstantinkozhin"
@@ -126,7 +128,7 @@ msgstr ""
 "/manuscript-"
 "ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%98%D0%BD%D1%82%D0%B5%D0%B3%D1%80%D0%B0%D1%86%D0%B8%D1%8F_%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D1%80%D0%B0%D1%81%D0%BF%D0%BE%D0%B7%D0%BD%D0%B0%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8F_%D0%B2_%D0%BF%D0%B0%D0%B9%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD.ipynb>`_."
 
-#: ../../getting_started.rst:78 6ee692c0ac1847f6b3bab71b79ea09c8
+#: ../../getting_started.rst:83 04a222af2af649d8a2e2899c2c9bb2e4
 #, python-format
 msgid ""
 "`Integrating a custom corrector into the pipeline <https://github.com/konstantinkozhin"
@@ -137,7 +139,7 @@ msgstr ""
 "/manuscript-"
 "ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%98%D0%BD%D1%82%D0%B5%D0%B3%D1%80%D0%B0%D1%86%D0%B8%D1%8F_%D0%BF%D0%BE%D0%BB%D1%8C%D0%B7%D0%BE%D0%B2%D0%B0%D1%82%D0%B5%D0%BB%D1%8C%D1%81%D0%BA%D0%BE%D0%B3%D0%BE_%D0%BA%D0%BE%D1%80%D1%80%D0%B5%D0%BA%D1%82%D0%BE%D1%80%D0%B0_%D0%B2_%D0%BF%D0%B0%D0%B9%D0%BF%D0%BB%D0%B0%D0%B9%D0%BD.ipynb>`_."
 
-#: ../../getting_started.rst:79 d76a18654f55418a9dcec89fc7b2b41a
+#: ../../getting_started.rst:84 758210066ac84d1dba19d8d33f501b41
 #, python-format
 msgid ""
 "`Combining models and building ensembles <https://github.com/konstantinkozhin/manuscript-"
@@ -146,7 +148,7 @@ msgstr ""
 "`Объединение моделей и построение ансамблей <https://github.com/konstantinkozhin/manuscript-"
 "ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%9E%D0%B1%D1%8A%D0%B5%D0%B4%D0%B8%D0%BD%D0%B5%D0%BD%D0%B8%D0%B5_%D0%B8_%D0%B0%D0%BD%D1%81%D0%B0%D0%BC%D0%B1%D0%BB%D0%B8%D1%80%D0%BE%D0%B2%D0%B0%D0%BD%D0%B8%D0%B5_%D0%BC%D0%BE%D0%B4%D0%B5%D0%BB%D0%B5%D0%B9.ipynb>`_."
 
-#: ../../getting_started.rst:80 37bac77ae6444144ac50d8747b9e00ca
+#: ../../getting_started.rst:85 76afe2481ba944afa3a78401102b2588
 #, python-format
 msgid ""
 "`Exporting and using yolov8m-historical-line-segmenter <https://github.com/konstantinkozhin"
@@ -159,7 +161,7 @@ msgstr ""
 "ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%AD%D0%BA%D1%81%D0%BF%D0%BE%D1%80%D1%82_%D0%B8_%D0%BF%D0%BE%D0%B4%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%BD%D0%B8%D0"
 "%B5_yolov8m-historical-line-segmenter.ipynb>`_."
 
-#: ../../getting_started.rst:81 a68671a654d647d693e5330c7216e0be
+#: ../../getting_started.rst:86 8cf41c3c0cdd425bbba9bcc06954647c
 #, python-format
 msgid ""
 "`Exporting and using cyrillic PP-OCRv5 mobile recognition <https://github.com/konstantinkozhin"
@@ -172,15 +174,15 @@ msgstr ""
 "ocr/blob/v_0_1_13/notebooks/v_0_1_13/%D0%AD%D0%BA%D1%81%D0%BF%D0%BE%D1%80%D1%82_%D0%B8_%D0%BF%D0%BE%D0%B4%D0%BA%D0%BB%D1%8E%D1%87%D0%B5%D0%BD%D0%B8%D0"
 "%B5_cyrillic_PP-OCRv5_mobile_rec.ipynb>`_."
 
-#: ../../getting_started.rst:84 d02e46de7406428fa51e71b6a27b57e7
+#: ../../getting_started.rst:89 9b778cf346d04849a96fc7b8943d6650
 msgid "Additional installation options"
 msgstr "Дополнительные варианты установки"
 
-#: ../../getting_started.rst:87 518de8650f204208b8b1f8984693a381
+#: ../../getting_started.rst:92 ba3280cadbd04cb699d99a1bcaad4191
 msgid "Apple Silicon acceleration (CoreML)"
 msgstr "Ускорение на Apple Silicon (CoreML)"
 
-#: ../../getting_started.rst:93 11c07c30fe65448484239f62f96a6436
+#: ../../getting_started.rst:98 22a12191f73441e2892cd62bf568ade7
 msgid ""
 "Official macOS ``onnxruntime`` wheels include the CoreML execution provider; a separate "
 "``onnxruntime-silicon`` package is not needed. Use ``device=\"coreml\"`` for the relevant models "
@@ -192,63 +194,63 @@ msgstr ""
 "компонентов пайплайна. См. `документацию ONNX Runtime по CoreML <https://onnxruntime.ai/docs"
 "/execution-providers/CoreML-ExecutionProvider.html>`_."
 
-#: ../../getting_started.rst:99 750be67e58114d06900334f82ba20498
+#: ../../getting_started.rst:111 ff1272c1eca841ff8a7b5df9b0c605d5
 msgid "Installation with training support"
 msgstr "Установка с поддержкой обучения"
 
-#: ../../getting_started.rst:105 119e2d7945e44c9395dbc94df9d763c9
+#: ../../getting_started.rst:117 37ea2e67b7864313a16ef8555304009f
 msgid "This installs additional dependencies for model training:"
 msgstr "Будут установлены дополнительные зависимости для обучения моделей:"
 
-#: ../../getting_started.rst:107 bf190a53fc9f4a41af940708ff0bee37
+#: ../../getting_started.rst:119 f6b97ff282f24c2195a4b573256d6692
 msgid "PyTorch and TorchVision"
 msgstr "PyTorch и TorchVision"
 
-#: ../../getting_started.rst:108 eba01eb54aee4ceb883baee834797060
+#: ../../getting_started.rst:120 e647f53576584691b3448f06ee5f86b0
 msgid "ONNX export tools"
 msgstr "Инструменты экспорта ONNX"
 
-#: ../../getting_started.rst:109 fdfacf61c76646e3aa1f15cefc98e0d1
+#: ../../getting_started.rst:121 72cc0b5543a6475ca7f6ce0d918fbf76
 msgid "Training utilities (albumentations, tensorboard, etc.)"
 msgstr "Утилиты для обучения (albumentations, TensorBoard и др.)"
 
-#: ../../getting_started.rst:110 4c2471b9a4084792a71125599b861a55
+#: ../../getting_started.rst:122 84630bb6a2cb4c3cae9713e29b7e6f2b
 msgid "Development tools (pytest, black, flake8, etc.)"
 msgstr "Инструменты разработки (pytest, black, flake8 и др.)"
 
-#: ../../getting_started.rst:113 2d116063ccb94cb1ae8cb11be02b7385
+#: ../../getting_started.rst:125 a2baf9282fe0497c9132657e4b08c0a9
 msgid "Minimum System Requirements"
 msgstr "Минимальные системные требования"
 
-#: ../../getting_started.rst:115 39d48a031b674df7b85ecffe1afc16e3
+#: ../../getting_started.rst:127 9b28cbf2f79f4e4a90b471af8fb36d1c
 msgid "Python 3.9.2 or newer"
 msgstr "Python 3.9.2 или новее"
 
-#: ../../getting_started.rst:116 ec8edd5922b1407688b058cca5c4c6ad
+#: ../../getting_started.rst:128 eb0541fc98a34ae4aeb99e6d272ecfb7
 msgid "Linux (Ubuntu 20.04+), Windows 10+, or macOS 11+"
 msgstr "Linux (Ubuntu 20.04+), Windows 10+ или macOS 11+"
 
-#: ../../getting_started.rst:117 df2f8003510641a499373f7ac72ebf0b
+#: ../../getting_started.rst:129 1b27fc397ef94224864a812eaedd63fb
 msgid "at least 2 CPU cores"
 msgstr "не менее 2 ядер CPU"
 
-#: ../../getting_started.rst:118 1b6008de81af44db834f070101da43ef
+#: ../../getting_started.rst:130 0b9241a4adc144ce9bf7bd9d8c81fbe9
 msgid "at least 8 GB RAM"
 msgstr "не менее 8 ГБ оперативной памяти"
 
-#: ../../getting_started.rst:119 d89eccae1826459fad1d1db7960c1c9f
+#: ../../getting_started.rst:131 f5bfa1fbeadc4d268d8edc62019c8947
 msgid "16 GB RAM or more is recommended for model training"
 msgstr "для обучения моделей рекомендуется 16 ГБ оперативной памяти или больше"
 
-#: ../../getting_started.rst:120 c04892a0e5ae4750aacdcd67b00fab07
+#: ../../getting_started.rst:132 89d5c8add14942c08a54e6d95c529107
 msgid "NVIDIA GPU with CUDA support is recommended for acceleration"
 msgstr "для ускорения вычислений рекомендуется NVIDIA GPU с поддержкой CUDA"
 
-#: ../../getting_started.rst:121 739da605843a43e8841ce0689302a736
+#: ../../getting_started.rst:133 fb430b9d5f0d445fb7b5f18ae9940bf8
 msgid "at least 4 GB VRAM is recommended for GPU execution"
 msgstr "для запуска на GPU рекомендуется не менее 4 ГБ видеопамяти"
 
-#: ../../getting_started.rst:123 8f6d1965bc61418ab4fd1c5c94b5ea39
+#: ../../getting_started.rst:135 f9dc4bca379a48ada811eb56d49ae84f
 msgid ""
 "CPU-only execution is supported, but performance may be significantly lower than on GPU. Model "
 "training currently targets CUDA-capable NVIDIA GPUs and falls back to CPU when CUDA is "
@@ -256,3 +258,21 @@ msgid ""
 msgstr ""
 "Библиотека работает и на CPU, но обычно медленнее, чем на GPU. Для обучения рекомендуется NVIDIA "
 "GPU с CUDA. Если CUDA недоступна, обучение выполняется на CPU."
+
+#~ msgid "If you are switching an existing installation from CPU to GPU:"
+#~ msgstr "Если библиотека уже установлена для работы на CPU:"
+
+#~ msgid "Remove the CPU version of ONNX Runtime and install the GPU version:"
+#~ msgstr "Удалите CPU-версию ONNX Runtime и установите GPU-версию:"
+
+#~ msgid ""
+#~ "If you are working in Jupyter Notebook, JupyterLab,"
+#~ " VS Code notebooks, or Google Colab, restart the"
+#~ " kernel or runtime after installation."
+#~ msgstr ""
+#~ "Если вы работаете в Jupyter Notebook, JupyterLab, "
+#~ "блокнотах VS Code или Google Colab, после установки"
+#~ " перезапустите ядро или среду выполнения."
+
+#~ msgid "Reinstalling ``manuscript-ocr`` is not required."
+#~ msgstr "Переустанавливать ``manuscript-ocr`` не требуется."

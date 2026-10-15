@@ -57,7 +57,7 @@ def test_default_preset_supplies_its_own_artifacts(corrector, monkeypatch):
 def test_lazy_session_created_once(corrector, monkeypatch):
     corrector.onnx_session = None
     constructor = Mock(return_value=Mock())
-    monkeypatch.setattr("manuscript.correctors._charlm.ort.InferenceSession", constructor)
+    monkeypatch.setattr("onnxruntime.InferenceSession", constructor)
     corrector._initialize_session()
     corrector._initialize_session()
     constructor.assert_called_once_with(corrector.weights, providers=["CPUExecutionProvider"])

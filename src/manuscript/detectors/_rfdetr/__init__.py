@@ -4,8 +4,8 @@ from copy import deepcopy
 
 import cv2
 import numpy as np
-import onnxruntime as ort
 
+from manuscript.api.base import managed_session_initialization
 from manuscript.api.detector import BaseDetector
 from manuscript.utils import read_image
 from manuscript.utils.geometry import repair_detection_polygon
@@ -163,6 +163,7 @@ class RFDETR(BaseDetector):
         self._input_dtype = np.float32
         self._input_hw = None
 
+    @managed_session_initialization
     def _initialize_session(self):
         if self.onnx_session is not None:
             return

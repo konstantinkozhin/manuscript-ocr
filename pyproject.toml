@@ -32,8 +32,6 @@ classifiers = [
 ]
 
 dependencies = [
-    # ONNX Runtime for inference (CPU by default, GPU/CoreML installed separately)
-    "onnxruntime>=1.16",
 
     # Image processing
     "numpy>=1.21",
@@ -42,31 +40,28 @@ dependencies = [
 
     # Geometry and image processing
     "shapely>=1.8",
-    "scikit-image>=0.19",
 
-    # Performance optimization
-    "numba>=0.56",
-    "rapidfuzz>=3.9,<4",
 
     # Data validation and utilities
     "pydantic>=2.0",
     "anytree>=2.13,<3",
     "PyYAML>=6.0",
     "tqdm>=4.60",
-    "gdown>=4.4",
     "packaging>=21",
 ]
 
 [project.optional-dependencies]
+cpu = ["onnxruntime>=1.16; sys_platform != 'emscripten'"]
+gpu = ["onnxruntime-gpu>=1.16; sys_platform != 'emscripten'"]
+fast = ["numba>=0.56; sys_platform != 'emscripten'"]
+gdrive = ["gdown>=4.4; sys_platform != 'emscripten'"]
+# Host page supplies ONNX Runtime Web; no native runtime in Pyodide.
+web = []
 trocr = ["tokenizers>=0.15,<1"]
-
-# GPU support for ONNX Runtime (NVIDIA CUDA)
-# User installs manually: pip install onnxruntime-gpu
-gpu = []
 
 # Apple Silicon support (CoreML acceleration)
 # Standard macOS onnxruntime wheels include CoreML; select device="coreml"
-silicon = []
+silicon = ["onnxruntime>=1.16; sys_platform != 'emscripten'"]
 
 # Full development dependencies (includes PyTorch for training)
 dev = [
@@ -82,6 +77,9 @@ dev = [
     "tokenizers>=0.15,<1",
     
     # Training utilities
+    "scikit-image>=0.19",
+    "numba>=0.56",
+    "gdown>=4.4",
     "Levenshtein",
     "torch-optimizer>=0.1",
     "evaluate>=0.4",
@@ -121,4 +119,5 @@ package-dir = { "" = "src" }
 where = ["src"]
 
 [tool.setuptools.package-data]
+"manuscript.runtimes" = ["*.mjs"]
 "manuscript.recognizers._trba.configs" = ["config.json", "charset.txt"]

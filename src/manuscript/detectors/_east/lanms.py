@@ -1,6 +1,16 @@
 import numpy as np
 
-from numba import njit
+try:
+    from numba import njit
+except ModuleNotFoundError as exc:
+    if exc.name != "numba":
+        raise
+
+    def njit(signature=None, **options):
+        """Run the same geometry functions without JIT when Numba is unavailable."""
+        if callable(signature):
+            return signature
+        return lambda function: function
 
 
 @njit("float64(float64[:,:])", fastmath=True, cache=True)
