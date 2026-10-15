@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Sequence
 
 import numpy as np
 
-from manuscript.data import TextSpan
+from manuscript.data import TextRegion
 from manuscript.utils.io import read_image
 
 REGION_PREPARER_PRESETS = frozenset({"bbox", "polygon_mask", "quad_warp"})
@@ -18,9 +18,9 @@ else:
 
 @_dataclass_compat
 class PreparedRegion:
-    """Prepared text crop associated with a specific ``TextSpan`` object."""
+    """Prepared text crop associated with a specific ``TextRegion`` object."""
 
-    text_span: Optional[TextSpan]
+    text_span: Optional[TextRegion]
     image: np.ndarray
     polygon: np.ndarray
     meta: Dict[str, Any] = field(default_factory=dict)

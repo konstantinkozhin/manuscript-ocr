@@ -166,8 +166,7 @@ class Registry:
                 try:
                     catalogs.append(_validate(json.loads(group_cache.read_text(encoding='utf-8'))))
                 except (OSError, ValueError, KeyError, TypeError):
-                    if group == list(SOURCES):
-                        catalogs.append(_validate(json.loads(Path(__file__).with_name('registry.json').read_text(encoding='utf-8'))))
+                    pass
         if not fresh:
             raise OSError('Cannot update model registry: ' + '; '.join(errors))
         data = {'schema_version': 1, 'models': {}, '_sources': self.sources}
@@ -189,12 +188,7 @@ class Registry:
                 except OSError:
                     pass
         except (OSError, ValueError, KeyError, TypeError):
-            try:
-                return self.refresh()
-            except OSError:
-                self._data = _validate(json.loads(Path(__file__).with_name('registry.json').read_text(encoding='utf-8')))
-                self._data['_sources'] = self.sources
-                _atomic_json(self.cache, self._data)
+            return self.refresh()
         return self._data
 
     def info(self, name, model_class=None, *, update_missing=True):

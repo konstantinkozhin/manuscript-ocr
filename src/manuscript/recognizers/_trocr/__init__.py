@@ -89,6 +89,7 @@ class TrOCR(BaseRecognizer):
         region_preparer_options=None,
         min_text_size=5,
         batch_size=1,
+        recognition_levels=None,
         generation=None,
         decoder_with_past=None,
         **kwargs,
@@ -97,13 +98,15 @@ class TrOCR(BaseRecognizer):
             weights=weights, device=device, force_download=force_download,
             rotate_threshold=rotate_threshold, region_preparer=region_preparer,
             region_preparer_options=region_preparer_options,
-            min_text_size=min_text_size, batch_size=batch_size, **kwargs
+            min_text_size=min_text_size, batch_size=batch_size,
+            recognition_levels=recognition_levels, **kwargs
         )
         self._weights_preset = None
         self.config_path = self._resolve_config(config)
         if not self.config_path:
-            raise ValueError("TrOCR requires an encoder companion JSON configuration")
+            raise ValueError("TrOCR requires a config artifact or explicit JSON config")
         self.config = self._load_config_data(self.config_path)
+        self._configure_recognition_levels(self.config)
         if (
             self.config.get("schema_version") != 1
             or self.config.get("algorithm") != "autoregressive"
@@ -360,15 +363,16 @@ class TrOCR(BaseRecognizer):
         return results
 
     @staticmethod
-    def export(source, output, *, use_cache=True, fp16=True):
-        """Export a compatible source model to an ONNX bundle with configuration.
+    def create_config(source, *, recognition_levels=None, output_path=None):
+        """Add recognition levels to an encoder bundle config and optionally save JSON."""
+        from copy import deepcopy
 
-        Image batches are dynamic. use_cache=True exports initial and cached
-        decoder graphs; False exports a full-prefix decoder. fp16=True also
-        creates FP16 graphs, including image/state/cache inputs and outputs.
-        The source is a local HF model directory. Export dependencies are
-        imported only when this method is called.
-        """
-        from .export import export
-
-        return export(source, output, use_cache=use_cache, fp16=fp16)
+        config = deepcopy(source) if isinstance(source, dict) else json.loads(
+            Path(source).read_text(encoding="utf-8"))
+        if config.get("schema_version") != 1 or config.get("algorithm") != "autoregressive":
+            raise ValueError("Unsupported TrOCR configuration")
+        selected = recognition_levels if recognition_levels is not None else config.get("recognition_levels", ["line"])
+        config["recognition_levels"] = list(BaseRecognizer._validate_levels(selected))
+        if output_path is not None:
+            Path(output_path).write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        return config

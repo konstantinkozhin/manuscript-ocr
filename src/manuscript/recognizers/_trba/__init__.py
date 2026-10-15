@@ -62,11 +62,13 @@ class TRBA(BaseRecognizer):
 
     config : str or Path, optional
         Path or identifier for model configuration JSON. Same URL schemes
-        as ``weights``. If ``None``, attempts to infer from weights location
-        or uses default config for preset models.
+        as ``weights``. Required for local weights; registry presets supply
+        their own config artifact.
+        The config must include ``recognition_levels``, e.g. ``["word"]``.
+        Pass ``levels=["word"]`` to override this selection explicitly.
     charset : str or Path, optional
-        Path or identifier for character set file. If ``None``, attempts to
-        find charset near weights or falls back to package default.
+        Path or identifier for character set file. Required for local weights;
+        registry presets supply their own charset artifact.
     device : {"cuda", "coreml", "cpu"}, optional
         Compute device. If ``None``, automatically selects CPU.
         For GPU/CoreML acceleration:
@@ -189,6 +191,7 @@ class TRBA(BaseRecognizer):
 
         with open(self.config_path, "r", encoding="utf-8") as f:
             config_dict = json.load(f)
+        self._configure_recognition_levels(config_dict)
 
         self.max_length = config_dict.get("max_len", 25)
         self.hidden_size = config_dict.get("hidden_size", 256)
@@ -237,9 +240,6 @@ class TRBA(BaseRecognizer):
         resolved = getattr(self, "_resolved_model_artifacts", {}).get("charset")
         if resolved:
             return str(resolved)
-        candidate = Path(self.weights).with_suffix(".txt")
-        if candidate.is_file():
-            return str(candidate.absolute())
         raise FileNotFoundError("TRBA requires a charset artifact or explicit charset")
 
     def _initialize_session(self):
@@ -490,6 +490,8 @@ class TRBA(BaseRecognizer):
         freeze_enc_rnn: str = "none",
         freeze_attention: str = "none",
         pretrain_weights: Optional[object] = "default",
+        recognition_levels: Sequence[str] = ("word",),
+        export_simplify: bool = False,
         **extra_config: Any,
     ):
         """
@@ -582,8 +584,8 @@ class TRBA(BaseRecognizer):
         resume_from : str or Path, optional
             Path to checkpoint file to resume training from. Default is ``None``.
         save_interval : int, optional
-            Save checkpoint every N epochs. If ``None``, only saves best model.
-            Default is ``None``.
+            Save the latest checkpoint every N epochs and on the final epoch.
+            None follows validation. Best checkpoints always follow validation.
         device : {"cuda", "cpu"}, optional
             Training device. Default is ``"cuda"``.
         freeze_cnn : {"none", "all", "first", "last"}, optional
@@ -600,6 +602,10 @@ class TRBA(BaseRecognizer):
             - str/Path - path or URL to custom weights file
 
             Default is ``"default"``.
+        export_simplify : bool, optional
+            Simplify the automatically exported ONNX graph with onnxsim.
+            Default is False: native simplifier crashes in some environments
+            cannot be caught as Python exceptions. Model validation remains enabled.
         **extra_config : dict, optional
             Additional configuration parameters passed to training config.
 
@@ -742,7 +748,10 @@ class TRBA(BaseRecognizer):
             current_dir = os.path.dirname(os.path.abspath(__file__))
             resolved_charset = os.path.join(current_dir, "configs", "charset.txt")
 
+        recognition_levels = BaseRecognizer._validate_levels(recognition_levels)
         config_payload: Dict[str, Any] = {
+            "recognition_levels": list(recognition_levels),
+            "export_simplify": export_simplify,
             "train_csvs": train_csvs_list,
             "train_roots": train_roots_list,
             "charset_path": resolved_charset,
@@ -1121,6 +1130,11 @@ class TRBA(BaseRecognizer):
                     "[WARNING] onnx-simplifier not installed, skipping simplification"
                 )
                 print("  Install with: pip install onnx-simplifier")
+
+        config["recognition_levels"] = list(BaseRecognizer._validate_levels(
+            config.get("recognition_levels", ["word"])))
+        output_path.with_suffix(".json").write_text(
+            json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
         # Print summary
         file_size_mb = output_path.stat().st_size / (1024 * 1024)

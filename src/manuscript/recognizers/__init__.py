@@ -1,7 +1,17 @@
-__all__ = ["TRBA", "PPOCRRec", "TrOCR"]
+__all__ = ["TRBA", "PPOCRRec", "TrOCR", "MajorityVotingRecognizer", "MedoidRecognizer"]
 
 
 def __getattr__(name):
+    if name == "MedoidRecognizer":
+        from ._medoid import MedoidRecognizer
+
+        return MedoidRecognizer
+
+    if name == "MajorityVotingRecognizer":
+        from ._majority_voting import MajorityVotingRecognizer
+
+        return MajorityVotingRecognizer
+
     if name == "TrOCR":
         from ._trocr import TrOCR
 

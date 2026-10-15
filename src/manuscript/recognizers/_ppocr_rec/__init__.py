@@ -1,11 +1,10 @@
-"""Configurable ONNX CTC recognition for compatible PP-OCR models."""
-
 import math
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
 import cv2
 import numpy as np
+from manuscript.utils.numerics import softmax
 import onnxruntime as ort
 from PIL import Image
 
@@ -36,6 +35,7 @@ class PPOCRRec(BaseRecognizer):
         region_preparer_options: Optional[Dict[str, Any]] = None,
         min_text_size: int = 5,
         batch_size: int = 16,
+        recognition_levels: Optional[Sequence[str]] = None,
         use_space_char: Optional[bool] = None,
         rec_image_shape: Optional[Sequence[int]] = None,
         **kwargs: Any,
@@ -53,6 +53,7 @@ class PPOCRRec(BaseRecognizer):
             region_preparer_options=region_preparer_options,
             min_text_size=min_text_size,
             batch_size=batch_size,
+            recognition_levels=recognition_levels,
             **kwargs,
         )
 
@@ -66,6 +67,7 @@ class PPOCRRec(BaseRecognizer):
             raise ValueError("PPOCRRec requires a config artifact or explicit config")
         from .config import normalize_config
         config_data = normalize_config(self._load_config_data(self.config_path))
+        self._configure_recognition_levels(config_data)
 
         self.rec_image_shape = self._resolve_rec_image_shape(
             rec_image_shape=rec_image_shape,
@@ -137,23 +139,6 @@ class PPOCRRec(BaseRecognizer):
             value = self._resolved_model_artifacts.get('charset')
             return str(value) if value else None
 
-        if self._weights_preset and self._weights_preset in self.charset_registry:
-            return self._resolve_extra_artifact(
-                self.charset_registry[self._weights_preset],
-                default_name=None,
-                registry=self.charset_registry,
-                description="charset",
-            )
-
-        weights_path = Path(self.weights)
-        candidates = [
-            weights_path.with_suffix(".txt"),
-            weights_path.parent / "dict.txt",
-            weights_path.parent / "custom_dict.txt",
-        ]
-        for candidate in candidates:
-            if candidate.exists():
-                return str(candidate.absolute())
         return None
 
 
@@ -202,7 +187,7 @@ class PPOCRRec(BaseRecognizer):
 
         raise FileNotFoundError(
             "Could not resolve character dictionary. "
-            "Provide charset explicitly or place a compatible inference.yml next to the model."
+            "Provide charset explicitly or include character_dict in the explicit config."
         )
 
 
@@ -241,6 +226,9 @@ class PPOCRRec(BaseRecognizer):
         self.onnx_session = session
 
     def _preprocess_image(self, image):
+        return self._prepare_image(image)[0]
+
+    def _prepare_image(self, image):
         img = read_image(image)
         if img.ndim != 3 or img.shape[2] != 3:
             raise ValueError("Expected RGB image with shape [H, W, 3]")
@@ -273,7 +261,7 @@ class PPOCRRec(BaseRecognizer):
             tensor = np.pad(tensor, ((0, 0), (pad, pad), (0, 0)))
         result = np.zeros((3, self.img_h, target), self._input_dtype)
         result[:, :, :tensor.shape[1]] = tensor.transpose(2, 0, 1)
-        return result[None]
+        return result[None], width + 2 * pad
 
 
     def _decode_recognition_logits(self, logits):
@@ -281,8 +269,7 @@ class PPOCRRec(BaseRecognizer):
         if logits.ndim != 3 or logits.shape[2] != len(self.characters) or logits.shape[1] == 0 or not np.isfinite(logits).all():
             raise ValueError("Invalid CTC output or dictionary size mismatch")
         if self.postprocess["output_is_logits"]:
-            logits = np.exp(logits - logits.max(axis=2, keepdims=True))
-            logits /= logits.sum(axis=2, keepdims=True)
+            logits = softmax(logits, axis=2)
         elif np.any(logits < -1e-5) or np.any(logits > 1.00001):
             raise ValueError("CTC probabilities outside [0, 1]; configure output_is_logits")
         preds_idx = logits.argmax(axis=2)
@@ -334,16 +321,19 @@ class PPOCRRec(BaseRecognizer):
         batch_size = fixed_batch or max(1, int(batch_size or self.batch_size))
         results = []
         for start in range(0, len(regions), batch_size):
-            tensors = [self._preprocess_image(region.image)[0] for region in regions[start:start + batch_size]]
+            prepared = [self._prepare_image(region.image) for region in regions[start:start + batch_size]]
+            tensors = [tensor[0] for tensor, _ in prepared]
+            lengths = [length for _, length in prepared]
             count = len(tensors)
             if fixed_batch:
                 tensors += [tensors[-1]] * (fixed_batch - count)
+                lengths += [lengths[-1]] * (fixed_batch - count)
             widths = np.array([tensor.shape[2] for tensor in tensors], np.int64)
             width = int(widths.max())
             images = np.stack([np.pad(tensor, ((0, 0), (0, 0), (0, width - tensor.shape[2]))) for tensor in tensors])
             feed = {self.input_name: images}
             if self.length_input_name:
-                feed[self.length_input_name] = (widths + self.length_input_stride - 1) // self.length_input_stride
+                feed[self.length_input_name] = (np.asarray(lengths, np.int64) + self.length_input_stride - 1) // self.length_input_stride
             names = [self.output_name] + ([self.length_output_name] if self.length_output_name else [])
             outputs = self.onnx_session.run(names, feed)
             if len(outputs[0]) != len(tensors):
@@ -359,14 +349,27 @@ class PPOCRRec(BaseRecognizer):
         return results
 
     @staticmethod
-    def export(source, output, crops=()):
-        """Export a compatible source model to an ONNX bundle with configuration.
+    def create_config(source, *, recognition_levels=None, output_path=None):
+        """Create an inference JSON config; new bundles recognize lines by default."""
+        from .config import normalize_config
+        import json
 
-        Export dependencies are imported only when this method is called.
-        """
-        from .export import export
+        if isinstance(source, dict):
+            config = source
+        else:
+            path = Path(source)
+            if path.suffix.lower() == ".json":
+                config = json.loads(path.read_text(encoding="utf-8"))
+            else:
+                import yaml
+                config = yaml.safe_load(path.read_text(encoding="utf-8"))
+        config = normalize_config(config)
+        selected = recognition_levels if recognition_levels is not None else config.get("recognition_levels", ["line"])
+        config["recognition_levels"] = list(BaseRecognizer._validate_levels(selected))
+        if output_path is not None:
+            Path(output_path).write_text(json.dumps(config, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
+        return config
 
-        return export(source, output, crops=crops)
 
 
 __all__ = ["PPOCRRec"]

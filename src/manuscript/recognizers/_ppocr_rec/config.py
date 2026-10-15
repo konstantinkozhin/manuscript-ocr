@@ -1,4 +1,3 @@
-"""Normalize native Paddle recognition configs into the explicit CTC schema."""
 from copy import deepcopy
 
 

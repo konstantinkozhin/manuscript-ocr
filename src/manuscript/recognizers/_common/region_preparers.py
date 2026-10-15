@@ -3,7 +3,7 @@ from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 import numpy as np
 
 from manuscript.api._page_helpers import filter_callable_kwargs
-from manuscript.data import Page, TextSpan
+from manuscript.data import Page
 from manuscript.utils.geometry import (
     crop_axis_aligned,
     crop_polygon_mask,
@@ -14,27 +14,27 @@ from manuscript.utils.geometry import (
 from .region_types import PreparedRegion, normalize_prepared_regions
 
 
+def _rotate_crop(rotate_region, crop, region):
+    kwargs = filter_callable_kwargs(rotate_region, {"region": region})
+    return rotate_region(crop, **kwargs)
+
+
 def iter_candidate_text_spans(
     page: Page,
     *,
     min_text_size: int,
+    levels=("word", "line"),
 ):
-    for block in page.blocks:
-        for line in block.lines:
-            for text_span in line.text_spans:
-                poly = np.asarray(text_span.polygon, dtype=np.float32)
-                if poly.size == 0:
-                    continue
-
-                bbox = polygon_to_bbox(poly)
-                if bbox is None:
-                    continue
-
-                x1, y1, x2, y2 = bbox
-                if (x2 - x1) < min_text_size or (y2 - y1) < min_text_size:
-                    continue
-
-                yield text_span, poly
+    from manuscript.data.tree import recognition_candidates
+    for text_span in recognition_candidates(page, levels=levels):
+        poly = np.asarray(text_span.polygon, dtype=np.float32)
+        bbox = polygon_to_bbox(poly)
+        if bbox is None:
+            continue
+        x1, y1, x2, y2 = bbox
+        if (x2 - x1) < min_text_size or (y2 - y1) < min_text_size:
+            continue
+        yield text_span, poly
 
 
 def prepare_bbox_regions(
@@ -49,7 +49,8 @@ def prepare_bbox_regions(
     pad = float(options.get("pad", 0))
     regions: List[PreparedRegion] = []
 
-    for text_span, poly in iter_candidate_text_spans(page, min_text_size=min_text_size):
+    for text_span, poly in iter_candidate_text_spans(page, min_text_size=min_text_size,
+                                                    levels=options.get("levels", ("word", "line"))):
         crop = crop_axis_aligned(image, poly, pad=pad)
         if crop is None:
             continue
@@ -57,7 +58,7 @@ def prepare_bbox_regions(
         regions.append(
             PreparedRegion(
                 text_span=text_span,
-                image=rotate_region(crop),
+                image=_rotate_crop(rotate_region, crop, text_span),
                 polygon=poly,
                 meta={"region_preparer": "bbox", "pad": pad},
             )
@@ -79,7 +80,8 @@ def prepare_polygon_mask_regions(
     background = int(options.get("background", 255))
     regions: List[PreparedRegion] = []
 
-    for text_span, poly in iter_candidate_text_spans(page, min_text_size=min_text_size):
+    for text_span, poly in iter_candidate_text_spans(page, min_text_size=min_text_size,
+                                                    levels=options.get("levels", ("word", "line"))):
         crop = crop_polygon_mask(image, poly, pad=pad, background=background)
         if crop is None:
             continue
@@ -87,7 +89,7 @@ def prepare_polygon_mask_regions(
         regions.append(
             PreparedRegion(
                 text_span=text_span,
-                image=rotate_region(crop),
+                image=_rotate_crop(rotate_region, crop, text_span),
                 polygon=poly,
                 meta={
                     "region_preparer": "polygon_mask",
@@ -121,7 +123,8 @@ def prepare_quad_warp_regions(
 
     regions: List[PreparedRegion] = []
 
-    for text_span, poly in iter_candidate_text_spans(page, min_text_size=min_text_size):
+    for text_span, poly in iter_candidate_text_spans(page, min_text_size=min_text_size,
+                                                    levels=options.get("levels", ("word", "line"))):
         crop = warp_quad(image, poly, output_size=output_size)
         used_fallback = False
         if crop is None and fallback_to_bbox:
@@ -133,7 +136,7 @@ def prepare_quad_warp_regions(
         regions.append(
             PreparedRegion(
                 text_span=text_span,
-                image=rotate_region(crop),
+                image=_rotate_crop(rotate_region, crop, text_span),
                 polygon=poly,
                 meta={
                     "region_preparer": "quad_warp",

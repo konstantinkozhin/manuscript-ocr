@@ -31,6 +31,16 @@
             "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.pth"
           ],
           "required": false
+        },
+        "config": {
+          "filename": "east_50_g1.json",
+          "format": "json",
+          "size": 68,
+          "sha256": "3c499a294bc46f50ad8e7b48553361e09058df0c8ae9302b3c88a49cfe25b66c",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.json"
+          ],
+          "required": true
         }
       }
     },
@@ -64,11 +74,23 @@
             "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_yenisei_gov_reports_g1.pth"
           ],
           "required": false
+        },
+        "config": {
+          "filename": "east_50_yenisei_gov_reports_g1.json",
+          "format": "json",
+          "size": 68,
+          "sha256": "3c499a294bc46f50ad8e7b48553361e09058df0c8ae9302b3c88a49cfe25b66c",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_yenisei_gov_reports_g1.json"
+          ],
+          "required": true
         }
       }
     },
     "mask2former_line_v0_prev": {
-      "model_classes": ["Mask2Former"],
+      "model_classes": [
+        "Mask2Former"
+      ],
       "library_version": null,
       "library_version_min": "0.1.10",
       "library_version_max": "0.1.13",
@@ -81,7 +103,9 @@
           "format": "onnx",
           "size": 12236574,
           "sha256": "69ad4f6ef7d004d5f6988e2748756685c29bcaf213fc1cf8d192f6117cf38d50",
-          "urls": ["https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.onnx"],
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.onnx"
+          ],
           "required": true
         },
         "external_data": {
@@ -89,15 +113,19 @@
           "format": "onnx_data",
           "size": 144179200,
           "sha256": "d33b1410f6b0f6dd77370a8d922c98ab410f602470612592bd30bfe400115c2c",
-          "urls": ["https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.onnx.data"],
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.onnx.data"
+          ],
           "required": true
         },
         "config": {
           "filename": "mask2former_line_v0_prev.json",
           "format": "json",
-          "size": 441,
-          "sha256": "f02afb6f28651e10f6db47cc42996e6163291850fe08c27edcbcf5860e134031",
-          "urls": ["https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.json"],
+          "size": 538,
+          "sha256": "9c1281ce677e68f441f55fb6ab94fb358bbebe018d81cf4db2117cd4c9e84c42",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.json"
+          ],
           "required": true
         }
       }
@@ -245,8 +273,8 @@
         "config": {
           "filename": "trba_base_g1.json",
           "format": "json",
-          "size": 3249,
-          "sha256": "180923256c4c150ac5ea5d8a27953cc036d1ad158dc921440540de13c1967ccc",
+          "size": 2907,
+          "sha256": "be9ac0c69405eb0c80caef634ea3e595ae18a1c9fcb7aa2d2ddf0dcda0e6efcd",
           "urls": [
             "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.json"
           ],
@@ -298,8 +326,8 @@
         "config": {
           "filename": "trba_lite_g1.json",
           "format": "json",
-          "size": 2867,
-          "sha256": "b8ea5f087750e19951324a24c6959a79ea2c73c6953a33fd67bb3641817c31da",
+          "size": 2561,
+          "sha256": "512a8c1ed3e8dd4083b772a5cbb7f9832ee23e12259461c3aaa7a7c6a394aa91",
           "urls": [
             "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.json"
           ],
@@ -351,8 +379,8 @@
         "config": {
           "filename": "trba_lite_g2.json",
           "format": "json",
-          "size": 4663,
-          "sha256": "f2689dd1446c3132abb8df232d6912a90bcee72494f65ce3f96f18434ac46850",
+          "size": 4278,
+          "sha256": "aa414b740ec67e0c07c5df90ad2dd2d8b8d1795bc91e098491800758c7fa5a86",
           "urls": [
             "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.json"
           ],
@@ -390,6 +418,59 @@
         }
       }
     },
+    "trba_lite_g3_prt": {
+      "model_classes": [
+        "TRBA"
+      ],
+      "library_version": null,
+      "library_version_min": "0.1.10",
+      "library_version_max": "0.1.13",
+      "description": "TRBA Lite recognizer fine-tuned for pre-reform Russian printed text",
+      "license": null,
+      "artifacts": {
+        "license": null,
+        "config": {
+          "filename": "trba_lite_g3_prt.json",
+          "format": "json",
+          "size": 409,
+          "sha256": "14ca35109881c02853c33dc6db87d824aa0490734f15b601b8daadbe7c20b0b0",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g3_prt.json"
+          ],
+          "required": true
+        },
+        "weights": {
+          "filename": "trba_lite_g3_prt.onnx",
+          "format": "onnx",
+          "size": 46193314,
+          "sha256": "e5bc69749f1c8f19e7d63184cdc5d7c7082d2fa2570b180b1bf666d51521e502",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g3_prt.onnx"
+          ],
+          "required": true
+        },
+        "checkpoint": {
+          "filename": "trba_lite_g3_prt.pth",
+          "format": "pth",
+          "size": 129362807,
+          "sha256": "8ac83129c4af6a82f99cfd01bb621354cf340123884da24b82f4e035131c1af6",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g3_prt.pth"
+          ],
+          "required": false
+        },
+        "charset": {
+          "filename": "trba_lite_g3_prt.txt",
+          "format": "txt",
+          "size": 694,
+          "sha256": "60c5a8a9ba9a73085e102ac13e0d03e33f5fac369bfd5f88f4602a15bd96f45b",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g3_prt.txt"
+          ],
+          "required": true
+        }
+      }
+    },
     "yolo26s_obb_text_g1": {
       "model_classes": [
         "YOLO"
@@ -422,12 +503,12 @@
           "required": true
         },
         "config": {
-          "filename": "yolo26s_obb_text_g1.raw.yaml",
-          "format": "yaml",
-          "size": 1810,
-          "sha256": "08fb5df9fee8227a6a48559a6de6e56fff103c787c07d824d4b79f606135ee03",
+          "filename": "yolo26s_obb_text_g1.raw.json",
+          "format": "json",
+          "size": 85,
+          "sha256": "abe7f5e68259874d6ea58e4c9781796ee800799d3bc9034f93027d423e27634f",
           "urls": [
-            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.yaml"
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.raw.json"
           ],
           "required": true
         }
@@ -465,12 +546,12 @@
           "required": true
         },
         "config": {
-          "filename": "yolo26x_obb_text_g1.raw.yaml",
-          "format": "yaml",
-          "size": 1810,
-          "sha256": "fe2a37982089e54a11979a7f8423fb2be555c499ed5f62e0dddf54cfc60deb87",
+          "filename": "yolo26x_obb_text_g1.raw.json",
+          "format": "json",
+          "size": 85,
+          "sha256": "abe7f5e68259874d6ea58e4c9781796ee800799d3bc9034f93027d423e27634f",
           "urls": [
-            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.yaml"
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.raw.json"
           ],
           "required": true
         }

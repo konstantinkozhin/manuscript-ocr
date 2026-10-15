@@ -13,7 +13,6 @@ from torch.amp import autocast as _amp_autocast
 
 
 def _autocast():
-    """Совместимый autocast: использует torch.amp.autocast для подавления FutureWarning."""
     return _amp_autocast("cuda")
 import torch.nn as nn
 import torch.optim as optim
@@ -172,6 +171,9 @@ class Config:
             raise TypeError("Config source must be either a path to JSON or a dict.")
 
         merged = self._maybe_apply_resume(user_data)
+        from manuscript.api.recognizer import BaseRecognizer
+        merged["recognition_levels"] = list(BaseRecognizer._validate_levels(
+            merged.get("recognition_levels", ["word"])))
         for k, v in merged.items():
             setattr(self, k, v)
 
@@ -795,22 +797,13 @@ def run_training(cfg: Config, device: str = "cuda"):
     # Resume checkpoint handling
     resume_from = getattr(cfg, "resume_from", None)
 
-    # Автоматический поиск последнего чекпоинта в exp_dir
     if not resume_from:
-        possible_checkpoints = []
-        if os.path.exists(exp_dir):
-            for fname in ["checkpoint_last.pth", "checkpoint_best.pth"]:
-                ckpt_path = os.path.join(exp_dir, fname)
-                if os.path.isfile(ckpt_path):
-                    possible_checkpoints.append(ckpt_path)
-
-        if possible_checkpoints:
-            # Предпочитаем checkpoint_last.pth для продолжения обучения
-            if os.path.join(exp_dir, "checkpoint_last.pth") in possible_checkpoints:
-                resume_from = os.path.join(exp_dir, "checkpoint_last.pth")
-            else:
-                resume_from = possible_checkpoints[0]
-            logger.info(f"Автоматически найден чекпоинт для продолжения: {resume_from}")
+        for filename in (*Config._RESUME_CKPT_CANDIDATES, "checkpoint_last.pth", "checkpoint_best.pth"):
+            candidate = os.path.join(exp_dir, filename)
+            if os.path.isfile(candidate):
+                resume_from = candidate
+                logger.info(f"Resuming from checkpoint: {resume_from}")
+                break
 
     # Validation interval
     val_interval = getattr(cfg, "val_interval", 1)
@@ -821,8 +814,10 @@ def run_training(cfg: Config, device: str = "cuda"):
     if val_interval < 1:
         raise ValueError("val_interval must be >= 1")
 
-    # Save interval (не используется, всегда сохраняем при валидации)
     save_interval = getattr(cfg, "save_interval", None)
+    if save_interval is not None and (
+            isinstance(save_interval, bool) or not isinstance(save_interval, int) or save_interval < 1):
+        raise ValueError("save_interval must be a positive integer or None")
 
     train_proportions = getattr(cfg, "train_proportions", None)
     val_size = getattr(cfg, "val_size", 3000)
@@ -1629,144 +1624,7 @@ def run_training(cfg: Config, device: str = "cuda"):
         print(msg)
         logger.info(msg)
 
-        if should_eval:
-            save_checkpoint(
-                last_path,
-                model,
-                optimizer,
-                scheduler,
-                scaler,
-                epoch,
-                global_step,
-                min(best_val_loss, avg_val_loss),
-                max(best_val_acc, val_acc),
-                itos,
-                stoi,
-                {
-                    "batch_size": batch_size,
-                    "epochs": epochs,
-                    "lr": lr,
-                    "optimizer": optimizer_name,
-                    "scheduler": scheduler_name,
-                    "weight_decay": weight_decay,
-                    "momentum": momentum,
-                    "img_h": img_h,
-                    "img_w": img_w,
-                    "encoding": encoding,
-                    "max_len": max_len,
-                    "hidden_size": hidden_size,
-                    "num_encoder_layers": num_encoder_layers,
-                    "cnn_in_channels": cnn_in_channels,
-                    "cnn_out_channels": cnn_out_channels,
-                    "cnn_backbone": cnn_backbone,
-                    "transformation": transformation,
-                    "tps_num_fiducial": tps_num_fiducial,
-                    **decoder_settings,
-                    "ctc_weight": ctc_weight,
-                    "charset_path": charset_path,
-                    "train_csvs": train_csvs,
-                    "train_roots": train_roots,
-                    "val_csvs": val_csvs,
-                    "val_roots": val_roots,
-                },
-                log_dir,
-            )
-            save_weights(last_weights_path, model)
-
-            if avg_val_loss < best_val_loss:
-                best_val_loss = avg_val_loss
-                save_checkpoint(
-                    best_loss_path,
-                    model,
-                    optimizer,
-                    scheduler,
-                    scaler,
-                    epoch,
-                    global_step,
-                    best_val_loss,
-                    max(best_val_acc, val_acc),
-                    itos,
-                    stoi,
-                    {
-                        "batch_size": batch_size,
-                        "epochs": epochs,
-                        "lr": lr,
-                        "optimizer": optimizer_name,
-                        "scheduler": scheduler_name,
-                        "weight_decay": weight_decay,
-                        "momentum": momentum,
-                        "img_h": img_h,
-                        "img_w": img_w,
-                        "encoding": encoding,
-                        "max_len": max_len,
-                        "hidden_size": hidden_size,
-                        "num_encoder_layers": num_encoder_layers,
-                        "cnn_in_channels": cnn_in_channels,
-                        "cnn_out_channels": cnn_out_channels,
-                        "cnn_backbone": cnn_backbone,
-                        "transformation": transformation,
-                        "tps_num_fiducial": tps_num_fiducial,
-                        **decoder_settings,
-                        "ctc_weight": ctc_weight,
-                        "charset_path": charset_path,
-                        "train_csvs": train_csvs,
-                        "train_roots": train_roots,
-                        "val_csvs": val_csvs,
-                        "val_roots": val_roots,
-                    },
-                    log_dir,
-                )
-                save_weights(best_loss_weights_path, model)
-                logger.info(f"New best val_loss: {best_val_loss:.4f} (epoch {epoch})")
-
-            if val_acc >= best_val_acc:
-                best_val_acc = val_acc
-                save_checkpoint(
-                    best_acc_path,
-                    model,
-                    optimizer,
-                    scheduler,
-                    scaler,
-                    epoch,
-                    global_step,
-                    best_val_loss,
-                    best_val_acc,
-                    itos,
-                    stoi,
-                    {
-                        "batch_size": batch_size,
-                        "epochs": epochs,
-                        "lr": lr,
-                        "optimizer": optimizer_name,
-                        "scheduler": scheduler_name,
-                        "weight_decay": weight_decay,
-                        "momentum": momentum,
-                        "img_h": img_h,
-                        "img_w": img_w,
-                        "encoding": encoding,
-                        "max_len": max_len,
-                        "hidden_size": hidden_size,
-                        "num_encoder_layers": num_encoder_layers,
-                        "cnn_in_channels": cnn_in_channels,
-                        "cnn_out_channels": cnn_out_channels,
-                        "cnn_backbone": cnn_backbone,
-                        "transformation": transformation,
-                        "tps_num_fiducial": tps_num_fiducial,
-                        **decoder_settings,
-                        "ctc_weight": ctc_weight,
-                        "charset_path": charset_path,
-                        "train_csvs": train_csvs,
-                        "train_roots": train_roots,
-                        "val_csvs": val_csvs,
-                        "val_roots": val_roots,
-                    },
-                    log_dir,
-                )
-                save_weights(best_acc_weights_path, model)
-                logger.info(f"New best acc: {best_val_acc:.4f} (epoch {epoch})")
-
         if scheduler is not None:
-            # OneCycleLR вызывается после каждого батча, не здесь
             if isinstance(scheduler, torch.optim.lr_scheduler.OneCycleLR):
                 pass
             elif isinstance(scheduler, ReduceLROnPlateau):
@@ -1774,6 +1632,56 @@ def run_training(cfg: Config, device: str = "cuda"):
                     scheduler.step(avg_val_loss)
             else:
                 scheduler.step()
+
+        improved_loss = should_eval and avg_val_loss < best_val_loss
+        improved_acc = should_eval and val_acc >= best_val_acc
+        if improved_loss:
+            best_val_loss = avg_val_loss
+        if improved_acc:
+            best_val_acc = val_acc
+        should_save = (should_eval if save_interval is None else epoch % save_interval == 0) or epoch == epochs
+        checkpoint_config = {
+            "batch_size": batch_size,
+            "epochs": epochs,
+            "lr": lr,
+            "optimizer": optimizer_name,
+            "scheduler": scheduler_name,
+            "weight_decay": weight_decay,
+            "momentum": momentum,
+            "img_h": img_h,
+            "img_w": img_w,
+            "encoding": encoding,
+            "max_len": max_len,
+            "hidden_size": hidden_size,
+            "num_encoder_layers": num_encoder_layers,
+            "cnn_in_channels": cnn_in_channels,
+            "cnn_out_channels": cnn_out_channels,
+            "cnn_backbone": cnn_backbone,
+            "transformation": transformation,
+            "tps_num_fiducial": tps_num_fiducial,
+            **decoder_settings,
+            "ctc_weight": ctc_weight,
+            "charset_path": charset_path,
+            "train_csvs": train_csvs,
+            "train_roots": train_roots,
+            "val_csvs": val_csvs,
+            "val_roots": val_roots,
+        }
+        checkpoint_args = (
+            model, optimizer, scheduler, scaler, epoch, global_step,
+            best_val_loss, best_val_acc, itos, stoi, checkpoint_config, log_dir,
+        )
+        if should_save:
+            save_checkpoint(last_path, *checkpoint_args)
+            save_weights(last_weights_path, model)
+        if improved_loss:
+            save_checkpoint(best_loss_path, *checkpoint_args)
+            save_weights(best_loss_weights_path, model)
+            logger.info(f"New best val_loss: {best_val_loss:.4f} (epoch {epoch})")
+        if improved_acc:
+            save_checkpoint(best_acc_path, *checkpoint_args)
+            save_weights(best_acc_weights_path, model)
+            logger.info(f"New best acc: {best_val_acc:.4f} (epoch {epoch})")
 
     writer.close()
     logger.info("Training finished.")
@@ -1791,7 +1699,7 @@ def run_training(cfg: Config, device: str = "cuda"):
             charset_path=charset_dest,
             output_path=onnx_path,
             opset_version=14,
-            simplify=True,
+            simplify=bool(getattr(cfg, "export_simplify", False)),
         )
         logger.info(f"ONNX model exported successfully: {onnx_path}")
     except Exception as e:

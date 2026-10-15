@@ -1,8 +1,8 @@
+from tests.support.modules import patch_modules
 """Tests for TRBA train/export orchestration."""
 
 import json
 import sys
-from pathlib import Path
 from types import ModuleType
 from unittest.mock import MagicMock, patch
 
@@ -208,9 +208,7 @@ class TestTRBAExport:
             def run(self, *_args, **_kwargs):
                 return [expected_output]
 
-        with patch.dict(
-            sys.modules,
-            {
+        with patch_modules({
                 "manuscript.recognizers._trba.model.model": fake_model_module,
                 "onnx": fake_onnx,
                 "onnxsim": fake_onnxsim,
