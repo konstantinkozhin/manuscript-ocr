@@ -1,29 +1,46 @@
-"""Pytest configuration and fixtures."""
-
+import importlib.util
+import os
 import pytest
 
+os.environ.setdefault("NO_ALBUMENTATIONS_UPDATE", "1")
 
-def pytest_collection_modifyitems(config, items):
-    """
-    Mark tests that require torch for skipping when torch is unavailable.
 
-    Note: This only works for tests that can be imported. Tests in modules
-    that directly import torch-dependent code will fail during collection.
-    Use --ignore flags in pytest command to skip those modules entirely.
-    """
-    try:
-        import torch  # noqa: F401
+def pytest_addoption(parser):
+    parser.addoption("--require-integration-deps", action="store_true")
 
-        torch_available = True
-    except ImportError:
-        torch_available = False
 
-    if not torch_available:
-        skip_torch = pytest.mark.skip(
-            reason="PyTorch not installed (required for training/export)"
+def pytest_sessionstart(session):
+    if session.config.getoption("--require-integration-deps"):
+        required = (
+            "torch",
+            "torchvision",
+            "onnx",
+            "onnxsim",
+            "transformers",
+            "tokenizers",
+            "albumentations",
+            "Levenshtein",
+            "build",
         )
+        missing = [name for name in required if importlib.util.find_spec(name) is None]
+        if missing:
+            raise pytest.UsageError(
+                "Missing integration dependencies: " + ", ".join(missing)
+            )
 
-        for item in items:
-            # Skip if test has requires_torch marker
-            if "requires_torch" in item.keywords:
-                item.add_marker(skip_torch)
+
+def pytest_sessionfinish(session, exitstatus):
+    if session.config.getoption("--require-integration-deps"):
+        reporter = session.config.pluginmanager.get_plugin("terminalreporter")
+        if reporter is None:
+            return
+        unexpected = [
+            report.nodeid
+            for report in reporter.stats.get("skipped", [])
+            if "CUDA" not in str(report.longrepr)
+        ]
+        if unexpected:
+            reporter.write_sep(
+                "=", "Unexpected integration skips: " + ", ".join(unexpected)
+            )
+            session.exitstatus = pytest.ExitCode.TESTS_FAILED
