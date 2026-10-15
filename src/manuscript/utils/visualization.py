@@ -56,13 +56,7 @@ def _draw_quads(
     >>> # From file path
     >>> result = draw_quads("document.jpg", quads, color=(255, 0, 0))
     """
-    # Load image using universal reader
-    if isinstance(image, (str, Path)):
-        img = read_image(image)
-    elif isinstance(image, Image.Image):
-        img = np.array(image.convert("RGB"))
-    else:
-        img = image.copy()
+    img = read_image(image).copy()
 
     # Apply darkening if requested
     if dark_alpha > 0:
@@ -87,98 +81,41 @@ def _draw_quads(
 def visualize_page(
     image: Union[str, Path, np.ndarray, Image.Image],
     page: Page,
-    color=(0, 255, 0),
-    thickness=4,
-    show_order=True,
-    show_lines=False,
-    show_numbers=False,
+    thickness=3,
+    numbers_levels=(1, 2),
+    connections_levels=(),
     line_color=(255, 165, 0),
     number_bg=(255, 255, 255),
     number_color=(0, 0, 0),
     max_size=4096,
+    upscale=False,
+    show_tables=True,
+    show_cells=True,
+    show_cell_indices=False,
+    show_orientation=False,
+    show_labels=False,
 ) -> Image.Image:
+    """Render hierarchy depth with alternating brightness and cold-color layers.
+
+    The background darkens by 30%. Level one restores original brightness,
+    adding 15% per extra overlap. Even levels blend translucent cold colors,
+    contrasting consecutive siblings. Odd levels from three onward lighten
+    accumulated colors by 25% per overlap. Three-pixel dark contours share a
+    color throughout each first-level subtree.
+    numbers_levels and connections_levels select tree depths; empty lists
+    disable their markers. Numbers default to levels one and two.
+    Markers follow depth-first order among visible polygons at that depth.
+    Overlap contributions are capped at two regions per depth.
+    show_labels draws the original model label (or element type) on each region.
     """
-    Visualize a Page object with detected text spans/blocks.
-
-    This function draws all text spans from the Page structure on the image,
-    optionally showing reading order with numbered markers and connecting lines.
-    When show_order=True, it also visualizes blocks with semi-transparent
-    bounding boxes, each block having a distinct color.
-
-    Parameters
-    ----------
-    image : str, Path, np.ndarray, or PIL.Image
-        Input image. Can be:
-        - Path to image file (str or Path) - supports Unicode paths
-        - RGB numpy array with shape (H, W, 3)
-        - PIL Image object
-    page : Page
-        Page object from manuscript.data containing detected blocks/text spans.
-    color : tuple of int, default=(0, 255, 0)
-        RGB color for text span boundaries.
-    thickness : int, default=4
-        Line thickness for text span boundaries.
-    show_order : bool, default=True
-        If True, colors different text lines with different colors and shows
-        semi-transparent block boundaries with different colors per block.
-    show_lines : bool, default=False
-        If True and show_order=True, draw connecting lines between consecutive
-        text spans showing the reading sequence.
-    show_numbers : bool, default=False
-        If True and show_order=True, display numbered markers on each text span
-        showing the reading order.
-    line_color : tuple of int, default=(255, 165, 0)
-        RGB color for connecting lines between text spans.
-    number_bg : tuple of int, default=(255, 255, 255)
-        Background color for order number boxes.
-    number_color : tuple of int, default=(0, 0, 0)
-        Text color for order numbers.
-    max_size : int or None, default=4096
-        Maximum size for the longer dimension of the output image.
-        Image will be resized proportionally if larger. Set to None to
-        keep original size.
-
-    Returns
-    -------
-    PIL.Image.Image
-        Visualized image with detection boxes and optional reading order annotations.
-        When show_order=True, also includes semi-transparent block boundaries.
-
-    Examples
-    --------
-    Basic visualization without reading order:
-
-    >>> from manuscript import EAST
-    >>> from manuscript.utils import visualize_page
-    >>> detector = EAST()
-    >>> page = detector.predict("document.jpg")
-    >>> # Can pass path directly
-    >>> vis = visualize_page("document.jpg", page)
-    >>> vis.save("output.jpg")
-
-    Visualization with reading order and block boundaries:
-
-    >>> # Can also use numpy array or PIL Image
-    >>> from manuscript.utils import read_image
-    >>> img = read_image("document.jpg")
-    >>> vis = visualize_page(
-    ...     img,
-    ...     page,
-    ...     show_order=True,
-    ...     color=(255, 0, 0),
-    ...     thickness=3
-    ... )
-
-    Show connecting lines and numbers between text spans:
-
-    >>> vis = visualize_page(
-    ...     "document.jpg",
-    ...     page,
-    ...     show_order=True,
-    ...     show_lines=True,
-    ...     show_numbers=True
-    ... )
-    """
+    for name, levels in (("numbers_levels", numbers_levels),
+                         ("connections_levels", connections_levels)):
+        if not isinstance(levels, (list, tuple)) or any(
+                isinstance(level, bool) or not isinstance(level, int) or level < 1
+                for level in levels):
+            raise ValueError(f"{name} must be a list or tuple of positive integers")
+    if isinstance(thickness, bool) or not isinstance(thickness, int) or thickness < 1:
+        raise ValueError("thickness must be a positive integer")
     # Load image using universal reader
     if isinstance(image, (str, Path)):
         img = read_image(image)
@@ -190,121 +127,163 @@ def visualize_page(
     if max_size is not None:
         h, w = img.shape[:2]
         scale = max_size / max(h, w)
-        if scale < 1:
-            img = cv2.resize(img, (int(w * scale), int(h * scale)))
+        if scale < 1 or upscale:
+            img = cv2.resize(img, (max(1, round(w * scale)), max(1, round(h * scale))),
+                             interpolation=cv2.INTER_CUBIC if scale > 1 else cv2.INTER_AREA)
         else:
             scale = 1.0
     else:
         scale = 1.0
 
-    def get_line_color(idx: int):
-        hue = (idx * 0.618033988749895) % 1.0
-        hsv = np.uint8([[[int(hue * 179), 220, 255]]])
-        return tuple(int(c) for c in cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)[0][0])
+    if not isinstance(page, Page):
+        raise TypeError("visualize_page requires the document-tree Page")
+    from manuscript.data import Table, Cell
 
-    def get_block_color(idx: int):
-        hue = ((idx * 0.618033988749895) + 0.5) % 1.0
-        hsv = np.uint8([[[int(hue * 179), 180, 255]]])
-        return tuple(int(c) for c in cv2.cvtColor(hsv, cv2.COLOR_HSV2RGB)[0][0])
-
-    lines = []
-    blocks = []
-    line_index = 0
-
-    for block_idx, block in enumerate(page.blocks):
-        block_quads = []
-        if block.lines:
-            for line in block.lines:
-                quads, text_spans = [], []
-                for text_span in line.text_spans:
-                    poly = np.asarray(text_span.polygon, dtype=np.float32) * scale
-                    quads.append(poly)
-                    text_spans.append(text_span)
-                    block_quads.append(poly)
-                if quads:
-                    lines.append((quads, text_spans, line_index))
-                    line_index += 1
-        elif block.text_spans:
-            quads, text_spans = [], []
-            for text_span in block.text_spans:
-                poly = np.asarray(text_span.polygon, dtype=np.float32) * scale
-                quads.append(poly)
-                text_spans.append(text_span)
-                block_quads.append(poly)
-            if quads:
-                lines.append((quads, text_spans, line_index))
-                line_index += 1
-        if block_quads:
-            blocks.append((block_quads, block_idx))
-
-    if not lines:
-        return Image.fromarray(img)
+    def visible(node):
+        return not ((isinstance(node, Table) and not show_tables)
+                    or (isinstance(node, Cell) and not show_cells))
 
     h, w = img.shape[:2]
+    regions = [(node, np.asarray(node.polygon, dtype=np.float32) * scale, None)
+               for node in page.descendants if node.polygon is not None and visible(node)]
+    levels = {}
+    for node, points, _ in regions:
+        levels.setdefault(node.depth, []).append((node, points))
 
-    # ----- BLOCK LAYER (RGBA) -----
-    block_layer = np.zeros((h, w, 4), dtype=np.uint8)
+    palette = ((45, 155, 180), (145, 70, 185),
+               (55, 170, 125), (75, 90, 195))
+    palette = tuple(tuple(min(255, round(channel * 1.15)) for channel in tint)
+                    for tint in palette)
+    pixels = np.clip(img.astype(np.float32) * 0.7, 0, 255).astype(np.uint8)
+    for depth, members in sorted(levels.items()):
+        if depth % 2 == 0:
+            overlay = Image.fromarray(pixels).convert("RGBA")
+            sibling_indices = {}
+            coverage = np.zeros((h, w), dtype=np.uint8)
+            for node, points in members:
+                parent_id = id(node.parent)
+                index = sibling_indices.get(parent_id, 0)
+                sibling_indices[parent_id] = index + 1
+                layer = np.zeros((h, w, 4), dtype=np.uint8)
+                cv2.fillPoly(layer, [points.astype(np.int32)],
+                             (*palette[index % len(palette)], 75))
+                selected = layer[:, :, 3] != 0
+                layer[coverage >= 2, 3] = 0
+                coverage[selected] = np.minimum(coverage[selected] + 1, 2)
+                overlay = Image.alpha_composite(overlay, Image.fromarray(layer, mode="RGBA"))
+            pixels = np.asarray(overlay.convert("RGB")).copy()
+        else:
+            coverage = np.zeros((h, w), dtype=np.uint32)
+            for _, points in members:
+                mask = np.zeros((h, w), dtype=np.uint8)
+                cv2.fillPoly(mask, [points.astype(np.int32)], 1)
+                coverage += mask
+            np.minimum(coverage, 2, out=coverage)
+            selected = coverage != 0
+            # Level one restores the source; later odd levels lighten the
+            # accumulated image, retaining all underlying color contributions.
+            source = img if depth == 1 else pixels
+            step = 0.15 if depth == 1 else 0.25
+            count = coverage.astype(np.float32) - (1 if depth == 1 else 0)
+            factor = 1.0 + step * np.maximum(count, 0)
+            brightened = np.clip(source.astype(np.float32) * factor[:, :, None],
+                                 0, 255).astype(np.uint8)
+            pixels[selected] = brightened[selected]
 
-    for block_quads, block_idx in blocks:
-        pts = np.vstack(block_quads)
-        x1, y1 = pts[:, 0].min(), pts[:, 1].min()
-        x2, y2 = pts[:, 0].max(), pts[:, 1].max()
-        color_b = get_block_color(block_idx)
-        cv2.rectangle(
-            block_layer, (int(x1), int(y1)), (int(x2), int(y2)), (*color_b, 75), -1
-        )  # alpha=75
-    
-    # ----- TEXT-SPAN MASK (cut out text spans from block layers) -----
-    text_span_mask = np.zeros((h, w), dtype=np.uint8)
-    for quads, _, _ in lines:
-        for quad in quads:
-            coords = np.asarray(quad, dtype=np.int32)
-            cv2.fillPoly(text_span_mask, [coords], 255)
-
-    inv_text_span_mask = cv2.bitwise_not(text_span_mask)
-
-     # cut out text spans -> blocks do not cover text spans
-    block_layer[:, :, 3] = cv2.bitwise_and(block_layer[:, :, 3], inv_text_span_mask)
-
-    # final image
-    base = Image.fromarray(img).convert("RGBA")
-    block_img = Image.fromarray(block_layer, mode="RGBA")
-    out = Image.alpha_composite(base, block_img).convert("RGB")
-
+    out = Image.fromarray(pixels).convert("RGB")
     draw = ImageDraw.Draw(out)
+    outline_palette = ((80, 20, 35), (15, 55, 85), (55, 20, 80),
+                       (15, 70, 40), (85, 45, 10), (20, 25, 80))
+    outline_palette = tuple(tuple(min(255, round(channel * 1.15)) for channel in tint)
+                            for tint in outline_palette)
+    outline_palette = tuple(outline_palette[index]
+                            for index in np.random.default_rng(0).permutation(len(outline_palette)))
+    root_colors = {id(node): outline_palette[index % len(outline_palette)]
+                   for index, node in enumerate(page.children)}
+    for node, points, _ in regions:
+        root = node.ancestors[1] if node.depth > 1 else node
+        contour = [(round(x), round(y)) for x, y in points]
+        outline = root_colors[id(root)]
+        if node.depth % 3:
+            draw.line(contour + [contour[0]], fill=outline, width=thickness)
+        else:
+            # Carry dash phase around corners instead of restarting each edge.
+            dash, gap = 9, 6
+            distance = 0.0
+            for start, end in zip(contour, contour[1:] + contour[:1]):
+                start = np.asarray(start, dtype=float)
+                delta = np.asarray(end, dtype=float) - start
+                length = float(np.linalg.norm(delta))
+                position = 0.0
+                while position < length:
+                    phase = distance % (dash + gap)
+                    drawing = phase < dash
+                    step = min((dash if drawing else dash + gap) - phase,
+                               length - position)
+                    if drawing:
+                        first = start + delta * (position / length)
+                        last = start + delta * ((position + step) / length)
+                        draw.line([tuple(first), tuple(last)], fill=outline, width=thickness)
+                    position += step
+                    distance += step
+    if show_cell_indices:
+        for node, points, _ in regions:
+            if not isinstance(node, Cell):
+                continue
+            label = f"r{node.row} c{node.column}"
+            if node.row_span != 1 or node.column_span != 1:
+                label += f" ({node.row_span}x{node.column_span})"
+            position = (int(points[:, 0].min()) + 4, int(points[:, 1].min()) + 4)
+            draw.rectangle(draw.textbbox(position, label), fill=tuple(number_bg))
+            draw.text(position, label, fill=tuple(number_color))
 
-    # ----- TEXT-SPAN BOXES -----
-    for quads, _, idx in lines:
-        col = get_line_color(idx) if show_order else color
-        for quad in quads:
-            pts = np.asarray(quad, dtype=np.float32)
-            pts_py = [(int(x), int(y)) for x, y in pts]
-            draw.line(pts_py + [pts_py[0]], fill=tuple(col), width=thickness)
+    def centers_at(depths):
+        return [tuple(points.mean(axis=0)) for node, points, _ in regions
+                if node.depth in depths]
 
-    # ----- ORDER LINES & NUMBERS -----
-    if show_order:
-        text_spans = [span for _, spans, _ in lines for span in spans]
-        centers = []
-        for text_span in text_spans:
-            xs = [p[0] * scale for p in text_span.polygon]
-            ys = [p[1] * scale for p in text_span.polygon]
-            centers.append((sum(xs) / len(xs), sum(ys) / len(ys)))
+    if connections_levels:
+        centers = centers_at(connections_levels)
+        for start, end in zip(centers, centers[1:]):
+            draw.line([start, end], fill=line_color, width=thickness)
+    if numbers_levels:
+        centers = centers_at(numbers_levels)
+        overlay = Image.new("RGBA", out.size, (0, 0, 0, 0))
+        labels = ImageDraw.Draw(overlay)
+        for index, (cx, cy) in enumerate(centers, 1):
+            text = str(index)
+            position = (cx - 6, cy - 8)
+            box = labels.textbbox(position, text)
+            labels.rectangle((box[0]-3,box[1]-3,box[2]+3,box[3]+3),
+                             fill=tuple(number_bg) + (140,))
+            labels.text(position, text, fill=tuple(number_color) + (255,))
+        out = Image.alpha_composite(out.convert("RGBA"), overlay).convert("RGB")
 
-        # Draw connecting lines only if show_lines is True
-        if show_lines:
-            for p, c in zip(centers, centers[1:]):
-                draw.line([p, c], fill=line_color, width=3)
+    if show_labels:
+        draw = ImageDraw.Draw(out)
+        for node, points, _ in regions:
+            label = node.label or node.type
+            position = (max(0, int(points[:, 0].min()) + 4),
+                        max(0, int(points[:, 1].min()) + 4))
+            bounds = draw.textbbox(position, label)
+            draw.rectangle(bounds, fill=tuple(number_bg))
+            draw.text(position, label, fill=tuple(number_color))
 
-        # Draw numbers only if show_numbers is True
-        if show_numbers:
-            overlay = Image.new("RGBA", out.size, (0, 0, 0, 0))
-            d2 = ImageDraw.Draw(overlay)
-            for cx, cy in centers:
-                d2.rectangle([cx - 12, cy - 12, cx + 12, cy + 12], fill=number_bg + (140,))
-            out = Image.alpha_composite(out.convert("RGBA"), overlay).convert("RGB")
-
-            draw = ImageDraw.Draw(out)
-            for i, (cx, cy) in enumerate(centers, 1):
-                draw.text((cx - 6, cy - 8), str(i), fill=number_color)
+    if show_orientation and isinstance(page, Page):
+        draw = ImageDraw.Draw(out)
+        for node, _, _ in regions:
+            if node.orientation in (None, 0):
+                continue
+            label = f"{node.orientation:g}°"
+            x, y = min(node.polygon, key=lambda point: (point[1], point[0]))
+            bounds = draw.textbbox((0, 0), label)
+            width, height = bounds[2] - bounds[0], bounds[3] - bounds[1]
+            padding = 3
+            left = max(0, min(round(x * scale), out.width - width - 2 * padding))
+            top = max(0, min(round(y * scale) - height - 2 * padding,
+                             out.height - height - 2 * padding))
+            draw.rectangle((left, top, left + width + 2 * padding,
+                            top + height + 2 * padding), fill=number_bg)
+            draw.text((left + padding - bounds[0], top + padding - bounds[1]),
+                      label, fill=number_color)
 
     return out

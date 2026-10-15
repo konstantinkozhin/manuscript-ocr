@@ -198,15 +198,15 @@ def order_quad_points(
     if pts.shape != (4, 2):
         raise ValueError(f"Expected 4 points with shape (4, 2), got: {pts.shape}")
 
-    rect = np.zeros((4, 2), dtype=np.float32)
-    sums = pts.sum(axis=1)
-    rect[0] = pts[np.argmin(sums)]
-    rect[2] = pts[np.argmax(sums)]
-
-    diffs = np.diff(pts, axis=1)
-    rect[1] = pts[np.argmin(diffs)]
-    rect[3] = pts[np.argmax(diffs)]
-    return rect
+    if not np.isfinite(pts).all():
+        raise ValueError("Quadrilateral vertices must be finite")
+    hull = cv2.convexHull(pts).reshape(-1, 2)
+    if len(hull) != 4 or abs(cv2.contourArea(hull)) <= 1e-6:
+        raise ValueError("Expected a nondegenerate convex quadrilateral")
+    centered = hull - hull.mean(axis=0)
+    rect = hull[np.argsort(np.arctan2(centered[:, 1], centered[:, 0]))]
+    first = np.lexsort((rect[:, 0], rect[:, 1], rect.sum(axis=1)))[0]
+    return np.roll(rect, -int(first), axis=0)
 
 
 def warp_quad(
@@ -239,7 +239,10 @@ def warp_quad(
     if pts.shape != (4, 2):
         return None
 
-    rect = order_quad_points(pts)
+    try:
+        rect = order_quad_points(pts)
+    except ValueError:
+        return None
 
     if output_size is None:
         top_width = np.linalg.norm(rect[1] - rect[0])
@@ -382,3 +385,40 @@ def polygons_to_boxes(polygons: np.ndarray) -> np.ndarray:
     if len(polygons) == 0:
         return np.zeros((0, 4), dtype=np.float32)
     return np.column_stack([polygons.min(axis=1), polygons.max(axis=1)]).astype(np.float32)
+
+
+def repair_detection_polygon(points, *, fallback=None):
+    """Preserve a usable detection outline, repairing topology before a box fallback.
+
+    Disconnected repairs use a rectangle covering the entire original outline;
+    they never silently select only the largest component. None means that even
+    the available fallback has no two-dimensional extent.
+    """
+    from shapely.geometry import Polygon
+    from shapely.errors import ShapelyError
+
+    points = np.asarray(points, dtype=np.float64)
+    if points.ndim != 2 or points.shape[1] != 2 or not np.isfinite(points).all():
+        raise ValueError("Detection polygon must contain finite XY points")
+    if len(points) >= 4:
+        geometry = Polygon(points)
+        if geometry.is_valid and geometry.area > 0:
+            return points
+        try:
+            repaired = geometry.buffer(0)
+        except ShapelyError:
+            repaired = None
+        if (repaired is not None and repaired.geom_type == "Polygon"
+                and repaired.is_valid and repaired.area > 0):
+            result = np.asarray(repaired.exterior.coords[:-1])
+            if len(result) >= 4:
+                return result
+    source = points if fallback is None else np.asarray(fallback, dtype=np.float64)
+    if source.ndim != 2 or source.shape[1] != 2 or not np.isfinite(source).all():
+        raise ValueError("Detection fallback must contain finite XY points")
+    if not len(source):
+        return None
+    result = cv2.boxPoints(cv2.minAreaRect(source.astype(np.float32))).astype(np.float64)
+    if Polygon(result).is_valid and Polygon(result).area > 0:
+        return result
+    return None

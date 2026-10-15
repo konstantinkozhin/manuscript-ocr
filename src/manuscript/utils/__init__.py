@@ -1,5 +1,7 @@
 """Common utilities for manuscript-ocr."""
 
+from .grouping import group_regions
+
 # I/O utilities
 from .io import read_image, create_page_from_text, create_page_from_image
 
@@ -23,6 +25,7 @@ from .page_transforms import (
 )
 
 __all__ = [
+    "group_regions",
     # I/O
     "read_image",
     "create_page_from_text",

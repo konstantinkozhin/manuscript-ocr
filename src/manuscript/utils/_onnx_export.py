@@ -1,9 +1,11 @@
 """Helpers loaded only by model exporters."""
 
 def half_model(path, *, keep_io_types=True):
+    from pathlib import Path
     import onnx
     from onnxruntime.transformers.float16 import convert_float_to_float16
 
+    path = Path(path)
     graph = convert_float_to_float16(onnx.load(path), keep_io_types=keep_io_types)
     pending = list(graph.graph.node)
     available = {item.name for item in graph.graph.input} | {item.name for item in graph.graph.initializer}
@@ -20,5 +22,7 @@ def half_model(path, *, keep_io_types=True):
     graph.graph.node.extend(ordered)
     onnx.checker.check_model(graph)
     output = path.with_name(path.name.replace(".fp32.", ".fp16."))
+    if output == path:
+        output = path.with_name(path.stem + ".fp16" + path.suffix)
     onnx.save(graph, output)
     return output

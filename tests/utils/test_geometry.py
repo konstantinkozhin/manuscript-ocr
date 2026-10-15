@@ -166,3 +166,38 @@ def test_warp_quad_returns_none_for_empty_warp(monkeypatch):
     monkeypatch.setattr(geometry.cv2, "warpPerspective", lambda *args, **kwargs: np.empty((0, 0, 3), dtype=np.uint8))
 
     assert warp_quad(image, polygon) is None
+
+
+def test_quad_order_preserves_four_distinct_vertices():
+    from manuscript.utils.geometry import order_quad_points
+    points = np.array([(20, 0), (40, 20), (20, 40), (0, 20)], np.float32)
+    ordered = order_quad_points(points)
+    assert len(np.unique(ordered, axis=0)) == 4, ordered
+
+
+@pytest.mark.parametrize("angle", [44.9, 45., 45.1, 90., 135.])
+def test_quad_permutations_preserve_crop_corners(angle):
+    import itertools
+    import cv2
+    corners = np.array([[-12., -8.], [12., -8.], [12., 8.], [-12., 8.]], np.float32)
+    radians = np.deg2rad(angle)
+    rotation = np.array([[np.cos(radians), -np.sin(radians)],
+                         [np.sin(radians), np.cos(radians)]], np.float32)
+    points = corners @ rotation.T + 32
+    image = np.zeros((64, 64, 3), np.uint8)
+    for color, point in enumerate(geometry.order_quad_points(points), 1):
+        cv2.circle(image, tuple(np.rint(point).astype(int)), 3, (color * 40,) * 3, -1)
+    expected = warp_quad(image, points, output_size=(24, 16))
+    assert sorted(np.rint(expected[[0, 0, -1, -1], [0, -1, -1, 0], 0] / 40).astype(int)) == [1, 2, 3, 4]
+    for order in itertools.permutations(range(4)):
+        actual = warp_quad(image, points[list(order)], output_size=(24, 16))
+        np.testing.assert_array_equal(actual, expected)
+
+
+@pytest.mark.parametrize("points", [
+    [(0, 0), (0, 0), (10, 10), (0, 10)],
+    [(0, 0), (1, 1), (2, 2), (3, 3)],
+    [(0, 0), (10, 0), (float("nan"), 10), (0, 10)],
+])
+def test_degenerate_quads_allow_preparer_fallback(points):
+    assert warp_quad(np.zeros((20, 20, 3), np.uint8), points) is None

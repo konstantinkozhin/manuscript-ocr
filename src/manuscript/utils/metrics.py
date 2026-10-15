@@ -6,7 +6,6 @@ from tqdm import tqdm
 from .geometry import _box_iou
 
 
-# может не нужна
 def _match_boxes(
     pred_boxes: List[Tuple[float, float, float, float]],
     gt_boxes: List[Tuple[float, float, float, float]],
@@ -39,7 +38,7 @@ def _match_boxes(
     --------
     >>> pred = [(10, 10, 50, 50), (60, 60, 100, 100)]
     >>> gt = [(12, 12, 52, 52)]  # Overlaps with first prediction
-    >>> tp, fp, fn = match_boxes(pred, gt, iou_threshold=0.5)
+    >>> tp, fp, fn = _match_boxes(pred, gt, iou_threshold=0.5)
     >>> (tp, fp, fn)
     (1, 1, 0)
     """
@@ -82,7 +81,6 @@ def _match_boxes(
     
     return tp, fp, fn
 
-# может не нужна
 def _compute_f1_score(
     true_positives: int,
     false_positives: int,
@@ -111,7 +109,7 @@ def _compute_f1_score(
         
     Examples
     --------
-    >>> f1, prec, rec = compute_f1_score(80, 10, 10)
+    >>> f1, prec, rec = _compute_f1_score(80, 10, 10)
     >>> round(f1, 2)
     0.84
     >>> round(prec, 2)
@@ -120,11 +118,11 @@ def _compute_f1_score(
     0.89
     
     >>> # Perfect detection
-    >>> compute_f1_score(100, 0, 0)
+    >>> _compute_f1_score(100, 0, 0)
     (1.0, 1.0, 1.0)
     
     >>> # No detections
-    >>> compute_f1_score(0, 0, 10)
+    >>> _compute_f1_score(0, 0, 10)
     (0.0, 0.0, 0.0)
     """
     if true_positives == 0:
@@ -159,7 +157,6 @@ def _evaluate_image_worker(args):
     
     return results
 
-# может не нужна будет (потом)
 def _evaluate_dataset(
     predictions: Dict[str, List[Tuple[float, float, float, float]]],
     ground_truths: Dict[str, List[Tuple[float, float, float, float]]],
@@ -209,7 +206,7 @@ def _evaluate_dataset(
     ...     'img1': [(12, 12, 52, 52)],
     ...     'img2': [(22, 22, 82, 82)]
     ... }
-    >>> results = evaluate_dataset(predictions, ground_truths, verbose=False)
+    >>> results = _evaluate_dataset(predictions, ground_truths, verbose=False)
     >>> results['f1@0.5'] > 0.5
     True
     
