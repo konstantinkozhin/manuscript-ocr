@@ -252,3 +252,13 @@ def test_region_types_orientation_and_config_generation(weights,class_config,tmp
     path=tmp_path/'page.json';page.save(path)
     assert Page.load(path).to_tree_dict()==page.to_tree_dict()
     assert model.class_ids==(1,2,3,4,5)
+
+
+def test_constructor_forwards_shared_web_runtime_options(weights):
+    external_data = {'weights.bin': str(weights.with_suffix('.bin'))}
+    model = RFDETR(weights, config=weights.with_suffix('.json'),
+                   runtime='web', device='gpu', web_external_data=external_data)
+    assert model.runtime == 'web'
+    assert model.device == 'gpu'
+    assert model.web_external_data == external_data
+    assert model.onnx_session is None

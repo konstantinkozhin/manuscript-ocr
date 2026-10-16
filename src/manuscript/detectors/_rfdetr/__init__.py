@@ -75,11 +75,15 @@ class RFDETR(BaseDetector):
         target_size=None,
         force_download=False,
         mask_threshold=None,
+        *,
+        runtime="auto",
+        web_external_data=None,
     ):
         if weights is None:
             raise ValueError("RFDETR requires explicit ONNX weights or a registry name")
         super().__init__(
-            weights=str(weights), device=device, force_download=force_download
+            weights=str(weights), device=device, force_download=force_download,
+            runtime=runtime, web_external_data=web_external_data,
         )
         config, self.config_path = self._load_detector_config(config)
         self._configure_region_types(config)

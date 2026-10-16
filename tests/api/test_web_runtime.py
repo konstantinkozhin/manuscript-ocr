@@ -121,3 +121,22 @@ def test_browser_parallel_mode_reports_sequential_alternative(monkeypatch):
         with pytest.raises(ValueError, match='parallel=False'):
             cls([Processor()], parallel=True)
         assert cls([Processor()], parallel=False).parallel is False
+
+
+def test_all_artifact_implementations_accept_shared_runtime_options():
+    import importlib
+    import inspect
+    import pkgutil
+    from manuscript.api.base import BaseArtifactModel
+
+    checked = set()
+    for name in ('detectors', 'recognizers', 'correctors'):
+        package = importlib.import_module('manuscript.' + name)
+        for entry in pkgutil.iter_modules(package.__path__, package.__name__ + '.'):
+            module = importlib.import_module(entry.name)
+            for _, cls in inspect.getmembers(module, inspect.isclass):
+                if (cls.__module__ == module.__name__ and issubclass(cls, BaseArtifactModel)
+                        and getattr(cls, 'registry_model_class', None) and not inspect.isabstract(cls)):
+                    inspect.signature(cls).bind_partial(runtime='web', web_external_data={})
+                    checked.add(cls.__name__)
+    assert checked

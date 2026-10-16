@@ -357,8 +357,25 @@ class TestTRBABatching:
             **kwargs,
         )
 
-    def test_run_inference_batches_pads_last_partial_batch(self, tmp_path, monkeypatch):
-        recognizer = self._create_recognizer(tmp_path, batch_size=4)
+    @pytest.mark.parametrize('runtime, device, input_batch, requested, count, expected_batches', [
+        ('native', 'cpu', 'batch', 4, 6, [4, 2]),
+        ('native', 'cpu', 'batch', 128, 1, [1]),
+        ('native', 'cuda', 'batch', 128, 1, [128]),
+        ('native', 'cuda', 'batch', 4, 6, [4, 4]),
+        ('native', 'coreml', 'batch', 128, 1, [128]),
+        ('web', 'gpu', 'batch', 128, 1, [1]),
+        ('web', 'cpu', 'batch', 4, 6, [4, 2]),
+        ('native', 'cpu', 4, 4, 6, [4, 4]),
+        ('native', 'cpu', 4, 1, 6, [4, 4]),
+        ('web', 'gpu', 4, 4, 6, [4, 4]),
+    ])
+    def test_run_inference_batches_padding_policy(
+        self, tmp_path, monkeypatch, runtime, device, input_batch, requested, count,
+        expected_batches,
+    ):
+        recognizer = self._create_recognizer(tmp_path, batch_size=requested)
+        recognizer.runtime = runtime
+        recognizer.device = device
 
         class FakeSession:
 
@@ -367,7 +384,7 @@ class TestTRBABatching:
 
             def get_inputs(self):
                 return [
-                    types.SimpleNamespace(name="input", shape=["batch", 3, 64, 256])
+                    types.SimpleNamespace(name="input", shape=[input_batch, 3, 64, 256])
                 ]
 
             def get_outputs(self):
@@ -388,11 +405,11 @@ class TestTRBABatching:
             "_preprocess_image",
             lambda image: np.zeros((1, 3, 64, 256), dtype=np.float32),
         )
-        images = [np.zeros((8, 8, 3), dtype=np.uint8) for _ in range(6)]
-        predictions = recognizer._predict_word_images(images, batch_size=4)
-        assert len(predictions) == 6
-        assert recognizer.onnx_session.calls == [4, 4]
-        assert [prediction["text"] for prediction in predictions] == ["a"] * 6
+        images = [np.zeros((8, 8, 3), dtype=np.uint8) for _ in range(count)]
+        predictions = recognizer._predict_word_images(images, batch_size=requested)
+        assert len(predictions) == count
+        assert recognizer.onnx_session.calls == expected_batches
+        assert [prediction["text"] for prediction in predictions] == ["a"] * count
 
     def test_predict_uses_constructor_batch_size_by_default(
         self, tmp_path, monkeypatch

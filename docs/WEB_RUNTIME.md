@@ -23,7 +23,7 @@ the native CPU runtime; select `device="coreml"` explicitly.
 
 Serve the wheel, model files and their configurations over HTTPS (or localhost).
 Extract `manuscript/runtimes/bridge.mjs` from the wheel and serve it alongside the
-host JavaScript. Install `onnxruntime-web` separately; version 1.23.2 was tested.
+host JavaScript. Install `onnxruntime-web` separately; version 1.30.0 was tested.
 Configure its WASM asset paths for your site.
 
 After creating the Pyodide interpreter, register the bridge once:
@@ -77,7 +77,14 @@ ONNX external data must accompany its graph. A sibling `<model>.onnx.data` is
 found automatically; registry artifacts also supply declared companions.
 For other names, pass `web_external_data={"name-in-graph": "/models/data.bin"}`.
 
-Browser HTTP requests use Fetch and obey CORS. The default model cache lives in
+Browser HTTP requests use Fetch and obey CORS. Direct GitHub Releases downloads
+were blocked in browser tests; an ordinary navigation download working does not
+mean Fetch can read the file. Serve model artifacts from the host page's origin,
+a CORS-enabled storage service, or a server endpoint restricted to registry
+artifacts. The demo's `scripts/browser_probe/serve.py` provides the latter and
+caches verified files; it does not perform OCR or receive user images.
+
+The default model cache lives in
 Pyodide's virtual filesystem; persistence across page reloads is the host's
 responsibility. `parallel=True` in Stack and recognizer ensembles requires
 native Python threads; use `parallel=False` in Pyodide.

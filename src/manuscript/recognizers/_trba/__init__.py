@@ -406,7 +406,15 @@ class TRBA(BaseRecognizer):
             return []
 
         results: List[RecognitionPrediction] = []
-        input_name = self.onnx_session.get_inputs()[0].name
+        input_info = self.onnx_session.get_inputs()[0]
+        input_name = input_info.name
+        input_batch = input_info.shape[0] if input_info.shape else None
+        fixed_batch = isinstance(input_batch, int) and input_batch > 0
+        # Preserve native accelerators' batch padding; dynamic CPU/Web sessions
+        # can process the actual number of regions without duplicate work.
+        pad_batch = fixed_batch or (
+            self.runtime == "native" and self.device in ("cuda", "coreml")
+        )
         output_name = self.onnx_session.get_outputs()[0].name
         for i in range(0, len(regions), effective_batch_size):
             batch_regions = regions[i : i + effective_batch_size]
@@ -414,7 +422,7 @@ class TRBA(BaseRecognizer):
 
             batch_tensors = [self._preprocess_image(region.image)[0] for region in batch_regions]
             inference_tensors = batch_tensors
-            if 0 < original_batch_size < effective_batch_size:
+            if pad_batch and 0 < original_batch_size < effective_batch_size:
                 pad_tensor = batch_tensors[-1]
                 inference_tensors = batch_tensors + [pad_tensor] * (
                     effective_batch_size - original_batch_size
