@@ -5,6 +5,8 @@ https://github.com/clovaai/deep-text-recognition-benchmark
 Upstream license: Apache-2.0;
 """
 
+from contextlib import nullcontext
+
 import torch
 from torch import nn
 from torch.nn import functional as F
@@ -89,7 +91,12 @@ class TPSLocalizationNetwork(nn.Module):
         nn.init.zeros_(self.fc2.bias)
 
     def forward(self, images):
-        features = self.fc1(self.conv(images).flatten(1))
+        # Keep CPU localization in FP32 instead of selecting platform-dependent
+        # BF16 kernels through an outer autocast. CUDA retains mixed precision.
+        cpu = images.device.type == "cpu"
+        context = torch.autocast("cpu", enabled=False) if cpu else nullcontext()
+        with context:
+            features = self.fc1(self.conv(images.float() if cpu else images).flatten(1))
         with torch.autocast(device_type=images.device.type, enabled=False):
             return self.fc2(features.float()).reshape(
                 images.shape[0], self.num_fiducial, 2

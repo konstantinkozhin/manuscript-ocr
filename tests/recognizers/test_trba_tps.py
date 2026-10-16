@@ -62,6 +62,28 @@ def test_rectifier_starts_as_identity_and_handles_autocast(size):
     torch.testing.assert_close(mixed, actual)
 
 
+def test_cpu_localization_keeps_linear_layers_in_fp32_under_autocast():
+    rectifier = TPSRectifier((16, 32)).eval()
+    observed = []
+
+    def record_dtype(module, args, output):
+        observed.append((args[0].dtype, output.dtype))
+
+    handles = [layer.register_forward_hook(record_dtype)
+               for layer in rectifier.localization.modules()
+               if isinstance(layer, torch.nn.Linear)]
+    try:
+        with torch.no_grad(), torch.autocast("cpu", dtype=torch.bfloat16):
+            result = rectifier(torch.randn(2, 3, 16, 32))
+            # The precision guard must not disable the caller's autocast.
+            assert torch.is_autocast_cpu_enabled()
+    finally:
+        for handle in handles:
+            handle.remove()
+    assert observed == [(torch.float32, torch.float32)] * 2
+    assert result.dtype == torch.float32
+
+
 def test_rectifier_learns_nonidentity_and_restores_weights(tmp_path):
     torch.manual_seed(4)
     rectifier = TPSRectifier((16, 32)).train()
