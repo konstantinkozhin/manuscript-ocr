@@ -80,7 +80,6 @@ dev = [
     "scikit-image>=0.19",
     "numba>=0.56",
     "gdown>=4.4",
-    "Levenshtein",
     "torch-optimizer>=0.1",
     "evaluate>=0.4",
     "jiwer>=2.2",

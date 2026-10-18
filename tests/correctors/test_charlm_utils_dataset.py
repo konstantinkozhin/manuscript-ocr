@@ -8,7 +8,6 @@ torch = pytest.importorskip("torch")
 
 
 def _load_charlm_modules(monkeypatch):
-    pytest.importorskip("Levenshtein")
     return (importlib.import_module("manuscript.correctors._charlm.utils"),
             importlib.import_module("manuscript.correctors._charlm.dataset"))
 
@@ -184,7 +183,6 @@ class TestCharLMDatasets:
 
 @pytest.mark.parametrize("return_details", [False, True])
 def test_reconstruct_word_preserves_text_outside_model_context(return_details):
-    pytest.importorskip("Levenshtein")
     from manuscript.correctors._charlm.utils import reconstruct_word
     from unittest.mock import Mock
     model = Mock()

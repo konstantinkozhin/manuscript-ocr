@@ -2,7 +2,7 @@ import json
 import random
 import csv
 import re
-import Levenshtein
+from manuscript._internal.edit_distance import levenshtein_distance
 import torch
 from datetime import datetime
 from statistics import mean
@@ -186,7 +186,7 @@ def reconstruct_word(model, word, c2i, i2c, device, max_len, mask_threshold,
 
 
 def cer(pred, target):
-    return Levenshtein.distance(pred, target) / len(target) if target else 0.0
+    return levenshtein_distance(pred, target) / len(target) if target else 0.0
 
 
 def evaluate_ocr_with_cer(corrector, eval_pairs, csv_path=None):

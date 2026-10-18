@@ -67,7 +67,9 @@ def kraken_export(source, path):
             # Shape tensors keep this ratio dynamic in the legacy exporter.
             w_in = torch._shape_as_tensor(images)[3]
             w_out = torch._shape_as_tensor(feat)[3]
-            out_lengths = (lengths.float() * w_out / w_in).floor().long().clamp(min=1)
+            # Match Kraken's ratio-first arithmetic before floor; reassociation
+            # can change a length by one timestep and alter the attention mask.
+            out_lengths = (lengths.float() * (w_out / w_in)).floor().long().clamp(min=1)
             positions = torch.arange(feat.shape[3], device=feat.device)
             mask = positions[None, :] < out_lengths[:, None]
             return self.network.head(self.network.neck(feat, mask)), out_lengths
@@ -153,7 +155,7 @@ def export(source, output, crops=(), *, recognition_levels=("line",)):
     sessions = [model.onnx_session for model in models]
     rng = np.random.default_rng(42)
     checks = []
-    for batch, width in [(1, 160), (2, 320), (2, 640), (1, 321)]:
+    for batch, width in [(1, 160), (1, 191), (2, 191), (2, 320), (2, 640), (1, 321)]:
         data = rng.uniform(0, 1, (batch, 3, models[0].img_h, width)).astype(np.float32)
         lengths = np.array([width] + [width * 3 // 4] * (batch - 1), np.int64)
         expected, expected_lengths = reference(data, lengths)

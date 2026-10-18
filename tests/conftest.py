@@ -19,7 +19,6 @@ def pytest_sessionstart(session):
             "transformers",
             "tokenizers",
             "albumentations",
-            "Levenshtein",
             "build",
         )
         missing = [name for name in required if importlib.util.find_spec(name) is None]

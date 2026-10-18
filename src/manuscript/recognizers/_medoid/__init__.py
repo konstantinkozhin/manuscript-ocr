@@ -1,7 +1,7 @@
 from collections import Counter
 from statistics import median
 
-from .._common.edit_distance import levenshtein_distance
+from manuscript._internal.edit_distance import levenshtein_distance
 
 from .._majority_voting import MajorityVotingRecognizer
 

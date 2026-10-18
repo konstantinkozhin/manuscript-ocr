@@ -1,7 +1,4 @@
-"""PARSeq decoder and permutation learning adapted to the existing TRBA encoder.
-
-Based on baudm/parseq; Copyright 2022 Darwin Bautista, Apache-2.0.
-"""
+"""PARSeq decoder and permutation learning for the TRBA encoder."""
 
 import math
 from itertools import permutations
@@ -132,7 +129,7 @@ class PARSeqLayer(nn.Module):
 
 
 class PARSeqDecoder(DecoderBase):
-    """Adapted from https://github.com/baudm/parseq (Darwin Bautista, Apache-2.0)."""
+    """Decode encoder features with permutation learning and iterative refinement."""
 
     def __init__(
         self,

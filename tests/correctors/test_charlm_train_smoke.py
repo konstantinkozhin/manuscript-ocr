@@ -11,7 +11,6 @@ import torch.nn as nn
 
 
 def _load_charlm_train_module(monkeypatch):
-    pytest.importorskip("Levenshtein")
     return importlib.import_module("manuscript.correctors._charlm.train")
 
 

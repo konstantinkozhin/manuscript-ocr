@@ -1,9 +1,4 @@
-"""Optional thin-plate-spline rectification using only PyTorch.
-
-Adapted from clovaai/deep-text-recognition-benchmark, modules/transformation.py
-https://github.com/clovaai/deep-text-recognition-benchmark
-Upstream license: Apache-2.0;
-"""
+"""Optional thin-plate-spline rectification using only PyTorch."""
 
 from contextlib import nullcontext
 
@@ -104,7 +99,6 @@ class TPSLocalizationNetwork(nn.Module):
 
 
 class TPSRectifier(nn.Module):
-    # Source: https://github.com/clovaai/deep-text-recognition-benchmark (Apache-2.0).
     """Learn image rectification jointly with the recognizer; no point labels."""
 
     def __init__(self, image_size, in_channels=3, num_fiducial=20):

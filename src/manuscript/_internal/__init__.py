@@ -1,1 +1,1 @@
-"""Internal helpers shared by model loading and runtime adapters."""
+"""Internal helpers shared by pipeline stages and runtime adapters."""

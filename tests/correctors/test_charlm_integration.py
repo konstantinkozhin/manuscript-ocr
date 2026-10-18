@@ -5,7 +5,6 @@ import numpy as np
 import pytest
 
 torch = pytest.importorskip("torch")
-pytest.importorskip("Levenshtein")
 
 
 def _charlm_config(tmp_path, **overrides):

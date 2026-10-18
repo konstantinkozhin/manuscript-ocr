@@ -8,7 +8,7 @@ import torch.nn.functional as F
 from torch.utils.data import DataLoader, Dataset
 from tqdm import tqdm
 from collections import Counter
-import Levenshtein
+from manuscript._internal.edit_distance import levenshtein_distance
 
 from .config import DEFAULT_CONFIG
 from .model import CharTransformerMLM
@@ -44,7 +44,7 @@ def load_pairs(path, allowed_chars, eval_ratio=0.15, seed=42, max_edits=3):
 def build_substitutions(pairs):
     subs = []
     for inc, cor in pairs:
-        dist = Levenshtein.distance(inc, cor)
+        dist = levenshtein_distance(inc, cor)
         if dist == 1 or dist == 2:
             if len(inc) == len(cor):
                 for ci, cc in zip(inc, cor):

@@ -4,7 +4,7 @@ import random
 
 import pytest
 
-from manuscript.recognizers._common.edit_distance import levenshtein_distance
+from manuscript._internal.edit_distance import levenshtein_distance
 
 
 def reference(first, second):
