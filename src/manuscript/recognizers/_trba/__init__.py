@@ -97,6 +97,13 @@ class TRBA(BaseRecognizer):
         ``"polygon_mask"``, or ``output_size=(width, height)`` for
         ``"quad_warp"``. Non-quad polygons passed to ``"quad_warp"`` fall back
         to bbox crops by default.
+        For ``"bbox"``, ``padding_x``, ``padding_y``, ``inset_x`` and
+        ``inset_y`` are nonnegative fractions of the original bbox size per
+        side (default 0). Insets must be below 0.5. Padding and inset on the
+        same axis cannot be combined; relative margins cannot be combined
+        with nonzero pixel ``pad``. For example, ``{"inset_y": 0.1}``
+        removes 10% from the top and bottom before orientation compensation,
+        without changing the Page geometry. Other presets reject these options.
     min_text_size : int, optional
         Minimum width and height of the region's axis-aligned bounding box
         in source-image pixels, checked before padding, clipping or warping.

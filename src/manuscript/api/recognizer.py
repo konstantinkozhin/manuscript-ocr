@@ -13,6 +13,7 @@ from manuscript.recognizers._common.debug import save_debug_regions
 from manuscript.recognizers._common.region_preparers import (
     call_region_preparer, prepare_bbox_regions, prepare_polygon_mask_regions,
     prepare_quad_warp_regions, prepare_text_regions,
+    validate_region_preparer_options,
 )
 from manuscript.recognizers._common.region_types import (
     REGION_PREPARER_PRESETS, PreparedRegion, RecognitionPrediction,
@@ -68,6 +69,9 @@ class BaseRecognizer(BaseArtifactModel):
         if rotate_threshold is not None and (isinstance(rotate_threshold, bool)
                 or not np.isfinite(rotate_threshold) or rotate_threshold < 0):
             raise ValueError("rotate_threshold must be nonnegative and finite or None")
+        preparer = self._validate_region_preparer(region_preparer)
+        preparer_options = dict(region_preparer_options or {})
+        validate_region_preparer_options(preparer, preparer_options)
         super().__init__(weights=weights, device=device, force_download=force_download, **kwargs)
         if not isinstance(use_orientation, bool):
             raise ValueError("use_orientation must be a boolean")
@@ -77,8 +81,8 @@ class BaseRecognizer(BaseArtifactModel):
             raise ValueError("Specify recognition_levels or levels, not both")
         selected_levels = recognition_levels if recognition_levels is not None else levels
         self.levels = self._validate_levels(selected_levels) if selected_levels is not None else None
-        self.region_preparer = self._validate_region_preparer(region_preparer)
-        self.region_preparer_options = dict(region_preparer_options or {})
+        self.region_preparer = preparer
+        self.region_preparer_options = preparer_options
         if self.levels is not None:
             self.region_preparer_options["levels"] = self.levels
         self.min_text_size = min_text_size

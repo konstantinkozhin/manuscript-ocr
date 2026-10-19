@@ -15,7 +15,16 @@ from .._common.region_types import PreparedRegion, RecognitionPrediction
 
 
 class PPOCRRec(BaseRecognizer):
-    """Recognize Page text regions with configurable CTC ONNX models."""
+    """Recognize Page text regions with configurable CTC ONNX models.
+
+    With ``region_preparer="bbox"``, ``region_preparer_options`` accepts
+    ``padding_x``, ``padding_y``, ``inset_x`` and ``inset_y`` as fractions of
+    the original bbox size per side. For example, ``{"inset_y": 0.1}``
+    removes 10% from the top and bottom before orientation compensation.
+    Insets must be below 0.5. Padding and inset on the same axis, or relative
+    margins and nonzero pixel ``pad``, cannot be combined. Page geometry is
+    preserved; other built-in crop presets reject relative margins.
+    """
 
     default_weights_name = None
     registry_model_class = "PPOCRRec"

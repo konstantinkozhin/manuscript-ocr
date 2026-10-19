@@ -23,7 +23,7 @@ class ReadingSorting(BaseLayout):
         for regions to share a reading row. Must be in (0, 1]; default is 0.5.
     infer_columns : bool, optional
         Use horizontal whitespace gaps to order columns left to right.
-        Default is False. In containment mode, also create column blocks
+        Default is True. In containment mode, also create column blocks
         when the input has no Page-level text blocks.
 
     Examples
@@ -38,7 +38,7 @@ class ReadingSorting(BaseLayout):
     """
 
     def __init__(self, mode="sort", containment_overlap=0.5,
-                 row_overlap=0.5, infer_columns=False):
+                 row_overlap=0.5, infer_columns=True):
         if mode not in {"sort", "containment"}:
             raise ValueError("mode must be 'sort' or 'containment'")
         for name, value in (("row_overlap", row_overlap),

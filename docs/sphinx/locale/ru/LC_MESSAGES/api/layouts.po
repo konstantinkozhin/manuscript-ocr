@@ -138,11 +138,11 @@ msgstr ""
 
 #: 86e81965437145ff9ea3051577ea4a32 manuscript.layouts._readingsorting.ReadingSorting:18 of
 msgid ""
-"Use horizontal whitespace gaps to order columns left to right. Default is False. In containment "
+"Use horizontal whitespace gaps to order columns left to right. Default is True. In containment "
 "mode, also create column blocks when the input has no Page-level text blocks."
 msgstr ""
 "Определять колонки по горизонтальным промежуткам и располагать их слева направо. По умолчанию "
-"False. В режиме containment также создавать блоки для колонок, если у Page ещё нет текстовых "
+"True. В режиме containment также создавать блоки для колонок, если у Page ещё нет текстовых "
 "блоков."
 
 #: bbfbff22c19c4c8fbdbf6adb72d98a0a manuscript.layouts._readingsorting.ReadingSorting:31 of

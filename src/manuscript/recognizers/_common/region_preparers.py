@@ -1,3 +1,5 @@
+import math
+from numbers import Real
 from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
@@ -12,6 +14,47 @@ from manuscript.utils.geometry import (
 )
 
 from .region_types import PreparedRegion, normalize_prepared_regions
+
+
+_RELATIVE_BBOX_OPTIONS = ("padding_x", "padding_y", "inset_x", "inset_y")
+
+
+def validate_region_preparer_options(preparer, options):
+    """Validate relative bbox margins before downloading or loading a model."""
+    if not isinstance(preparer, str):
+        return
+    if preparer != "bbox":
+        if any(name in options for name in _RELATIVE_BBOX_OPTIONS):
+            raise ValueError("padding_x, padding_y, inset_x and inset_y require region_preparer='bbox'")
+        return
+    for name in _RELATIVE_BBOX_OPTIONS:
+        value = options.get(name, 0.0)
+        if isinstance(value, bool) or not isinstance(value, Real) or not math.isfinite(value) or value < 0:
+            raise ValueError(f"{name} must be a nonnegative finite number")
+        if name.startswith("inset") and value >= 0.5:
+            raise ValueError(f"{name} must be less than 0.5")
+    for axis in ("x", "y"):
+        if options.get(f"padding_{axis}", 0) and options.get(f"inset_{axis}", 0):
+            raise ValueError(f"Specify padding_{axis} or inset_{axis}, not both")
+    if any(options.get(name, 0) for name in _RELATIVE_BBOX_OPTIONS) and float(options.get("pad", 0)) != 0:
+        raise ValueError("Pixel pad cannot be combined with relative bbox margins")
+
+
+def _relative_bbox_crop(image, polygon, options):
+    # Use floating-point bounds before clipping or rounding. In particular,
+    # off-image portions still contribute to the original width and height.
+    x1, y1 = polygon.min(axis=0).astype(np.float64)
+    x2, y2 = polygon.max(axis=0).astype(np.float64)
+    dx = (x2 - x1) * (options.get("padding_x", 0.0) - options.get("inset_x", 0.0))
+    dy = (y2 - y1) * (options.get("padding_y", 0.0) - options.get("inset_y", 0.0))
+    height, width = image.shape[:2]
+    left = math.floor(np.clip(x1 - dx, 0, width))
+    top = math.floor(np.clip(y1 - dy, 0, height))
+    right = math.ceil(np.clip(x2 + dx, 0, width))
+    bottom = math.ceil(np.clip(y2 + dy, 0, height))
+    if right <= left or bottom <= top:
+        return None
+    return image[top:bottom, left:right].copy()
 
 
 def _rotate_crop(rotate_region, crop, region):
@@ -46,12 +89,15 @@ def prepare_bbox_regions(
     options: Optional[Dict[str, Any]] = None,
 ) -> List[PreparedRegion]:
     options = dict(options or {})
+    validate_region_preparer_options("bbox", options)
     pad = float(options.get("pad", 0))
+    relative = any(options.get(name, 0) for name in _RELATIVE_BBOX_OPTIONS)
     regions: List[PreparedRegion] = []
 
     for text_span, poly in iter_candidate_text_spans(page, min_text_size=min_text_size,
                                                     levels=options.get("levels", ("word", "line"))):
-        crop = crop_axis_aligned(image, poly, pad=pad)
+        crop = (_relative_bbox_crop(image, poly, options) if relative
+                else crop_axis_aligned(image, poly, pad=pad))
         if crop is None:
             continue
 
@@ -60,7 +106,9 @@ def prepare_bbox_regions(
                 text_span=text_span,
                 image=_rotate_crop(rotate_region, crop, text_span),
                 polygon=poly,
-                meta={"region_preparer": "bbox", "pad": pad},
+                meta={"region_preparer": "bbox", "pad": pad,
+                      **({name: float(options.get(name, 0.0)) for name in _RELATIVE_BBOX_OPTIONS}
+                         if relative else {})},
             )
         )
 
@@ -76,6 +124,7 @@ def prepare_polygon_mask_regions(
     options: Optional[Dict[str, Any]] = None,
 ) -> List[PreparedRegion]:
     options = dict(options or {})
+    validate_region_preparer_options("polygon_mask", options)
     pad = float(options.get("pad", 0))
     background = int(options.get("background", 255))
     regions: List[PreparedRegion] = []
@@ -111,6 +160,7 @@ def prepare_quad_warp_regions(
     options: Optional[Dict[str, Any]] = None,
 ) -> List[PreparedRegion]:
     options = dict(options or {})
+    validate_region_preparer_options("quad_warp", options)
     raw_output_size = options.get("output_size")
     fallback_to_bbox = bool(options.get("fallback_to_bbox", True))
     output_size = None

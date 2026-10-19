@@ -30,7 +30,7 @@ def test_columns_read_left_to_right():
     left = region('line', 0, 100, width=100)
     right = region('line', 300, 0, width=100)
     page.children = (right, left)
-    ReadingSorting(infer_columns=True).predict(page)
+    ReadingSorting().predict(page)
     assert page.children[0] is left
 
 
@@ -117,12 +117,12 @@ def test_inferred_columns_create_blocks_only_in_containment_mode():
         page.children = (right, left)
         return page, left, right
     page, left, right = make()
-    ReadingSorting(mode='containment', infer_columns=True).predict(page)
+    ReadingSorting(mode='containment').predict(page)
     assert len(page.children) == 2
     assert all(n.type == 'block' for n in page.children)
     assert left.parent is page.children[0] and right.parent is page.children[1]
     before = page.to_tree_dict()
-    ReadingSorting(mode='containment', infer_columns=True).predict(page)
+    ReadingSorting(mode='containment').predict(page)
     assert page.to_tree_dict() == before
     assert len([n for n in page.descendants if n.type == 'block']) == 2
     flat, left, right = make()
@@ -208,7 +208,7 @@ def test_identical_coordinates_keep_distinct_objects_and_stable_order(mode):
     page = Page(image_width=100, image_height=100)
     first, second = region("word", 10, 10), region("word", 10, 10)
     page.children = [second, first]
-    layout = ReadingSorting(mode=mode)
+    layout = ReadingSorting(mode=mode, infer_columns=False)
     layout.predict(page)
     assert page.children[0] is second and page.children[1] is first
     layout.predict(page)
@@ -265,7 +265,7 @@ def test_row_overlap_boundary_changes_reading_order(overlap, expected):
     right = region("word", 40, 0, 10, 10)
     left = region("word", 0, 10 - overlap, 10, 10)
     page.children = [right, left]
-    ReadingSorting(row_overlap=.5).predict(page)
+    ReadingSorting(row_overlap=.5, infer_columns=False).predict(page)
     assert page.children[0] is (left if expected == "left" else right)
 
 
@@ -294,6 +294,6 @@ def test_tall_region_does_not_join_separate_rows():
     tall = region('word', 20, 0, 10, 30)
     lower = region('word', 0, 20, 10, 10)
     page.children = [lower, upper, tall]
-    ReadingSorting().predict(page)
+    ReadingSorting(infer_columns=False).predict(page)
     assert all(actual is expected for actual, expected in
                zip(page.children, [tall, upper, lower]))
