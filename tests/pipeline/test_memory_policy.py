@@ -227,8 +227,9 @@ def test_real_native_onnx_session_is_released_and_recreated(tmp_path):
 def test_trocr_kv_cache_releases_all_three_native_sessions(tmp_path, monkeypatch):
     import json
     import weakref
-    import onnx
-    from tokenizers import Tokenizer, models
+    onnx = pytest.importorskip('onnx')
+    tokenizers = pytest.importorskip('tokenizers')
+    Tokenizer, models = tokenizers.Tokenizer, tokenizers.models
     from manuscript.recognizers import TrOCR
     from tests.package.wheel_smoke import save_constant_graph
 
