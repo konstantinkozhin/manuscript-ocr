@@ -23,6 +23,11 @@ class MedoidRecognizer(MajorityVotingRecognizer):
     parallel : bool, optional
         Run models concurrently in threads if True; default is False.
         List order determines tie priority regardless of completion order.
+    memory_policy : {"keep", "sequential"}, optional
+        Keep sessions loaded by default. "sequential" releases participant
+        sessions after each call, including on failure, and applies to nested
+        compositions. Requires close() and parallel=False; shared participants
+        need external synchronization.
 
     Examples
     --------

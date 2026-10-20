@@ -5,10 +5,13 @@ from concurrent.futures import ThreadPoolExecutor
 
 from manuscript.api._page_helpers import accepts_predict_kwarg, filter_predict_kwargs
 from manuscript.data import Page, TextRegion
+from manuscript._internal.model_lifecycle import (
+    ModelComposition, managed_prediction, processor_scope, validate_composition,
+)
 from manuscript.utils import read_image
 
 
-class MajorityVotingRecognizer:
+class MajorityVotingRecognizer(ModelComposition):
     """Combine independent recognizers by whole-region plurality voting.
 
     Parameters
@@ -22,6 +25,11 @@ class MajorityVotingRecognizer:
         Run models concurrently in threads if True; default is False.
         Completion order does not change tie priority. Participants share
         the image array and must not modify it.
+    memory_policy : {"keep", "sequential"}, optional
+        Keep sessions loaded by default. "sequential" releases each member's
+        sessions after its call, including on failure. Nested compositions
+        inherit this policy. Requires close() on every participant and
+        disallows parallel=True. Shared participants need external locking.
 
     Examples
     --------
@@ -38,7 +46,8 @@ class MajorityVotingRecognizer:
 
     batch_size = None
 
-    def __init__(self, models, *, parallel=False):
+    def __init__(self, models, *, parallel=False, memory_policy="keep"):
+        self._init_memory_policy(memory_policy)
         self.models = tuple(models)
         if not self.models:
             raise ValueError(f'{type(self).__name__} requires at least one recognizer')
@@ -50,6 +59,10 @@ class MajorityVotingRecognizer:
         if parallel and sys.platform == "emscripten":
             raise ValueError("Python thread parallelism is unavailable in Pyodide; use parallel=False.")
         self.parallel = parallel
+        validate_composition(self)
+
+    def _memory_children(self):
+        return self.models
 
     @staticmethod
     def _nodes(page):
@@ -83,6 +96,7 @@ class MajorityVotingRecognizer:
             fail('page', 'parent')
         compare(reference, predicted, 'page')
 
+    @managed_prediction
     def predict(self, page: Page, image=None, batch_size=None, *, return_raw=False, **kwargs):
         """Return a Page copy with aggregated recognition results.
 
@@ -140,7 +154,8 @@ class MajorityVotingRecognizer:
             selected_batch = batch_size if batch_size is not None else getattr(model, 'batch_size', None)
             if selected_batch is not None:
                 options['batch_size'] = selected_batch
-            prediction = model.predict(candidate, **filter_predict_kwargs(model, options))
+            with processor_scope(model):
+                prediction = model.predict(candidate, **filter_predict_kwargs(model, options))
             if not isinstance(prediction, Page):
                 raise TypeError(f'{name}.predict must return Page')
             self._check_tree(reference, prediction, name)

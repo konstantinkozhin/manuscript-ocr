@@ -6,9 +6,12 @@ from typing import Any, Iterable, Optional
 
 from .api._page_helpers import accepts_predict_kwarg, filter_predict_kwargs
 from .data import Page
+from ._internal.model_lifecycle import (
+    ModelComposition, managed_prediction, processor_scope, validate_composition,
+)
 
 
-class Stack:
+class Stack(ModelComposition):
     """Combine processors in one Pipeline stage or run them directly.
 
     Parameters
@@ -20,6 +23,12 @@ class Stack:
         Run image detectors concurrently in threads if True; default is False.
         Results are merged in list order. Only detector-only Stacks support
         this mode; page processors require the preceding result.
+    memory_policy : {"keep", "sequential"}, optional
+        Keep sessions loaded by default. "sequential" releases each processor's
+        sessions after its call, including on failure, and applies to nested
+        compositions. Requires close() on every participant and disallows
+        parallel=True. Participants must be exclusively owned or externally
+        synchronized when shared with other callers.
 
     Examples
     --------
@@ -38,7 +47,8 @@ class Stack:
     # member use its own default instead of imposing Pipeline's fallback of 32.
     batch_size = None
 
-    def __init__(self, stages: Iterable[Any], *, parallel: bool = False):
+    def __init__(self, stages: Iterable[Any], *, parallel: bool = False, memory_policy="keep"):
+        self._init_memory_policy(memory_policy)
         self.stages = tuple(stages)
         if not self.stages:
             raise ValueError("Stack requires at least one processor")
@@ -52,6 +62,10 @@ class Stack:
         self.parallel = parallel
         if parallel:
             self._detector_stages()
+        validate_composition(self)
+
+    def _memory_children(self):
+        return self.stages
 
     def _detector_stages(self):
         stages = []
@@ -89,8 +103,10 @@ class Stack:
         # The primary input is supplied separately, never also as a keyword.
         options.pop(first.name, None)
         if first.kind == inspect.Parameter.KEYWORD_ONLY:
-            return stage.predict(**{first.name: value, **options})
-        return stage.predict(value, **options)
+            with processor_scope(stage):
+                return stage.predict(**{first.name: value, **options})
+        with processor_scope(stage):
+            return stage.predict(value, **options)
 
     @staticmethod
     def _detection_context(page, results):
@@ -104,6 +120,7 @@ class Stack:
             "detector_results": list(results),
         }
 
+    @managed_prediction
     def predict(
         self, page: Optional[Page] = None, image: Any = None, *,
         return_raw: bool = False, return_masks: bool = False,

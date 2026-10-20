@@ -18,6 +18,9 @@ from .api.protocols import (
     RecognizerProtocol,
 )
 from .data import Page, TextRegion
+from ._internal.model_lifecycle import (
+    ModelComposition, managed_prediction, processor_scope, validate_composition,
+)
 from .detectors import YOLO
 from .layouts import SimpleSorting
 from .recognizers import TRBA
@@ -27,7 +30,7 @@ _DEFAULT = object()
 _VALID_LAYOUT_AFTER = {"detector", "recognizer", "corrector"}
 
 
-class Pipeline:
+class Pipeline(ModelComposition):
     """
     High-level OCR pipeline with configurable stage ordering.
 
@@ -43,6 +46,7 @@ class Pipeline:
         recognizer: Optional[RecognizerProtocol] = _DEFAULT,
         corrector: Optional[CorrectorProtocol] = None,
         layout_after: str = "detector",
+        memory_policy: str = "keep",
     ):
         """
         Initialize OCR pipeline.
@@ -66,7 +70,14 @@ class Pipeline:
             Default is ``None`` (disabled).
         layout_after : {"detector", "recognizer", "corrector"}, optional
             Slot where layout stage is executed. Default is ``"detector"``.
+        memory_policy : {"keep", "sequential"}, optional
+            Keep loaded model sessions by default. "sequential" releases
+            sessions after each processor call, including on failure, and
+            applies inside nested Stacks and ensembles. Participants require
+            close(); nested parallel execution is incompatible. Shared models
+            need external synchronization across pipelines and direct calls.
         """
+        self._init_memory_policy(memory_policy)
         if layout_after not in _VALID_LAYOUT_AFTER:
             raise ValueError(
                 f"layout_after must be one of {_VALID_LAYOUT_AFTER}, got: {layout_after}"
@@ -91,6 +102,7 @@ class Pipeline:
         self.corrector = corrector
 
         self.layout_after = layout_after
+        validate_composition(self)
 
         self._last_detection_page: Optional[Page] = None
         self._last_layout_page: Optional[Page] = None
@@ -98,6 +110,10 @@ class Pipeline:
         self._last_correction_page: Optional[Page] = None
         self._last_timings: Dict[str, float] = {}
 
+    def _memory_children(self):
+        return (self.detector, self.layout, self.recognizer, self.corrector)
+
+    @managed_prediction
     def predict(
         self,
         image: Union[str, Path, np.ndarray, Image.Image],
@@ -148,7 +164,8 @@ class Pipeline:
                 layout_kwargs["detector_result"] = detector_result
             if accepts_predict_kwarg(self.layout, "image"):
                 layout_kwargs["image"] = get_image_array()
-            page = call_page_stage(self.layout, page, **layout_kwargs)
+            with processor_scope(self.layout):
+                page = call_page_stage(self.layout, page, **layout_kwargs)
             self._last_layout_page = page.clone()
             self._last_timings["layout"] = (time.perf_counter() - t0
                 - (self._last_timings.get("load_image", 0.0) - load_before))
@@ -158,9 +175,10 @@ class Pipeline:
 
         # Detection
         t0 = time.perf_counter()
-        detection = self.detector.predict(image, **filter_predict_kwargs(self.detector, {
-            "return_raw": True, "return_masks": False, "return_outputs": False,
-        }))
+        with processor_scope(self.detector):
+            detection = self.detector.predict(image, **filter_predict_kwargs(self.detector, {
+                "return_raw": True, "return_masks": False, "return_outputs": False,
+            }))
         detector_result = detection if isinstance(detection, dict) else None
         page = detection.get("page") if detector_result is not None else detection
         if not isinstance(page, Page):
@@ -189,7 +207,8 @@ class Pipeline:
             )
             if accepts_predict_kwarg(self.recognizer, "image"):
                 recognizer_kwargs["image"] = get_image_array()
-            page = call_page_stage(self.recognizer, page, **recognizer_kwargs)
+            with processor_scope(self.recognizer):
+                page = call_page_stage(self.recognizer, page, **recognizer_kwargs)
             self._last_recognition_page = page.clone()
             self._last_timings["recognizer"] = (time.perf_counter() - t0
                 - (self._last_timings.get("load_image", 0.0) - load_before))
@@ -208,7 +227,8 @@ class Pipeline:
                 corrector_kwargs["detector_result"] = detector_result
             if accepts_predict_kwarg(self.corrector, "image"):
                 corrector_kwargs["image"] = get_image_array()
-            page = call_page_stage(self.corrector, page, **corrector_kwargs)
+            with processor_scope(self.corrector):
+                page = call_page_stage(self.corrector, page, **corrector_kwargs)
             self._last_correction_page = page.clone()
             self._last_timings["corrector"] = (time.perf_counter() - t0
                 - (self._last_timings.get("load_image", 0.0) - load_before))

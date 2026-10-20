@@ -91,6 +91,35 @@ Use an ensemble when recognizers should independently read the same regions:
 Majority voting selects the most frequent normalized string; medoid selects
 an existing answer by summed character edit distance.
 
+Model memory
+------------
+
+Use ``memory_policy="sequential"`` to release each model's sessions after use
+and reload them when needed. The default, ``"keep"``, retains loaded sessions.
+
+.. code-block:: python
+
+    recognizer = MedoidRecognizer([model_a, model_b, model_c])
+    pipeline = Pipeline(recognizer=recognizer, memory_policy="sequential")
+
+The policy applies inside nested Stacks and ensembles. It can also be set on
+an individual Stack, MajorityVotingRecognizer or MedoidRecognizer. Sequential
+mode releases previously loaded participant sessions before starting and
+cleans up the active model even if prediction fails. ``close()`` releases all
+participants explicitly; the composition can be used again afterwards.
+
+This mode requires ``parallel=False`` throughout the controlled composition.
+Custom processors must implement an idempotent ``close()`` and support another
+prediction after closing; stateless processors can use a no-op. Participants
+must not be used concurrently by other pipelines
+or direct calls without external synchronization. Calls on the same sequential
+composition are serialized.
+
+Image data, voting results, dictionaries and runtime allocations can still
+occupy memory. Session release does not guarantee an immediate drop in process
+RSS or GPU memory reported by the driver. Repeated session initialization
+trades inference speed for lower model residency.
+
 Custom stages
 -------------
 
