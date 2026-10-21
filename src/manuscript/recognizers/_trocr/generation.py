@@ -3,8 +3,42 @@
 import numpy as np
 
 
-def generate_batch(hidden, generation, decode, banned):
+class NumpyBackend:
+    def ids(self, rows, hidden):
+        return np.asarray(rows, np.int64)
+
+    def gather(self, values, indices):
+        return values[np.asarray(indices, np.int64)]
+
+    def scores(self, logits, count):
+        logits = np.asarray(logits)
+        if (logits.ndim != 3 or logits.shape[0] != count or not logits.shape[1]
+                or not logits.shape[2] or not np.isfinite(logits).all()):
+            raise ValueError('Decoder emitted invalid or nonfinite logits')
+        logits = logits[:, -1].astype(np.float64)
+        logits -= logits.max(axis=1, keepdims=True)
+        return logits - np.log(np.exp(logits).sum(axis=1, keepdims=True))
+
+    def block(self, scores, index, blocked, prior):
+        scores[index, blocked] = -np.inf
+        scores[index] += prior
+
+    def top(self, scores, k):
+        flat = scores.ravel()
+        k = min(k, flat.size)
+        # Select only top-k, preserving the previous stable flattened-index ties.
+        threshold = np.partition(flat, flat.size - k)[flat.size - k]
+        greater = np.flatnonzero(flat > threshold)
+        ties = np.flatnonzero(flat == threshold)[:k - len(greater)]
+        candidates = np.sort(np.concatenate((greater, ties)))
+        order = np.argsort(-flat[candidates], kind='stable')
+        top = candidates[order]
+        return top.tolist(), flat[top].tolist()
+
+
+def generate_batch(hidden, generation, decode, banned, *, backend=None):
     """Decode all samples together; cache rows follow surviving beam parents."""
+    backend = NumpyBackend() if backend is None else backend
     g = generation
     beams, limit = g['num_beams'], g['max_length']
     start, eos = int(g['decoder_start_token_id']), g['eos_token_id']
@@ -19,31 +53,22 @@ def generate_batch(hidden, generation, decode, banned):
             active.extend(state['active'])
         if len(active[0][0]) >= limit:
             break
-        ids = np.array([item[0] for item in active], np.int64)
-        logits, present = decode(ids, hidden[np.asarray(owners)], cache)
-        logits = np.asarray(logits, np.float64)
-        if (logits.ndim != 3 or logits.shape[0] != len(active)
-                or not logits.shape[1] or not logits.shape[2] or not np.isfinite(logits).all()):
-            raise ValueError('Decoder emitted invalid or nonfinite logits')
-        logits = logits[:, -1]
-        logits -= logits.max(axis=1, keepdims=True)
-        scores = logits - np.log(np.exp(logits).sum(axis=1, keepdims=True))
+        ids = backend.ids([item[0] for item in active], hidden)
+        logits, present = decode(ids, backend.gather(hidden, owners), cache)
+        scores = backend.scores(logits, len(active))
         for i, (tokens, score) in enumerate(active):
-            scores[i, banned(tokens, g['no_repeat_ngram_size'])] = -np.inf
-            scores[i] += score
+            backend.block(scores, i, banned(tokens, g['no_repeat_ngram_size']), score)
         parents = []
         offset = 0
         for state in states:
             count = len(state['active'])
             if not count:
                 continue
-            flat = scores[offset:offset + count].ravel()
-            top = np.argsort(-flat, kind='stable')[:max(2, 1 + len(eos)) * beams]
+            top, values = backend.top(scores[offset:offset + count], max(2, 1 + len(eos)) * beams)
             next_active, next_parents = [], []
             generated_len = len(state['active'][0][0])
-            for rank, index in enumerate(top):
+            for rank, (index, score) in enumerate(zip(top, values)):
                 beam, token = divmod(int(index), scores.shape[1])
-                score = float(flat[index])
                 if not np.isfinite(score):
                     continue
                 tokens = state['active'][beam][0] + [token]
@@ -59,7 +84,7 @@ def generate_batch(hidden, generation, decode, banned):
             state['active'] = next_active
             if len(state['finished']) >= beams:
                 worst = state['finished'][-1][0]
-                best = float(flat[top[0]])
+                best = values[0]
                 early = g['early_stopping']
                 bound = limit - 1 if early == 'never' and penalty > 0 else generated_len
                 if early is True or worst >= best / bound**penalty:
@@ -67,8 +92,8 @@ def generate_batch(hidden, generation, decode, banned):
                     next_parents = []
             parents.extend(next_parents)
             offset += count
-        if present is not None:
-            cache = {name: value[np.asarray(parents, dtype=np.int64)] for name, value in present.items()}
+        if present is not None and parents:
+            cache = {name: backend.gather(value, parents) for name, value in present.items()}
     results = []
     for state in states:
         for tokens, score in state['active']:

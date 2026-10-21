@@ -206,7 +206,9 @@ class PPOCR(BaseDetector):
             values = values[:, :, ::-1]
         mean = np.asarray(self.preprocess["mean"], dtype=np.float32)
         std = np.asarray(self.preprocess["std"], dtype=np.float32)
-        values = (values * self.preprocess["scale"] - mean) / std
+        np.multiply(values, self.preprocess["scale"], out=values)
+        np.subtract(values, mean, out=values)
+        np.divide(values, std, out=values)
         return np.ascontiguousarray(values.transpose(2, 0, 1)[None], dtype=self._input_dtype)
 
     @staticmethod

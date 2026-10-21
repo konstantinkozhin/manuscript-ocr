@@ -392,6 +392,9 @@ class TRBA(BaseRecognizer):
             return_raw=return_raw,
         )
 
+    def _region_preparation_batch_size(self, batch_size):
+        return self._effective_inference_batch_size(batch_size)
+
     def _run_inference_batches(
         self,
         regions: Sequence[PreparedRegion],
@@ -425,40 +428,34 @@ class TRBA(BaseRecognizer):
         output_name = self.onnx_session.get_outputs()[0].name
         for i in range(0, len(regions), effective_batch_size):
             batch_regions = regions[i : i + effective_batch_size]
-            original_batch_size = len(batch_regions)
-
-            batch_tensors = [self._preprocess_image(region.image)[0] for region in batch_regions]
-            inference_tensors = batch_tensors
-            if pad_batch and 0 < original_batch_size < effective_batch_size:
-                pad_tensor = batch_tensors[-1]
-                inference_tensors = batch_tensors + [pad_tensor] * (
-                    effective_batch_size - original_batch_size
-                )
-
-            batch_input = np.stack(inference_tensors, axis=0)
-
-            try:
-                logits = self.onnx_session.run([output_name], {input_name: batch_input})[0]
-            except Exception as exc:
-                if batch_input.shape[0] > 1 and self._is_batch_shape_error(exc):
-                    self._supports_multi_batch_inference = False
-                    self._warn_single_batch_only()
-                    for batch_tensor in batch_tensors:
-                        single_input = np.expand_dims(batch_tensor, axis=0)
-                        single_logits = self.onnx_session.run([output_name], {input_name: single_input})[0]
-                        results.extend(self._decode_predictions(single_logits, return_raw))
-                    continue
-                raise
-
-            if len(batch_regions) > 1 and self._supports_multi_batch_inference is None:
-                self._supports_multi_batch_inference = True
-
-            if len(logits) != original_batch_size:
-                logits = logits[:original_batch_size]
-
-            results.extend(self._decode_predictions(logits, return_raw))
+            results.extend(self._infer_image_batch(
+                batch_regions, effective_batch_size if pad_batch else len(batch_regions),
+                input_name, output_name, return_raw,
+            ))
 
         return results
+
+    def _infer_image_batch(self, regions, size, input_name, output_name, return_raw):
+        from .._common.image_batch import prepare_image_batch
+
+        batch_input = prepare_image_batch(regions, self._preprocess_image, size)
+        try:
+            logits = self.onnx_session.run([output_name], {input_name: batch_input})[0]
+        except Exception as exc:
+            if size > 1 and self._is_batch_shape_error(exc):
+                self._supports_multi_batch_inference = False
+                self._warn_single_batch_only()
+                results = []
+                for index in range(len(regions)):
+                    single_input = batch_input[index:index + 1]
+                    single_logits = self.onnx_session.run([output_name], {input_name: single_input})[0]
+                    results.extend(self._decode_predictions(single_logits, return_raw))
+                    del single_logits
+                return results
+            raise
+        if len(regions) > 1 and self._supports_multi_batch_inference is None:
+            self._supports_multi_batch_inference = True
+        return self._decode_predictions(logits[:len(regions)], return_raw)
 
 
     @staticmethod

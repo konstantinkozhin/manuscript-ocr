@@ -1,4 +1,5 @@
 import json
+from itertools import chain, islice
 import warnings
 from pathlib import Path
 from typing import Any, Callable, Dict, List, Optional, Sequence, Union
@@ -13,7 +14,7 @@ from manuscript.recognizers._common.debug import save_debug_regions
 from manuscript.recognizers._common.region_preparers import (
     call_region_preparer, prepare_bbox_regions, prepare_polygon_mask_regions,
     prepare_quad_warp_regions, prepare_text_regions,
-    validate_region_preparer_options,
+    validate_region_preparer_options, iter_text_regions,
 )
 from manuscript.recognizers._common.region_types import (
     REGION_PREPARER_PRESETS, PreparedRegion, RecognitionPrediction,
@@ -35,6 +36,8 @@ class BaseRecognizer(BaseArtifactModel):
     rotate_threshold heuristic for tall crops. Missing orientation uses that
     heuristic; None or zero rotate_threshold disables it.
 
+    Built-in models prepare standard crops per inference batch. Custom preparers,
+    debug output and whole-page batch planners retain whole-page preparation.
     Models implement _predict_text_images(); custom stages may override predict().
     """
 
@@ -331,6 +334,22 @@ class BaseRecognizer(BaseArtifactModel):
             region.text_span.text = prediction.text
             region.text_span.recognition_confidence = prediction.confidence
 
+    def _region_preparation_batch_size(self, batch_size):
+        # Custom recognizers keep the existing whole-page preparation contract.
+        return None
+
+    def _warn_missing_levels(self, page):
+        available_levels = {node.type for node in page.descendants if isinstance(node, TextRegion)}
+        selected_levels = self.region_preparer_options.get("levels") or self.levels or ("word", "line")
+        if available_levels and not available_levels.intersection(selected_levels):
+            warnings.warn(
+                f"{type(self).__name__}: recognition skipped because page text levels "
+                f"{sorted(available_levels)} do not match recognition_levels="
+                f"{list(selected_levels)}. Override recognition_levels when initializing "
+                "the recognizer, or add a text segmentation stage for the requested levels.",
+                UserWarning, stacklevel=3,
+            )
+
     def predict(
         self,
         page: Page,
@@ -370,19 +389,49 @@ class BaseRecognizer(BaseArtifactModel):
         self._positive_integer(batch_size, "batch_size")
 
         image_array = read_image(image)
+        chunk_size = None
+        iterator = None
+        if (isinstance(self.region_preparer, str) and debug_save_dir is None and
+                type(self)._region_preparation_batch_size is not BaseRecognizer._region_preparation_batch_size and
+                type(self)._call_region_preparer is BaseRecognizer._call_region_preparer and
+                "_call_region_preparer" not in self.__dict__ and
+                "_predict_text_images" not in self.__dict__):
+            iterator = iter_text_regions(
+                result_page, image_array, preset=self.region_preparer,
+                min_text_size=self.min_text_size, rotate_region=self._apply_region_rotation,
+                options=self.region_preparer_options,
+            )
+            first = next(iterator, None)
+            if first is None:
+                self._warn_missing_levels(result_page)
+                return result()
+            chunk_size = self._region_preparation_batch_size(batch_size)
+            iterator = chain(iter((first,)), iterator) if chunk_size is not None else None
+            del first
+        if chunk_size is not None:
+            records = []
+            processed = False
+            while True:
+                regions = list(islice(iterator, chunk_size))
+                if not regions:
+                    break
+                processed = True
+                from ._page_helpers import filter_callable_kwargs
+                options = {"regions": regions, "batch_size": batch_size}
+                if return_raw:
+                    options["return_raw"] = True
+                predictions = self._normalize_text_predictions(self._predict_text_images(
+                    **filter_callable_kwargs(self._predict_text_images, options)))
+                self._apply_text_predictions(regions, predictions)
+                if return_raw:
+                    records.extend(result(regions, predictions)["predictions"])
+                del regions, predictions, options
+            if not processed:
+                self._warn_missing_levels(result_page)
+            return {"page": result_page, "predictions": records} if return_raw else result_page
         regions = self._call_region_preparer(result_page, image_array)
         if not regions:
-            available_levels = {node.type for node in result_page.descendants
-                                if isinstance(node, TextRegion)}
-            selected_levels = self.region_preparer_options.get("levels") or self.levels or ("word", "line")
-            if available_levels and not available_levels.intersection(selected_levels):
-                warnings.warn(
-                    f"{type(self).__name__}: recognition skipped because page text levels "
-                    f"{sorted(available_levels)} do not match recognition_levels="
-                    f"{list(selected_levels)}. Override recognition_levels when initializing "
-                    "the recognizer, or add a text segmentation stage for the requested levels.",
-                    UserWarning, stacklevel=2,
-                )
+            self._warn_missing_levels(result_page)
             return result()
 
         if debug_save_dir is not None:

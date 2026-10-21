@@ -2,6 +2,7 @@
 
 
 import json
+import warnings
 from pathlib import Path
 
 import numpy as np
@@ -102,6 +103,13 @@ class TrOCR(BaseRecognizer):
     decoder_with_past : str or Path, optional
         Cached decoder ONNX file or URL for a ``kv_cache`` bundle.
         Defaults to the companion artifact declared by the bundle.
+    cuda_decoding : {"auto", "off", "required"}, default "auto"
+        Keep encoder states, logits and KV caches on CUDA using optional Torch
+        buffers and ONNX I/O binding. Requires dynamic-batch KV-cache graphs,
+        CUDA-enabled Torch and ORT DLPack support. Install
+        ``manuscript-ocr[gpu,trocr-cuda]``. Auto falls back with a warning on CUDA
+        when unavailable; required raises instead. CPU, CoreML and Web use NumPy.
+        CUDA floating-point kernels may produce small differences in scores.
     **kwargs
         Additional base recognizer options, such as ``use_orientation`` and
         ``debug_save_dir``.
@@ -141,8 +149,14 @@ class TrOCR(BaseRecognizer):
         recognition_levels=None,
         generation=None,
         decoder_with_past=None,
+        cuda_decoding="auto",
         **kwargs,
     ):
+        if not isinstance(cuda_decoding, str) or cuda_decoding not in ("auto", "off", "required"):
+            raise ValueError("cuda_decoding must be 'auto', 'off' or 'required'")
+        self.cuda_decoding = cuda_decoding
+        self._cuda_decoding_enabled = False
+        self._cuda_warning_reason = None
         super().__init__(
             weights=weights, device=device, force_download=force_download,
             rotate_threshold=rotate_threshold, region_preparer=region_preparer,
@@ -248,6 +262,12 @@ class TrOCR(BaseRecognizer):
             raise ImportError(
                 'TrOCR requires tokenizers: pip install "manuscript-ocr[trocr]"'
             ) from exc
+        if getattr(self, "runtime", None) == "native" and self.device == "cuda" and self.cuda_decoding != "off":
+            # Import before ORT sessions so Torch's CUDA DLLs are available on Windows.
+            try:
+                import torch  # noqa: F401
+            except ImportError:
+                pass
         encoder_session = self._create_onnx_session()
         decoder_session = self._create_onnx_session(self.decoder_path)
         tokenizer = Tokenizer.from_file(self.tokenizer_path)
@@ -320,6 +340,24 @@ class TrOCR(BaseRecognizer):
         self.onnx_session = encoder_session
         self.decoder_session = decoder_session
         self.tokenizer = tokenizer
+        self._select_cuda_decoding()
+
+    def _select_cuda_decoding(self):
+        self._cuda_decoding_enabled = False
+        if self.cuda_decoding == "off":
+            return
+        if self.cuda_decoding == "auto" and (self.runtime != "native" or self.device != "cuda"):
+            return
+        from .cuda import unavailable_reason
+        reason = unavailable_reason(self)
+        if reason is None:
+            self._cuda_decoding_enabled = True
+        elif self.cuda_decoding == "required":
+            raise RuntimeError("TrOCR device-resident CUDA decoding unavailable: " + reason)
+        elif reason != self._cuda_warning_reason:
+            warnings.warn("TrOCR uses NumPy decoding with host transfers: " + reason,
+                          RuntimeWarning, stacklevel=3)
+            self._cuda_warning_reason = reason
 
     def _preprocess_image(self, image):
         image = read_image(image)  # package images are RGB
@@ -383,6 +421,17 @@ class TrOCR(BaseRecognizer):
         """Compatibility wrapper for a single encoded image."""
         return self._generate_batch(hidden)[0]
 
+    def _region_preparation_batch_size(self, batch_size):
+        self._initialize_session()
+        fixed = self.onnx_session.get_inputs()[0].shape[0]
+        effective = fixed if isinstance(fixed, int) and fixed > 0 else batch_size
+        sessions = [self.decoder_session]
+        if self.decoder_with_past_session is not None:
+            sessions.append(self.decoder_with_past_session)
+        if any(isinstance(x.shape[0], int) for session in sessions for x in session.get_inputs()):
+            effective = 1
+        return effective
+
     def _predict_text_images(self, regions, batch_size=None, return_raw=False):
         if not regions:
             return []
@@ -390,26 +439,38 @@ class TrOCR(BaseRecognizer):
         requested = self._positive_integer(self.batch_size if batch_size is None else batch_size, "batch_size")
         image_input = self.onnx_session.get_inputs()[0]
         fixed = image_input.shape[0]
-        effective = fixed if isinstance(fixed, int) and fixed > 0 else requested
-        # Old decoder graphs with a fixed batch cannot process several images.
-        sessions = [self.decoder_session]
-        if self.decoder_with_past_session is not None:
-            sessions.append(self.decoder_with_past_session)
-        if any(isinstance(x.shape[0], int) for session in sessions for x in session.get_inputs()):
-            effective = 1
+        effective = self._region_preparation_batch_size(requested)
         results = []
         for offset in range(0, len(regions), effective):
             group = regions[offset:offset + effective]
-            pixels = np.concatenate([self._preprocess_image(region.image) for region in group])
-            if isinstance(fixed, int) and len(group) < fixed:
-                pixels = np.concatenate([pixels, np.repeat(pixels[-1:], fixed - len(group), axis=0)])
-            hidden = self.onnx_session.run(None, {image_input.name: pixels})[0][:len(group)]
-            for index, (tokens, confidence) in enumerate(self._generate_batch(hidden)):
-                results.append(RecognitionPrediction(
-                    self.tokenizer.decode(tokens, skip_special_tokens=True), confidence,
-                    {**({"encoder_output": hidden[index:index + 1].copy()} if return_raw else {}),
-                     "token_ids": tokens, "confidence_kind": "geometric_mean_token_probability"},
-                ))
+            size = fixed if isinstance(fixed, int) and fixed > 0 else len(group)
+            results.extend(self._infer_image_batch(group, size, image_input.name, return_raw))
+
+        return results
+
+    def _infer_image_batch(self, regions, size, input_name, return_raw):
+        from .._common.image_batch import prepare_image_batch
+
+        pixels = prepare_image_batch(regions, self._preprocess_image, size)
+        cuda = getattr(self, "_cuda_decoding_enabled", False)
+        if cuda:
+            from .cuda import generate_cuda
+            hidden, generated = generate_cuda(self, pixels)
+        else:
+            hidden = self.onnx_session.run(None, {input_name: pixels})[0][:len(regions)]
+            generated = self._generate_batch(hidden)
+        del pixels
+        results = []
+        for index, (tokens, confidence) in enumerate(generated):
+            raw_hidden = {}
+            if return_raw:
+                value = hidden[index:index + 1]
+                raw_hidden["encoder_output"] = value.cpu().numpy().copy() if cuda else value.copy()
+            results.append(RecognitionPrediction(
+                self.tokenizer.decode(tokens, skip_special_tokens=True), confidence,
+                {**raw_hidden,
+                 "token_ids": tokens, "confidence_kind": "geometric_mean_token_probability"},
+            ))
         return results
 
     @staticmethod

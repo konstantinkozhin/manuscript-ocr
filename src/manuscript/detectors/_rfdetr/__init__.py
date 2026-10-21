@@ -215,12 +215,17 @@ class RFDETR(BaseDetector):
     def _preprocess(self, image):
         height, width = self._input_hw
         # RF-DETR resizes float RGB tensors with bilinear, antialias=False.
+        pixels = image.astype(np.float32)
+        np.divide(pixels, 255.0, out=pixels)
         image = cv2.resize(
-            image.astype(np.float32) / 255.0,
+            pixels,
             (width, height),
             interpolation=cv2.INTER_LINEAR,
         )
-        tensor = (image - self.mean) / self.std
+        del pixels
+        np.subtract(image, self.mean, out=image)
+        np.divide(image, self.std, out=image)
+        tensor = image
         return np.ascontiguousarray(
             tensor.transpose(2, 0, 1)[None], dtype=self._input_dtype
         )

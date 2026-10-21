@@ -270,3 +270,36 @@ def test_constructor_validates_threshold_overrides(tmp_path, key, value):
     path.write_bytes(b"model")
     with pytest.raises(ValueError):
         Mask2Former(weights=path, config=Mask2Former.create_config(), **{key: value})
+
+
+@pytest.mark.parametrize('shape', [(1, 1), (7, 13), (100, 101)])
+def test_packed_mask_iou_matches_dense_masks_exactly(shape):
+    from manuscript.detectors._mask2former import _packed_mask_iou
+    from manuscript.utils.masks import mask_iou
+
+    rng = np.random.default_rng(42)
+    masks = [np.zeros(shape, bool), np.ones(shape, bool),
+             rng.random(shape) > .5, rng.random(shape) > .9]
+    for first in masks:
+        for second in masks:
+            actual = _packed_mask_iou(np.packbits(first), np.packbits(second),
+                                      int(first.sum()), int(second.sum()))
+            assert actual == mask_iou(first, second)
+            restored = Mask2Former._unpack_mask(np.packbits(first), *shape)
+            np.testing.assert_array_equal(restored, first)
+            assert restored.dtype == np.bool_
+
+
+def test_postprocess_can_retain_only_packed_masks(tmp_path):
+    weights, config = _artifacts(tmp_path)
+    detector = Mask2Former(weights=weights, config=config)
+    logits = np.array([[8, -8], [7, -8]], np.float32)
+    masks = np.full((2, 16, 16), -8, np.float32)
+    masks[:, 4:12, 2:14] = 8
+    geometry = (101, 103, 0, 0, 1024, 1024)
+    dense = detector._postprocess(logits, masks, geometry)
+    packed = detector._postprocess(logits, masks, geometry, _packed=True)
+    assert len(dense) == len(packed) == 1
+    assert packed[0][1:] == dense[0][1:]
+    np.testing.assert_array_equal(detector._unpack_mask(packed[0][0], 101, 103), dense[0][0])
+    assert packed[0][0].nbytes == (101 * 103 + 7) // 8

@@ -374,3 +374,74 @@ def test_lengths_track_content_with_fixed_and_minimum_width(bundle, monkeypatch,
     final_length = 128 if fixed_width else 232
     np.testing.assert_array_equal(feeds[1]["lengths"], [(final_length + stride - 1) // stride] * 2)
     assert feeds[0]["images"].shape[3] == (fixed_width or max(min_width, 112))
+
+
+@pytest.mark.parametrize('sort,budget,fixed', [
+    (False, None, None), (True, None, None), (True, 32 * 144 * 2, None),
+    (False, 32 * 144 * 2, None), (True, 32 * 144 * 3, 3),
+])
+def test_memory_batches_preserve_inputs_order_and_release_buffers(bundle, monkeypatch, sort, budget, fixed):
+    import weakref
+
+    previous = []
+    shapes = []
+    model = PPOCRRec(str(bundle[0]), config=bundle[0].with_suffix('.json'),
+                    batch_size=3, sort_by_width=sort, max_batch_pixels=budget)
+    crops = [np.full((32, w, 3), 255 - marker, np.uint8)
+             for w, marker in [(112, 10), (16, 20), (80, 30), (24, 40), (96, 50)]]
+    for crop in crops:
+        crop[0, 0] = 255
+    expected = {10 * (i + 1): model._prepare_image(crop)[0][0]
+                for i, crop in enumerate(crops)}
+
+    class Session:
+        def get_inputs(self):
+            return [SimpleNamespace(name='images', shape=[fixed or 'N', 3, 32, 'W'])]
+
+        def run(self, names, feed):
+            # The prior input and output must be dead before allocating this batch.
+            assert all(ref() is None for ref in previous)
+            images = feed['images']
+            shapes.append(images.shape)
+            if budget:
+                assert images.shape[0] * images.shape[2] * images.shape[3] <= budget
+            logits = np.full((len(images), 2, 4), -10, np.float32)
+            for i, image in enumerate(images):
+                marker = int(round(float(image[0, 1, 17]) * 255))
+                original = expected[marker]
+                padded = np.pad(original, ((0, 0), (0, 0), (0, image.shape[2] - original.shape[2])))
+                np.testing.assert_array_equal(image, padded)
+                logits[i, :, 1 if marker in (10, 30, 50) else 2] = 10
+            previous[:] = [weakref.ref(images), weakref.ref(logits)]
+            return [logits, np.full(len(images), 2, np.int64)]
+
+    model.onnx_session = Session()
+    monkeypatch.setattr(model, '_initialize_session', lambda: None)
+    result = model._predict_text_images([SimpleNamespace(image=crop) for crop in crops], return_raw=True)
+    assert [item.text for item in result] == ['а', 'б', 'а', 'б', 'а']
+    assert all(ref() is None for ref in previous)
+    if fixed:
+        assert all(shape[0] == fixed for shape in shapes)
+    if sort and budget is None:
+        # Narrow crops share a narrow batch; final wide batch contains only two.
+        assert [shape[3] for shape in shapes] == [112, 144]
+
+
+@pytest.mark.parametrize('options', [
+    {'sort_by_width': 'yes'}, {'max_batch_pixels': True}, {'max_batch_pixels': 0},
+    {'max_batch_pixels': -1}, {'max_batch_pixels': 1.5},
+])
+def test_memory_batch_options_reject_invalid_values(options):
+    with pytest.raises(ValueError):
+        PPOCRRec('missing.onnx', **options)
+
+
+@pytest.mark.parametrize('fixed', [None, 4])
+def test_memory_budget_rejects_oversized_input_before_inference(bundle, monkeypatch, fixed):
+    model = PPOCRRec(str(bundle[0]), config=bundle[0].with_suffix('.json'),
+                    max_batch_pixels=32 * 100)
+    model.onnx_session = SimpleNamespace(get_inputs=lambda: [
+        SimpleNamespace(name='images', shape=[fixed or 'N', 3, 32, 'W'])])
+    monkeypatch.setattr(model, '_initialize_session', lambda: None)
+    with pytest.raises(ValueError, match='exceeding max_batch_pixels'):
+        model._predict_word_images([np.zeros((32, 80, 3), np.uint8)])

@@ -58,6 +58,7 @@ gdrive = ["gdown>=4.4; sys_platform != 'emscripten'"]
 # Host page supplies ONNX Runtime Web; no native runtime in Pyodide.
 web = []
 trocr = ["tokenizers>=0.15,<1"]
+trocr-cuda = ["tokenizers>=0.15,<1", "torch>=2.0"]
 
 # Apple Silicon support (CoreML acceleration)
 # Standard macOS onnxruntime wheels include CoreML; select device="coreml"

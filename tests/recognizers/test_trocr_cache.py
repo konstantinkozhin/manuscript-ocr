@@ -37,3 +37,23 @@ def test_native_uint8_bicubic_resize_matches_torchvision(original, target):
     expected = functional.resize(torch.from_numpy(image.transpose(2, 0, 1)), list(target),
                                  interpolation=functional.InterpolationMode.BICUBIC, antialias=True).numpy().transpose(1, 2, 0)
     np.testing.assert_array_equal(_resize_antialiased(image, *target, 3, uint8_rounding=True), expected)
+
+
+@pytest.mark.parametrize('dtype', [np.float16, np.float32, np.float64])
+def test_generation_uses_last_position_without_mutating_decoder_output(dtype):
+    from manuscript.recognizers._trocr.generation import generate_batch
+
+    generation = dict(num_beams=1, max_length=4, decoder_start_token_id=1,
+                      eos_token_id=2, length_penalty=1., early_stopping=False,
+                      no_repeat_ngram_size=0)
+    logits = np.zeros((1, 3, 5), dtype)
+    logits[:, -1, 2] = 10
+    original = logits.copy()
+    result = generate_batch(np.zeros((1, 1, 2)), generation,
+                            lambda *args: (logits, None), TrOCR._banned)
+    assert result[0][0] == [1, 2]
+    np.testing.assert_array_equal(logits, original)
+    logits[0, 0, 0] = np.nan
+    with pytest.raises(ValueError, match='nonfinite'):
+        generate_batch(np.zeros((1, 1, 2)), generation,
+                       lambda *args: (logits, None), TrOCR._banned)

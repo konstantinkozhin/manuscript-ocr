@@ -8,8 +8,17 @@ import numpy as np
 from manuscript.api.base import managed_session_initialization
 from manuscript.api.detector import BaseDetector
 from ...utils import read_image
-from manuscript.utils.masks import mask_iou, mask_to_polygon
+from manuscript.utils.masks import mask_to_polygon
 from manuscript.utils.numerics import softmax, sigmoid
+
+
+_BIT_COUNTS = np.array([bin(i).count("1") for i in range(256)], dtype=np.uint8)
+
+
+def _packed_mask_iou(first, second, first_area, second_area):
+    intersection = int(_BIT_COUNTS[np.bitwise_and(first, second)].sum())
+    union = first_area + second_area - intersection
+    return intersection / union if union else 0.0
 
 
 class Mask2Former(BaseDetector):
@@ -177,12 +186,15 @@ class Mask2Former(BaseDetector):
         top = (self.image_size - resized_size[1]) // 2
         canvas = np.full((self.image_size, self.image_size, 3), 255, dtype=np.uint8)
         canvas[top:top + resized_size[1], left:left + resized_size[0]] = resized
-        pixels = canvas.astype(np.float32) / 255.0
-        pixels = ((pixels - self.image_mean) / self.image_std).transpose(2, 0, 1)[None]
+        pixels = canvas.astype(np.float32)
+        np.divide(pixels, 255.0, out=pixels)
+        np.subtract(pixels, self.image_mean, out=pixels)
+        np.divide(pixels, self.image_std, out=pixels)
+        pixels = pixels.transpose(2, 0, 1)[None]
         pixels = pixels.astype(self.pixel_dtype, copy=False)
         return pixels, left, top, resized_size
 
-    def _postprocess(self, class_logits, mask_logits, geometry):
+    def _postprocess(self, class_logits, mask_logits, geometry, *, _packed=False):
         original_height, original_width, left, top, resized_width, resized_height = geometry
         if (class_logits.ndim != 2 or class_logits.shape[1] < 2 or mask_logits.ndim != 3
                 or class_logits.shape[0] != mask_logits.shape[0]
@@ -215,15 +227,25 @@ class Mask2Former(BaseDetector):
             restored = cv2.resize(cropped.astype(np.uint8),
                                   (original_width, original_height),
                                   interpolation=cv2.INTER_NEAREST).astype(bool)
-            if int(restored.sum()) >= self.min_mask_area:
-                candidates.append((restored, score, class_id))
+            area = int(restored.sum())
+            if area >= self.min_mask_area:
+                candidates.append((np.packbits(restored), score, class_id, area))
+            del restored
         candidates.sort(key=lambda item: item[1], reverse=True)
         kept = []
-        for mask, score, class_id in candidates:
-            if all(old_class != class_id or mask_iou(mask, old) <= self.nms_iou_threshold
-                   for old, _, old_class in kept):
-                kept.append((mask, score, class_id))
-        return kept
+        for mask, score, class_id, area in candidates:
+            if all(old_class != class_id or
+                   _packed_mask_iou(mask, old, area, old_area) <= self.nms_iou_threshold
+                   for old, _, old_class, old_area in kept):
+                kept.append((mask, score, class_id, area))
+        if _packed:
+            return [(mask, score, class_id) for mask, score, class_id, _ in kept]
+        return [(self._unpack_mask(mask, original_height, original_width), score, class_id)
+                for mask, score, class_id, _ in kept]
+
+    @staticmethod
+    def _unpack_mask(mask, height, width):
+        return np.unpackbits(mask, count=height * width).reshape(height, width).view(np.bool_)
 
     def predict(self, image, return_raw=False, *, return_masks=False, return_outputs=False):
         if self.onnx_session is None:
@@ -238,19 +260,23 @@ class Mask2Former(BaseDetector):
         detections = self._postprocess(
             class_logits[0], mask_logits[0],
             (original_height, original_width, left, top,
-             resized_size[0], resized_size[1]))
+             resized_size[0], resized_size[1]), _packed=True)
         rows = []
-        for mask, score, class_id in detections:
+        for packed, score, class_id in detections:
+            mask = self._unpack_mask(packed, original_height, original_width)
             polygon = mask_to_polygon(mask)
             if polygon is not None:
-                rows.append((polygon.tolist(), score, class_id, mask))
+                details = (self._mask_details(mask, include_mask=return_masks)
+                           if return_raw or return_masks or return_outputs else {})
+                rows.append((polygon.tolist(), score, class_id, details))
+            del mask
         page = self._tree_from_regions([polygon for polygon, _, _, _ in rows],
                                        [score for _, score, _, _ in rows],
                                        [class_id for _, _, class_id, _ in rows], source.shape[:2])
         if return_raw or return_masks or return_outputs:
             details = [{"class_id": class_id, "confidence": score, "polygon": polygon,
-                        **self._mask_details(mask, include_mask=return_masks)}
-                       for polygon, score, class_id, mask in rows]
+                        **mask_details}
+                       for polygon, score, class_id, mask_details in rows]
             return self._raw_result(page, {self.output_class_logits: class_logits,
                                           self.output_mask_logits: mask_logits} if return_outputs else None,
                                     details, source.shape[:2],

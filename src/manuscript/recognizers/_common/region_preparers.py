@@ -1,6 +1,6 @@
 import math
 from numbers import Real
-from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple, Union
+from typing import Any, Callable, Dict, Iterator, List, Optional, Sequence, Tuple, Union
 
 import numpy as np
 
@@ -88,11 +88,23 @@ def prepare_bbox_regions(
     rotate_region: Callable[[np.ndarray], np.ndarray],
     options: Optional[Dict[str, Any]] = None,
 ) -> List[PreparedRegion]:
+    return list(iter_bbox_regions(
+        page, image, min_text_size=min_text_size, rotate_region=rotate_region, options=options,
+    ))
+
+
+def iter_bbox_regions(
+    page: Page,
+    image: np.ndarray,
+    *,
+    min_text_size: int,
+    rotate_region: Callable[[np.ndarray], np.ndarray],
+    options: Optional[Dict[str, Any]] = None,
+) -> Iterator[PreparedRegion]:
     options = dict(options or {})
     validate_region_preparer_options("bbox", options)
     pad = float(options.get("pad", 0))
     relative = any(options.get(name, 0) for name in _RELATIVE_BBOX_OPTIONS)
-    regions: List[PreparedRegion] = []
 
     for text_span, poly in iter_candidate_text_spans(page, min_text_size=min_text_size,
                                                     levels=options.get("levels", ("word", "line"))):
@@ -101,18 +113,14 @@ def prepare_bbox_regions(
         if crop is None:
             continue
 
-        regions.append(
-            PreparedRegion(
-                text_span=text_span,
-                image=_rotate_crop(rotate_region, crop, text_span),
-                polygon=poly,
-                meta={"region_preparer": "bbox", "pad": pad,
-                      **({name: float(options.get(name, 0.0)) for name in _RELATIVE_BBOX_OPTIONS}
-                         if relative else {})},
-            )
+        yield PreparedRegion(
+            text_span=text_span,
+            image=_rotate_crop(rotate_region, crop, text_span),
+            polygon=poly,
+            meta={"region_preparer": "bbox", "pad": pad,
+                  **({name: float(options.get(name, 0.0)) for name in _RELATIVE_BBOX_OPTIONS}
+                     if relative else {})},
         )
-
-    return regions
 
 
 def prepare_polygon_mask_regions(
@@ -123,11 +131,23 @@ def prepare_polygon_mask_regions(
     rotate_region: Callable[[np.ndarray], np.ndarray],
     options: Optional[Dict[str, Any]] = None,
 ) -> List[PreparedRegion]:
+    return list(iter_polygon_mask_regions(
+        page, image, min_text_size=min_text_size, rotate_region=rotate_region, options=options,
+    ))
+
+
+def iter_polygon_mask_regions(
+    page: Page,
+    image: np.ndarray,
+    *,
+    min_text_size: int,
+    rotate_region: Callable[[np.ndarray], np.ndarray],
+    options: Optional[Dict[str, Any]] = None,
+) -> Iterator[PreparedRegion]:
     options = dict(options or {})
     validate_region_preparer_options("polygon_mask", options)
     pad = float(options.get("pad", 0))
     background = int(options.get("background", 255))
-    regions: List[PreparedRegion] = []
 
     for text_span, poly in iter_candidate_text_spans(page, min_text_size=min_text_size,
                                                     levels=options.get("levels", ("word", "line"))):
@@ -135,20 +155,16 @@ def prepare_polygon_mask_regions(
         if crop is None:
             continue
 
-        regions.append(
-            PreparedRegion(
-                text_span=text_span,
-                image=_rotate_crop(rotate_region, crop, text_span),
-                polygon=poly,
-                meta={
-                    "region_preparer": "polygon_mask",
-                    "pad": pad,
-                    "background": background,
-                },
-            )
+        yield PreparedRegion(
+            text_span=text_span,
+            image=_rotate_crop(rotate_region, crop, text_span),
+            polygon=poly,
+            meta={
+                "region_preparer": "polygon_mask",
+                "pad": pad,
+                "background": background,
+            },
         )
-
-    return regions
 
 
 def prepare_quad_warp_regions(
@@ -159,6 +175,19 @@ def prepare_quad_warp_regions(
     rotate_region: Callable[[np.ndarray], np.ndarray],
     options: Optional[Dict[str, Any]] = None,
 ) -> List[PreparedRegion]:
+    return list(iter_quad_warp_regions(
+        page, image, min_text_size=min_text_size, rotate_region=rotate_region, options=options,
+    ))
+
+
+def iter_quad_warp_regions(
+    page: Page,
+    image: np.ndarray,
+    *,
+    min_text_size: int,
+    rotate_region: Callable[[np.ndarray], np.ndarray],
+    options: Optional[Dict[str, Any]] = None,
+) -> Iterator[PreparedRegion]:
     options = dict(options or {})
     validate_region_preparer_options("quad_warp", options)
     raw_output_size = options.get("output_size")
@@ -171,7 +200,6 @@ def prepare_quad_warp_regions(
             )
         output_size = (int(raw_output_size[0]), int(raw_output_size[1]))
 
-    regions: List[PreparedRegion] = []
 
     for text_span, poly in iter_candidate_text_spans(page, min_text_size=min_text_size,
                                                     levels=options.get("levels", ("word", "line"))):
@@ -183,20 +211,16 @@ def prepare_quad_warp_regions(
         if crop is None:
             continue
 
-        regions.append(
-            PreparedRegion(
-                text_span=text_span,
-                image=_rotate_crop(rotate_region, crop, text_span),
-                polygon=poly,
-                meta={
-                    "region_preparer": "quad_warp",
-                    "output_size": output_size,
-                    "fallback_to_bbox": used_fallback,
-                },
-            )
+        yield PreparedRegion(
+            text_span=text_span,
+            image=_rotate_crop(rotate_region, crop, text_span),
+            polygon=poly,
+            meta={
+                "region_preparer": "quad_warp",
+                "output_size": output_size,
+                "fallback_to_bbox": used_fallback,
+            },
         )
-
-    return regions
 
 
 def prepare_text_regions(
@@ -234,6 +258,13 @@ def prepare_text_regions(
         )
 
     raise ValueError(f"Unsupported region_preparer preset: {preset}")
+
+
+def iter_text_regions(page, image, *, preset, min_text_size, rotate_region, options=None):
+    preparers = {"bbox": iter_bbox_regions, "polygon_mask": iter_polygon_mask_regions,
+                 "quad_warp": iter_quad_warp_regions}
+    yield from preparers[preset](page, image, min_text_size=min_text_size,
+                                rotate_region=rotate_region, options=options)
 
 
 def call_region_preparer(
