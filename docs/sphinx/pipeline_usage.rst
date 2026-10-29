@@ -90,6 +90,56 @@ Use an ensemble when recognizers should independently read the same regions:
 
 Majority voting selects the most frequent normalized string; medoid selects
 an existing answer by summed character edit distance.
+Both compare text after NFC normalization, lowercasing and trimming outer
+whitespace. The returned text keeps the most frequent case-sensitive spelling
+among answers matching the winning normalized string; spelling ties prefer the
+first model. For example, ``Москва``, ``Москва``, ``москва`` produce ``Москва``.
+With ``return_raw=True``, ``winner`` contains this spelling, while
+``normalized_winner`` identifies its key in ``votes`` (and ``distance_sums``
+for medoid).
+
+Detector consensus
+~~~~~~~~~~~~~~~~~~
+
+Use ``ConsensusWBFDetector`` to retain detections supported by multiple models:
+
+.. code-block:: python
+
+    from manuscript.detectors import ConsensusWBFDetector
+
+    detector = ConsensusWBFDetector(
+        detectors=[detector_a, detector_b, detector_c],
+        weights=None,  # Equal coordinate weights; alternatively [1, 2, 1].
+        cluster_iou=0.5,
+        consensus_fraction=0.5,
+        minimum_votes=2,
+    )
+    pipeline = Pipeline(detector=detector)
+    raw = detector.predict("page.jpg", return_raw=True)
+    votes = [item["votes"] for item in raw["detections"]]
+
+Required votes are ``max(minimum_votes, ceil(len(detectors) * consensus_fraction))``.
+Empty answers count toward the total number of participants; inference errors
+propagate. Each participant contributes at most one vote per cluster. Regions
+are matched separately by ``(type, label)``; configure matching semantic labels
+on participants. Polygons become axis-aligned enclosing boxes. Participant Pages
+must already use original-image coordinates and dimensions, as built-in
+detectors do. No extra resize or NMS is performed by the ensemble.
+
+Participants run in supplied order. Greedy one-to-one matching uses representatives
+frozen before each participant; equal IoUs prefer higher object and cluster indices.
+The algorithm is order-dependent. The representative and final rectangle use
+arithmetic means by default, or weighted means with one finite positive weight
+per participant. Weights affect geometry and matching, never vote thresholds.
+Confidence scores are ignored, and fused ``detection_confidence`` is ``None``.
+
+The output is a flat Page; geometric descendants of participant Pages are
+treated as detections. Raw detections include ``votes`` and ``detector_indices``
+referencing the supplied order. Fusion does not produce masks or model tensors.
+``predict_batch(images)`` returns independent results in image order, including
+an empty list for an empty batch. It calls single-image prediction sequentially.
+Pickle preserves parameters and nested participants when those participants
+support pickling; no JSON configuration protocol for arbitrary models is assumed.
 
 Model memory
 ------------

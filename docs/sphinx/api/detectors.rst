@@ -5,9 +5,17 @@ Supported models:
 
 - :class:`~manuscript.detectors.YOLO`
 - :class:`~manuscript.detectors.EAST`
+- :class:`~manuscript.detectors.ConsensusWBFDetector`
 - :class:`~manuscript.detectors._ppocr.PPOCR`
 - :class:`~manuscript.detectors._rfdetr.RFDETR`
 - :class:`~manuscript.detectors._mask2former.Mask2Former`
+
+ConsensusWBFDetector
+--------------------
+
+.. autoclass:: manuscript.detectors.ConsensusWBFDetector
+   :members: predict, predict_batch, required_votes
+   :show-inheritance:
 
 YOLO
 ----

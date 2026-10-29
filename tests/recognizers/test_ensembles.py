@@ -56,13 +56,15 @@ def test_normalized_votes_preserve_input_and_model_batch_defaults(page, ensemble
     before = page.to_tree_dict()
     models = [Recognizer(' Е\u0308Ж '), Recognizer('ёж'), Recognizer('еж')]
     raw = ensemble(models, parallel=parallel).predict(page, return_raw=True)
-    assert first_word(raw['page']).text == 'ёж'
+    assert first_word(raw['page']).text == 'ЁЖ'
     assert first_word(raw['page']).recognition_confidence is None
     assert page.to_tree_dict() == before
     assert all(model.received_batch_size == 7 for model in models)
     record = next(record for record in raw['voting'] if record['type'] == 'word')
     assert record['votes'] == {'ёж': 2, 'еж': 1}
     assert record['winning_votes'] == 2
+    assert record['winner'] == 'ЁЖ'
+    assert record['normalized_winner'] == 'ёж'
     ensemble(models).predict(page, batch_size=3)
     assert all(model.received_batch_size == 3 for model in models)
 
@@ -73,6 +75,22 @@ def test_missing_answers_abstain_but_empty_strings_vote(page, ensemble):
     assert first_word(result).recognition_confidence == .8
     result = ensemble([Recognizer(None), Recognizer('')]).predict(page)
     assert first_word(result).text == ''
+
+
+@pytest.mark.parametrize('values, expected', [
+    (['Москва', 'Москва', 'москва'], 'Москва'),
+    (['москва', 'Москва', 'Москва'], 'Москва'),
+    (['Москва', 'москва'], 'Москва'),
+    (['NASA'], 'NASA'),
+    (['iPhone', 'iphone', 'iPhone'], 'iPhone'),
+    (['OTHER', 'Москва', 'Москва', 'москва'], 'Москва'),
+])
+def test_winning_spelling_preserves_case(page, ensemble, values, expected):
+    raw = ensemble([Recognizer(value) for value in values]).predict(page, return_raw=True)
+    assert first_word(raw['page']).text == expected
+    record = next(record for record in raw['voting'] if record['type'] == 'word')
+    assert record['winner'] == expected
+    assert record['winning_votes'] == record['votes'][record['normalized_winner']]
 
 
 def test_ties_prefer_first_model_even_in_parallel(page, ensemble):
@@ -108,8 +126,8 @@ def test_tree_changes_abort_without_mutating_input(page, ensemble, field):
 
 def test_region_levels_are_aggregated_independently(page, ensemble):
     result = ensemble([Recognizer('WORD'), Recognizer('LINE', kind='line')]).predict(page)
-    assert first_word(result).text == 'word'
-    assert result.children[0].children[0].text == 'line'
+    assert first_word(result).text == 'WORD'
+    assert result.children[0].children[0].text == 'LINE'
 
 
 def test_plurality_and_medoid_make_different_selections(page):

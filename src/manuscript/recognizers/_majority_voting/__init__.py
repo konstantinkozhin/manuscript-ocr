@@ -134,6 +134,11 @@ class MajorityVotingRecognizer(ModelComposition):
         -----
         Participant exceptions abort aggregation. Models may target different
         levels; parent and descendant texts are aggregated independently.
+        Comparison uses NFC, lowercase and stripped outer whitespace. Output
+        preserves the most frequent case-sensitive spelling among candidates
+        matching the winning normalized text (NFC and stripped). Ties prefer
+        the first model. Raw votes use normalized keys; normalized_winner
+        identifies the key corresponding to the case-preserving winner.
         """
         if not isinstance(page, Page):
             raise TypeError(f'{type(self).__name__} requires a document-tree Page')
@@ -184,13 +189,22 @@ class MajorityVotingRecognizer(ModelComposition):
                 candidates.append({'model_index': model_index, 'text': text,
                                    'normalized_text': normalized, 'confidence': confidence})
             winner, counts, details = self._aggregate(candidates, region.type)
+            normalized_winner = winner
+            if winner is not None:
+                spellings = Counter(
+                    unicodedata.normalize('NFC', candidate['text']).strip()
+                    for candidate in candidates
+                    if candidate['normalized_text'] == normalized_winner
+                )
+                winner = max(spellings, key=spellings.get)
             if winner is not None:
                 region.text = winner
                 region.recognition_confidence = None
             if return_raw:
                 records.append({'path': path, 'type': region.type, 'candidates': candidates,
                                 'votes': dict(counts), 'winner': winner,
-                                'winning_votes': counts[winner] if winner is not None else 0,
+                                'normalized_winner': normalized_winner,
+                                'winning_votes': counts[normalized_winner] if winner is not None else 0,
                                 'participating_models': len(candidates), 'total_models': len(self.models),
                                 **details})
         return {'page': result, 'voting': records} if return_raw else result

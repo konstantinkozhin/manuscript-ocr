@@ -1,7 +1,12 @@
-__all__ = ["EAST", "YOLO"]
+__all__ = ["EAST", "YOLO", "ConsensusWBFDetector"]
 
 
 def __getattr__(name):
+    if name == "ConsensusWBFDetector":
+        from ._consensus import ConsensusWBFDetector
+
+        return ConsensusWBFDetector
+
     if name == "EAST":
         from ._east import EAST
 
