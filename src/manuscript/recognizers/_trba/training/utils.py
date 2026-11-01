@@ -1,7 +1,26 @@
+import os
 import random
+import tempfile
 from typing import Dict, Any, Tuple, Optional
 
 import torch
+
+
+def _atomic_torch_save(value, path):
+    """Keep the previous checkpoint intact if writing the new one fails."""
+    target = os.path.abspath(os.fspath(path))
+    temporary = None
+    try:
+        with tempfile.NamedTemporaryFile(mode="w+b", dir=os.path.dirname(target),
+                                         prefix=os.path.basename(target) + ".", suffix=".tmp", delete=False) as stream:
+            temporary = stream.name
+            torch.save(value, stream)
+            stream.flush()
+            os.fsync(stream.fileno())
+        os.replace(temporary, target)
+    finally:
+        if temporary is not None and os.path.exists(temporary):
+            os.remove(temporary)
 
 
 def save_checkpoint(
@@ -32,12 +51,13 @@ def save_checkpoint(
         "stoi": stoi,
         "config": config,
         "log_dir": log_dir,
+        "torch_rng_state": torch.get_rng_state(),
     }
-    torch.save(ckpt, path)
+    _atomic_torch_save(ckpt, path)
 
 
 def save_weights(path, model):
-    torch.save(model.state_dict(), path)
+    _atomic_torch_save(model.state_dict(), path)
 
 
 def load_checkpoint(
@@ -79,7 +99,25 @@ def load_checkpoint(
 
         missing_keys = set(current_state.keys()) - set(filtered_state.keys())
 
+        # Full training checkpoints must match before any model or optimizer
+        # state is changed. Weight-only imports retain partial loading support.
+        if strict and "optimizer_state" in metadata and (
+            shape_mismatches or skipped_keys or missing_keys
+        ):
+            raise RuntimeError(
+                "Training checkpoint architecture does not match the model: "
+                f"{len(shape_mismatches)} shape mismatches, "
+                f"{len(skipped_keys)} unexpected keys, {len(missing_keys)} missing keys. "
+                "Use strict=False for an intentional partial weight import."
+            )
+
         result = model.load_state_dict(filtered_state, strict=False)
+
+        if strict and result.unexpected_keys:
+            raise RuntimeError(
+                "Checkpoint contains unexpected keys after compatibility filtering: "
+                f"{result.unexpected_keys[:5]}"
+            )
 
         if shape_mismatches or skipped_keys or missing_keys:
             if shape_mismatches:
@@ -88,6 +126,15 @@ def load_checkpoint(
                     print(f"   - {msg}")
                 if len(shape_mismatches) > 5:
                     print(f"   ... and {len(shape_mismatches) - 5} more")
+
+            if skipped_keys:
+                print(
+                    f"ℹ️  Keys absent in current model (skipped): {len(skipped_keys)}"
+                )
+                for key in skipped_keys[:3]:
+                    print(f"   - {key}")
+                if len(skipped_keys) > 3:
+                    print(f"   ... and {len(skipped_keys) - 3} more")
 
             if missing_keys:
                 print(
@@ -111,11 +158,16 @@ def load_checkpoint(
         scheduler.load_state_dict(metadata["scheduler_state"])
     if scaler is not None and metadata.get("scaler_state") is not None:
         scaler.load_state_dict(metadata["scaler_state"])
+    if metadata.get("torch_rng_state") is not None:
+        torch.set_rng_state(metadata["torch_rng_state"].cpu())
     return metadata
 
 
 def set_seed(seed: int = 42):
+    import numpy as np
+
     random.seed(seed)
+    np.random.seed(seed)
     torch.manual_seed(seed)
     torch.backends.cudnn.deterministic = False
     torch.backends.cudnn.benchmark = True

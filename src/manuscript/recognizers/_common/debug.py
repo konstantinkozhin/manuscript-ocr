@@ -5,7 +5,7 @@ from typing import Any, Dict, List, Optional, Sequence, Union
 import numpy as np
 from PIL import Image
 
-from manuscript.utils import polygon_to_bbox
+from manuscript.utils.geometry import polygon_to_bbox
 
 from .region_types import PreparedRegion, RecognitionPrediction
 

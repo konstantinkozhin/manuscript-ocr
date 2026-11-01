@@ -11,6 +11,21 @@ import manuscript.recognizers._trba.training.metrics as metrics_module
 import manuscript.recognizers._trba.training.utils as utils_module
 
 
+def test_failed_checkpoint_write_preserves_previous_file(tmp_path, monkeypatch):
+    path = tmp_path / "last_ckpt.pth"
+    utils_module._atomic_torch_save({"epoch": 7}, path)
+
+    def interrupted_save(value, stream):
+        stream.write(b"incomplete new checkpoint")
+        raise OSError("simulated write failure")
+
+    monkeypatch.setattr(torch, "save", interrupted_save)
+    with pytest.raises(OSError, match="simulated"):
+        utils_module._atomic_torch_save({"epoch": 8}, path)
+    assert torch.load(path, weights_only=True)["epoch"] == 7
+    assert list(tmp_path.iterdir()) == [path]
+
+
 class TinyModel(nn.Module):
     def __init__(self):
         super().__init__()
@@ -19,6 +34,19 @@ class TinyModel(nn.Module):
 
     def forward(self, x):
         return self.encoder(self.attention_decoder(x))
+
+
+class TinyParseqModel(nn.Module):
+    decoder_type = "parseq"
+
+    def __init__(self, decoder_out_features=3):
+        super().__init__()
+        self.encoder = nn.Linear(2, 2, bias=False)
+        self.attention_decoder = nn.Linear(2, decoder_out_features, bias=False)
+
+    def forward(self, x):
+        encoded = self.encoder(x)
+        return self.attention_decoder(encoded)
 
 
 class DummyScaler:
@@ -48,14 +76,25 @@ class TestTRBAMetrics:
         calls = []
         monkeypatch.setattr(metrics_module, "_cer_metric", None)
         monkeypatch.setattr(
-            metrics_module.evaluate,
-            "load",
+            metrics_module,
+            "_JiwerMetric",
             lambda name: calls.append(name) or fake_metric,
         )
 
         assert metrics_module.get_cer_metric() is fake_metric
         assert metrics_module.get_cer_metric() is fake_metric
         assert calls == ["cer"]
+
+    def test_local_metrics_are_corpus_weighted_and_preserve_case(self, monkeypatch):
+        monkeypatch.setattr(metrics_module, "_cer_metric", None)
+        monkeypatch.setattr(metrics_module, "_wer_metric", None)
+        assert metrics_module.compute_cer(["abcd", "x"], ["abc", "y"]) == pytest.approx(0.4)
+        assert metrics_module.compute_wer(["one two three", "four"], ["one two", "five"]) == pytest.approx(0.5)
+        assert metrics_module.compute_cer(["Ёж"], ["ёж"]) == pytest.approx(0.5)
+        assert metrics_module.compute_cer(["a"], ["aaaa"]) == pytest.approx(3.0)
+        assert metrics_module.compute_cer(["a"], [""]) == pytest.approx(1.0)
+        with pytest.raises(ValueError, match="equal lengths"):
+            metrics_module.compute_cer(["a", "b"], ["a"])
 
     def test_compute_cer_and_wer_replace_empty_strings(self, monkeypatch):
         fake_cer = FakeMetric(0.1)
@@ -133,6 +172,27 @@ class TestTRBATrainingUtils:
         captured = capsys.readouterr().out
         assert "Shape mismatches" in captured or "Missing keys" in captured
         assert "model_state" in metadata
+
+    def test_load_checkpoint_keeps_matching_weights_for_decoder_mismatch(self, tmp_path, capsys):
+        src_model = TinyParseqModel(decoder_out_features=2)
+        dst_model = TinyParseqModel(decoder_out_features=3)
+        path = tmp_path / "parseq_mismatch.pt"
+        original_decoder = dst_model.attention_decoder.weight.detach().clone()
+        original_encoder = dst_model.encoder.weight.detach().clone()
+        torch.save({"model_state": src_model.state_dict()}, path)
+
+        metadata = utils_module.load_checkpoint(
+            str(path),
+            model=dst_model,
+            map_location="cpu",
+        )
+
+        captured = capsys.readouterr().out
+        assert metadata["model_state"]
+        assert "Shape mismatches" in captured
+        assert torch.allclose(dst_model.encoder.weight, src_model.encoder.weight)
+        assert not torch.allclose(dst_model.encoder.weight, original_encoder)
+        assert torch.allclose(dst_model.attention_decoder.weight, original_decoder)
 
     def test_save_weights_writes_state_dict(self, tmp_path):
         model = TinyModel()

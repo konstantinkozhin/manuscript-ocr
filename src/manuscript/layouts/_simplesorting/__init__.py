@@ -4,23 +4,38 @@ import numpy as np
 
 from manuscript.api.layout import BaseLayout
 
-from ...data import Block, Line, Page, TextSpan
+from ...data import Page, TextRegion
+from collections import defaultdict, deque
+from ...utils.grouping import group_regions
 
 
 class SimpleSorting(BaseLayout):
-    """
-    Layout-модель, которая группирует обнаруженные текстовые области по колонкам и строкам.
+    """Group detected words into lines and arrange text in reading order.
 
-    Параметры
+    Parameters
     ----------
     max_splits : int, optional
-        Максимальное число попыток разбиения на колонки. По умолчанию 10.
+        Maximum number of column splits. Default is 10; zero uses the
+        horizontal extent of the regions as the iteration limit.
     use_columns : bool, optional
-        Если ``True``, перед группировкой строк выполняется сегментация на колонки.
-        По умолчанию ``True``.
+        Separate Page-level words into columns before grouping. Default is True.
+
+    Examples
+    --------
+    >>> from manuscript.layouts import SimpleSorting
+    >>> layout = SimpleSorting(use_columns=False)
+    >>> page = layout.predict(page)
+
+    See Also
+    --------
+    ReadingSorting : Order detected regions and optionally infer containment.
     """
 
     def __init__(self, max_splits: int = 10, use_columns: bool = True):
+        if isinstance(max_splits, bool) or not isinstance(max_splits, int) or max_splits < 0:
+            raise ValueError("max_splits must be a nonnegative integer")
+        if not isinstance(use_columns, bool):
+            raise TypeError("use_columns must be a boolean")
         self.max_splits = max_splits
         self.use_columns = use_columns
 
@@ -119,10 +134,11 @@ class SimpleSorting(BaseLayout):
             return []
 
         img_width = max(b[2] for b in boxes)
-        segments = [(0, img_width)]
+        left_edge = min(0, min(b[0] for b in boxes))
+        segments = [(left_edge, img_width)]
         separators: List[int] = []
 
-        for _ in range(self.max_splits or img_width):
+        for _ in range(self.max_splits or max(1, int(np.ceil(img_width - left_edge)))):
             best = None
             for idx, (s, e) in enumerate(segments):
                 for x in self._find_gaps(boxes, s, e):
@@ -145,7 +161,7 @@ class SimpleSorting(BaseLayout):
             segments.insert(idx + 1, (x_split, e))
             segments.sort()
 
-        parts = [(0, img_width)]
+        parts = [(left_edge, img_width)]
         for x in separators:
             new_parts: List[Tuple[int, int]] = []
             for s, e in parts:
@@ -235,64 +251,67 @@ class SimpleSorting(BaseLayout):
             compressed, mapping, y_tol_ratio, x_gap_ratio
         )
 
-    def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
-        """
-        Упорядочивает текстовые области на странице по блокам и строкам и назначает
-        порядок чтения.
+    @staticmethod
+    def _bounds(node):
+        points = np.asarray(node.polygon, dtype=float)
+        return (*points.min(axis=0), *points.max(axis=0))
 
-        Параметры
+    def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
+        """Group and sort regions in place.
+
+        Parameters
         ----------
         page : Page
-            Входная страница с обнаруженными текстовыми областями.
+            Document tree to organize.
         image : numpy.ndarray, optional
-            Исходное изображение страницы (не используется данной layout-моделью).
+            Accepted for Pipeline compatibility; not used.
 
-        Возвращает
+        Returns
         -------
         Page
-            Упорядоченная страница.
+            The supplied Page with updated grouping and child order.
         """
-        _ = image
+        if not isinstance(page, Page):
+            raise TypeError("SimpleSorting requires the document-tree Page")
+        page.validate_tree()
+        self._group(page)
+        page.validate_tree()
+        return page
 
-        all_text_spans: List[TextSpan] = []
-        for block in page.blocks:
-            for line in block.lines:
-                all_text_spans.extend(line.text_spans)
-
-        if not all_text_spans:
-            return Page(blocks=[Block(lines=[Line(text_spans=[], order=0)], order=0)])
-
-        text_span_to_box = {}
-        boxes = []
-        for text_span in all_text_spans:
-            poly = np.array(text_span.polygon, dtype=np.int32)
-            x_min, y_min = np.min(poly, axis=0)
-            x_max, y_max = np.max(poly, axis=0)
-            box = (int(x_min), int(y_min), int(x_max), int(y_max))
-            boxes.append(box)
-            text_span_to_box[box] = text_span
-
-        if self.use_columns:
-            columns = self._segment_columns(boxes)
+    def _group(self, parent):
+        if parent.type in {"table", "cell"}:
+            return
+        for child in tuple(parent.children):
+            self._group(child)
+        words = [child for child in parent.children
+                 if isinstance(child, TextRegion) and child.type == "word"
+                 and child.polygon is not None]
+        is_line = isinstance(parent, TextRegion) and parent.type == "line"
+        if words and not is_line:
+            boxes = [self._bounds(word) for word in words]
+            lookup = defaultdict(deque)
+            for word, box in zip(words, boxes):
+                lookup[box].append(word)
+            columns = (self._segment_columns(boxes)
+                       if self.use_columns and isinstance(parent, Page) else [boxes])
+            for column in columns:
+                grouped_lines = []
+                for line_boxes in self._sort_column_into_lines(
+                        column, {box: box for box in column}, 0.6, np.inf):
+                    members = [lookup[box].popleft() for box in line_boxes]
+                    grouped_lines.append(group_regions(members, type="line"))
+                if isinstance(parent, Page):
+                    group_regions(grouped_lines, type="block")
+        children = list(parent.children)
+        if is_line:
+            key = lambda node: (node.polygon is None,
+                                self._bounds(node)[0] if node.polygon else 0)
         else:
-            columns = [boxes]
-
-        blocks: List[Block] = []
-        for block_idx, column_boxes in enumerate(columns):
-            lines_in_column = self._sort_into_lines(column_boxes, use_columns=False)
-
-            lines: List[Line] = []
-            for line_idx, line_boxes in enumerate(lines_in_column):
-                line_text_spans = []
-                for text_span_idx, box in enumerate(line_boxes):
-                    text_span = text_span_to_box[box]
-                    text_span.order = text_span_idx
-                    line_text_spans.append(text_span)
-
-                line = Line(text_spans=line_text_spans, order=line_idx)
-                lines.append(line)
-
-            block = Block(lines=lines, order=block_idx)
-            blocks.append(block)
-
-        return Page(blocks=blocks)
+            key = lambda node: (node.polygon is None,
+                                self._bounds(node)[1] if node.polygon else 0,
+                                self._bounds(node)[0] if node.polygon else 0)
+        if isinstance(parent, Page) and children and all(
+                isinstance(node, TextRegion) and node.type == "block" for node in children):
+            key = lambda node: (node.polygon is None,
+                                self._bounds(node)[0] if node.polygon else 0)
+        parent.children = sorted(children, key=key)

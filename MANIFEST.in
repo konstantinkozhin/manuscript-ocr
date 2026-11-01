@@ -1,2 +1,7 @@
 include README.md LICENSE
-recursive-include src *
+recursive-include src *.py
+include src/manuscript/recognizers/_trba/configs/config.json
+include src/manuscript/recognizers/_trba/configs/charset.txt
+prune scripts
+global-exclude *.pyc *.pyo *.nbc *.nbi
+recursive-include src/manuscript/runtimes *.mjs

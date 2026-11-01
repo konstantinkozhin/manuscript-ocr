@@ -229,6 +229,7 @@ def _run_training(
     score_map_shrink_ratio: Optional[float] = None,
     augmentation_config: Optional[Dict[str, Any]] = None,
     log_collage: bool = True,
+    detection_level: str = "word",
 ):
     experiment_dir = os.path.abspath(os.fspath(experiment_dir))
     log_dir = os.path.join(experiment_dir, "logs")
@@ -267,6 +268,12 @@ def _run_training(
         "augmentation_config": augmentation_config,
     }
     
+    from manuscript.data import TextRegion
+    TextRegion(type=detection_level)
+    config["region_classes"] = {"0": {"type": detection_level}}
+    with open(os.path.join(experiment_dir, "inference.json"), "w", encoding="utf-8") as stream:
+        json.dump({"region_classes": config["region_classes"]}, stream, indent=2)
+
     config_path = os.path.join(experiment_dir, "training_config.json")
     with open(config_path, "w", encoding="utf-8") as f:
         json.dump(config, f, indent=2, ensure_ascii=False)
@@ -780,6 +787,7 @@ def _run_training(
             input_size=export_size,
             opset_version=14,
             simplify=True,
+            detection_level=detection_level,
         )
         print(f"ONNX model exported successfully: {onnx_path}")
     except Exception as e:

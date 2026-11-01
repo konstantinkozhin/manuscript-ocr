@@ -4,21 +4,13 @@ import numpy as np
 import cv2
 from pathlib import Path
 
-try:
-    import torch
-    from manuscript.detectors._east.dataset import (
-        order_vertices_clockwise,
-        shrink_poly,
-        EASTDataset,
-    )
-
-    TORCH_AVAILABLE = True
-except ImportError:
-    TORCH_AVAILABLE = False
-    torch = None
-    order_vertices_clockwise = None
-    shrink_poly = None
-    EASTDataset = None
+torch = pytest.importorskip("torch")
+from manuscript.detectors._east.dataset import (
+    order_vertices_clockwise,
+    shrink_poly,
+    EASTDataset,
+)
+TORCH_AVAILABLE = True
 
 
 def _quad(x0, y0, x1, y1):
@@ -130,7 +122,6 @@ class TestGeometricFunctions:
 # ============================================================================
 # Tests for EASTDataset
 # ============================================================================
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 class TestEASTDataset:
     """Tests for EASTDataset class"""
 
@@ -634,7 +625,6 @@ class TestEASTDataset:
         assert quad.max() <= 512
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 class TestEASTDatasetEdgeCases:
     """Edge case tests for EASTDataset"""
 
@@ -732,7 +722,6 @@ class TestEASTDatasetEdgeCases:
         return str(img_dir), str(ann_file)
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 class TestEASTDatasetAugmentations:
     @pytest.fixture
     def simple_dataset(self, tmp_path):

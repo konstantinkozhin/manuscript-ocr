@@ -1,9 +1,9 @@
 """Tests for CharLM train/export orchestration."""
 
+from tests.support.modules import patch_modules
+
 import json
 import os
-import sys
-from pathlib import Path
 from types import ModuleType
 from unittest.mock import MagicMock, patch
 
@@ -30,9 +30,7 @@ class TestCharLMTrain:
 
         fake_train_module.train = fake_run_training
 
-        with patch.dict(
-            sys.modules,
-            {
+        with patch_modules({
                 "manuscript.correctors._charlm.train": fake_train_module,
                 "manuscript.correctors._charlm.config": fake_config_module,
             },
@@ -87,9 +85,7 @@ class TestCharLMTrain:
 
         fake_train_module.train = fake_run_training
 
-        with patch.dict(
-            sys.modules,
-            {
+        with patch_modules({
                 "manuscript.correctors._charlm.train": fake_train_module,
                 "manuscript.correctors._charlm.config": fake_config_module,
             },
@@ -167,9 +163,7 @@ class TestCharLMExport:
         def _write_onnx(*args, **kwargs):
             output_path.write_bytes(b"fake onnx")
 
-        with patch.dict(
-            sys.modules,
-            {
+        with patch_modules({
                 "manuscript.correctors._charlm.model": fake_model_module,
                 "onnx": fake_onnx,
                 "onnxsim": fake_onnxsim,

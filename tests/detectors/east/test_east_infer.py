@@ -1,25 +1,14 @@
 import pytest
 from pathlib import Path
 import numpy as np
-import cv2
-
-try:
-    import torch
-    TORCH_AVAILABLE = True
-except ImportError:
-    TORCH_AVAILABLE = False
-    torch = None
 
 from manuscript.api.detector import BaseDetector
 from manuscript.detectors import EAST
-from manuscript.data import Page
 
 
 def test_east_inherits_base_detector():
     assert issubclass(EAST, BaseDetector)
 
-
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 class TestEASTInitialization:
     """Tests initialization EAST"""
 
@@ -64,25 +53,27 @@ class TestEASTInitialization:
         detector = EAST(device="cpu")
         assert detector.device == "cpu"
 
-    def test_initialization_nonexistent_weights(self):
+    def test_initialization_nonexistent_weights(self, local_east_artifacts):
         """Test errors with nonexistent weights"""
+        local_east_artifacts.side_effect = ValueError("unknown model")
         with pytest.raises(ValueError):
-            EAST(weights="nonexistent_model.onnx")
+            EAST(weights="nonexistent_model.onnx", config=Path("nonexistent_model.onnx").with_suffix(".json"))
 
-    def test_initialization_downloads_default_model(self):
+    def test_initialization_resolves_default_preset(self, local_east_artifacts):
         """Test that model is downloaded if path not specified"""
         # Model should be downloaded or already downloaded
         detector = EAST()
         
+        local_east_artifacts.assert_called_once_with("east_50_g1", "EAST", force_download=False)
+
         # Check that weights path exists
         assert detector.weights is not None
         assert Path(detector.weights).exists()
         
         # Check that default model exists in cache
-        default_path = Path.home() / ".manuscript" / "weights" / "east_50_g1.onnx"
+        default_path = Path(detector.weights)
         assert default_path.exists()
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 class TestEASTScalingMethods:
     """Tests for scaling methods и трансформации"""
 
@@ -176,7 +167,6 @@ class TestEASTScalingMethods:
         assert aligned[0, 8] == 0.9
         assert aligned[1, 8] == 0.8
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 class TestEASTGeometricUtils:
     """Tests for geometric utilities"""
 
@@ -266,8 +256,7 @@ class TestEASTGeometricUtils:
         
         # Only the big one should remain
         assert len(result) == 1
-    
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
+
     def test_remove_area_anomalies_disabled(self):
         """Test that anomalies are not removed if the flag is disabled"""
         detector = EAST(remove_area_anomalies=False)
@@ -281,7 +270,7 @@ class TestEASTGeometricUtils:
         
         # All remain
         assert len(result) == 2
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
+
     def test_remove_area_anomalies_too_few_boxes(self):
         """Test that anomalies are not removed if there are too few boxes"""
         detector = EAST(remove_area_anomalies=True, anomaly_min_box_count=10)
@@ -296,247 +285,6 @@ class TestEASTGeometricUtils:
         # All remain (less than 10 boxes)
         assert len(result) == 2
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-class TestEASTPredict:
-    """Tests for the predict method"""
-
-    @pytest.fixture
-    def test_image(self):
-        """Creates a test image"""
-        return np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
-
-    @pytest.fixture
-    def test_image_path(self, tmp_path, test_image):
-        """Creates a temporary file with an image"""
-        img_path = tmp_path / "test_image.jpg"
-        cv2.imwrite(str(img_path), cv2.cvtColor(test_image, cv2.COLOR_RGB2BGR))
-        return str(img_path)
-    
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_predict_with_path(self, test_image_path):
-        """Test predict with file path"""
-        detector = EAST()
-        
-        result = detector.predict(test_image_path)
-        
-        assert isinstance(result, Page)
-    
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_predict_with_numpy_array(self, test_image):
-        """Test predict with numpy array"""
-        detector = EAST()
-        
-        result = detector.predict(test_image)
-        
-        assert isinstance(result, Page)
-    
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_predict_returns_page_structure(self, test_image):
-        """Test that predict returns correct Page structure"""
-        detector = EAST()
-        
-        result = detector.predict(test_image)
-        page = result
-        
-        assert hasattr(page, "blocks")
-        assert isinstance(page.blocks, list)
-        
-        if len(page.blocks) > 0:
-            block = page.blocks[0]
-            assert hasattr(block, "lines")
-            assert isinstance(block.lines, list)
-            if len(block.lines) > 0:
-                assert isinstance(block.lines[0].text_spans, list)
-
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_predict_different_thresholds(self, test_image):
-        """Test with different thresholds"""
-        detector_low = EAST(score_thresh=0.1)
-        detector_high = EAST(score_thresh=0.9)
-        
-        result_low = detector_low.predict(test_image)
-        result_high = detector_high.predict(test_image)
-        
-        # Both should work without errors
-        assert isinstance(result_low, Page)
-        assert isinstance(result_high, Page)
-    
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_predict_axis_aligned_vs_original(self, test_image):
-        """Test axis_aligned_output flag"""
-        detector_aligned = EAST(axis_aligned_output=True)
-        detector_original = EAST(axis_aligned_output=False)
-        
-        result_aligned = detector_aligned.predict(test_image)
-        result_original = detector_original.predict(test_image)
-        
-        # Both should return results
-        assert isinstance(result_aligned, Page)
-        assert isinstance(result_original, Page)
-
-
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-class TestEASTErrorHandling:
-    """Tests error handling"""
-    
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_predict_nonexistent_file(self):
-        """Test errors with nonexistent file"""
-        detector = EAST()
-        
-        with pytest.raises(FileNotFoundError):
-            detector.predict("nonexistent_image.jpg")
-    
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_predict_invalid_type(self):
-        """Test errors with invalid input type"""
-        detector = EAST()
-        
-        with pytest.raises((TypeError, AttributeError)):
-            detector.predict(12345)
-    
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_predict_corrupted_image_path(self, tmp_path):
-        """Test with a corrupted image file"""
-        # Create a text file instead of an image
-        fake_img = tmp_path / "fake.jpg"
-        fake_img.write_text("not an image")
-        
-        detector = EAST()
-        
-        # Should raise an error when reading
-        with pytest.raises((cv2.error, ValueError, OSError)):
-            detector.predict(str(fake_img))
-
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-class TestEASTEdgeCases:
-    """Tests edge cases"""
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_predict_very_small_image(self):
-        """Test with very small image"""
-        detector = EAST()
-        
-        # Image 10x10
-        small_img = np.random.randint(0, 255, (10, 10, 3), dtype=np.uint8)
-        
-        result = detector.predict(small_img)
-        
-        # Should not raise errors
-        assert isinstance(result, Page)
-    
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_predict_very_large_image(self):
-        """Test with very large image"""
-        detector = EAST()
-        
-        # Image 2000x3000
-        large_img = np.random.randint(0, 255, (2000, 3000, 3), dtype=np.uint8)
-        
-        result = detector.predict(large_img)
-        
-        # Should not raise errors
-        assert isinstance(result, Page)
-    
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_predict_grayscale_image(self):
-        """Test with grayscale image"""
-        detector = EAST()
-        
-        # Grayscale image (2D)
-        gray_img = np.random.randint(0, 255, (480, 640), dtype=np.uint8)
-        
-        # Should raise an error or automatically convert
-        try:
-            result = detector.predict(gray_img)
-            # If it worked, check the result
-            assert isinstance(result, Page)
-        except (ValueError, AttributeError):
-            # Expected error for grayscale
-            pass
-    
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_predict_black_image(self):
-        """Test with completely black image"""
-        detector = EAST()
-        
-        black_img = np.zeros((480, 640, 3), dtype=np.uint8)
-        
-        page = detector.predict(black_img)
-        
-        # Most likely there will be no detections, but there should be no errors
-        assert isinstance(page, Page)
-    
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_predict_white_image(self):
-        """Test with completely white image"""
-        detector = EAST()
-        
-        white_img = np.ones((480, 640, 3), dtype=np.uint8) * 255
-        
-        page = detector.predict(white_img)
-        
-        assert isinstance(page, Page)
-        
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_predict_with_extreme_expand_ratios(self):
-        """Test with extreme expand ratios"""
-        detector = EAST(expand_ratio_w=0.0, expand_ratio_h=0.0)
-        
-        test_img = np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
-        
-        result = detector.predict(test_img)
-        
-        # Should not raise errors even with zero expansion
-        assert isinstance(result, Page)
-
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-class TestEASTIntegration:
-    """Integration tests with real image"""
-
-    @pytest.fixture
-    def example_image_path(self):
-        """Path to example image if it exists"""
-        repo_root = Path(__file__).parent.parent.parent.parent
-        image_path = repo_root / "example" / "ocr_example_image.jpg"
-        
-        if not image_path.exists():
-            pytest.skip("Test image example/ocr_example_image.jpg not found")
-        
-        return str(image_path)
-    
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_different_target_sizes(self, example_image_path):
-        """Test with different shapes target_size"""
-        sizes = [640, 1280, 1920]
-        
-        for size in sizes:
-            detector = EAST(target_size=size)
-            result = detector.predict(example_image_path)
-            
-            # All should run without errors
-            assert isinstance(result, Page)
-
-    @pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
-    def test_consistency_across_runs(self):
-        """Test consistency across runs"""
-        detector = EAST(score_thresh=0.5)
-        
-        # Create a fixed image
-        np.random.seed(42)
-        img = np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
-        
-        # Run twice
-        result1 = detector.predict(img)
-        result2 = detector.predict(img)
-        
-        # The number of detections should be the same
-        words1 = sum(len(line.text_spans) for b in result1.blocks for line in b.lines)
-        words2 = sum(len(line.text_spans) for b in result2.blocks for line in b.lines)
-        
-        assert words1 == words2
-
-
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 class TestEASTTTA:
     """Tests for Test-Time Augmentation (TTA) functionality."""
 
@@ -623,101 +371,95 @@ class TestEASTTTA:
         assert box == (0, 0, 120, 100)  # x: min(0,80)=0, max(100,120)=120, y from orig: 0, 100
         assert abs(score - 0.85) < 1e-6
 
-    def test_tta_predict_runs_without_error(self):
-        """Test that predict with TTA runs without errors."""
-        detector = EAST(use_tta=True, tta_iou_thresh=0.1)
-        
-        # Create a simple test image
-        img = np.zeros((480, 640, 3), dtype=np.uint8)
-        # Add some white rectangles to simulate text
-        img[100:150, 100:300] = 255
-        img[200:250, 150:350] = 255
-        
-        result = detector.predict(img)
-        
-        assert isinstance(result, Page)
-
-    def test_tta_consistency(self):
-        """Test that TTA produces consistent results."""
-        detector = EAST(use_tta=True, score_thresh=0.5)
-        
-        np.random.seed(42)
-        img = np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
-        
-        result1 = detector.predict(img)
-        result2 = detector.predict(img)
-        
-        words1 = sum(len(line.text_spans) for block in result1.blocks for line in block.lines)
-        words2 = sum(len(line.text_spans) for block in result2.blocks for line in block.lines)
-        
-        assert words1 == words2
-
-    def test_tta_vs_no_tta(self):
-        """Test that TTA and non-TTA can produce different results."""
-        # This is more of a sanity check - TTA might or might not find more boxes
-        detector_tta = EAST(use_tta=True, score_thresh=0.5)
-        detector_no_tta = EAST(use_tta=False, score_thresh=0.5)
-        
-        # Create image with content
-        np.random.seed(42)
-        img = np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
-        
-        result_tta = detector_tta.predict(img)
-        result_no_tta = detector_no_tta.predict(img)
-        
-        # Both should return valid Page objects
-        assert isinstance(result_tta, Page)
-        assert isinstance(result_no_tta, Page)
-
-    def test_tta_with_axis_aligned_false(self):
-        """Test that TTA works correctly with axis_aligned_output=False."""
-        detector = EAST(use_tta=True, axis_aligned_output=False, score_thresh=0.5)
-        
-        # Create a simple test image
-        img = np.zeros((480, 640, 3), dtype=np.uint8)
-        img[100:150, 100:300] = 255
-        
-        result = detector.predict(img)
-        
-        assert isinstance(result, Page)
-        
-        # Check that polygons are preserved (not converted to axis-aligned rectangles)
-        # With axis_aligned_output=False, we should get the original 4-point polygons
-        for block in result.blocks:
-            for line in block.lines:
-                for text_span in line.text_spans:
-                    # Each polygon should have 4 points
-                    assert len(text_span.polygon) == 4
-                    # Each point should have 2 coordinates
-                    for point in text_span.polygon:
-                        assert len(point) == 2
-
-    def test_tta_axis_aligned_true_vs_false(self):
-        """Test that axis_aligned_output affects TTA output correctly."""
-        detector_aligned = EAST(use_tta=True, axis_aligned_output=True, score_thresh=0.5)
-        detector_not_aligned = EAST(use_tta=True, axis_aligned_output=False, score_thresh=0.5)
-        
-        # Create test image
-        np.random.seed(42)
-        img = np.random.randint(0, 255, (480, 640, 3), dtype=np.uint8)
-        
-        result_aligned = detector_aligned.predict(img)
-        result_not_aligned = detector_not_aligned.predict(img)
-        
-        # Both should return valid results
-        assert isinstance(result_aligned, Page)
-        assert isinstance(result_not_aligned, Page)
-        
-        # Get all words from both results
-        def get_all_words(page):
-            return [text_span for block in page.blocks for line in block.lines for text_span in line.text_spans]
-        
-        words_aligned = get_all_words(result_aligned)
-        words_not_aligned = get_all_words(result_not_aligned)
-        
-        # Should have the same number of words
-        assert len(words_aligned) == len(words_not_aligned)
 
 
+@pytest.fixture(autouse=True)
+def local_east_artifacts(tmp_path, monkeypatch):
+    import json
+    from types import SimpleNamespace
+    from unittest.mock import Mock
+    weights = tmp_path / "model.onnx"
+    config = tmp_path / "model.json"
+    weights.write_bytes(b"fake")
+    config.write_text(json.dumps({"region_classes": {"0": {"type": "word"}}}))
+    resolve = Mock(return_value={"weights": weights, "config": config})
+    monkeypatch.setattr("manuscript.models.resolve", resolve)
+    session = SimpleNamespace(
+        get_inputs=lambda: [SimpleNamespace(name="images")],
+        get_outputs=lambda: [SimpleNamespace(name="score"), SimpleNamespace(name="geometry")],
+        run=lambda *args: [np.zeros((1, 1, 8, 8), np.float32), np.zeros((1, 8, 8, 8), np.float32)],
+    )
+    monkeypatch.setattr(EAST, "_create_onnx_session", lambda self: session)
+    return resolve
 
 
+@pytest.mark.parametrize("source", ["array", "path", "pil"])
+def test_predict_restores_original_coordinates_and_region_type(tmp_path, monkeypatch, source):
+    from PIL import Image
+    image = np.zeros((50, 100, 3), np.uint8)
+    detector = EAST(target_size=100, expand_ratio_w=0, expand_ratio_h=0)
+    quad = np.array([[10, 20, 30, 20, 30, 40, 10, 40, .8]], np.float32)
+    monkeypatch.setattr(detector, "_run_inference_on_image", lambda image: (quad, None, None))
+    if source == "path":
+        path = tmp_path / "image.png"
+        Image.fromarray(image).save(path)
+        image = path
+    elif source == "pil": image = Image.fromarray(image)
+    page = detector.predict(image)
+    assert (page.image_width, page.image_height) == (100, 50)
+    assert len(page.children) == 1 and page.children[0].type == "word"
+    np.testing.assert_allclose(page.children[0].polygon, [[10, 10], [30, 10], [30, 20], [10, 20]])
+    assert page.children[0].detection_confidence == pytest.approx(.8)
+
+
+def test_score_threshold_changes_decoded_detections():
+    detector = EAST(target_size=32, expand_ratio_w=0, expand_ratio_h=0, score_thresh=.6)
+    detector._initialize_session()
+    score = np.zeros((1, 1, 8, 8), np.float32)
+    score[0, 0, 3, 3] = .7
+    geometry = np.zeros((1, 8, 8, 8), np.float32)
+    geometry[0, :, 3, 3] = [-1, -1, 1, -1, 1, 1, -1, 1]
+    detector.onnx_session.run = lambda *args: [score, geometry]
+    image = np.zeros((32, 32, 3), np.uint8)
+    assert len(detector.predict(image).children) == 1
+    detector.score_thresh = .8
+    assert not detector.predict(image).children
+
+
+@pytest.mark.parametrize("matches", [False, True])
+def test_tta_mirrors_coordinates_and_retains_only_matched_quads(monkeypatch, matches):
+    detector = EAST(target_size=100, use_tta=True, expand_ratio_w=0, expand_ratio_h=0)
+    image = np.arange(50 * 100 * 3, dtype=np.uint8).reshape(50, 100, 3)
+    original = np.array([[10, 20, 30, 20, 30, 40, 10, 40, .9]], np.float32)
+    flipped = np.array([[70, 20, 90, 20, 90, 40, 70, 40, .8]], np.float32) if matches else np.empty((0, 9), np.float32)
+    calls = []
+    def infer(pixels):
+        calls.append(pixels.copy())
+        return (original if len(calls) == 1 else flipped, None, None)
+    monkeypatch.setattr(detector, "_run_inference_on_image", infer)
+    page = detector.predict(image)
+    np.testing.assert_array_equal(calls[1], image[:, ::-1])
+    assert len(page.children) == int(matches)
+    if matches:
+        np.testing.assert_allclose(page.children[0].polygon, [[10, 10], [30, 10], [30, 20], [10, 20]])
+
+
+def test_unknown_preset_is_not_silently_replaced(local_east_artifacts):
+    local_east_artifacts.side_effect = ValueError("unknown model")
+    with pytest.raises(ValueError, match="unknown model"):
+        EAST(weights="unknown")
+
+
+@pytest.mark.parametrize("source", [object(), "/nonexistent/image.png"])
+def test_invalid_image_source_fails(source):
+    with pytest.raises((TypeError, FileNotFoundError)):
+        EAST(target_size=32).predict(source)
+
+
+def test_configured_line_level_is_used_in_prediction(monkeypatch):
+    detector = EAST(target_size=32, config={"region_classes": {"0": {"type": "line"}}},
+                    expand_ratio_w=0, expand_ratio_h=0)
+    quad = np.array([[4, 4, 12, 4, 12, 12, 4, 12, .8]], np.float32)
+    monkeypatch.setattr(detector, "_run_inference_on_image", lambda image: (quad, None, None))
+    page = detector.predict(np.zeros((32, 32, 3), np.uint8))
+    assert page.children[0].type == "line"

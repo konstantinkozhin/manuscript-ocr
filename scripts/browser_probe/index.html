@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Manuscript — браузерный пайплайн</title>
+<link rel="stylesheet" href="./style.css?v=registry-routing-2">
+</head>
+<body>
+<header><h1>Manuscript OCR</h1></header>
+<div class="toolbar"><label>Устройство <select id="device"><option value="cpu">CPU / WASM</option><option value="gpu">WebGPU</option></select></label><button id="stop" disabled>Остановить и освободить память</button></div>
+<p id="status" role="status" aria-live="polite"></p>
+<div id="notice" role="alert" hidden></div>
+<main class="workspace">
+<div class="configuration">
+<section class="card"><div class="card-title"><span class="number">01</span><h2>Изображение</h2></div><label class="photo-picker">Выбрать фото<input id="photo" type="file" accept="image/*"></label><span id="photoName" class="muted">Файл не выбран</span><button id="sample" class="link-button">Взять пример изображения</button></section>
+<div id="stages"></div>
+<button id="run" class="primary run" disabled>Распознать</button>
+</div>
+<div class="results">
+<section class="card"><div class="card-title"><h2>Результат</h2><span id="resultBadge" class="muted">Ожидает запуска</span></div><img id="preview" alt="Изображение и найденные области" hidden><div id="emptyPreview" class="empty">Выбери изображение и собери пайплайн слева</div><p id="previewModels" class="hint" aria-live="polite"></p></section>
+<section class="card"><div class="card-title"><h2>Распознанный текст</h2><div><button id="saveText" disabled>TXT</button><button id="saveJson" disabled>JSON</button></div></div><textarea id="text" aria-label="Распознанный текст" placeholder="Здесь появится текст"></textarea><pre id="stats"></pre></section>
+<details class="card"><summary>Ход обработки и подробности ошибок</summary><pre id="log"></pre></details>
+</div>
+</main>
+<input id="folder" type="file" webkitdirectory multiple hidden>
+
+<script type="module" src="./app.mjs?v=registry-routing-2"></script>
+</body></html>

@@ -13,6 +13,30 @@ from torch.utils.data import Dataset
 import manuscript.recognizers._trba.training.train as train_module
 
 
+@pytest.mark.parametrize("decoder_type", ["attention", "parseq"])
+@pytest.mark.parametrize("policy", ["none", "partial", "full"])
+def test_decoder_freezing_preserves_encoder_gradients(decoder_type, policy):
+    from manuscript.recognizers._trba.model.model import AttentionDecoder
+    from manuscript.recognizers._trba.model.decoder_parseq import PARSeqDecoder
+
+    if decoder_type == "attention":
+        decoder = AttentionDecoder(16, 16, 8, sos_id=1, eos_id=2, pad_id=0)
+    else:
+        decoder = PARSeqDecoder(16, 8, 3, 1, 2, 0, None, layers=1, heads=2, ffn=32)
+    train_module._freeze_attention_decoder(decoder, policy)
+    for name, parameter in decoder.named_parameters():
+        expected = policy == "none" or (policy == "partial" and name.startswith("generator."))
+        assert parameter.requires_grad == expected, name
+
+    memory = torch.randn(1, 5, 16, requires_grad=True)
+    text = torch.tensor([[1, 4, 5, 2]])
+    logits = decoder.forward_training(memory, text, 3)
+    logits[..., 4].sum().backward()
+    assert memory.grad is not None and memory.grad.abs().sum() > 0
+    for parameter in decoder.parameters():
+        assert (parameter.grad is not None) == parameter.requires_grad
+
+
 class FakeOCRDataset(Dataset):
     def __init__(self, _csv_path, _root, _stoi, img_height, img_max_width, transform, encoding):
         self.items = [0] * 10

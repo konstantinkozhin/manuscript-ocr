@@ -1,564 +1,470 @@
-# SOME DESCRIPTIVE TITLE.
+# Russian translations for manuscript-ocr documentation.
 # Copyright (C) 2026, Konstantin Kozhin
 # This file is distributed under the same license as the manuscript-ocr
 # package.
-# FIRST AUTHOR <EMAIL@ADDRESS>, 2025.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr 0.1.11\n"
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-04-05 19:57+0700\n"
-"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"POT-Creation-Date: 2026-10-15 20:25+0700\n"
+"PO-Revision-Date: 2026-10-15 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
-"Language-Team: ru\n"
 "Language: ru\n"
+"Language-Team: ru\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || "
+"n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
 "Generated-By: Babel 2.17.0\n"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:2
-#: 9fea74bfee3e4e95a80ce726a8631f7c
+#: ../../api/data.rst:2 8ae7dc48597e40fb9ecb15170decc8cd
 msgid "Data Structures"
 msgstr "Структуры данных"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:4
-#: 9123f2b8764542349c6534b1a2e4dadc
-msgid "Core data structures for representing OCR results."
-msgstr "Основные структуры данных для представления результатов OCR."
+#: ../../api/data.rst:5 a19754d7f04c42328f5c28407ba726ac
+msgid "Document tree"
+msgstr "Дерево документа"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:7
-#: 4cc4f370201f4b78b567498ddc2a6374
-msgid "Data Model"
-msgstr "Модель данных"
-
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:9
-#: d0ec79e792cc4ee1aa035c36d61f7678
-msgid "The following diagram shows the relationships between data structures:"
-msgstr "Следующая диаграмма показывает взаимосвязи между структурами данных:"
-
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:41
-#: 8ec1cbcf1a0c43e5b078aea2eda1457c
-msgid "Compatibility"
-msgstr "Совместимость"
-
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:43
-#: 02a32a191bcd46ab842d2cf3ec05039e
+#: ../../api/data.rst:7 e295b7a7607a40a5b00d8180b5aa9285
 msgid ""
-"The canonical names in ``v0_1_11`` are ``TextSpan`` and ``text_spans``. For "
-"code and services that still target ``v0_1_10``, ``Word`` and ``words`` "
-"remain available as compatibility aliases on import, validation, and Python "
-"attribute access."
+"``Page`` represents one image. Its children may contain words, lines, blocks, tables, images or "
+"custom elements. There is no required tree depth: a detector can return flat regions, and a "
+"layout stage can organize them later."
 msgstr ""
-"Канонические имена в ``v0_1_11`` — ``TextSpan`` и ``text_spans``. Для кода и "
-"сервисов, которые всё ещё ориентируются на ``v0_1_10``, ``Word`` и ``words`` "
-"остаются доступными как алиасы совместимости при импорте, валидации и "
-"доступе к атрибутам из Python."
+"``Page`` описывает одно изображение. Внутри него могут находиться слова, строки, блоки, таблицы, "
+"изображения и пользовательские элементы. Глубина дерева не ограничена: детектор может вернуть "
+"плоский список регионов, а компонент анализа структуры — сгруппировать их позднее."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:48
-#: 81b06c4d6468476081a9942fcfcf0ab1
-msgid "When exporting OCR results, choose the schema explicitly:"
-msgstr "При экспорте результатов OCR указывайте схему явно:"
-
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:55
-#: 1d3c8a464dc342e6a944cc8959ee1854
+#: ../../api/data.rst:11 6544fd73dd4f415cb820b9aa5368e260
 msgid ""
-"Use ``\"v0_1_10\"`` only for legacy JSON consumers. New integrations should "
-"prefer ``\"v0_1_11\"``."
+"Each element has one ``parent``. The sequence of ``children`` defines reading order; there is no "
+"separate ``order`` field. Assign links through ``parent`` or ``children`` after constructing the "
+"objects."
 msgstr ""
-"Используйте ``\"v0_1_10\"`` только для потребителей старого JSON-контракта. "
-"Для новых интеграций предпочтительнее ``\"v0_1_11\"``."
+"У каждого элемента один родитель — ``parent``. Порядок чтения определяется положением в "
+"``children``; отдельного поля ``order`` нет. Родительские связи задаются через ``parent`` или "
+"``children`` после создания объектов."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:59
-#: f7e93d52479c44e09dd444118542a572
-msgid "Module Reference"
-msgstr "Справочник модуля"
+#: ../../api/data.rst:25 9df538a990b645998f82969bdc79e96d
+msgid "The diagram shows class inheritance. Tree containment is defined separately by parent-child links."
+msgstr ""
+"Схема показывает наследование классов. Вложенность элементов в дереве не зависит от наследования "
+"и задаётся родительскими связями."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data:1 8a1263284f464f10a7917776817085a0
-msgid "Data structures for manuscript OCR."
-msgstr "Структуры данных для OCR рукописей."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data:3 182421dc98d348cfa371dc32427deefa
+#: ../../api/data.rst:46 83c84f0d3a754b20811f30d8d8d4dc36
 msgid ""
-"This package contains the core data structures used to represent OCR results "
-"throughout the manuscript-ocr library."
+"Assigning ``parent`` moves the element between containers. Cycles are not allowed; ``Page`` must "
+"remain the root."
 msgstr ""
-"Этот пакет содержит основные структуры данных, используемые для "
-"представления результатов OCR во всей библиотеке manuscript-ocr."
+"При смене ``parent`` элемент переносится к новому родителю. Циклы запрещены, а ``Page`` всегда "
+"остаётся корнем дерева."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:1 manuscript.data.structures.Line:1
-#: manuscript.data.structures.Page:1 manuscript.data.structures.TextSpan:1
-#: 225785ccb9e6477b914a1e2788555a65 f47ca2f1c5224a7692b1f79880cd8b48
-#: dddb24e0530342e384302d3d5f47ff86 6c8cde59135e45a2ba50d266a1768172
-msgid "Bases: :py:class:`~pydantic.BaseModel`"
-msgstr "Базовый класс: :py:class:`~pydantic.BaseModel`"
+#: ../../api/data.rst:50 185d643d14bf480bbec420efa126a8ed
+msgid "Elements and fields"
+msgstr "Элементы и поля"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:2 bc66626417d44856bc18feda466d00de
-msgid "A single detected or recognized text span."
-msgstr "Один обнаруженный или распознанный текстовый фрагмент."
+#: ../../api/data.rst:52 273d3105487749f2afbbddffe9f5c96f
+msgid "All classes inherit from ``Element`` and share these fields:"
+msgstr "Все классы наследуются от ``Element`` и имеют общие поля:"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:4 9f572c88edea4838958c21559fa88bd5
+#: ../../api/data.rst:58 41541e338267448c9adc317b4874f892
+msgid "Field"
+msgstr "Поле"
+
+#: ../../api/data.rst:59 19a5f209b9804692a50dc505bd7ab2df
+msgid "Meaning"
+msgstr "Назначение"
+
+#: ../../api/data.rst:60 8eb34ccfc8cd4191a91678d0de755da1
+msgid "``type``"
+msgstr "``type``"
+
+#: ../../api/data.rst:61 f1f8a0b3d89d4d99a7203471925f3002
+msgid "Nonempty structural type; also used as the COCO category name."
+msgstr "Тип элемента. Не может быть пустым; при экспорте в COCO становится именем категории."
+
+#: ../../api/data.rst:62 97b34528d2be4060a631d33c70633a55
+msgid "``label``"
+msgstr "``label``"
+
+#: ../../api/data.rst:63 7321aaca5dee499e85f4fff4295ac8a0
+msgid "Optional model-specific class name."
+msgstr "Необязательное имя класса конкретной модели."
+
+#: ../../api/data.rst:64 71110e9f9a4d4e1c8eea728ede1d07da
+msgid "``polygon``"
+msgstr "``polygon``"
+
+#: ../../api/data.rst:65 edf60f14c627404887366f5f06750598
+msgid "Optional list of at least four finite XY vertices in original-image pixels."
+msgstr ""
+"Полигон: не менее четырёх вершин XY в пикселях исходного изображения. Координаты должны быть "
+"конечными числами. Поле необязательное."
+
+#: ../../api/data.rst:66 6e620b1448214bc69fdcdf0a2a726cdc
+msgid "``detection_confidence``"
+msgstr "``detection_confidence``"
+
+#: ../../api/data.rst:67 ab9d842b1e5340ee90e523e8beed14c0
+msgid "Optional detection confidence in [0, 1]."
+msgstr "Уверенность детектора от 0 до 1. Поле необязательное."
+
+#: ../../api/data.rst:68 6198665185084200a0f994f5dabd812f
+msgid "``orientation``"
+msgstr "``orientation``"
+
+#: ../../api/data.rst:69 c37b53f5b5274e3ea50b1c4eb9b69868
 msgid ""
-"A text span is the smallest OCR region in the pipeline. It may correspond to "
-"a word, a whole text line, or any other contiguous text segment returned by "
-"a detector."
+"Optional absolute clockwise angle in degrees. ``None`` means unknown; zero means upright. The "
+"angle must be finite."
 msgstr ""
-"TextSpan — это наименьшая OCR-область в конвейере. Она может соответствовать "
-"слову, целой текстовой строке или любому другому непрерывному текстовому "
-"сегменту, возвращённому детектором."
+"Угол поворота по часовой стрелке в градусах. ``None`` — ориентация неизвестна, 0 — поворота нет. "
+"Угол должен быть конечным числом. Поле необязательное."
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:0
-#: 1d80c5b2c0554aecb2e988686122a07f d2b49e5df2ea4a73ab78778adc37107b
-#: 0f76158c219644188f40e83c4a8a114f 48282423a1b24b6ab831a8009f532049
-#: 66774ebfed7344f6a4a9a5b0e6df0344 9cfe9b06fb72405185f63a96d2a05ef6
+#: ../../api/data.rst:72 25d0987ab8a24040b349fe562f616c94
+msgid ""
+"Geometry is not calculated from children automatically. Changing a tree link also does not change"
+" coordinates or orientation."
+msgstr ""
+"Геометрия родителя не рассчитывается по дочерним элементам автоматически. При изменении связей в "
+"дереве координаты и ориентация остаются прежними."
+
+#: ../../api/data.rst:79 3bf451c96bcc4eb196b0a80a1e916e1d
+msgid "Class"
+msgstr "Класс"
+
+#: ../../api/data.rst:80 d4d92fcc6e7a4610a0f8b3f0109c3b83
+msgid "Additional fields"
+msgstr "Дополнительные поля"
+
+#: ../../api/data.rst:81 b45567278d9842a48954bfd84c17f65a
+msgid "``Page``"
+msgstr "``Page``"
+
+#: ../../api/data.rst:82 d50da93b946e48b7aa3caf9f197df643
+msgid ""
+"Positive ``image_width`` and ``image_height``, and optional ``file_name`` (empty string by "
+"default). Its type is ``page``."
+msgstr ""
+"Положительные ``image_width`` и ``image_height``, необязательное ``file_name`` (по умолчанию "
+"пустая строка). Тип — ``page``."
+
+#: ../../api/data.rst:84 88bfc4d63cad4d2aa8c19d22cae5ae9c
+msgid "``TextRegion``"
+msgstr "``TextRegion``"
+
+#: ../../api/data.rst:85 b5d34b568b4545039edbd5e4572f0c2c
+msgid ""
+"Type ``word``, ``line`` or ``block``; optional ``text`` and ``recognition_confidence`` in [0, 1]."
+" Text can be stored at any of these levels."
+msgstr ""
+"Тип ``word``, ``line`` или ``block``; необязательные ``text`` и ``recognition_confidence`` в "
+"диапазоне [0, 1]. Текст можно хранить на любом из этих уровней."
+
+#: ../../api/data.rst:87 6544198a49f44946bbb9933ccf3a8375
+msgid "``Table``"
+msgstr "``Table``"
+
+#: ../../api/data.rst:88 717c95cbafe64219a25c80fe4bd3c026
+msgid "Type ``table``; optional positive ``rows`` and ``columns``."
+msgstr "Тип ``table``; необязательные положительные ``rows`` и ``columns``."
+
+#: ../../api/data.rst:89 a563057aebd8432387117ffa34b6a94c
+msgid "``Cell``"
+msgstr "``Cell``"
+
+#: ../../api/data.rst:90 2413ea70305841758bf7ffab23b1a6ee
+msgid ""
+"Type ``cell``; zero-based ``row`` and ``column``; positive ``row_span`` and ``column_span``, both"
+" 1 by default."
+msgstr ""
+"Тип ``cell``; ``row`` и ``column`` с отсчётом от нуля; положительные ``row_span`` и "
+"``column_span``, оба по умолчанию равны 1."
+
+#: ../../api/data.rst:92 d6fdfa99bdd145989e615a52e5466486
+msgid "``Image``"
+msgstr "``Image``"
+
+#: ../../api/data.rst:93 b2ce383d2cc94037b96070f820c12e4b
+msgid "Type ``image`` for an image region within a page."
+msgstr "Тип ``image`` для области изображения внутри страницы."
+
+#: ../../api/data.rst:95 ad85f751f0694b3dbbb57d57d285ef8a
+msgid ""
+"Field validation also applies to assignment. Call ``page.validate_tree()`` after editing to check"
+" contextual rules, including overlapping table cells and cells extending beyond declared grid "
+"dimensions. Incomplete grids are allowed."
+msgstr ""
+"Значения полей проверяются при каждом присваивании. После изменения дерева вызовите "
+"``page.validate_tree()``: метод проверит связи между элементами, пересечения ячеек и выход за "
+"размеры таблицы. Заполнять всю сетку таблицы необязательно."
+
+#: ../../api/data.rst:100 28a0c7d5999543798f5f623a078c1bd3
+msgid "Tables"
+msgstr "Таблицы"
+
+#: ../../api/data.rst:102 974d5e4b4ca5469e9442d97896f87f3d
+msgid ""
+"Table cells are linked like other elements. Their indices describe the grid; their children can "
+"contain text regions."
+msgstr ""
+"Ячейки включаются в дерево так же, как остальные элементы. Индексы задают их положение в таблице,"
+" а текст хранится в дочерних текстовых регионах."
+
+#: ../../api/data.rst:117 ceeb7f5a1cf240a7b9c6b86779fbf910
+msgid "Copying and serialization"
+msgstr "Копирование и сериализация"
+
+#: ../../api/data.rst:119 f8b482a1459f410f8c6f1a42fe0a83a3
+msgid ""
+"``to_tree_dict()`` produces a nested dictionary of fields and ordered children, without parent "
+"references. ``Element.from_tree_dict()`` restores the registered classes and parent links. "
+"``Page.clone()`` creates independent objects:"
+msgstr ""
+"``to_tree_dict()`` сохраняет поля и дочерние элементы во вложенный словарь без обратных ссылок на"
+" родителей. Порядок элементов сохраняется. ``Element.from_tree_dict()`` восстанавливает классы и "
+"связи дерева, а ``Page.clone()`` создаёт независимую копию:"
+
+#: ../../api/data.rst:134 fff731097e3346e78f0ee39a8e7a34bb
+msgid "COCO files"
+msgstr "Файлы COCO"
+
+#: ../../api/data.rst:136 b08e77979137426092eca0c3c910236d
+msgid ""
+"``Page.to_dict()``, ``save()`` and ``load()`` use single-image polygon COCO with Manuscript "
+"extensions. The public ``to_coco()`` and ``from_coco()`` functions provide the same conversion."
+msgstr ""
+"``Page.to_dict()``, ``save()`` и ``load()`` используют полигональный COCO для одного изображения "
+"с расширениями Manuscript. Публичные функции ``to_coco()`` и ``from_coco()`` выполняют те же "
+"преобразования."
+
+#: ../../api/data.rst:151 2c0c3c6d31fb405a8c480ced52282c96
+msgid ""
+"The format preserves text, geometry and tree links. Import also supports unversioned polygon COCO"
+" with one image. RLE masks and multiple polygons per annotation are unsupported; a bbox alone "
+"does not supply polygon geometry."
+msgstr ""
+"Формат сохраняет текст, геометрию и связи дерева. Можно также импортировать полигональный COCO "
+"для одного изображения без маркера версии. RLE-маски и несколько полигонов в одной аннотации не "
+"поддерживаются. Если указан только bbox, полигон по нему не создаётся."
+
+#: ../../api/data.rst:156 5d868937f06d403aa61cfef130dd28b1
+msgid "Text output"
+msgstr "Вывод текста"
+
+#: ../../api/data.rst:158 d06e401ad7d840b9b4062c36a706a3f3
+msgid ""
+"``Page.get_text(format=\"plain\")`` serializes text without changing the tree. "
+"``Pipeline.get_text(page, ...)`` delegates to this method."
+msgstr ""
+"``Page.get_text(format=\"plain\")`` возвращает текст, не меняя дерево. ``Pipeline.get_text(page, "
+"...)`` вызывает тот же метод."
+
+#: ../../api/data.rst:161 c161fcf80d7f486eb644be004c013fe4
+msgid ""
+"Words use spaces, lines use newlines, and blocks and tables use blank lines. Between unlike "
+"siblings, the higher-priority boundary wins. Text from descendants takes precedence over text "
+"stored on their parent, preventing duplicate output. Flat words remain a single line: "
+"serialization does not infer lines from geometry. Separators are inserted only between nonempty "
+"results."
+msgstr ""
+"Слова разделяются пробелами, строки — переводами строк, блоки и таблицы — пустыми строками. Между"
+" соседними элементами разных типов используется разделитель с более высоким приоритетом. Чтобы "
+"текст не дублировался, текст дочерних элементов имеет приоритет перед текстом родителя. Слова из "
+"плоского списка выводятся одной строкой: метод не группирует их по геометрии. Разделители "
+"добавляются только между непустыми фрагментами."
+
+#: ../../api/data.rst:172 9ed9ab692e5449d49476f412c7685bf3
+msgid ""
+"Use ``separator_priorities`` to change boundary precedence; higher values win. Defaults are "
+"word=0, line=1, block=2 and table=2."
+msgstr ""
+"``separator_priorities`` задаёт приоритет разделителей: чем больше значение, тем выше приоритет. "
+"По умолчанию word=0, line=1, block=2 и table=2."
+
+#: ../../api/data.rst:175 bbffadedc1114f9197ef74440dd43950
+msgid ""
+"Tables serialize as row-major TSV, preserving empty grid positions. Spanned cells appear only at "
+"their origin; covered slots remain empty. Whitespace inside cells becomes spaces, so cell text "
+"cannot introduce extra table rows. Only ``plain`` output is currently supported."
+msgstr ""
+"Таблицы выводятся построчно в формате TSV, включая пустые ячейки. Текст объединённой ячейки "
+"записывается только в её начальной позиции; остальные занятые ею позиции остаются пустыми. "
+"Пробельные символы внутри ячеек заменяются обычными пробелами, чтобы не нарушать строки и столбцы"
+" TSV. Пока поддерживается только формат ``plain``."
+
+#: ../../api/data.rst:181 23716429445b46bdb0e8fbded54427a9
+msgid "Custom elements"
+msgstr "Пользовательские элементы"
+
+#: ../../api/data.rst:183 211476c60f0e45f2a7e1bfa5ff97d708
+msgid ""
+"A generic ``Element(type=\"custom_region\")`` can retain a custom type and the common fields. "
+"During import or cloning, unknown types produce a warning and remain generic elements. "
+"Specialized pipeline stages may skip them."
+msgstr ""
+"Обычный ``Element(type=\"custom_region\")`` может хранить пользовательский тип и общие поля. При "
+"импорте или клонировании неизвестные типы вызывают предупреждение и остаются обычными элементами."
+" Специализированные этапы обработки могут их пропускать."
+
+#: ../../api/data.rst:187 4a54f7933cd54de59f5f093ff1f799e3
+msgid "Register a subclass when a type needs additional fields or behavior:"
+msgstr "Зарегистрируйте подкласс, если типу нужны дополнительные поля или поведение:"
+
+#: ../../api/data.rst:202 ac73db12605c49309332e14c63589de9
+msgid ""
+"Register custom classes before restoring their serialized data. Fields not declared by the "
+"selected class are rejected."
+msgstr ""
+"Зарегистрируйте пользовательские классы до загрузки сохранённых данных. Если данные содержат "
+"поля, которых нет в выбранном классе, возникнет ошибка."
+
+#: 0a77e0ba3c4448788df19df5f84b19fb manuscript.data.tree.Element:1 of
+msgid "Bases: :py:class:`~pydantic.main.BaseModel`, :py:class:`~anytree.node.nodemixin.NodeMixin`"
+msgstr ""
+"Базовые классы: :py:class:`~pydantic.main.BaseModel`, "
+":py:class:`~anytree.node.nodemixin.NodeMixin`"
+
+#: ff446d8378a543bd9e172cd3b44287ea manuscript.data.tree.Element:2 of
+msgid "A positioned or geometry-free document node."
+msgstr "Узел документа с геометрией или без неё."
+
+#: 146117add6d449f3b8783913cb81befe manuscript.data.tree.Element:4 of
+msgid ""
+"type defines structural semantics and the exported COCO category. label stores an optional model-"
+"specific class name. Polygon and confidence are optional; geometry is not inferred from children."
+" orientation is an absolute clockwise angle in degrees, with None meaning unknown and zero "
+"upright."
+msgstr ""
+"type определяет тип элемента и имя категории при экспорте в COCO. label — необязательное имя "
+"класса модели. Полигон и уверенность тоже необязательны; геометрия не рассчитывается по дочерним "
+"элементам. orientation задаёт угол поворота по часовой стрелке в градусах: None — ориентация "
+"неизвестна, 0 — поворота нет."
+
+#: ../../api/data.rst 15d86a0d60c740f3b5c232ed45ae3ca1 213127b7532f4fdc9d44edf17082196a
+#: 349465e0ef054228931b8d8740bf48f9 37943c15b5ff436c9364543c594bc35c 3efa8ec11c0f40cb9d9622408523607d
+#: 5500a4bb99ea46a58b8531713c1ba717 69b6dd7aec0e46158f8af03d44fa039e 81f99531e9de42538b2b2103716c6079
+#: cf954c74b91144bdb38f39d3c3f9a335 e73fe7d005ca498aa1e18687c1903a55 ebb6d303cb134fbaa0e58b38dc8e3b99
 msgid "Parameters"
 msgstr "Параметры"
 
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:0
-#: c4d048b1cb9848ee96d6068457c62e0b ee2a2bdd6a1247808f2b302d7a458289
-#: 8a5a056f514d4d2fbc30f83589e50541 3a08aebed0364c71af055322a7344fe5
-#: fdb4a784dedb42a4809f4672fbb56ae0 13abbd3d97134d328bf5ffda0f08f442
+#: a92391d0c0e44d40960307af3e656ccb manuscript.data.tree.Element.from_tree_dict:2 of
+msgid "Restore typed nodes and parent links from a nested tree dictionary."
+msgstr "Восстанавливает элементы соответствующих классов и связи между ними из вложенного словаря."
+
+#: ../../api/data.rst 1a544c7732a74aacacd1c548d0f8b5ea 8599f58db0c44a9b8bfb22f3c9c89172
+#: 90a2d910558d49299fdcc28ec3494268 aa284db40a944253b5f5a7e8c0e37c26 bae363d3f3a04aaf963a9ed142007f09
+#: cb818669d7f84c279d667d16fa0772bb f50a3da4a03d4dc79eaf7bb6a21919ff
 msgid "Return type"
 msgstr "Тип возвращаемого значения"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:10 3517c2d360e94e9791708a1ae2ca9e90
+#: 47ec2b20feda4826858962f031e308c6 manuscript.data.tree.Element.from_tree_dict:19 of
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~manuscript.data.tree.Element\\``"
+msgstr ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~manuscript.data.tree.Element\\``"
+
+#: 1a71377f8d8b4a20b3607a0c3bb503de c43f65cf51fb4dd89a92ae32ff1ad8dc
+#: manuscript.data.tree.Element.register:18 manuscript.data.tree.Element.validate_tree:21 of
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
+msgstr ":sphinx_autodoc_typehints_type:`\\:py\\:obj\\:\\`None\\``"
+
+#: aef8ece02b074cc1af7c1c2d6ce01d38 manuscript.data.tree.Element.resolve_type:2 of
+msgid "Use registered semantics or preserve an unfamiliar structural type."
+msgstr "Выбирает зарегистрированный класс элемента или сохраняет неизвестный тип без преобразования."
+
+#: 9f6b627cfa464a0db9f29461e367e515 manuscript.data.tree.Element.resolve_type:19 of
 msgid ""
-"Polygon vertices (x, y), ordered clockwise. The public data model supports "
-"arbitrary polygons with 4 or more points. For quadrilateral text regions, "
-"the canonical order is TL -> TR -> BR -> BL (Top-Left, Top-Right, Bottom-"
-"Right, Bottom-Left)."
+":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~typing.Type\\`\\\\ "
+"\\\\\\[\\:py\\:class\\:\\`\\~manuscript.data.tree.Element\\`\\]`"
 msgstr ""
-"Вершины полигона (x, y), упорядоченные по часовой стрелке. Публичная модель "
-"данных поддерживает произвольные полигоны с 4 или более точками. Для "
-"четырёхугольных текстовых областей канонический порядок такой: TL -> TR -> "
-"BR -> BL (верхний левый, верхний правый, нижний правый, нижний левый)."
+":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~typing.Type\\`\\\\ "
+"\\\\\\[\\:py\\:class\\:\\`\\~manuscript.data.tree.Element\\`\\]`"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:0 manuscript.data.structures.Line:0
-#: manuscript.data.structures.Page:0 manuscript.data.structures.TextSpan:0
-#: 21835ad7db6e436196d12e40877ffb48 d598a7e665904e59b601a5c4f1e39338
-#: c7c8e5173a224b4facad547545c13931 249e6601417c4b48a000d20663f7cb9a
-#: 152fae13b5f740babc5a17437b6c0d6a 4afaeb38b6624294bdd6fdb04257943f
-#: ff02a7933b1d458a8efe16af977425b1 5e75748c6eb2473594ab1e5c1d7fdcbc
-#: b372d597699a4bf18a353a724280b912 e56c9d12555b4e0990135b6743c8bab1
-#: 05926fcd0668419583e8f5da2306c363
-msgid "type"
-msgstr "тип"
+#: da6efbac26b441f48c5c6a9e76f1aa45 manuscript.data.tree.Element.to_tree_dict:2 of
+msgid "Serialize node fields and ordered children without parent cycles."
+msgstr "Сохраняет поля элемента и его потомков в порядке дерева, без обратных ссылок на родителей."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:15 7b7e316fe39b4dedadc0ce1851b06bc1
-msgid "List[Tuple[float, float]]"
-msgstr "List[Tuple[float, float]]"
+#: 89c0def12a3544f0bf56df27af870c6c d7e5b73256ee46e3880ac997a1976fef
+#: manuscript.data.tree.Element.to_tree_dict:19 manuscript.data.tree.to_coco:21 of
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`dict\\``"
+msgstr ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`dict\\``"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:19 ef6639176dba44b2989ea12b8c227e7b
-msgid "Text detection confidence score from detector (0.0 to 1.0)."
-msgstr "Оценка уверенности детекции текста от детектора (от 0.0 до 1.0)."
+#: d36727b97ba24456a96a5d616d25c49b manuscript.data.tree.Element.validate_tree:2 of
+msgid "Check context-dependent rules after construction or editing."
+msgstr "Проверяет связи и согласованность элементов после создания или изменения дерева."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:21 cc47b9fc3aa7480aa0803fe31ce9be20
-msgid "float"
-msgstr "float"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:25 50639526535e4ca184682adca45cee3b
+#: 65e08b1b29cb40fdbf0ada37f6a3f5b9 manuscript.data.tree.Element.validate_tree:4 of
 msgid ""
-"Recognized text content (populated by OCR pipeline). None if only detection "
-"was performed."
+"Geometry is never inferred from children. Empty containers and detached elements are allowed. "
+"Table grid checks do not require a complete grid."
 msgstr ""
-"Распознанное текстовое содержимое (заполняется OCR-конвейером). None, если "
-"выполнялась только детекция."
+"Геометрия не рассчитывается по дочерним элементам. Допускаются пустые контейнеры, элементы без "
+"родителя и таблицы с незаполненными ячейками."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:28 9a8df0b0ca7c477db43fc039f3e3573c
-msgid "str, optional"
-msgstr "str, необязательный"
+#: 19c9e55d65e84ea3b5ababf785ea7ab8 8436689123f141eda71af28f40937101 d363ca99225744429552f615e76450dc
+#: e7fabca3addc40bdad22624e16b1e70a f80bd519ca1b4f8f8185300d2a0916bb manuscript.data.tree.Cell:1
+#: manuscript.data.tree.Image:1 manuscript.data.tree.Page:1 manuscript.data.tree.Table:1
+#: manuscript.data.tree.TextRegion:1 of
+msgid "Bases: :py:class:`~manuscript.data.tree.Element`"
+msgstr "Базовые классы: :py:class:`~manuscript.data.tree.Element`"
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:32 a3e5beccb4b54781a4e8d3088402c8d6
+#: 421dfb99545a45789671d9bdba52b865 manuscript.data.tree.Page:2 of
+msgid "Root for one image; children may be flat regions or nested structures."
+msgstr ""
+"Корневой элемент одного изображения. Может содержать плоский список регионов или вложенные "
+"элементы."
+
+#: 3ab20794f99b4127b82c6b3d421a5fb8 manuscript.data.tree.Page.clone:2 of
+msgid "Copy data and rebuild parent links within the copied tree."
+msgstr "Создаёт копию дерева с собственными данными и родительскими связями."
+
+#: 294a28fe512f48998870476b0a9aa5aa manuscript.data.tree.Page.get_text:2 of
+msgid "Serialize text with type boundaries and row-major plain-text tables."
+msgstr "Собирает текст с разделителями для разных типов регионов и выводит таблицы по строкам."
+
+#: 9304013a541a4452a32a20ad2543aa3d manuscript.data.tree.TextRegion:2 of
+msgid "Word, line or block, with independently stored recognition results."
+msgstr "Слово, строка или блок с собственным результатом распознавания."
+
+#: 9bae6ecec6984323b8732239c6b326f4 manuscript.data.tree.Table:2 of
+msgid "Table with optional grid dimensions and cell children."
+msgstr "Таблица с необязательными размерами сетки и дочерними ячейками."
+
+#: fb210b56787e403f9665624550e1a9af manuscript.data.tree.Cell:2 of
+msgid "Cell at a zero-based grid position, optionally spanning rows or columns."
+msgstr "Ячейка с индексами от нуля, при необходимости занимающая несколько строк или столбцов."
+
+#: df1691681cfc4a0ca4fdff229a86b413 manuscript.data.tree.to_coco:2 of
+msgid "Single-page COCO with lossless Manuscript extensions."
+msgstr "COCO для одной страницы с расширениями Manuscript без потери данных."
+
+#: f0afbe4405964f75ab6bcbda931596b1 manuscript.data.tree.to_coco:4 of
 msgid ""
-"Text recognition confidence score from recognizer (0.0 to 1.0). None if only "
-"detection was performed."
+"IDs belong to this export. Missing geometry remains an empty segmentation, not a fabricated "
+"polygon; such objects are containers, not training targets."
 msgstr ""
-"Оценка уверенности распознавания текста от распознавателя (от 0.0 до 1.0). "
-"None, если выполнялась только детекция."
+"При каждом экспорте идентификаторы назначаются заново. Если геометрия не задана, сегментация "
+"остаётся пустой: полигон не создаётся автоматически. Такие объекты служат контейнерами и не "
+"подходят в качестве обучающих примеров."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:35 1389d030131f4ecdbb6d3b6a21c83e49
-msgid "float, optional"
-msgstr "float, необязательный"
+#: 1825f953fb394b1eabedd2857a0ebfd9 manuscript.data.tree.from_coco:2 of
+msgid "Read one page from Manuscript COCO or unversioned polygon COCO."
+msgstr "Прочитать одну страницу из Manuscript COCO или полигонального COCO без версии."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:39 8bcff1335d944e0e81b8350c114c8dfe
-msgid "Text span position inside the line after sorting. None before sorting."
-msgstr "Позиция текстового фрагмента внутри строки после сортировки. None до сортировки."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:22 manuscript.data.structures.Line:14
-#: manuscript.data.structures.TextSpan:41 4ebc4fedc8644c4a8ea35dfa5042d1a1
-#: 9a0d23a405bd463a947dfbeef6a0ab4c a93bdc3ec457411f9a908fdb29ceae1e
-msgid "int, optional"
-msgstr "int, необязательный"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:25 manuscript.data.structures.Line:17
-#: manuscript.data.structures.Page:14
-#: manuscript.data.structures.Page.from_json:12
-#: manuscript.data.structures.Page.to_json:18
-#: manuscript.data.structures.TextSpan:44 38dbc54da6ff492e8fdeeb8bb9a8ac36
-#: 8be1557841ae410e9a611e8e0896274b 0b717fb828a54095ba722bd30833b921
-#: 9ab46b2b356149c9a00661b7368ccff4 2784a5c8131f42c0957fc1d11a02a2e2
-#: 23b84ca9c6504bd38d6ea2bdfc98c67b
-msgid "Examples"
-msgstr "Примеры"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:52 manuscript.data.structures.Line:40
-#: manuscript.data.structures.Page:32 manuscript.data.structures.TextSpan:57
-#: 2e0954b56bd040bd8dff14b33503b6da a2df5a6221df4272a4a243c9bb18b163
-#: cfbe9478fb474348b38aeb24a06f286b b9d3c5dbd64e4fb986818ed0a7c36902
-msgid "Methods"
-msgstr "Методы"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:62:<autosummary>:1
-#: 4eeb79950a2347e1861acd66c1e19f5a
+#: ba866ce0a4c44be98c02a7cb23320f5f manuscript.data.tree.from_coco:4 of
 msgid ""
-":py:obj:`__call__ <manuscript.data.TextSpan.__call__>`\\ \\(\\*args\\, "
-"\\*\\*kwargs\\)"
+"Unversioned input uses category names as types, optional parent_id links and value as text. Empty"
+" values mean unknown text. Annotation sequence determines sibling order. Known category names "
+"select typed elements; unknown names create generic Elements with a warning. RLE masks and "
+"multiple polygons are unsupported. Bbox alone does not supply a polygon."
 msgstr ""
-":py:obj:`__call__ <manuscript.data.TextSpan.__call__>`\\ \\(\\*args\\, "
-"\\*\\*kwargs\\)"
+"В COCO без маркера версии типы элементов определяются по именам категорий, связи — по "
+"необязательному parent_id, а текст берётся из value. Пустое значение означает, что текст "
+"неизвестен. Порядок аннотаций задаёт порядок соседних элементов. Для известных категорий "
+"создаются элементы соответствующих классов, для неизвестных — обычный Element с предупреждением. "
+"RLE-маски и несколько полигонов не поддерживаются. По одному bbox полигон не создаётся."
 
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:57:<autosummary>:1
-#: manuscript.data.structures.Line:45:<autosummary>:1
-#: manuscript.data.structures.Page:40:<autosummary>:1
-#: manuscript.data.structures.TextSpan:62:<autosummary>:1
-#: c3e67d37e3024a2e8ebfcdaa10a30d71 fffa31495e534a09871878ad218fb6d3
-#: 80b7dd2856694b1fb2a5408b6b3669bd 01e4974fec3044d6854e5b6da9fdf9d6
-msgid "Call self as a function."
-msgstr "Вызов объекта как функции."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:64 ed4c90e0dbc549ffa8e2bb70574aef5d
-msgid "**detection_confidence**"
-msgstr "**detection_confidence**"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:60 manuscript.data.structures.Line:47
-#: manuscript.data.structures.Page:42 manuscript.data.structures.TextSpan:65
-#: f2375ca3f8c248fe9213c733feaf3c09 c2571c5f388549b18446215fa8a7d4d5
-#: 39b186b508f443dabaa02e537fd4f18b 9a16800f06fc4103b37bcb4dc507f15b
-msgid "**model_config**"
-msgstr "**model_config**"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:61 manuscript.data.structures.Line:48
-#: manuscript.data.structures.TextSpan:66 6486058c471146c6b7661d6601019d1a
-#: 89a379803c734e23992161165e7b349f 4b6da1bbc7d44b29ac7144f5fae8082f
-msgid "**order**"
-msgstr "**order**"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:67 884c52a4ab904daea344356524500c97
-msgid "**polygon**"
-msgstr "**polygon**"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:68 e2665bdca6a6440789867216ffcf6665
-msgid "**recognition_confidence**"
-msgstr "**recognition_confidence**"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.TextSpan:69 7709293277f9485b9e3a0cbb112cf65d
-msgid "**text**"
-msgstr "**text**"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Line:2 1483895a19554899a98b770526da7633
-msgid "A single text line containing one or more text spans."
-msgstr "Одна текстовая строка, содержащая один или несколько текстовых фрагментов."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Line:6 1cabd479ff6a42a69e763287ea819ae1
-msgid "List of text spans in the line."
-msgstr "Список текстовых фрагментов в строке."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Line:8 ebb8779d11c5436d8a667b06e6e432a2
-msgid "List[TextSpan]"
-msgstr "List[TextSpan]"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Line:12 0d737c51c03c4c9da73f046b087b32d0
-msgid ""
-"Line position inside a block or page after sorting. None before sorting."
-msgstr ""
-"Позиция строки внутри блока или страницы после сортировки. None до "
-"сортировки."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:0 manuscript.data.structures.Line:0
-#: dfbc00d771634f4dbfa39b9a8f530412 5654a29694bb4f058509435e583bb329
-msgid "Attributes"
-msgstr "Атрибуты"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:48 manuscript.data.structures.Line:36
-#: 178bcccca1bf459d90af52fdd1c72a4e 7d9679a4cea54d948b51746f4bda4cab
-msgid ":obj:`words <words>`"
-msgstr ":obj:`words <words>`"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.Line.words:2 manuscript.data.structures.Line:37
-#: 4c930ead21574c849ab986d0c0c954a1 e42dc7e6fc12423d91c96e54ec73f425
-msgid "Backward-compatible alias for ``text_spans``."
-msgstr "Алиас обратной совместимости для ``text_spans``."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Line:45:<autosummary>:1
-#: 8dddb468370c4ae6a6a3848b271b7056
-msgid ""
-":py:obj:`__call__ <manuscript.data.Line.__call__>`\\ \\(\\*args\\, "
-"\\*\\*kwargs\\)"
-msgstr ""
-":py:obj:`__call__ <manuscript.data.Line.__call__>`\\ \\(\\*args\\, "
-"\\*\\*kwargs\\)"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:62 manuscript.data.structures.Line:49
-#: c2f585e43c544b8da45c4a0854af176b 182319a2fe044f3b893162ecdafc46da
-msgid "**text_spans**"
-msgstr "**text_spans**"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:2 be5441739b694543b0dcacfea344bf4a
-msgid "A logical text block (e.g., paragraph, column)."
-msgstr "Логический текстовый блок (например, абзац или колонка)."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:6 e2222faa425243a89f394f2142fbcbe6
-msgid "List of text lines in the block."
-msgstr "Список текстовых строк в блоке."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:8 7edff4a7da004aaeaf3d1d9c7f19a878
-msgid "List[Line]"
-msgstr "List[Line]"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:12 f78a6e3e0d4143cea93737d752e632c5
-msgid ""
-"Optional flat list of text spans used as a shorthand input. If ``lines`` is "
-"empty and ``text_spans`` are provided, they are wrapped into a single line."
-msgstr ""
-"Необязательный плоский список текстовых фрагментов, используемый как "
-"сокращённый вход. Если ``lines`` пуст, а ``text_spans`` переданы, они "
-"оборачиваются в одну строку."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:16 94f3baf71c804b2d94b6cec27c191331
-msgid "List[TextSpan], optional"
-msgstr "List[TextSpan], необязательный"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:20 d71f55f5c0b54629846e9c6d0cb2590a
-msgid "Block reading-order position after sorting. None before sorting."
-msgstr "Позиция блока в порядке чтения после сортировки. None до сортировки."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.Block.words:2 manuscript.data.structures.Block:49
-#: 13362f055c214f8ea722ab98a0a0bb47 e84b2a22cd864de8bea09da34a9ff7cf
-msgid "Backward-compatible alias for flat ``text_spans`` input."
-msgstr "Алиас обратной совместимости для плоского входа ``text_spans``."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:57:<autosummary>:1
-#: f893e8e1ed934e9aa5c9a15aab8e7f4f
-msgid ""
-":py:obj:`__call__ <manuscript.data.Block.__call__>`\\ \\(\\*args\\, "
-"\\*\\*kwargs\\)"
-msgstr ""
-":py:obj:`__call__ <manuscript.data.Block.__call__>`\\ \\(\\*args\\, "
-"\\*\\*kwargs\\)"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block:59 be78b1e71af44c849dcdcfe92ae10b88
-msgid "**lines**"
-msgstr "**lines**"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Block.__init__:2
-#: 1992b1ff97314d61afe4757be9d846c9
-msgid "Initialize Block, normalizing flat ``text_spans`` into one line."
-msgstr "Инициализирует Block, сводя плоский список ``text_spans`` к одной строке."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:2 9e4cd7c0dd7b440d9dbbd5163d3d5483
-msgid "A document page containing blocks of text."
-msgstr "Страница документа, содержащая текстовые блоки."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:4 77f955434fa34b2ab358cb1482a187f3
-msgid ""
-"For a full visual diagram of the data model, see: ``DATA_MODEL.md`` located "
-"in the same module directory."
-msgstr ""
-"Полную визуальную диаграмму модели данных см. в файле ``DATA_MODEL.md``, "
-"расположенном в том же каталоге модуля."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:9 52a296f7be944f6c863740b73681ac23
-msgid "List of text blocks on the page."
-msgstr "Список текстовых блоков на странице."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:11 65e9a2d430904b59bc5d39ec6e257310
-msgid "List[Block]"
-msgstr "List[Block]"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:40:<autosummary>:1
-#: a9249b2f65314a16a0c168354b090a44
-msgid ""
-":py:obj:`__call__ <manuscript.data.Page.__call__>`\\ \\(\\*args\\, "
-"\\*\\*kwargs\\)"
-msgstr ""
-":py:obj:`__call__ <manuscript.data.Page.__call__>`\\ \\(\\*args\\, "
-"\\*\\*kwargs\\)"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:40:<autosummary>:1
-#: a9a107d096dd45a29ef797ffaad899ff
-msgid ":py:obj:`from_json <manuscript.data.Page.from_json>`\\ \\(source\\)"
-msgstr ""
-":py:obj:`from_json <manuscript.data.Page.from_json>`\\ \\(source\\)"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.from_json:2
-#: manuscript.data.structures.Page:40:<autosummary>:1
-#: 11973e6dd4b34f9fbc755a34e7b3f8f3 76a56426012d47aa825469f342a7fb3f
-msgid "Load Page from JSON file or string."
-msgstr "Загрузить Page из JSON-файла или строки."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:40:<autosummary>:1
-#: f8bdafec569441c689e567904ed48c39
-msgid ":py:obj:`to_dict <manuscript.data.Page.to_dict>`\\ \\(\\[schema\\]\\)"
-msgstr ""
-":py:obj:`to_dict <manuscript.data.Page.to_dict>`\\ \\(\\[schema\\]\\)"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.to_dict:2
-#: manuscript.data.structures.Page:40:<autosummary>:1
-#: 34cd6bd421304ef1808281d2df500dd0 de244363d5474f4a988e6cd9147399d5
-msgid "Export Page to a plain Python dictionary."
-msgstr "Экспортирует Page в обычный словарь Python."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page:40:<autosummary>:1
-#: ed741064e74345b8b47f5aa30fc8ba38
-msgid ""
-":py:obj:`to_json <manuscript.data.Page.to_json>`\\ \\(\\[path\\, indent\\, "
-"schema\\]\\)"
-msgstr ""
-":py:obj:`to_json <manuscript.data.Page.to_json>`\\ \\(\\[path\\, indent\\, "
-"schema\\]\\)"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.to_json:2
-#: manuscript.data.structures.Page:40:<autosummary>:1
-#: 952fd37d62c647e4b357b658255bdb2f c5dbd02b4bad45798fffbf012783e453
-msgid "Export Page to JSON."
-msgstr "Экспорт Page в JSON."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.from_json:5
-#: 9134a7143cf6420991544b3b834785fb
-msgid "Path to JSON file or JSON string."
-msgstr "Путь к JSON-файлу или JSON-строка."
-
-#: ../../../Users/user/manuscript-ocr-1/docs/sphinx/api/data.rst:0
-#: 7e4d57a58c374f06a2918b00017fcc97 4a448c6e3dd54030b512f4f73fa7674c
-msgid "Returns"
-msgstr "Возвращает"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.from_json:8
-#: f37f40515b0a4418b2aa097e4f6fed79
-msgid "Loaded Page object."
-msgstr "Загруженный объект Page."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.to_dict:5
-#: manuscript.data.structures.Page.to_json:11 d75f0886ddd547358eac7e00a730147e
-#: 00a08e5750d842ff8e2b70b46c1ac0cb
-msgid "Output schema version. Default is ``\"v0_1_11\"``."
-msgstr "Версия выходной схемы. По умолчанию ``\"v0_1_11\"``."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.to_dict:21
-#: 9e13ce956bf84eff9ce6e30611408ffd
-msgid ""
-":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ \\\\"
-"\\[\\:py\\:class\\:\\`str\\`\\, \\:py\\:data\\:\\`\\~typing.Any\\`\\]`"
-msgstr ""
-":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~typing.Dict\\`\\\\ \\\\"
-"\\[\\:py\\:class\\:\\`str\\`\\, \\:py\\:data\\:\\`\\~typing.Any\\`\\]`"
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.to_json:5
-#: 61f1c9e6fca641c297e83d1b9efe241e
-msgid "If provided, saves JSON to file."
-msgstr "Если указан, сохраняет JSON в файл."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.to_json:8
-#: fa25c620e28f4e45ab75183971bd98f1
-msgid "JSON indentation. Default is 2."
-msgstr "Отступ JSON. По умолчанию 2."
-
-#: ../../../Users/user/manuscript-ocr-1/src/manuscript/data/__init__.py:docstring
-#: of manuscript.data.structures.Page.to_json:14
-#: cd4a9e140b744a209f4c0b37bccf0a13
-msgid "JSON string representation."
-msgstr "Строковое представление JSON."
-
-#~ msgid ""
-#~ ":py:obj:`__call__ <manuscript.data.Word.__call__>`\\ \\(\\*args\\, "
-#~ "\\*\\*kwargs\\)"
-#~ msgstr ""
-#~ ":py:obj:`__call__ <manuscript.data.Word.__call__>`\\ \\(\\*args\\, "
-#~ "\\*\\*kwargs\\)"
-
-#~ msgid "List of words in the line."
-#~ msgstr "Список слов в строке."
-
-#~ msgid "List[Word]"
-#~ msgstr "List[Word]"
-
-#~ msgid ""
-#~ "Legacy: Direct list of words without line structure. Used for backward "
-#~ "compatibility. If both `lines` and `words` are empty, creates a single "
-#~ "line from words."
-#~ msgstr ""
-#~ "Устаревшее: прямой список слов без структуры строк. Используется для "
-#~ "обратной совместимости. Если и `lines`, и `words` пусты, создаётся одна "
-#~ "строка из слов."
-
-#~ msgid "**words**"
-#~ msgstr "**words**"
-
-#~ msgid "Initialize Block with backward compatibility for words-only input."
-#~ msgstr ""
-#~ "Инициализация Block с обратной совместимостью для ввода только слов."
+#: 657f8375e8b44b748f43c3c06e5e2358 manuscript.data.tree.from_coco:24 of
+msgid ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~manuscript.data.tree.Page\\``"
+msgstr ":sphinx_autodoc_typehints_type:`\\:py\\:class\\:\\`\\~manuscript.data.tree.Page\\``"

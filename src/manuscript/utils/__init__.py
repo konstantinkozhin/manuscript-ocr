@@ -1,10 +1,9 @@
 """Common utilities for manuscript-ocr."""
 
+from .grouping import group_regions
+
 # I/O utilities
 from .io import read_image, create_page_from_text, create_page_from_image
-
-# Visualization utilities
-from .visualization import visualize_page
 
 # Sorting and postprocessing utilities
 from .sorting import organize_page
@@ -25,11 +24,8 @@ from .page_transforms import (
     merge_text_spans,
 )
 
-# Training utilities
-from .training import set_seed
-
-
 __all__ = [
+    "group_regions",
     # I/O
     "read_image",
     "create_page_from_text",
@@ -52,3 +48,17 @@ __all__ = [
     # Training
     "set_seed",
 ]
+
+
+def __getattr__(name):
+    if name == "visualize_page":
+        from .visualization import visualize_page
+
+        return visualize_page
+
+    if name == "set_seed":
+        from .training import set_seed
+
+        return set_seed
+
+    raise AttributeError(f"module {__name__!r} has no attribute {name!r}")

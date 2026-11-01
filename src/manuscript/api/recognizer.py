@@ -1,21 +1,462 @@
-from abc import abstractmethod
-from typing import Any, Optional
+import json
+from itertools import chain, islice
+import warnings
+from pathlib import Path
+from typing import Any, Callable, Dict, List, Optional, Sequence, Union
 
-from manuscript.data import Page
+import numpy as np
+from PIL import Image
 
+from manuscript.data import Page, TextRegion
+from manuscript.utils.geometry import crop_axis_aligned
+from manuscript.utils.io import read_image
+from manuscript.recognizers._common.debug import save_debug_regions
+from manuscript.recognizers._common.region_preparers import (
+    call_region_preparer, prepare_bbox_regions, prepare_polygon_mask_regions,
+    prepare_quad_warp_regions, prepare_text_regions,
+    validate_region_preparer_options, iter_text_regions,
+)
+from manuscript.recognizers._common.region_types import (
+    REGION_PREPARER_PRESETS, PreparedRegion, RecognitionPrediction,
+    normalize_prepared_regions, normalize_recognition_predictions,
+)
 from .base import BaseArtifactModel
 
 
 class BaseRecognizer(BaseArtifactModel):
-    """Public recognizer base with ``predict(page, image=None, **kwargs) -> Page``."""
+    """Base class for recognizing text in document-tree Pages.
 
-    @abstractmethod
+    The shared predict() workflow copies the Page, prepares crops at
+    recognition_levels, and stores text and confidence on selected TextRegions.
+    Levels come from the model config unless explicitly overridden. When several
+    levels are selected, the deepest matching regions are recognized.
+
+    use_orientation=True undoes a region's absolute clockwise angle before
+    recognition. Known orientation, including zero, takes precedence over the
+    rotate_threshold heuristic for tall crops. Missing orientation uses that
+    heuristic; None or zero rotate_threshold disables it.
+
+    Built-in models prepare standard crops per inference batch. Custom preparers,
+    debug output and whole-page batch planners retain whole-page preparation.
+    Models implement _predict_text_images(); custom stages may override predict().
+    """
+
+    use_orientation = True
+    config_registry: Dict[str, str] = {}
+
+    def __init__(
+        self,
+        weights: Optional[str] = None,
+        device: Optional[str] = None,
+        force_download: bool = False,
+        rotate_threshold: Optional[float] = 1.5,
+        use_orientation: bool = True,
+        region_preparer: Union[str, Callable[..., Sequence[Any]]] = "bbox",
+        region_preparer_options: Optional[Dict[str, Any]] = None,
+        min_text_size: int = 5,
+        batch_size: int = 16,
+        debug_save_dir: Optional[Union[str, Path]] = None,
+        levels: Optional[Sequence[str]] = None,
+        recognition_levels: Optional[Sequence[str]] = None,
+        **kwargs: Any,
+    ):
+        for removed, replacement in (
+            ("region_predictor", "Pass a custom recognizer to Pipeline instead."),
+            ("recognizer_debug_dir", "Use debug_save_dir instead."),
+        ):
+            if removed in kwargs:
+                raise TypeError(f"{removed} has been removed from {type(self).__name__}. {replacement}")
+        self._positive_integer(batch_size, "batch_size")
+        if isinstance(min_text_size, bool) or not isinstance(min_text_size, int) or min_text_size < 0:
+            raise ValueError("min_text_size must be a nonnegative integer")
+        if rotate_threshold is not None and (isinstance(rotate_threshold, bool)
+                or not np.isfinite(rotate_threshold) or rotate_threshold < 0):
+            raise ValueError("rotate_threshold must be nonnegative and finite or None")
+        preparer = self._validate_region_preparer(region_preparer)
+        preparer_options = dict(region_preparer_options or {})
+        validate_region_preparer_options(preparer, preparer_options)
+        super().__init__(weights=weights, device=device, force_download=force_download, **kwargs)
+        if not isinstance(use_orientation, bool):
+            raise ValueError("use_orientation must be a boolean")
+        self.use_orientation = use_orientation
+        self.rotate_threshold = rotate_threshold
+        if levels is not None and recognition_levels is not None:
+            raise ValueError("Specify recognition_levels or levels, not both")
+        selected_levels = recognition_levels if recognition_levels is not None else levels
+        self.levels = self._validate_levels(selected_levels) if selected_levels is not None else None
+        self.region_preparer = preparer
+        self.region_preparer_options = preparer_options
+        if self.levels is not None:
+            self.region_preparer_options["levels"] = self.levels
+        self.min_text_size = min_text_size
+        self.batch_size = max(1, int(batch_size))
+        self.default_debug_save_dir = (
+            Path(debug_save_dir).expanduser() if debug_save_dir is not None else None
+        )
+
+    @staticmethod
+    def _validate_levels(levels):
+        if isinstance(levels, str) or not levels or set(levels) - {"word", "line", "block"}:
+            raise ValueError("levels must be a nonempty list of word, line or block")
+        return tuple(dict.fromkeys(levels))
+
+    def _configure_recognition_levels(self, config):
+        if self.levels is None:
+            self.levels = self._validate_levels(config.get("recognition_levels"))
+        self.region_preparer_options["levels"] = self.levels
+
+    @staticmethod
+    def _positive_integer(value, name):
+        if isinstance(value, bool) or not isinstance(value, (int, np.integer)) or value <= 0:
+            raise ValueError(f"{name} must be a positive integer")
+        return int(value)
+
+    def _decode_predictions(self, logits, return_raw=False):
+        predictions = self._decode_recognition_logits(logits)
+        if return_raw:
+            for prediction, row in zip(predictions, logits):
+                prediction.meta["model_output"] = row.copy()
+        return predictions
+
+    def _predict_text_images(
+        self, regions: Sequence[PreparedRegion], batch_size: Optional[int] = None,
+    ) -> List[RecognitionPrediction]:
+        """Recognize crops; required when using the default ``predict`` workflow."""
+        raise NotImplementedError("Implement _predict_text_images or override predict.")
+
+    def _resolve_config(self, config: Optional[str]) -> Optional[str]:
+        if config is not None:
+            return self._resolve_extra_artifact(
+                config,
+                default_name=None,
+                registry=self.config_registry,
+                description="config",
+            )
+
+        if getattr(self, '_resolved_model_artifacts', None):
+            value = self._resolved_model_artifacts.get('config')
+            return str(value) if value else None
+
+        return None
+
+    @staticmethod
+    def _load_config_data(config_path: Optional[str]) -> Dict[str, Any]:
+        if not config_path:
+            return {}
+
+        path = Path(config_path)
+        if not path.exists():
+            raise FileNotFoundError(f"Config file not found: {config_path}")
+
+        with open(path, "r", encoding="utf-8") as f:
+            if path.suffix.lower() == ".json":
+                data = json.load(f)
+            else:
+                import yaml
+
+                data = yaml.safe_load(f) or {}
+
+        if not isinstance(data, dict):
+            raise ValueError(f"Expected config dict in {config_path}")
+        return data
+
+    @staticmethod
+    def _validate_region_preparer(
+        region_preparer: Union[str, Callable[..., Sequence[Any]]]
+    ) -> Union[str, Callable[..., Sequence[Any]]]:
+        if isinstance(region_preparer, str):
+            if region_preparer not in REGION_PREPARER_PRESETS:
+                raise ValueError(
+                    f"region_preparer must be one of {REGION_PREPARER_PRESETS}, "
+                    f"got: {region_preparer}"
+                )
+            return region_preparer
+        if not callable(region_preparer):
+            raise TypeError("region_preparer must be a preset name or callable")
+        return region_preparer
+
+    def _apply_region_rotation(self, crop: np.ndarray, region=None) -> np.ndarray:
+        """Undo the region's clockwise orientation, or use the shape heuristic."""
+        orientation = getattr(region, "orientation", None)
+        if self.use_orientation and orientation is not None:
+            angle = float(orientation) % 360
+            if angle == 0:
+                return crop
+            if angle % 90 == 0:
+                return np.ascontiguousarray(np.rot90(crop, k=int(angle / 90)))
+            return np.asarray(Image.fromarray(crop).rotate(
+                angle, resample=Image.Resampling.BICUBIC, expand=True,
+                fillcolor=(255, 255, 255) if crop.ndim == 3 else 255,
+            ))
+        if not self.rotate_threshold:
+            return crop
+
+        height, width = crop.shape[:2]
+        if height > width * self.rotate_threshold:
+            return np.rot90(crop, k=-1)
+        return crop
+
+    def _prepare_crop(self, crop: np.ndarray) -> np.ndarray:
+        """Compatibility alias for crop orientation."""
+        return self._apply_region_rotation(crop)
+
+    def _extract_word_image(
+        self, image: np.ndarray, polygon: np.ndarray
+    ) -> Optional[np.ndarray]:
+        """Compatibility helper for axis-aligned crops."""
+        return crop_axis_aligned(image, polygon, pad=0)
+
+    @staticmethod
+    def _normalize_text_regions(regions: Sequence[Any]) -> List[PreparedRegion]:
+        return normalize_prepared_regions(regions)
+
+    @staticmethod
+    def _normalize_text_predictions(
+        predictions: Sequence[Any],
+    ) -> List[RecognitionPrediction]:
+        return normalize_recognition_predictions(predictions)
+
+    def _prepare_bbox_regions(
+        self, page: Page, image: np.ndarray, options: Optional[Dict[str, Any]] = None
+    ) -> List[PreparedRegion]:
+        return prepare_bbox_regions(
+            page,
+            image,
+            min_text_size=self.min_text_size,
+            rotate_region=self._apply_region_rotation,
+            options=options,
+        )
+
+    def _prepare_polygon_mask_regions(
+        self, page: Page, image: np.ndarray, options: Optional[Dict[str, Any]] = None
+    ) -> List[PreparedRegion]:
+        return prepare_polygon_mask_regions(
+            page,
+            image,
+            min_text_size=self.min_text_size,
+            rotate_region=self._apply_region_rotation,
+            options=options,
+        )
+
+    def _prepare_quad_warp_regions(
+        self, page: Page, image: np.ndarray, options: Optional[Dict[str, Any]] = None
+    ) -> List[PreparedRegion]:
+        return prepare_quad_warp_regions(
+            page,
+            image,
+            min_text_size=self.min_text_size,
+            rotate_region=self._apply_region_rotation,
+            options=options,
+        )
+
+    def _prepare_text_regions(
+        self,
+        page: Page,
+        image: np.ndarray,
+        options: Optional[Dict[str, Any]] = None,
+    ) -> List[PreparedRegion]:
+        preset = self.region_preparer
+        if not isinstance(preset, str):
+            raise TypeError("_prepare_text_regions is available only for preset preparers")
+
+        return prepare_text_regions(
+            page=page,
+            image=image,
+            preset=preset,
+            min_text_size=self.min_text_size,
+            rotate_region=self._apply_region_rotation,
+            options=options,
+        )
+
+    def _call_region_preparer(self, page: Page, image: np.ndarray) -> List[PreparedRegion]:
+        return call_region_preparer(
+            page=page,
+            image=image,
+            preparer=self.region_preparer,
+            options=self.region_preparer_options,
+            recognizer=self,
+            min_text_size=self.min_text_size,
+            rotate_region=self._apply_region_rotation,
+        )
+
+    def _predict_word_images(
+        self,
+        images: List[Union[np.ndarray, str, Path, Image.Image]],
+        batch_size: Optional[int] = None,
+    ) -> List[Dict[str, Any]]:
+        regions = [
+            PreparedRegion(
+                text_span=None,
+                image=read_image(image),
+                polygon=np.empty((0, 2), dtype=np.float32),
+                meta={"region_preparer": "legacy_raw_images"},
+            )
+            for image in images
+        ]
+        if batch_size is None:
+            batch_size = self.batch_size
+        predictions = self._predict_text_images(regions, batch_size=batch_size)
+        return [
+            {
+                "text": prediction.text,
+                "confidence": prediction.confidence,
+                "meta": dict(prediction.meta),
+            }
+            for prediction in predictions
+        ]
+
+    def _save_debug_regions(
+        self,
+        regions: Sequence[PreparedRegion],
+        debug_save_dir: Union[str, Path],
+        predictions: Optional[Sequence[RecognitionPrediction]] = None,
+        *,
+        write_images: bool = True,
+    ) -> None:
+        save_debug_regions(
+            regions=regions,
+            debug_save_dir=debug_save_dir,
+            predictions=predictions,
+            write_images=write_images,
+        )
+
+    @staticmethod
+    def _apply_text_predictions(
+        regions: Sequence[PreparedRegion],
+        predictions: Sequence[RecognitionPrediction],
+    ) -> None:
+        if len(regions) != len(predictions):
+            raise ValueError(
+                "predictor must return the same number of predictions as regions"
+            )
+
+        for region, prediction in zip(regions, predictions):
+            region.text_span.text = prediction.text
+            region.text_span.recognition_confidence = prediction.confidence
+
+    def _region_preparation_batch_size(self, batch_size):
+        # Custom recognizers keep the existing whole-page preparation contract.
+        return None
+
+    def _warn_missing_levels(self, page):
+        available_levels = {node.type for node in page.descendants if isinstance(node, TextRegion)}
+        selected_levels = self.region_preparer_options.get("levels") or self.levels or ("word", "line")
+        if available_levels and not available_levels.intersection(selected_levels):
+            warnings.warn(
+                f"{type(self).__name__}: recognition skipped because page text levels "
+                f"{sorted(available_levels)} do not match recognition_levels="
+                f"{list(selected_levels)}. Override recognition_levels when initializing "
+                "the recognizer, or add a text segmentation stage for the requested levels.",
+                UserWarning, stacklevel=3,
+            )
+
     def predict(
         self,
         page: Page,
-        image: Optional[Any] = None,
-        **kwargs: Any,
-    ) -> Page: ...
+        image: Optional[Union[np.ndarray, str, Path, Image.Image]] = None,
+        batch_size: Optional[int] = None,
+        debug_save_dir: Optional[Union[str, Path]] = None,
+        profile: bool = False,
+        return_raw: bool = False,
+    ) -> Union[Page, Dict[str, Any]]:
+        """Return a Page copy with recognized text and confidence for its regions.
+
+        Without an image, return an unchanged copy. Debug crops are saved
+        after region preparation and rotation, before model preprocessing.
+        With return_raw=True, return a dictionary containing the Page and
+        per-region predictions with model-specific metadata.
+        """
+        if not isinstance(page, Page):
+            raise TypeError("Recognizer requires the document-tree Page")
+        # Pydantic deep-copy copies parent links separately from child links.
+        # Rebuild the tree explicitly so every child points to the copied parent.
+        result_page = page.clone()
+        def result(regions=(), predictions=()):
+            if not return_raw:
+                return result_page
+            return {"page": result_page, "predictions": [
+                {"text": prediction.text, "confidence": prediction.confidence,
+                 "polygon": region.polygon.copy(), "metadata": dict(prediction.meta)}
+                for region, prediction in zip(regions, predictions)]}
+
+        if image is None:
+            return result()
+
+        if debug_save_dir is None:
+            debug_save_dir = self.default_debug_save_dir
+        if batch_size is None:
+            batch_size = self.batch_size
+        self._positive_integer(batch_size, "batch_size")
+
+        image_array = read_image(image)
+        chunk_size = None
+        iterator = None
+        if (isinstance(self.region_preparer, str) and debug_save_dir is None and
+                type(self)._region_preparation_batch_size is not BaseRecognizer._region_preparation_batch_size and
+                type(self)._call_region_preparer is BaseRecognizer._call_region_preparer and
+                "_call_region_preparer" not in self.__dict__ and
+                "_predict_text_images" not in self.__dict__):
+            iterator = iter_text_regions(
+                result_page, image_array, preset=self.region_preparer,
+                min_text_size=self.min_text_size, rotate_region=self._apply_region_rotation,
+                options=self.region_preparer_options,
+            )
+            first = next(iterator, None)
+            if first is None:
+                self._warn_missing_levels(result_page)
+                return result()
+            chunk_size = self._region_preparation_batch_size(batch_size)
+            iterator = chain(iter((first,)), iterator) if chunk_size is not None else None
+            del first
+        if chunk_size is not None:
+            records = []
+            processed = False
+            while True:
+                regions = list(islice(iterator, chunk_size))
+                if not regions:
+                    break
+                processed = True
+                from ._page_helpers import filter_callable_kwargs
+                options = {"regions": regions, "batch_size": batch_size}
+                if return_raw:
+                    options["return_raw"] = True
+                predictions = self._normalize_text_predictions(self._predict_text_images(
+                    **filter_callable_kwargs(self._predict_text_images, options)))
+                self._apply_text_predictions(regions, predictions)
+                if return_raw:
+                    records.extend(result(regions, predictions)["predictions"])
+                del regions, predictions, options
+            if not processed:
+                self._warn_missing_levels(result_page)
+            return {"page": result_page, "predictions": records} if return_raw else result_page
+        regions = self._call_region_preparer(result_page, image_array)
+        if not regions:
+            self._warn_missing_levels(result_page)
+            return result()
+
+        if debug_save_dir is not None:
+            self._save_debug_regions(
+                regions=regions,
+                debug_save_dir=debug_save_dir,
+                write_images=True,
+            )
+
+        from ._page_helpers import filter_callable_kwargs
+        options = {"regions": regions, "batch_size": batch_size}
+        if return_raw:
+            options["return_raw"] = True
+        predictions = self._normalize_text_predictions(self._predict_text_images(
+            **filter_callable_kwargs(self._predict_text_images, options)))
+        if debug_save_dir is not None:
+            self._save_debug_regions(
+                regions=regions,
+                debug_save_dir=debug_save_dir,
+                predictions=predictions,
+                write_images=False,
+            )
+
+        self._apply_text_predictions(regions, predictions)
+        return result(regions, predictions)
 
 
 __all__ = ["BaseRecognizer"]

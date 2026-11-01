@@ -4,6 +4,8 @@ from collections import defaultdict
 import cv2
 import numpy as np
 
+from .charset import load_charset
+
 # Optional imports for training (not needed for inference)
 try:
     import torch
@@ -111,29 +113,6 @@ def build_file_index(roots, exts={".png", ".jpg", ".jpeg", ".bmp", ".tif", ".tif
                     continue
                 index[fn.lower()].append(os.path.join(dirpath, fn))
     return index
-
-
-def load_charset(charset_path: str):
-    """
-    Loads the character vocabulary from a file of the format:
-        <PAD>
-        <SOS>
-        <EOS>
-        <BLANK>
-        a
-        b
-        ...
-    Returns (itos, stoi).
-    """
-    itos = []
-    with open(charset_path, "r", encoding="utf-8") as f:
-        for line in f:
-            tok = line.rstrip("\n")
-            if tok == "":
-                continue
-            itos.append(tok)
-    stoi = {s: i for i, s in enumerate(itos)}
-    return itos, stoi
 
 
 # Training-only classes and functions (require albumentations and torch)

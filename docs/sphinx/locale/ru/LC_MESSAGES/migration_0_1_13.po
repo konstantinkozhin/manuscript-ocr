@@ -1,0 +1,142 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, 2026.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-15 20:25+0700\n"
+"PO-Revision-Date: 2026-10-15 00:00+0700\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language: ru\n"
+"Language-Team: ru <LL@li.org>\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || "
+"n%100>=20) ? 1 : 2);\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
+
+#: ../../migration_0_1_13.rst:2 1aaa57501d3f41119234615ef58c0c4c
+msgid "Migrating from 0.1.12 to 0.1.13"
+msgstr "Переход с 0.1.12 на 0.1.13"
+
+#: ../../migration_0_1_13.rst:4 62bc35e8a7674f35beb3a5ef6cc1aa8b
+msgid ""
+"Version 0.1.13 replaces the fixed OCR hierarchy with a document tree. Update code that constructs"
+" regions, traverses results or reads saved JSON. See :doc:`api/data` for the full data contract "
+"and :doc:`release_notes` for other changes."
+msgstr ""
+"В версии 0.1.13 вместо фиксированной иерархии OCR используется дерево документа. Потребуется "
+"обновить код, который создаёт регионы, обходит результаты и читает сохранённый JSON. Структура "
+"данных описана в :doc:`api/data`, остальные изменения — в :doc:`release_notes`."
+
+#: ../../migration_0_1_13.rst:10 9f7a5fda6cc94de791e4252a702810de
+msgid "Elements and reading order"
+msgstr "Элементы и порядок чтения"
+
+#: ../../migration_0_1_13.rst:16 f589d70d5bb64f0d9345ebd0816986c1
+msgid "Previous API"
+msgstr "Прежний API"
+
+#: ../../migration_0_1_13.rst:17 12837f8ae28f4c32a17a7806005b1c29
+msgid "0.1.13"
+msgstr "0.1.13"
+
+#: ../../migration_0_1_13.rst:18 1f1352eaa3554915a556ca13ef61f0b5
+msgid "``Block``, ``Line``, ``TextSpan`` (or ``Word``)"
+msgstr "``Block``, ``Line``, ``TextSpan`` (или ``Word``)"
+
+#: ../../migration_0_1_13.rst:19 ff5356d1eab64bb686a5466fb3ff0b67
+msgid "``TextRegion(type=\"block\" / \"line\" / \"word\")``"
+msgstr "``TextRegion(type=\"block\" / \"line\" / \"word\")``"
+
+#: ../../migration_0_1_13.rst:20 6bc13962b1964cfeb561f4dde800525e
+msgid "``page.blocks``, ``block.lines``, ``line.text_spans``"
+msgstr "``page.blocks``, ``block.lines``, ``line.text_spans``"
+
+#: ../../migration_0_1_13.rst:21 4bc94c34a15a44878ccc417d8dfde553
+msgid "Ordered ``children`` links; use ``descendants`` to traverse all depths."
+msgstr "Дочерние элементы в ``children``. Для обхода всех уровней используйте ``descendants``."
+
+#: ../../migration_0_1_13.rst:22 6f58ddaa275c4f10a9a4151e088d51f9
+msgid "``order`` fields"
+msgstr "Поля ``order``"
+
+#: ../../migration_0_1_13.rst:23 aefe71369d984dcfa47931ab39faf584
+msgid "Position in the parent's ``children`` sequence."
+msgstr "Положение элемента в ``children`` его родителя."
+
+#: ../../migration_0_1_13.rst:24 23be3caa668e4e39a1ee9886068b0a10
+msgid "Child lists passed to constructors"
+msgstr "Списки дочерних элементов в конструкторах"
+
+#: ../../migration_0_1_13.rst:25 4e53110080d048c0983096d3cc56f9c9
+msgid "Assign ``children`` or ``parent`` after constructing elements."
+msgstr "Назначайте ``children`` или ``parent`` после создания элементов."
+
+#: ../../migration_0_1_13.rst:27 b791f7f010f94bada0bd30b60f5fc70d
+msgid ""
+"The tree can be flat or nested. Do not assume every word has a line and block above it. To "
+"construct the former three-level hierarchy explicitly:"
+msgstr ""
+"Дерево может быть плоским или вложенным: слово не обязательно входит в строку и блок. Чтобы "
+"построить прежнюю трёхуровневую иерархию:"
+
+#: ../../migration_0_1_13.rst:48 a6b38e9a449b44c19766faf76d15beac
+msgid "To collect words regardless of their depth:"
+msgstr "Чтобы собрать слова независимо от глубины:"
+
+#: ../../migration_0_1_13.rst:56 330b4d5157a74614861514a5d2bbf85a
+msgid ""
+"Use ``page.get_text()`` for text output. It respects child order and prefers descendant text over"
+" parent text. Use ``SimpleSorting`` to group flat words into lines and blocks, or "
+"``ReadingSorting`` to order existing regions and optionally infer containment."
+msgstr ""
+"Для вывода текста используйте ``page.get_text()``. Метод учитывает порядок детей и предпочитает "
+"текст потомков тексту родителя. ``SimpleSorting`` группирует плоский список слов в строки и "
+"блоки; ``ReadingSorting`` упорядочивает существующие регионы и при необходимости определяет "
+"вложенность."
+
+#: ../../migration_0_1_13.rst:62 6d152936864f46ff9d74fe5a1a54b170
+msgid "Saved results"
+msgstr "Сохранённые результаты"
+
+#: ../../migration_0_1_13.rst:64 de755f0925584313bbdc61995b86feab
+msgid ""
+"``page.to_dict()`` now returns single-image polygon COCO with Manuscript extensions. The previous"
+" ``schema=\"v0_1_10\"`` and ``schema=\"v0_1_11\"`` options are removed. To write a file, replace "
+"``page.to_json(path)`` with ``page.save(path)``. Unlike ``to_json()``, ``save()`` requires a path"
+" and returns ``None`` instead of a JSON string:"
+msgstr ""
+"``page.to_dict()`` теперь возвращает полигональный COCO для одного изображения с расширениями "
+"Manuscript. Прежние варианты ``schema=\"v0_1_10\"`` и ``schema=\"v0_1_11\"`` удалены. Для записи "
+"в файл замените ``page.to_json(path)`` на ``page.save(path)``. В отличие от ``to_json()``, "
+"``save()`` требует путь и возвращает ``None``, а не JSON-строку:"
+
+#: ../../migration_0_1_13.rst:76 a3b818c74bd24ccf8115b31a44c6f325
+msgid ""
+"For JSON strings, use explicit encoding and decoding. ``Page.from_json()`` is removed; "
+"``Page.load()`` accepts file paths only:"
+msgstr ""
+"Чтобы работать с JSON-строками, используйте функции кодирования и декодирования JSON. Метод "
+"``Page.from_json()`` удалён, а ``Page.load()`` принимает только путь к файлу:"
+
+#: ../../migration_0_1_13.rst:88 236d3e3d2aaa4ca9af0a03faaa413d3f
+msgid ""
+"``Page.load()`` accepts the new format and supported unversioned polygon COCO; it does not "
+"convert legacy nested OCR JSON. Convert those files explicitly by creating typed elements and "
+"rebuilding their links, or read them with the matching older library version first. For a nested "
+"representation in new integrations, use ``to_tree_dict()`` and ``Page.from_tree_dict()``. The "
+"``manuscript-coco-v1`` marker identifies the serialization format independently of the package "
+"version."
+msgstr ""
+"``Page.load()`` принимает новый формат и поддерживаемый полигональный COCO без версии; старый "
+"вложенный OCR JSON он не преобразует. Конвертируйте такие файлы явно, создавая типизированные "
+"элементы и восстанавливая связи, либо сначала прочитайте их соответствующей старой версией "
+"библиотеки. Для вложенного представления в новых интеграциях используйте ``to_tree_dict()`` и "
+"``Page.from_tree_dict()``. Маркер ``manuscript-coco-v1`` обозначает формат сериализации "
+"независимо от версии пакета."

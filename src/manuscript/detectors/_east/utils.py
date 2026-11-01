@@ -3,15 +3,6 @@ import time
 import cv2
 import numpy as np
 
-# Optional torch import (only needed for training/visualization utilities)
-try:
-    import torch
-
-    _TORCH_AVAILABLE = True
-except ImportError:
-    torch = None
-    _TORCH_AVAILABLE = False
-
 from ...utils.visualization import _draw_quads
 from ...utils.io import _tensor_to_image
 
@@ -27,10 +18,12 @@ def create_collage(
     cell_size=640,
 ):
     """Create visualization collage for EAST training (requires torch)."""
-    if not _TORCH_AVAILABLE:
+    try:
+        import torch
+    except ImportError as exc:
         raise ImportError(
             "create_collage requires PyTorch. Install with: pip install manuscript-ocr[dev]"
-        )
+        ) from exc
 
     n_rows, n_cols = 2, 10
     collage = np.full((cell_size * n_rows, cell_size * n_cols, 3), 255, dtype=np.uint8)

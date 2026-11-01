@@ -1,0 +1,29 @@
+/* Language switcher styles */
+.language-switcher {
+    position: fixed;
+    top: 10px;
+    right: 20px;
+    z-index: 9999;
+    display: flex;
+    gap: 5px;
+}
+
+.language-switcher a {
+    display: inline-block;
+    padding: 5px 12px;
+    background: #2980b9;
+    color: white !important;
+    text-decoration: none;
+    border-radius: 3px;
+    font-size: 13px;
+    font-weight: bold;
+    transition: background 0.2s;
+}
+
+.language-switcher a:hover {
+    background: #3498db;
+}
+
+.language-switcher a.active {
+    background: #1a5276;
+}

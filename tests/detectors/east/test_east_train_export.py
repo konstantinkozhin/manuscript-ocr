@@ -1,3 +1,4 @@
+from tests.support.modules import patch_modules
 """Tests for EAST train/export orchestration."""
 
 import json
@@ -42,6 +43,11 @@ def _write_coco_dataset(root: Path, stem: str) -> Tuple[str, str]:
     return str(images_dir), str(ann_path)
 
 
+@pytest.fixture(scope="module", autouse=True)
+def initialize_east_training_stack():
+    east_module._ensure_torch_dependencies(training=True)
+
+
 class _FakeDataset:
     def __init__(self, **kwargs):
         self.kwargs = kwargs
@@ -55,6 +61,7 @@ class _FakeConcatDataset:
 
 @pytest.fixture
 def east_train_stack(monkeypatch):
+    monkeypatch.setattr(east_module, "_EAST_TRAINING_AVAILABLE", True)
     monkeypatch.setattr(east_module, "_TORCH_AVAILABLE", True)
     monkeypatch.setattr(
         east_module,
@@ -87,7 +94,8 @@ class TestEASTTrain:
         assert isinstance(EAST.__dict__["train"], staticmethod)
 
     def test_train_requires_training_dependencies(self, monkeypatch, tmp_path):
-        monkeypatch.setattr(east_module, "_TORCH_AVAILABLE", False)
+        monkeypatch.setattr(east_module, "_TORCH_AVAILABLE", None)
+        monkeypatch.setitem(sys.modules, "torch", None)
         train_images, train_anns = _write_coco_dataset(tmp_path, "train")
         val_images, val_anns = _write_coco_dataset(tmp_path, "val")
 
@@ -243,9 +251,10 @@ class TestEASTExport:
         assert isinstance(EAST.__dict__["export"], staticmethod)
 
     def test_export_requires_training_dependencies(self, monkeypatch, tmp_path):
-        monkeypatch.setattr(east_module, "_TORCH_AVAILABLE", False)
+        monkeypatch.setattr(east_module, "_TORCH_AVAILABLE", None)
+        monkeypatch.setitem(sys.modules, "torch", None)
 
-        with pytest.raises(ImportError, match="PyTorch is required for exporting"):
+        with pytest.raises(ImportError, match="PyTorch is required for training/exporting"):
             EAST.export(
                 weights_path=str(tmp_path / "weights.pth"),
                 output_path=str(tmp_path / "model.onnx"),
@@ -316,9 +325,7 @@ class TestEASTExport:
         ):
             with patch.object(east_module, "EASTModel", return_value=FakeEastModel()):
                 with patch.object(east_module.torch.onnx, "export", side_effect=_write_onnx) as mock_export:
-                    with patch.dict(
-                        sys.modules,
-                        {
+                    with patch_modules({
                             "onnx": fake_onnx,
                             "onnxsim": fake_onnxsim,
                             "onnxruntime": fake_onnxruntime,
@@ -377,9 +384,7 @@ class TestEASTExport:
         ):
             with patch.object(east_module, "EASTModel", return_value=FakeEastModel()):
                 with patch.object(east_module.torch.onnx, "export", side_effect=_write_onnx):
-                    with patch.dict(
-                        sys.modules,
-                        {
+                    with patch_modules({
                             "onnx": fake_onnx,
                             "onnxsim": fake_onnxsim,
                             "onnxruntime": fake_onnxruntime,

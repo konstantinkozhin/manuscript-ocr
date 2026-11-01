@@ -1,18 +1,166 @@
+# Russian translations for manuscript-ocr documentation.
+# Copyright (C) 2026, Konstantin Kozhin
+# This file is distributed under the same license as the manuscript-ocr
+# package.
+#
 msgid ""
 msgstr ""
-"Project-Id-Version: manuscript-ocr 0.1.11\n"
-"PO-Revision-Date: 2026-04-05 00:00+0700\n"
+"Project-Id-Version: manuscript-ocr 0.1.13\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-15 20:53+0700\n"
+"PO-Revision-Date: 2026-10-15 00:00+0700\n"
 "Last-Translator: OpenAI Codex\n"
 "Language: ru\n"
 "Language-Team: ru\n"
-"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && "
-"n%10<=4 && (n%100<10 || n%100>=20) ? 1 : 2);\n"
+"Plural-Forms: nplurals=3; plural=(n%10==1 && n%100!=11 ? 0 : n%10>=2 && n%10<=4 && (n%100<10 || "
+"n%100>=20) ? 1 : 2);\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8bit\n"
+"Generated-By: Babel 2.17.0\n"
 
+#: ../../api/layouts.rst:2 c845f7a8c5fc454da567d6a01b9f27a0
 msgid "Layouts"
-msgstr "Layout-модели"
+msgstr "Анализ структуры"
 
-msgid "Layout models reorder and group detected words into reading order structure."
-msgstr "Layout-модели переупорядочивают и группируют обнаруженные слова в структуру порядка чтения."
+#: ../../api/layouts.rst:4 59af19ef400e4d31a9f85fcb08b8c82c
+msgid "Supported layouts:"
+msgstr "Поддерживаемые компоненты анализа структуры:"
+
+#: ../../api/layouts.rst:6 d8fb9105d2eb4e5c951cd62523790ca0
+msgid ":class:`~manuscript.layouts.SimpleSorting`"
+msgstr ":class:`~manuscript.layouts.SimpleSorting`"
+
+#: ../../api/layouts.rst:7 bbb7316dc26846899aaa6227507e414c
+msgid ":class:`~manuscript.layouts.ReadingSorting`"
+msgstr ":class:`~manuscript.layouts.ReadingSorting`"
+
+#: ../../api/layouts.rst:10 0eae9667fc5447b6843aa8924508f049
+msgid "SimpleSorting"
+msgstr "SimpleSorting"
+
+#: 04a7c0381d9e447bb82850769d844e6f 9dff459bac694e1dbadc49d9bee2ca1b
+#: manuscript.layouts._readingsorting.ReadingSorting:1
+#: manuscript.layouts._simplesorting.SimpleSorting:1 of
+msgid "Bases: :py:class:`~manuscript.api.layout.BaseLayout`"
+msgstr "Базовые классы: :py:class:`~manuscript.api.layout.BaseLayout`"
+
+#: 9c136ddfde584681995a1d00bb5bf15a manuscript.layouts._simplesorting.SimpleSorting:2 of
+msgid "Group detected words into lines and arrange text in reading order."
+msgstr "Группирует обнаруженные слова в строки и задаёт порядок чтения."
+
+#: ../../api/layouts.rst 9a62c7a2f03742de912a0b5f87b1329e befea1dff4014b6a8657ba66482b9813
+msgid "Parameters"
+msgstr "Параметры"
+
+#: 578b2363cea34223ad746ef4d75b0d67 manuscript.layouts._simplesorting.SimpleSorting:5 of
+msgid ""
+"Maximum number of column splits. Default is 10; zero uses the horizontal extent of the regions as"
+" the iteration limit."
+msgstr ""
+"Максимальное число попыток разделить страницу на колонки. По умолчанию 10. При 0 предел числа "
+"итераций рассчитывается по горизонтальному размеру регионов."
+
+#: 4e9010ce0cac43e5b6587e712dc59fd2 manuscript.layouts._simplesorting.SimpleSorting:9 of
+msgid "Separate Page-level words into columns before grouping. Default is True."
+msgstr "Разделять слова на уровне Page на колонки перед группировкой. По умолчанию True."
+
+#: 16f9a9eb35fb48a6b902d26e2f03f3f5 manuscript.layouts._readingsorting.ReadingSorting:24
+#: manuscript.layouts._simplesorting.SimpleSorting:13 of
+msgid "Examples"
+msgstr "Примеры"
+
+#: f5d919b9ef7f4b75aaec6e6ff803523d manuscript.layouts._simplesorting.SimpleSorting:20 of
+msgid ":py:obj:`ReadingSorting`"
+msgstr ":py:obj:`ReadingSorting`"
+
+#: 7cb2b771f78d48f3aa43442d12e2fd2f manuscript.layouts._simplesorting.SimpleSorting:21 of
+msgid "Order detected regions and optionally infer containment."
+msgstr "Упорядочить обнаруженные регионы и при необходимости определить вложенность."
+
+#: 6f4b4c4bd3414e37807a69c6729bf4a5 manuscript.layouts._simplesorting.SimpleSorting.predict:2 of
+msgid "Group and sort regions in place."
+msgstr "Группирует и сортирует регионы, изменяя исходную страницу."
+
+#: cd930a91d5604448b92db0a0277a1952 manuscript.layouts._readingsorting.ReadingSorting.predict:5
+#: manuscript.layouts._simplesorting.SimpleSorting.predict:5 of
+msgid "Document tree to organize."
+msgstr "Страница, регионы которой нужно упорядочить."
+
+#: b2536e5b30f0475f91d1b2ff62c5fe79 manuscript.layouts._readingsorting.ReadingSorting.predict:8
+#: manuscript.layouts._simplesorting.SimpleSorting.predict:8 of
+msgid "Accepted for Pipeline compatibility; not used."
+msgstr "Принимается для совместимости с Pipeline; не используется."
+
+#: ../../api/layouts.rst 384c30bd6d964f5c9ae72ee9d7c17610
+msgid "Returns"
+msgstr "Возвращает"
+
+#: 7def0db6cb074e3f89ee1ef00476f105 manuscript.layouts._simplesorting.SimpleSorting.predict:11 of
+msgid "The supplied Page with updated grouping and child order."
+msgstr "Исходный Page с обновлённой группировкой и порядком дочерних элементов."
+
+#: ../../api/layouts.rst 2ac303282c1e455ea52ffde8b880a564
+msgid "Return type"
+msgstr "Тип возвращаемого значения"
+
+#: ../../api/layouts.rst:17 ddf0c46cd39a4d25b9d568ca2b5bf606
+msgid "ReadingSorting"
+msgstr "ReadingSorting"
+
+#: 6b5ec986768a4218be80a6bff04b3ef6 manuscript.layouts._readingsorting.ReadingSorting:2 of
+msgid "Arrange detected regions in reading order and optionally nest them."
+msgstr "Задаёт порядок чтения регионов и при необходимости выстраивает их вложенность."
+
+#: 19d5fc746aad490384d489307b39c877 manuscript.layouts._readingsorting.ReadingSorting:5 of
+msgid ""
+"\"sort\" changes child order while retaining parent links. \"containment\" also assigns Page-"
+"level regions to detected lines and blocks. Default is \"sort\"."
+msgstr ""
+"\"sort\" меняет порядок дочерних элементов, сохраняя родителей. \"containment\" также помещает "
+"регионы уровня Page в обнаруженные строки и блоки. По умолчанию \"sort\"."
+
+#: 647fc0a97f7249a4aae5dc6c31cc0fd4 manuscript.layouts._readingsorting.ReadingSorting:10 of
+msgid ""
+"Minimum intersection area divided by the child's polygon area for assigning a parent. Must be in "
+"(0, 1]; default is 0.5."
+msgstr ""
+"Чтобы элемент стал дочерним, его полигон должен быть покрыт полигоном родителя хотя бы на эту "
+"долю площади. Значение больше 0 и не больше 1; по умолчанию 0.5."
+
+#: 1a2ce27562e44fd19b93d4929ccd6cd4 manuscript.layouts._readingsorting.ReadingSorting:14 of
+msgid ""
+"Minimum vertical overlap divided by the smaller bounding-box height for regions to share a "
+"reading row. Must be in (0, 1]; default is 0.5."
+msgstr ""
+"Минимальное вертикальное пересечение, делённое на меньшую высоту bbox, для объединения регионов в"
+" одну строку чтения. Значение в (0, 1]; по умолчанию 0.5."
+
+#: 86e81965437145ff9ea3051577ea4a32 manuscript.layouts._readingsorting.ReadingSorting:18 of
+msgid ""
+"Use horizontal whitespace gaps to order columns left to right. Default is True. In containment "
+"mode, also create column blocks when the input has no Page-level text blocks."
+msgstr ""
+"Определять колонки по горизонтальным промежуткам и располагать их слева направо. По умолчанию "
+"True. В режиме containment также создавать блоки для колонок, если у Page ещё нет текстовых "
+"блоков."
+
+#: bbfbff22c19c4c8fbdbf6adb72d98a0a manuscript.layouts._readingsorting.ReadingSorting:31 of
+msgid ":py:obj:`SimpleSorting`"
+msgstr ":py:obj:`SimpleSorting`"
+
+#: d5f64d3e6e71464a91c31be5d37477ce manuscript.layouts._readingsorting.ReadingSorting:32 of
+msgid "Create lines and blocks from detected words."
+msgstr "Создать строки и блоки из обнаруженных слов."
+
+#: 295e25669c2d4ccb81e27f9a1d7bd292 manuscript.layouts._readingsorting.ReadingSorting.predict:2 of
+msgid "Organize the document tree in place."
+msgstr "Меняет порядок и вложенность элементов в исходном дереве документа."
+
+#: 0b52ce427c1646af84eb19697e2bf006 manuscript.layouts._readingsorting.ReadingSorting.predict:11 of
+msgid ""
+"The supplied Page with updated child order and, in containment mode, inferred parent links and "
+"optional column blocks."
+msgstr ""
+"Исходный Page с обновлённым порядком дочерних элементов, а в режиме containment — с определёнными"
+" родительскими связями и необязательными блоками колонок."

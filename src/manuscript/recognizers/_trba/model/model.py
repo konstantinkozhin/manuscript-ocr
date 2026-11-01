@@ -6,11 +6,14 @@ import torch.nn.functional as F
 
 from .seresnet31 import SEResNet31
 from .seresnetlite31 import SEResNet31Lite
+from .seresnetlite31v2 import SEResNet31LiteV2
 
 
 CNN_BACKBONES = {
     "seresnet31": SEResNet31,
     "seresnet31lite": SEResNet31Lite,
+    "seresnetlite31v2": SEResNet31LiteV2,
+    "seresnet31lite_linear": SEResNet31LiteV2,  # Legacy saved configurations.
 }
 
 
@@ -71,7 +74,7 @@ class AttentionCell(nn.Module):
         self.hidden_size = hidden_size
         self.dropout_p = dropout_p
 
-    def forward(self, prev_hidden, batch_H, char_onehots):
+    def forward(self, prev_hidden, batch_H, char_onehots, proj_H=None):
         """
         Args:
             prev_hidden: (h, c) tuple for LSTM
@@ -83,7 +86,8 @@ class AttentionCell(nn.Module):
             alpha: [B, Tenc, 1] attention weights
         """
         # Attention mechanism
-        proj_H = self.i2h(batch_H)  # [B, Tenc, H]
+        if proj_H is None:
+            proj_H = self.i2h(batch_H)  # [B, Tenc, H]
         proj_h = self.h2h(prev_hidden[0]).unsqueeze(1)
         e = self.score(torch.tanh(proj_H + proj_h))  # [B, Tenc, 1]
 
@@ -175,13 +179,14 @@ class AttentionDecoder(nn.Module):
 
         # Decoding
         max_steps = batch_max_length if onnx_mode else (batch_max_length + 1)
+        proj_H = self.attention_cell.i2h(batch_H)
 
         for t in range(max_steps):
             # One-hot encoding (ONNX-friendly)
             onehots = self._char_to_onehot(targets)
 
             # Attention step
-            hidden, _ = self.attention_cell(hidden, batch_H, onehots)
+            hidden, _ = self.attention_cell(hidden, batch_H, onehots, proj_H)
             h_out = hidden[0]
 
             # Generate logits
@@ -229,20 +234,20 @@ class AttentionDecoder(nn.Module):
 
         out_hid = torch.zeros(B, steps, self.hidden_size, device=device)
         targets = text[:, 0]  # <SOS>
+        proj_H = self.attention_cell.i2h(batch_H)
 
         for t in range(steps):
             onehots = self._char_to_onehot(targets)
-            hidden, _ = self.attention_cell(hidden, batch_H, onehots)
+            hidden, _ = self.attention_cell(hidden, batch_H, onehots, proj_H)
 
             h_out = hidden[0]
             out_hid[:, t, :] = h_out
 
-            out = F.dropout(h_out, p=self.dropout_p, training=self.training)
-            logits_t = self.generator(out)
-
             # Scheduled sampling
             if t < steps - 1:
-                if torch.rand(1).item() < self.sampling_prob:
+                if self.sampling_prob > 0 and torch.rand(1).item() < self.sampling_prob:
+                    out = F.dropout(h_out, p=self.dropout_p, training=self.training)
+                    logits_t = self.generator(out)
                     targets = logits_t.argmax(1)
                 else:
                     targets = text[:, t + 1]
@@ -269,6 +274,16 @@ class TRBAModel(nn.Module):
         blank_id: Optional[int] = 3,
         enc_dropout_p: float = 0.1,
         use_ctc_head: bool = True,
+        transformation: str = "none",
+        tps_num_fiducial: int = 20,
+        decoder_type: str = "attention",
+        decoder_layers: int = 2,
+        decoder_heads: int = 8,
+        decoder_ffn: int = 1024,
+        decoder_dropout: float = 0.1,
+        max_len: int = 40,
+        parseq_permutations: int = 6,
+        parseq_refine_iters: int = 1,
     ):
         super().__init__()
 
@@ -279,7 +294,6 @@ class TRBAModel(nn.Module):
         self.img_w = img_w
         self.use_ctc_head = use_ctc_head
         self.cnn_backbone = cnn_backbone.lower()
-
         # ===== CNN Encoder =====
         backbone_cls = CNN_BACKBONES.get(self.cnn_backbone)
         if backbone_cls is None:
@@ -321,15 +335,49 @@ class TRBAModel(nn.Module):
 
         # ===== CTC Head (optional) =====
         if self.use_ctc_head:
+            # Legacy charsets may use PAD as the CTC blank.
+            ctc_blank_id = pad_id if blank_id is None else blank_id
             self.ctc_head = nn.Linear(hidden_size, num_classes)
             self.ctc_loss_fn = nn.CTCLoss(
-                blank=blank_id, reduction="mean", zero_infinity=True
+                blank=ctc_blank_id, reduction="mean", zero_infinity=True
             )
 
-    def encode(self, x: torch.Tensor) -> torch.Tensor:
-        # CNN
-        f = self.cnn(x)  # [B, C, H', W']
+        self.transformation = transformation.lower()
+        self.tps = None
+        if self.transformation == "tps":
+            from .tps import TPSRectifier
 
+            # Preserve shared baseline weights and the subsequent CPU RNG stream.
+            with torch.random.fork_rng(devices=[]):
+                self.tps = TPSRectifier(
+                    (img_h, img_w), cnn_in_channels, tps_num_fiducial
+                )
+        elif self.transformation != "none":
+            raise ValueError(f"Unsupported transformation: {transformation!r}")
+
+        self.decoder_type = decoder_type.lower()
+        if self.decoder_type != "attention":
+            if decoder_layers < 1 or decoder_heads < 1 or decoder_ffn < 1:
+                raise ValueError("Decoder layers, heads and FFN size must be positive")
+            from .decoder_parseq import PARSeqDecoder
+
+            if self.decoder_type != "parseq":
+                raise ValueError(f"Unsupported decoder_type: {decoder_type!r}")
+            # Build after all common modules, preserving baseline CNN/RNN/CTC
+            # initialization and the CPU RNG stream for the next training step.
+            with torch.random.fork_rng(devices=[]):
+                self.attention_decoder = PARSeqDecoder(
+                    hidden_size, num_classes, max_len, sos_id, eos_id, pad_id, blank_id,
+                    layers=decoder_layers, heads=decoder_heads, ffn=decoder_ffn,
+                    dropout=decoder_dropout, perm_num=parseq_permutations, refine_iters=parseq_refine_iters,
+                )
+
+    def _cnn_features(self, x: torch.Tensor) -> torch.Tensor:
+        if self.tps is not None:
+            x = self.tps(x)
+        return self.cnn(x)
+
+    def _encode_sequence(self, f: torch.Tensor) -> torch.Tensor:
         # Pooling by height
         f = f.mean(dim=2)  # [B, C, W']
 
@@ -341,6 +389,18 @@ class TRBAModel(nn.Module):
         f = self.enc_dropout(f)
 
         return f
+
+    def encode(self, x: torch.Tensor) -> torch.Tensor:
+        """The original 1D sequence interface, also used by the CTC branch."""
+        return self._encode_sequence(self._cnn_features(x))
+
+    def _decoder_memory(self, x: torch.Tensor) -> Any:
+        return self.encode(x)
+
+    def evaluation_steps(self, max_chars):
+        # New heads reserve an EOS slot, matching their exported ONNX graph.
+        # In particular, PARSeq refinement must see the same full context.
+        return max_chars if self.decoder_type == "attention" else max_chars + 1
 
     def forward_attention(
         self,
@@ -364,7 +424,7 @@ class TRBAModel(nn.Module):
             logits: [B, T, num_classes]
             preds: [B, T] (inference only) or None
         """
-        enc_output = self.encode(x)  # [B, W, hidden_size]
+        enc_output = self._decoder_memory(x)
 
         if is_train:
             assert text is not None, "text is required for training"
@@ -405,6 +465,7 @@ class TRBAModel(nn.Module):
         result: Dict[str, Any] = {}
         
         enc_output = self.encode(x)
+        memory = enc_output
 
         # CTC head
         if self.use_ctc_head:
@@ -413,18 +474,28 @@ class TRBAModel(nn.Module):
         # Attention head
         if is_train:
             assert text is not None, "text is required for training"
-            logits = self.attention_decoder.forward_training(
-                enc_output, text, batch_max_length
-            )
-            result["attention_logits"] = logits
+            if self.decoder_type == "attention":
+                result["attention_logits"] = self.attention_decoder.forward_training(
+                    memory, text, batch_max_length
+                )
+            else:
+                result.update(self.attention_decoder.training_outputs(memory, text, batch_max_length))
         else:
             logits, preds = self.attention_decoder.greedy_decode(
-                enc_output, batch_max_length, onnx_mode=onnx_mode
+                memory, batch_max_length, onnx_mode=onnx_mode
             )
             result["attention_logits"] = logits
             result["attention_preds"] = preds
 
         return result
+
+    def compute_attention_loss(self, result, targets, criterion=None):
+        """Use PARSeq permutation learning or the original attention objective."""
+        if self.decoder_type != "attention":
+            return self.attention_decoder.loss(result, targets)
+        if criterion is None:
+            criterion = nn.CrossEntropyLoss(ignore_index=self.attention_decoder.pad_id)
+        return criterion(result["attention_logits"].flatten(0, 1), targets.flatten())
 
     def compute_ctc_loss(
         self,
@@ -437,8 +508,8 @@ class TRBAModel(nn.Module):
 
         Args:
             ctc_logits: [B, W, num_classes]
-            targets: [B, T] target tokens
-            target_lengths: [B] target sequence lengths
+            targets: [B, T] character or attention-packed targets
+            target_lengths: [B] lengths, including EOS if present
 
         Returns:
             ctc_loss
@@ -446,25 +517,18 @@ class TRBAModel(nn.Module):
         if not self.use_ctc_head:
             return ctc_logits.sum() * 0.0
 
+        # Attention packing appends EOS. CTC aligns characters without EOS.
+        last_indices = (target_lengths - 1).clamp_min(0).to(targets.device)
+        last_tokens = targets.gather(1, last_indices.unsqueeze(1)).squeeze(1)
+        has_eos = (target_lengths > 0) & (last_tokens == self.attention_decoder.eos_id)
+        target_lengths = target_lengths - has_eos.long()
         ctc_logits = ctc_logits.permute(1, 0, 2)  # [W, B, num_classes]
 
         B, W = ctc_logits.size(1), ctc_logits.size(0)
         input_lengths = torch.full((B,), W, dtype=torch.long, device=ctc_logits.device)
 
-        log_probs = ctc_logits.log_softmax(2)
-
-        try:
-            ctc_loss = nn.functional.ctc_loss(
-                log_probs,
-                targets,
-                input_lengths,
-                target_lengths,
-                blank=0,
-                reduction="mean",
-                zero_infinity=True,
-            )
-        except Exception as e:
-            print(f"Warning: CTC loss failed: {e}")
-            ctc_loss = ctc_logits.sum() * 0.0
-
-        return ctc_loss
+        # Keep log-softmax and CTC in FP32 under mixed precision. Do not hide
+        # runtime failures by silently disabling the auxiliary objective.
+        with torch.autocast(device_type=ctc_logits.device.type, enabled=False):
+            log_probs = ctc_logits.float().log_softmax(2)
+            return self.ctc_loss_fn(log_probs, targets, input_lengths, target_lengths)

@@ -5,17 +5,16 @@ import numpy as np
 from manuscript.detectors._east.utils import (
     decode_quads_from_maps,
     expand_boxes,
+    create_collage,
 )
 
 try:
     import torch
-    from manuscript.detectors._east.utils import create_collage
 
     TORCH_AVAILABLE = True
 except ImportError:
     TORCH_AVAILABLE = False
     torch = None
-    create_collage = None
 
 
 # --- Tests for decode_quads_from_maps ---

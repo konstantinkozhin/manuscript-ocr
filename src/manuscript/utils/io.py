@@ -1,11 +1,14 @@
 from pathlib import Path
-from typing import Sequence, Tuple, Union, List
+from typing import TYPE_CHECKING, Sequence, Tuple, Union, List
 
 import cv2
 import numpy as np
 from PIL import Image
 
-from manuscript.data import TextSpan, Line, Block, Page
+from manuscript.data import Page, TextRegion
+
+if TYPE_CHECKING:
+    import torch
 
 
 def read_image(img_or_path: Union[str, Path, bytes, np.ndarray, Image.Image]) -> np.ndarray:
@@ -49,11 +52,10 @@ def read_image(img_or_path: Union[str, Path, bytes, np.ndarray, Image.Image]) ->
 
     >>> img = read_image(existing_array)
     """
-    # File path (str or Path) - TRBA method with Unicode support
     if isinstance(img_or_path, (str, Path)):
         # Use np.fromfile to handle Unicode paths on Windows
         data = np.fromfile(str(img_or_path), dtype=np.uint8)
-        img = cv2.imdecode(data, cv2.IMREAD_COLOR)
+        img = cv2.imdecode(data, cv2.IMREAD_COLOR) if data.size else None
         
         # Fallback to PIL for non-standard formats (TIFF, etc.)
         if img is None:
@@ -70,6 +72,8 @@ def read_image(img_or_path: Union[str, Path, bytes, np.ndarray, Image.Image]) ->
     
     # Bytes buffer (e.g., from HTTP response or file.read())
     elif isinstance(img_or_path, bytes):
+        if not img_or_path:
+            raise ValueError("Failed to decode image from empty bytes")
         arr = np.frombuffer(img_or_path, dtype=np.uint8)
         img = cv2.imdecode(arr, cv2.IMREAD_COLOR)
         if img is None:
@@ -90,6 +94,18 @@ def read_image(img_or_path: Union[str, Path, bytes, np.ndarray, Image.Image]) ->
             f"Expected str, Path, bytes, numpy.ndarray, or PIL.Image"
         )
     
+    if not img.size:
+        raise ValueError("Image arrays must not be empty")
+    if img.dtype != np.uint8:
+        raise ValueError("Image arrays must have dtype uint8")
+    if img.ndim == 2:
+        img = cv2.cvtColor(img, cv2.COLOR_GRAY2RGB)
+    elif img.ndim == 3 and img.shape[2] == 1:
+        img = cv2.cvtColor(img[:, :, 0], cv2.COLOR_GRAY2RGB)
+    elif img.ndim == 3 and img.shape[2] == 4:
+        img = cv2.cvtColor(img, cv2.COLOR_RGBA2RGB)
+    elif img.ndim != 3 or img.shape[2] != 3:
+        raise ValueError("Image arrays must have shape [H, W], [H, W, 1], [H, W, 3] or [H, W, 4]")
     return img
 
 
@@ -125,17 +141,17 @@ def _tensor_to_image(
     --------
     >>> import torch
     >>> tensor = torch.rand(3, 224, 224)
-    >>> img = tensor_to_image(tensor)
+    >>> img = _tensor_to_image(tensor)
     >>> img.shape
     (224, 224, 3)
 
     >>> batch = torch.rand(8, 3, 224, 224)
-    >>> imgs = tensor_to_image(batch)
+    >>> imgs = _tensor_to_image(batch)
     >>> imgs.shape
     (8, 224, 224, 3)
 
     >>> normalized = torch.rand(3, 224, 224)
-    >>> img = tensor_to_image(
+    >>> img = _tensor_to_image(
     ...     normalized,
     ...     denormalize={'mean': [0.5, 0.5, 0.5], 'std': [0.5, 0.5, 0.5]}
     ... )
@@ -182,224 +198,99 @@ def _tensor_to_image(
 
 
 def create_page_from_text(
-    lines: List[str],
+    lines: Union[str, Sequence[str]],
     confidence: float = 1.0,
 ) -> Page:
-    """
-    Create a Page object from a list of text lines.
+    """Create a block → lines → words tree with synthetic pixel coordinates.
 
-    This utility function creates a simple Page structure from raw text,
-    useful for testing correctors or other text processing components without
-    requiring actual OCR detection/recognition.
+    Accepts a list of lines or a multiline string. Whitespace splits words;
+    empty lines reserve vertical space without creating empty text regions.
+    Geometry is illustrative, useful for testing text processing without OCR.
 
-    Each line becomes a Line object with text spans split by whitespace. Text
-    spans are assigned dummy polygon coordinates for compatibility with the
-    data structures.
-
-    Parameters
-    ----------
-    lines : List[str]
-        List of text lines. Each line will be split into text spans.
-    confidence : float, optional
-        Confidence score to assign to all text spans (default 1.0).
-
-    Returns
-    -------
-    Page
-        Page object with one Block containing the provided lines.
-
-    Examples
-    --------
-    >>> from manuscript.utils import create_page_from_text
-    >>> page = create_page_from_text(["Hello world", "This is a test"])
-    >>> page.blocks[0].lines[0].text_spans[0].text
+    >>> page = create_page_from_text(["Hello world"])
+    >>> page.children[0].children[0].children[0].text
     'Hello'
-    >>> len(page.blocks[0].lines)
-    2
-
-    Use with corrector:
-
-    >>> from manuscript.correctors import CharLM
-    >>> from manuscript.utils import create_page_from_text
-    >>>
-    >>> page = create_page_from_text(["Привѣтъ міръ"])
-    >>> corrector = CharLM()
-    >>> corrected = corrector.predict(page)
-    >>> for line in corrected.blocks[0].lines:
-    ...     print(" ".join(span.text for span in line.text_spans))
     """
+    # Validate confidence even when the input contains no words.
+    TextRegion(type="word", detection_confidence=confidence)
+    if isinstance(lines, str):
+        lines = lines.splitlines()
+    if not isinstance(lines, Sequence) or any(not isinstance(line, str) for line in lines):
+        raise TypeError("lines must be a string or a sequence of strings")
     result_lines = []
-    y_offset = 0
-    line_height = 30
-    
-    for line_text in lines:
-        words_text = line_text.split()
-        if not words_text:
-            y_offset += line_height
-            continue
-            
-        text_spans = []
-        x_offset = 0
-        
-        for word_text in words_text:
-            word_width = len(word_text) * 10
-            polygon = [
-                (float(x_offset), float(y_offset)),
-                (float(x_offset + word_width), float(y_offset)),
-                (float(x_offset + word_width), float(y_offset + line_height)),
-                (float(x_offset), float(y_offset + line_height)),
-            ]
-            text_span = TextSpan(
-                polygon=polygon,
-                detection_confidence=confidence,
-                text=word_text,
-                recognition_confidence=confidence,
-            )
-            text_spans.append(text_span)
-            x_offset += word_width + 10
-        
-        result_lines.append(Line(text_spans=text_spans))
-        y_offset += line_height + 5
-    
-    block = Block(lines=result_lines)
-    return Page(blocks=[block])
+    width = 1
+    y = 0
+    for text in lines:
+        words = []
+        x = 0
+        for word in text.split():
+            right = x + len(word) * 10
+            words.append(TextRegion(type="word", text=word,
+                polygon=[(x, y), (right, y), (right, y + 30), (x, y + 30)],
+                detection_confidence=confidence, recognition_confidence=confidence))
+            x = right + 10
+        if words:
+            right = x - 10
+            line = TextRegion(type="line",
+                polygon=[(0, y), (right, y), (right, y + 30), (0, y + 30)])
+            line.children = words
+            result_lines.append(line)
+            width = max(width, right)
+        y += 35
+    page = Page(image_width=width, image_height=max(1, y - 5))
+    if result_lines:
+        top = result_lines[0].polygon[0][1]
+        bottom = result_lines[-1].polygon[2][1]
+        block = TextRegion(type="block", polygon=[(0, top), (width, top), (width, bottom), (0, bottom)])
+        block.children = result_lines
+        page.children = [block]
+    return page
 
 
 def create_page_from_image(
-    image: Union[
-        str,
-        Path,
-        bytes,
-        np.ndarray,
-        Image.Image,
-        Sequence[Union[str, Path, bytes, np.ndarray, Image.Image]],
-    ],
+    image: Union[str, Path, bytes, np.ndarray, Image.Image,
+                 Sequence[Union[str, Path, bytes, np.ndarray, Image.Image]]],
     confidence: float = 1.0,
     gap: int = 8,
     return_image: bool = False,
+    *,
+    region_type: str = "word",
 ) -> Union[Page, Tuple[Page, np.ndarray]]:
+    """Wrap each crop as a flat text region in the document-tree Page.
+
+    Multiple images are stacked vertically in input order on a white RGB
+    canvas. region_type defaults to word (TRBA); use line for PPOCRRec/TrOCR
+    line crops, or block for a cropped text block. Page dimensions and crop
+    polygons refer to the returned canvas. Single file inputs retain file_name.
+
+    >>> page, pixels = create_page_from_image(np.zeros((32, 100, 3), np.uint8),
+    ...                                      region_type="line", return_image=True)
+    >>> page.children[0].type
+    'line'
+    >>> (page.image_width, page.image_height)
+    (100, 32)
     """
-    Create a ``Page`` object that wraps one or more images or text crops.
-
-    This utility is useful when a recognizer expects the ``0.1.11+`` stage API
-    (``predict(page, image=...) -> Page``), but you want to run inference on
-    one or more pre-cropped images without a detector. For a single image, the
-    function creates one block, one line, and one ``TextSpan`` covering the
-    full image extent. For multiple images, the crops are stacked vertically
-    into a synthetic page, and each crop becomes a separate line with one
-    ``TextSpan``.
-
-    Parameters
-    ----------
-    image : str, Path, bytes, numpy.ndarray, PIL.Image, or sequence thereof
-        Image source accepted by :func:`read_image`.
-    confidence : float, optional
-        Detection confidence assigned to the created text span. Default is ``1.0``.
-    gap : int, optional
-        Vertical gap in pixels between crops when a sequence of images is
-        passed. Default is ``8``.
-    return_image : bool, optional
-        If ``True``, also return the normalised RGB image that corresponds to
-        the created ``Page``. Especially useful when ``image`` is a sequence
-        and a synthetic page image is built. Default is ``False``.
-
-    Returns
-    -------
-    Page or tuple of (Page, numpy.ndarray)
-        Page object with one block, one line, and one text span covering the
-        whole image. If ``return_image=True``, also returns the RGB image used
-        to build the page.
-
-    Examples
-    --------
-    >>> from manuscript.utils import create_page_from_image
-    >>> page = create_page_from_image("crop1.png")
-    >>> span = page.blocks[0].lines[0].text_spans[0]
-    >>> span.polygon
-    [(0.0, 0.0), (120.0, 0.0), (120.0, 32.0), (0.0, 32.0)]
-
-    Use with a recognizer:
-
-    >>> from manuscript.recognizers import TRBA
-    >>> page = create_page_from_image("crop1.png")
-    >>> recognizer = TRBA()
-    >>> result_page = recognizer.predict(page, image="crop1.png")
-    >>> result_page.blocks[0].lines[0].text_spans[0].text
-    'example'
-
-    Use with multiple crops:
-
-    >>> page, composed_image = create_page_from_image(
-    ...     ["crop1.png", "crop2.png"],
-    ...     return_image=True,
-    ... )
-    >>> recognizer = TRBA()
-    >>> result_page = recognizer.predict(page, image=composed_image)
-    """
-    def _is_sequence_input(value) -> bool:
-        return isinstance(value, Sequence) and not isinstance(
-            value, (str, Path, bytes, np.ndarray, Image.Image)
-        )
-
-    def _full_image_span(width: int, height: int, order: int) -> TextSpan:
-        return TextSpan(
-            polygon=[
-                (0.0, 0.0),
-                (float(width), 0.0),
-                (float(width), float(height)),
-                (0.0, float(height)),
-            ],
-            detection_confidence=confidence,
-            order=order,
-        )
-
-    if not _is_sequence_input(image):
-        img = read_image(image)
-        h, w = img.shape[:2]
-        page = Page(
-            blocks=[
-                Block(
-                    lines=[
-                        Line(
-                            text_spans=[_full_image_span(w, h, order=0)],
-                            order=0,
-                        )
-                    ],
-                    order=0,
-                )
-            ]
-        )
-        if return_image:
-            return page, img
-        return page
-
-    images = [read_image(item) for item in image]
+    TextRegion(type=region_type, detection_confidence=confidence)
+    if isinstance(gap, bool) or not isinstance(gap, int) or gap < 0:
+        raise ValueError("gap must be a nonnegative integer")
+    multiple = isinstance(image, Sequence) and not isinstance(
+        image, (str, Path, bytes, np.ndarray, Image.Image))
+    images = [read_image(item) for item in image] if multiple else [read_image(image)]
     if not images:
         raise ValueError("image sequence must not be empty")
-
-    max_width = max(img.shape[1] for img in images)
-    total_height = sum(img.shape[0] for img in images) + gap * (len(images) - 1)
-    canvas = np.full((total_height, max_width, 3), 255, dtype=np.uint8)
-
-    lines = []
-    y_offset = 0
-    for order, img in enumerate(images):
+    width = max(img.shape[1] for img in images)
+    height = sum(img.shape[0] for img in images) + gap * (len(images) - 1)
+    canvas = np.full((height, width, 3), 255, dtype=np.uint8) if multiple else images[0]
+    page = Page(image_width=width, image_height=height,
+                file_name=str(image) if not multiple and isinstance(image, (str, Path)) else "")
+    regions = []
+    y = 0
+    for img in images:
         h, w = img.shape[:2]
-        canvas[y_offset : y_offset + h, 0:w] = img
-        text_span = TextSpan(
-            polygon=[
-                (0.0, float(y_offset)),
-                (float(w), float(y_offset)),
-                (float(w), float(y_offset + h)),
-                (0.0, float(y_offset + h)),
-            ],
-            detection_confidence=confidence,
-            order=0,
-        )
-        lines.append(Line(text_spans=[text_span], order=order))
-        y_offset += h + gap
-
-    page = Page(blocks=[Block(lines=lines, order=0)])
-    if return_image:
-        return page, canvas
-    return page
+        if multiple:
+            canvas[y:y + h, :w] = img
+        regions.append(TextRegion(type=region_type, detection_confidence=confidence,
+            polygon=[(0, y), (w, y), (w, y + h), (0, y + h)]))
+        y += h + gap
+    page.children = regions
+    return (page, canvas) if return_image else page

@@ -1,25 +1,16 @@
 import pytest
 import numpy as np
 
-try:
-    import torch
-    import torch.nn as nn
-    from manuscript.detectors._east.train_utils import (
-        dice_coefficient as _dice_coefficient,
-        _custom_collate_fn,
-    )
-
-    TORCH_AVAILABLE = True
-except ImportError:
-    TORCH_AVAILABLE = False
-    torch = None
-    nn = None
-    _dice_coefficient = None
-    _custom_collate_fn = None
+torch = pytest.importorskip("torch")
+import torch.nn as nn
+from manuscript.detectors._east.train_utils import (
+    dice_coefficient as _dice_coefficient,
+    _custom_collate_fn,
+)
+TORCH_AVAILABLE = True
 
 
 # --- Tests for _dice_coefficient ---
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_perfect_match():
     """Test Dice coefficient with perfect match"""
     pred = torch.ones(2, 1, 4, 4)
@@ -32,7 +23,6 @@ def test_dice_coefficient_perfect_match():
     assert torch.allclose(dice, torch.ones(2))
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_no_overlap():
     """Test Dice coefficient with no overlap"""
     pred = torch.zeros(2, 1, 4, 4)
@@ -48,7 +38,6 @@ def test_dice_coefficient_no_overlap():
     assert dice[0] < 0.1  # First sample almost 0
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_partial_overlap():
     """Test Dice coefficient with partial overlap"""
     pred = torch.zeros(1, 1, 4, 4)
@@ -63,7 +52,6 @@ def test_dice_coefficient_partial_overlap():
     assert 0 < dice[0] < 1
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_batch_processing():
     """Test Dice coefficient with different batch sizes"""
     for batch_size in [1, 2, 4, 8]:
@@ -77,7 +65,6 @@ def test_dice_coefficient_batch_processing():
         assert torch.all(dice <= 1)
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_different_shapes():
     """Test Dice coefficient with different shapes"""
     shapes = [(4, 4), (8, 8), (16, 16), (32, 32)]
@@ -91,7 +78,6 @@ def test_dice_coefficient_different_shapes():
         assert dice.shape == (2,)
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_multi_channel():
     """Test Dice coefficient with multiple channels"""
     pred = torch.rand(2, 3, 4, 4)  # 3 channels
@@ -103,7 +89,6 @@ def test_dice_coefficient_multi_channel():
     assert dice.shape == (2,)
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_zeros():
     """Test Dice coefficient with zero tensors"""
     pred = torch.zeros(2, 1, 4, 4)
@@ -115,7 +100,6 @@ def test_dice_coefficient_zeros():
     assert torch.isfinite(dice).all()
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_numerical_stability():
     """Test numerical stability Dice coefficient"""
     # Very small values
@@ -127,7 +111,6 @@ def test_dice_coefficient_numerical_stability():
     assert torch.isfinite(dice).all()
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_custom_eps():
     """Test Dice coefficient with custom eps"""
     pred = torch.rand(2, 1, 4, 4)
@@ -140,7 +123,6 @@ def test_dice_coefficient_custom_eps():
     assert dice1.shape == dice2.shape
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_gradient():
     """Test that gradients flow through Dice coefficient"""
     pred = torch.rand(2, 1, 4, 4, requires_grad=True)
@@ -154,7 +136,6 @@ def test_dice_coefficient_gradient():
     assert pred.grad.abs().sum() > 0
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_binary_masks():
     """Test Dice coefficient with binary masks"""
     pred = torch.zeros(1, 1, 8, 8)
@@ -169,7 +150,6 @@ def test_dice_coefficient_binary_masks():
     assert torch.allclose(dice, torch.ones(1))
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_soft_predictions():
     """Test Dice coefficient with soft predictions"""
     pred = torch.rand(2, 1, 4, 4)  # Values in [0, 1]
@@ -184,7 +164,6 @@ def test_dice_coefficient_soft_predictions():
 # --- Tests for _custom_collate_fn ---
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_custom_collate_fn_basic():
     """Test basic functionality _custom_collate_fn"""
     # Create a batch of 2 samples
@@ -221,7 +200,6 @@ def test_custom_collate_fn_basic():
     assert targets["quads"][1].shape == (3, 8)
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_custom_collate_fn_single_sample():
     """Test _custom_collate_fn with single sample"""
     img = torch.rand(3, 64, 64)
@@ -241,7 +219,6 @@ def test_custom_collate_fn_single_sample():
     assert len(targets["quads"]) == 1
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_custom_collate_fn_multiple_samples():
     """Test _custom_collate_fn with multiple samples"""
     batch_size = 4
@@ -264,7 +241,6 @@ def test_custom_collate_fn_multiple_samples():
     assert len(targets["quads"]) == batch_size
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_custom_collate_fn_empty_quads():
     """Test _custom_collate_fn with empty quads"""
     img = torch.rand(3, 64, 64)
@@ -283,7 +259,6 @@ def test_custom_collate_fn_empty_quads():
     assert targets["quads"][0].shape == (0, 8)
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_custom_collate_fn_different_rbox_counts():
     """Test _custom_collate_fn with different number of boxes"""
     img1 = torch.rand(3, 64, 64)
@@ -310,7 +285,6 @@ def test_custom_collate_fn_different_rbox_counts():
     assert targets["quads"][1].shape[0] == 2
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_custom_collate_fn_preserves_dtype():
     """Test that _custom_collate_fn preserves data types"""
     img = torch.rand(3, 64, 64, dtype=torch.float32)
@@ -329,7 +303,6 @@ def test_custom_collate_fn_preserves_dtype():
     assert targets["geo_map"].dtype == torch.float32
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_custom_collate_fn_stack_consistency():
     """Test stack consistency for images and maps"""
     batch = []
@@ -351,7 +324,6 @@ def test_custom_collate_fn_stack_consistency():
             assert images[i].mean() > images[0].mean()
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_custom_collate_fn_different_image_channels():
     """Test _custom_collate_fn with different number of channels"""
     # Usually 3 channels (RGB)
@@ -369,7 +341,6 @@ def test_custom_collate_fn_different_image_channels():
     assert images.shape[1] == 3  # RGB channels
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_custom_collate_fn_large_batch():
     """Test _custom_collate_fn with large batch"""
     batch_size = 16
@@ -393,7 +364,6 @@ def test_custom_collate_fn_large_batch():
 
 
 # --- Additional tests ---
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_edge_case_single_pixel():
     """Test Dice coefficient with single active pixel"""
     pred = torch.zeros(1, 1, 8, 8)
@@ -408,7 +378,6 @@ def test_dice_coefficient_edge_case_single_pixel():
     assert torch.allclose(dice, torch.ones(1))
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_asymmetric_overlap():
     """Test Dice coefficient with asymmetric overlap"""
     pred = torch.zeros(1, 1, 8, 8)
@@ -423,7 +392,6 @@ def test_dice_coefficient_asymmetric_overlap():
     assert 0 < dice[0] < 1
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_continuous_values():
     """Test Dice coefficient with continuous values"""
     pred = torch.rand(3, 1, 16, 16) * 0.8 + 0.1  # In the range [0.1, 0.9]
@@ -436,7 +404,6 @@ def test_dice_coefficient_continuous_values():
     assert torch.all(dice <= 1)
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_custom_collate_fn_maintains_rbox_structure():
     """Test что _custom_collate_fn maintains structure quads"""
     batch = []
@@ -457,7 +424,6 @@ def test_custom_collate_fn_maintains_rbox_structure():
         assert targets["quads"][i].shape == expected_shape
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_dice_coefficient_high_precision():
     """Test Dice coefficient with high precision"""
     # Create nearly identical tensors
@@ -470,7 +436,6 @@ def test_dice_coefficient_high_precision():
     assert dice[0] > 0.99
 
 
-@pytest.mark.skipif(not TORCH_AVAILABLE, reason="PyTorch not installed")
 def test_custom_collate_fn_geo_map_channels():
     """Test that _custom_collate_fn correctly processes 8 channels geo_map"""
     img = torch.rand(3, 64, 64)

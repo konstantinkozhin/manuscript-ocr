@@ -1,33 +1,53 @@
 Detectors
 =========
 
-Text detection models.
+Supported models:
 
-.. automodule:: manuscript.detectors
-   :members:
-   :undoc-members:
+- :class:`~manuscript.detectors.YOLO`
+- :class:`~manuscript.detectors.EAST`
+- :class:`~manuscript.detectors.ConsensusWBFDetector`
+- :class:`~manuscript.detectors._ppocr.PPOCR`
+- :class:`~manuscript.detectors._rfdetr.RFDETR`
+- :class:`~manuscript.detectors._mask2former.Mask2Former`
+
+ConsensusWBFDetector
+--------------------
+
+.. autoclass:: manuscript.detectors.ConsensusWBFDetector
+   :members: predict, predict_batch, required_votes
    :show-inheritance:
 
-.. rubric:: EAST: Training Notes
+YOLO
+----
 
-The ``EAST`` detector in manuscript-ocr is based on the architecture proposed in
-`EAST: An Efficient and Accurate Scene Text Detector <https://openaccess.thecvf.com/content_cvpr_2017/papers/Zhou_EAST_An_Efficient_CVPR_2017_paper.pdf>`_
-(Zhou et al., CVPR 2017). The training procedure has been significantly reworked
-compared to the original: the loss weighting scheme, augmentation pipeline,
-quadrilateral annotation handling, and support for mixed annotations have all
-been modified. Pretrained weights were produced by the project authors.
+.. autoclass:: manuscript.detectors.YOLO
+   :members: predict, create_config
+   :show-inheritance:
 
-.. rubric:: EAST Training Quads
+EAST
+----
 
-EAST training expects quadrilateral targets. When loading COCO
-``segmentation`` polygons, use ``augmentation_config["quad_source"]`` in
-``EAST.train(...)`` to control how polygons are converted into 4-point
-training quads:
+.. autoclass:: manuscript.detectors.EAST
+   :members: predict, train, export
+   :show-inheritance:
 
-- ``"auto"`` keeps existing 4-point polygons as-is and falls back to
-  ``minAreaRect`` for longer polygons.
-- ``"as_is"`` accepts only 4-point polygons and skips polygons with a
-  different number of vertices.
-- ``"min_area_rect"`` always fits the minimum-area rectangle and matches
-  the legacy conversion path.
+PPOCR
+-----
 
+.. autoclass:: manuscript.detectors._ppocr.PPOCR
+   :members: predict, create_config
+   :show-inheritance:
+
+RFDETR
+------
+
+.. autoclass:: manuscript.detectors._rfdetr.RFDETR
+   :members: predict, create_config
+   :show-inheritance:
+
+Mask2Former
+-----------
+
+.. autoclass:: manuscript.detectors._mask2former.Mask2Former
+   :members: predict, create_config
+   :show-inheritance:

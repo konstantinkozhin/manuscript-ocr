@@ -1,7 +1,7 @@
+from tests.support.tree import make_page, make_region, sibling_index
 import numpy as np
 import pytest
-
-from manuscript.data import TextSpan
+from manuscript.data import TextRegion
 from manuscript.recognizers._common.region_types import (
     PreparedRegion,
     RecognitionPrediction,
@@ -11,7 +11,8 @@ from manuscript.recognizers._common.region_types import (
 
 
 def _make_text_span():
-    return TextSpan(
+    return make_region(
+        "word",
         polygon=[(0.0, 0.0), (10.0, 0.0), (10.0, 5.0), (0.0, 5.0)],
         detection_confidence=0.95,
     )
@@ -25,9 +26,7 @@ def test_normalize_prepared_regions_copies_prepared_region():
         polygon=np.asarray(text_span.polygon, dtype=np.int32),
         meta={"source": "prepared"},
     )
-
     normalized = normalize_prepared_regions([region])
-
     assert len(normalized) == 1
     assert normalized[0] is not region
     assert normalized[0].text_span == text_span
@@ -38,7 +37,6 @@ def test_normalize_prepared_regions_copies_prepared_region():
 
 def test_normalize_prepared_regions_accepts_dict_and_uses_text_span_polygon():
     text_span = _make_text_span()
-
     normalized = normalize_prepared_regions(
         [
             {
@@ -48,7 +46,6 @@ def test_normalize_prepared_regions_accepts_dict_and_uses_text_span_polygon():
             }
         ]
     )
-
     assert len(normalized) == 1
     assert normalized[0].text_span == text_span
     assert normalized[0].polygon.shape == (4, 2)
@@ -74,19 +71,14 @@ def test_normalize_prepared_regions_requires_polygon_when_missing_from_text_span
 
 def test_normalize_recognition_predictions_accepts_none():
     normalized = normalize_recognition_predictions([None])
-
     assert normalized == [RecognitionPrediction(text=None, confidence=None, meta={})]
 
 
 def test_normalize_recognition_predictions_copies_prediction_dataclass():
     prediction = RecognitionPrediction(
-        text="hello",
-        confidence=0.9,
-        meta={"source": "model"},
+        text="hello", confidence=0.9, meta={"source": "model"}
     )
-
     normalized = normalize_recognition_predictions([prediction])
-
     assert normalized[0] is not prediction
     assert normalized[0].text == "hello"
     assert normalized[0].confidence == 0.9
@@ -98,7 +90,6 @@ def test_normalize_recognition_predictions_supports_recognition_confidence_alias
     normalized = normalize_recognition_predictions(
         [{"text": "hello", "recognition_confidence": 0.77}]
     )
-
     assert normalized[0].text == "hello"
     assert normalized[0].confidence == 0.77
 

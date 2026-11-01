@@ -1,14 +1,14 @@
+import warnings
 import os
 from pathlib import Path
 from typing import Any, Dict, List, Optional, Sequence, Tuple, Union
 
 import cv2
 import numpy as np
-import onnxruntime as ort
 
+from manuscript.api.base import managed_session_initialization
 from manuscript.api.detector import BaseDetector
 
-from ...data import Block, Line, Page, TextSpan
 from ...utils import read_image
 from .lanms import locality_aware_nms
 from .utils import (
@@ -16,22 +16,52 @@ from .utils import (
     expand_boxes,
 )
 
-# Optional imports for training (not needed for inference)
-try:
-    import torch
-    from torch.utils.data import ConcatDataset
-    from .dataset import EASTDataset
-    from .east import EASTModel
-    from .train_utils import _run_training
+torch = None
+ConcatDataset = None
+EASTDataset = None
+EASTModel = None
+_run_training = None
+_TORCH_AVAILABLE = None
+_EAST_TRAINING_AVAILABLE = None
 
-    _TORCH_AVAILABLE = True
-except ImportError:
-    torch = None
-    ConcatDataset = None
-    EASTDataset = None
-    EASTModel = None
-    _run_training = None
-    _TORCH_AVAILABLE = False
+
+def _ensure_torch_dependencies(*, training: bool = False) -> None:
+    global torch, ConcatDataset, EASTDataset, EASTModel, _run_training
+    global _TORCH_AVAILABLE, _EAST_TRAINING_AVAILABLE
+
+    if _TORCH_AVAILABLE is not True:
+        try:
+            import torch as torch_module
+            from .east import EASTModel as east_model_cls
+        except ImportError as exc:
+            _TORCH_AVAILABLE = False
+            raise ImportError(
+                "PyTorch is required for training/exporting EAST models. "
+                "Install with: pip install manuscript-ocr[dev]"
+            ) from exc
+
+        torch = torch_module
+        EASTModel = east_model_cls
+        _TORCH_AVAILABLE = True
+
+    if not training or _EAST_TRAINING_AVAILABLE is True:
+        return
+
+    try:
+        from torch.utils.data import ConcatDataset as concat_dataset_cls
+        from .dataset import EASTDataset as east_dataset_cls
+        from .train_utils import _run_training as run_training_fn
+    except ImportError as exc:
+        _EAST_TRAINING_AVAILABLE = False
+        raise ImportError(
+            "PyTorch training dependencies are required for EAST training. "
+            "Install with: pip install manuscript-ocr[dev]"
+        ) from exc
+
+    ConcatDataset = concat_dataset_cls
+    EASTDataset = east_dataset_cls
+    _run_training = run_training_fn
+    _EAST_TRAINING_AVAILABLE = True
 
 
 class EAST(BaseDetector):
@@ -52,43 +82,49 @@ class EAST(BaseDetector):
 
     device : str, optional
         Compute device: ``"cuda"``, ``"coreml"``, or ``"cpu"``. If None,
-        automatically selects CPU. For GPU/CoreML acceleration:
+        selects CUDA when ONNX Runtime reports GPU support, otherwise CPU. For GPU/CoreML acceleration:
 
         - CUDA (NVIDIA): ``pip install onnxruntime-gpu``
-        - CoreML (Apple Silicon M1/M2/M3): ``pip install onnxruntime-silicon``
+        - CoreML (Apple Silicon): included in standard macOS ONNX Runtime wheels;
+          select ``device="coreml"`` explicitly.
 
-        Default is ``None`` (CPU).
+        Default is ``None`` (automatic selection).
+    config : dict or path, optional
+        Region mapping configuration. Required key ``region_classes`` maps
+        class IDs to element fields, e.g. ``{"0": {"type": "word"}}``.
+        If omitted, uses a registry
+        config artifact. Local weights require an explicit config path.
     target_size : int, optional
         Input image size for inference. Images are resized to
         ``(target_size, target_size)``. Default is 1280.
     expand_ratio_w : float, optional
         Horizontal expansion factor applied to detected boxes after NMS.
-        Default is 0.7.
+        Default is 1.4.
     expand_ratio_h : float, optional
         Vertical expansion factor applied to detected boxes after NMS.
-        Default is 0.7.
+        Default is 1.5.
     expand_power : float, optional
         Power for non-linear box expansion. Controls how expansion scales with box size.
         - 1.0 = linear (small and large boxes expand equally)
         - <1.0 = small boxes expand more (e.g., 0.5, recommended for character-level detection)
         - >1.0 = large boxes expand more
-        Default is 0.5.
+        Default is 0.6.
     score_thresh : float, optional
         Confidence threshold for selecting candidate detections before NMS.
-        Default is 0.7.
+        Default is 0.6.
     iou_threshold : float, optional
-        IoU threshold for locality-aware NMS merging phase. Default is 0.2.
+        IoU threshold for locality-aware NMS merging phase. Default is 0.05.
     iou_threshold_standard : float, optional
         IoU threshold for standard NMS after locality-aware merging.
-        If None, uses the same value as iou_threshold. Default is None.
+        If None, uses the same value as iou_threshold. Default is 0.05.
     score_geo_scale : float, optional
         Scale factor for decoding geometry/score maps. Default is 0.25.
     quantization : int, optional
         Quantization resolution for point coordinates during decoding.
         Default is 2.
-    axis_aligned_output : bool, optional
-        If True, outputs axis-aligned rectangles instead of original quads.
-        Default is True.
+    axis_aligned_output : bool, optional, deprecated
+        Deprecated. Explicit True outputs axis-aligned rectangles.
+        By default, original quads are preserved.
     remove_area_anomalies : bool, optional
         If True, removes quads with extremely large area relative to the
         distribution. Default is False.
@@ -99,30 +135,19 @@ class EAST(BaseDetector):
         Default is 30.
     use_tta : bool, optional
         Enable Test-Time Augmentation (TTA). When enabled, inference is run
-        on both the original and horizontally flipped image, and results are
-        merged. This can improve detection of partially visible or edge text.
+        on both the original and horizontally flipped image. Only original
+        detections with a matching box in the flipped view are retained.
         Default is False.
     tta_iou_thresh : float, optional
-        IoU threshold for merging boxes from original and flipped images
-        during TTA. Boxes with IoU > threshold are considered matches and
-        merged. Default is 0.1.
+        IoU threshold for matching boxes from original and flipped images
+        during TTA. An original detection is retained when a flipped-view
+        box has IoU > threshold. Default is 0.1.
 
-    Notes
-    -----
-    The class provides two main public methods:
-
-    - ``predict`` — run inference on a single image and return detections.
-    - ``train`` — high-level training entrypoint to train an EAST model on custom datasets.
-
-    The detector uses ONNX Runtime for fast inference on CPU and GPU.
-    For GPU acceleration, install: ``pip install onnxruntime-gpu``
     """
 
     default_weights_name = "east_50_g1"
+    registry_model_class = "EAST"
 
-    pretrained_registry = {
-        "east_50_g1": "github://konstantinkozhin/manuscript-ocr/v0.1.0/east_50_g1.onnx",
-    }
 
     def __init__(
         self,
@@ -130,6 +155,7 @@ class EAST(BaseDetector):
         device: Optional[str] = None,
         force_download: bool = False,
         *,
+        config=None,
         target_size: int = 1280,
         expand_ratio_w: float = 1.4,
         expand_ratio_h: float = 1.5,
@@ -139,7 +165,7 @@ class EAST(BaseDetector):
         iou_threshold_standard: Optional[float] = 0.05,
         score_geo_scale: float = 0.25,
         quantization: int = 2,
-        axis_aligned_output: bool = True,
+        axis_aligned_output: Optional[bool] = None,
         remove_area_anomalies: bool = False,
         anomaly_sigma_threshold: float = 5.0,
         anomaly_min_box_count: int = 30,
@@ -155,6 +181,8 @@ class EAST(BaseDetector):
         )
 
         self.onnx_session = None
+        values, self.config_path = self._load_detector_config(config)
+        self._configure_region_types(values)
 
         self.target_size = target_size
         self.expand_ratio_w = expand_ratio_w
@@ -168,7 +196,10 @@ class EAST(BaseDetector):
         self.score_geo_scale = score_geo_scale
         self.quantization = quantization
 
-        self.axis_aligned_output = axis_aligned_output
+        if axis_aligned_output is not None:
+            warnings.warn("axis_aligned_output is deprecated; configure recognition crops instead",
+                          DeprecationWarning, stacklevel=2)
+        self.axis_aligned_output = bool(axis_aligned_output)
         self.remove_area_anomalies = remove_area_anomalies
         self.anomaly_sigma_threshold = anomaly_sigma_threshold
         self.anomaly_min_box_count = anomaly_min_box_count
@@ -177,19 +208,12 @@ class EAST(BaseDetector):
         self.use_tta = use_tta
         self.tta_iou_thresh = tta_iou_thresh
 
+    @managed_session_initialization
     def _initialize_session(self):
         if self.onnx_session is not None:
             return
 
-        self._prepare_runtime_dependencies()
-        providers = self.runtime_providers()
-
-        self.onnx_session = ort.InferenceSession(
-            self.weights,
-            providers=providers,
-        )
-
-        self._log_device_info(self.onnx_session)
+        self.onnx_session = self._create_onnx_session()
 
     def _scale_boxes_to_original(
         self, boxes: np.ndarray, orig_size: Tuple[int, int]
@@ -371,7 +395,7 @@ class EAST(BaseDetector):
         return merged
 
     def _run_inference_on_image(
-        self, img: np.ndarray
+        self, img: np.ndarray, return_raw: bool = False
     ) -> Tuple[np.ndarray, np.ndarray, np.ndarray]:
         """
         Run ONNX inference on a single image.
@@ -413,12 +437,15 @@ class EAST(BaseDetector):
             iou_threshold_standard=self.iou_threshold_standard,
         )
 
-        return final_quads_nms, score_map, geo_map
+        result = (final_quads_nms, score_map, geo_map)
+        return (*result, dict(zip(output_names, outputs))) if return_raw else result
 
     def predict(
         self,
         img_or_path: Union[str, Path, np.ndarray],
-    ) -> Page:
+        return_raw: bool = False,
+        *, return_masks: bool = False, return_outputs: bool = False,
+    ):
         """
         Run EAST inference and return detected page structure.
 
@@ -430,30 +457,9 @@ class EAST(BaseDetector):
         Returns
         -------
         Page
-            Parsed detection result as a Page object containing a single
-            Block with a single Line of TextSpan objects. Each TextSpan has polygon
-            coordinates, confidence score, and sequential ``order`` index.
-
-        Notes
-        -----
-        The method performs:
-        (1) image loading, (2) resizing and normalization, (3) model inference,
-        (4) quad decoding, (5) NMS, (6) box expansion, (7) scaling coordinates
-        back to original size.
-
-        **Test-Time Augmentation (TTA):**
-
-        When ``use_tta=True`` is set during initialization, the method runs
-        inference on both the original and horizontally flipped image, then
-        merges results. Boxes from both views are matched by IoU and merged
-        by taking the union of coordinates with averaged scores. This can
-        improve detection of text near image edges or partially visible text.
-
-        For visualization, use the external ``visualize_page`` utility:
-
-        >>> from manuscript.utils import visualize_page
-        >>> page = model.predict(img_path)
-        >>> vis_img = visualize_page(img, page)
+            Detection result as a flat document tree of configured text regions.
+            Each region has polygon coordinates and a detection confidence score.
+            Child sequence defines order; a layout stage can establish reading order.
 
         Examples
         --------
@@ -463,9 +469,9 @@ class EAST(BaseDetector):
         >>> model = EAST()
         >>> img_path = r"example/ocr_example_image.jpg"
         >>> page = model.predict(img_path)
-        >>> # Access first line's first text span
-        >>> first_text_span = page.blocks[0].lines[0].text_spans[0]
-        >>> print(f"Confidence: {first_text_span.detection_confidence}")
+        >>> # Access the first detected region, when present
+        >>> for region in page.children[:1]:
+        ...     print(f"Confidence: {region.detection_confidence}")
 
         Visualize results separately:
 
@@ -484,13 +490,20 @@ class EAST(BaseDetector):
         orig_h, orig_w = img.shape[:2]
 
         # Run inference on original image
-        final_quads_nms, _, _ = self._run_inference_on_image(img)
+        inference = (self._run_inference_on_image(img, return_raw=True) if return_outputs
+                     else self._run_inference_on_image(img))
+        final_quads_nms, score_map, geo_map = inference[:3]
+        raw_outputs = inference[3] if return_outputs else None
 
         # TTA: Run on horizontally flipped image and merge results
         if self.use_tta:
             # Flip image horizontally
             img_flipped = np.fliplr(img).copy()
-            final_quads_flipped, _, _ = self._run_inference_on_image(img_flipped)
+            flipped = (self._run_inference_on_image(img_flipped, return_raw=True) if return_outputs
+                       else self._run_inference_on_image(img_flipped))
+            final_quads_flipped = flipped[0]
+            if return_outputs:
+                raw_outputs.update({"flipped_" + key: value for key, value in flipped[3].items()})
 
             # Scale both to original size first
             scaled_orig = self._scale_boxes_to_original(
@@ -567,19 +580,15 @@ class EAST(BaseDetector):
             else processed_quads
         )
 
-        text_spans: List[TextSpan] = []
-        for quad in output_quads:
-            pts = quad[:8].reshape(4, 2)
-            score = float(np.clip(quad[8], 0.0, 1.0))
-            text_spans.append(TextSpan(polygon=pts.tolist(), detection_confidence=score))
-
-        for idx, text_span in enumerate(text_spans):
-            text_span.order = idx
-
-        page = Page(
-            blocks=[Block(lines=[Line(text_spans=text_spans, order=0)], order=0)]
-        )
-
+        page = self._tree_from_regions(output_quads[:, :8].reshape(-1, 4, 2),
+                                      np.clip(output_quads[:, 8], 0, 1),
+                                      np.zeros(len(output_quads), dtype=int), (orig_h, orig_w))
+        if return_raw or return_masks or return_outputs:
+            detections = [{"polygon": quad[:8].reshape(4, 2).astype(float).tolist(),
+                           "confidence": float(np.clip(quad[8], 0, 1)),
+                           "class_id": 0} for quad in processed_quads]
+            return self._raw_result(page, raw_outputs, detections, (orig_h, orig_w),
+                                    model_image_size=[self.target_size, self.target_size])
         return page
 
     @staticmethod
@@ -619,6 +628,7 @@ class EAST(BaseDetector):
         val_interval: int = 1,
         num_workers: int = 0,
         log_collage: bool = True,
+        detection_level: str = "word",
         device: Optional["torch.device"] = None,
     ) -> "torch.nn.Module":
         """
@@ -652,9 +662,10 @@ class EAST(BaseDetector):
         pretrained_backbone : bool, optional
             Use ImageNet-pretrained backbone weights. Default ``True``.
         freeze_first : bool, optional
-            Freeze lowest layers of the backbone. Default ``True``.
+            Freeze lowest layers of the backbone. Default ``False``.
         target_size : int, optional
-            Resize shorter side of images to this size. Default ``1024``.
+            Resize images to ``(target_size, target_size)`` without preserving
+            aspect ratio. Default ``1024``.
         score_geo_scale : float, optional
             Multiplier to recover original coordinates from score/geo maps.
             If None, automatically taken from the model. Default ``None``.
@@ -674,7 +685,7 @@ class EAST(BaseDetector):
 
             Default is ``1`` (no accumulation).
         lr : float, optional
-            Learning rate. Default ``1e-3``.
+            Learning rate. Default ``1e-4``.
         lr_scheduler : {"cosine_restart", "cosine", "linear", "step", "exponential", "plateau", "none"}, optional
             Learning rate scheduler type. Default ``"cosine_restart"``.
         lr_scheduler_params : dict, optional
@@ -712,17 +723,17 @@ class EAST(BaseDetector):
             Patience (epochs without improvement) for early stopping.
             Default ``100``.
         use_sam : bool, optional
-            Enable SAM optimizer. Default ``True``.
+            Enable SAM optimizer. Default ``False``.
         sam_type : {"sam", "asam"}, optional
             Variant of SAM to use. Default ``"asam"``.
         use_lookahead : bool, optional
-            Wrap optimizer with Lookahead. Default ``True``.
+            Wrap optimizer with Lookahead. Default ``False``.
         use_ema : bool, optional
             Maintain EMA version of model weights. Default ``False``.
         use_multiscale : bool, optional
             Random multi-scale training. Default ``True``.
         use_ohem : bool, optional
-            Online Hard Example Mining. Default ``True``.
+            Online Hard Example Mining. Default ``False``.
         ohem_ratio : float, optional
             Ratio of hard negatives for OHEM. Default ``0.5``.
         use_focal_geo : bool, optional
@@ -752,7 +763,10 @@ class EAST(BaseDetector):
         Returns
         -------
         torch.nn.Module
-            Best model weights (EMA if enabled, otherwise base model).
+            Model after the last completed training epoch (EMA if enabled,
+            otherwise base model). Best validation weights are saved separately
+            as ``best_loss.pth`` and ``best_dice.pth`` in the experiment's
+            ``checkpoints`` directory.
 
         Examples
         --------
@@ -777,7 +791,7 @@ class EAST(BaseDetector):
         ...     "/data/ddi/test.json"
         ... ]
         >>>
-        >>> best_model = EAST.train(
+        >>> trained_model = EAST.train(
         ...     train_images=train_images,
         ...     train_anns=train_anns,
         ...     val_images=val_images,
@@ -790,7 +804,7 @@ class EAST(BaseDetector):
         ...     freeze_first=False,
         ...     val_interval=3,
         ... )
-        >>> print("Best checkpoint loaded:", best_model)
+        >>> print("Model after the last completed epoch:", trained_model)
 
         Configure augmentations via ``augmentation_config``:
 
@@ -817,7 +831,7 @@ class EAST(BaseDetector):
         ...     "downscale_range": (0.7, 0.95),
         ...     "negative_prob": 0.05,
         ... }
-        >>> best_model = EAST.train(
+        >>> trained_model = EAST.train(
         ...     train_images=train_images,
         ...     train_anns=train_anns,
         ...     val_images=val_images,
@@ -825,11 +839,7 @@ class EAST(BaseDetector):
         ...     augmentation_config=aug_cfg,
         ... )
         """
-        if not _TORCH_AVAILABLE:
-            raise ImportError(
-                "PyTorch is required for training. "
-                "Install with: pip install manuscript-ocr[dev]"
-            )
+        _ensure_torch_dependencies(training=True)
 
         if device is None:
             device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
@@ -1084,6 +1094,7 @@ class EAST(BaseDetector):
             score_map_shrink_ratio=score_map_shrink_ratio,
             augmentation_config=aug_cfg,
             log_collage=log_collage,
+            detection_level=detection_level,
         )
         return best_model
 
@@ -1095,13 +1106,16 @@ class EAST(BaseDetector):
         input_size: int = 1280,
         opset_version: int = 14,
         simplify: bool = True,
+        detection_level: str = "word",
     ) -> None:
         """
         Export EAST PyTorch model to ONNX format.
 
         This method converts a trained EAST model from PyTorch to ONNX format,
         which can be used for faster inference with ONNX Runtime. The exported
-        model can be loaded using ``EAST(weights_path="model.onnx", use_onnx=True)``.
+        model can be loaded using
+        ``EAST(weights="model.onnx", config="model.json")``. The exporter
+        writes the matching configuration alongside the ONNX graph.
 
         Parameters
         ----------
@@ -1150,9 +1164,9 @@ class EAST(BaseDetector):
 
         **Automatic Backbone Detection:**
 
-        The method automatically detects the backbone architecture from the checkpoint
-        by analyzing the number of parameters in layer4. This prevents mismatches between
-        checkpoint and architecture that could lead to incorrect exports.
+        The method checks the checkpoint's ``backbone.extractor.layer3`` keys
+        for ``layer3.10``. Its presence selects ResNet-101; otherwise, the
+        exporter selects ResNet-50.
 
         Examples
         --------
@@ -1180,21 +1194,17 @@ class EAST(BaseDetector):
         Use the exported model for inference:
 
         >>> detector = EAST(
-        ...     weights_path="east_model.onnx",
-        ...     use_onnx=True,
+        ...     weights="east_model.onnx",
+        ...     config="east_model.json",
         ...     device="cuda"
         ... )
         >>> result = detector.predict("image.jpg")
 
         See Also
         --------
-        EAST.__init__ : Initialize EAST detector with ONNX support using ``use_onnx=True``.
+        EAST.__init__ : Initialize EAST with ONNX weights and matching configuration.
         """
-        if not _TORCH_AVAILABLE:
-            raise ImportError(
-                "PyTorch is required for exporting models. "
-                "Install with: pip install manuscript-ocr[dev]"
-            )
+        _ensure_torch_dependencies()
 
         class EASTWrapper(torch.nn.Module):
             def __init__(self, east_model):
@@ -1357,6 +1367,13 @@ class EAST(BaseDetector):
             print(f"  Install with: pip install onnxruntime")
         except Exception as e:
             print(f"[WARNING] ONNX inference test failed: {e}")
+
+        from manuscript.data import TextRegion
+        TextRegion(type=detection_level)
+        import json
+        Path(output_path).with_suffix(".json").write_text(
+            json.dumps({"region_classes": {"0": {"type": detection_level}}}, indent=2) + "\n",
+            encoding="utf-8")
 
         file_size_mb = Path(output_path).stat().st_size / (1024 * 1024)
         print(f"\n[OK] Export complete! Model size: {file_size_mb:.1f} MB")

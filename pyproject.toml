@@ -4,10 +4,10 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "manuscript-ocr"
-version = "0.1.12"
+version = "0.1.13"
 description = "Detects and recognizes text in historical, archival and handwritten documents. Optimized for fast inference with ONNX Runtime (CPU/GPU/CoreML) and optional training with PyTorch. Supports plugging custom models via a simple API."
 readme = "README.md"
-requires-python = ">=3.8"
+requires-python = ">=3.9.2"
 authors = [
     { name = "Pavel Sherstnev", email = "sherstpasha99@gmail.com" },
     { name = "Vlada Zhukovskaya", email = "zhukovskaya.vlada00@gmail.com" },
@@ -20,18 +20,18 @@ urls = { Homepage = "https://github.com/konstantinkozhin/manuscript-ocr" }
 classifiers = [
     "Development Status :: 4 - Beta",
     "Programming Language :: Python :: 3",
-    "Programming Language :: Python :: 3.8",
     "Programming Language :: Python :: 3.9",
     "Programming Language :: Python :: 3.10",
     "Programming Language :: Python :: 3.11",
+    "Programming Language :: Python :: 3.12",
+    "Programming Language :: Python :: 3.13",
+    "Programming Language :: Python :: 3.14",
     "Operating System :: OS Independent",
     "Topic :: Scientific/Engineering :: Image Processing",
     "Topic :: Scientific/Engineering :: Artificial Intelligence",
 ]
 
 dependencies = [
-    # ONNX Runtime for inference (CPU by default, GPU/CoreML installed separately)
-    "onnxruntime>=1.16",
 
     # Image processing
     "numpy>=1.21",
@@ -40,27 +40,29 @@ dependencies = [
 
     # Geometry and image processing
     "shapely>=1.8",
-    "scikit-image>=0.19",
 
-    # Performance optimization
-    "numba>=0.56",
 
     # Data validation and utilities
     "pydantic>=2.0",
+    "anytree>=2.13,<3",
     "PyYAML>=6.0",
     "tqdm>=4.60",
-    "gdown>=4.4",
+    "packaging>=21",
 ]
 
 [project.optional-dependencies]
-
-# GPU support for ONNX Runtime (NVIDIA CUDA)
-# User installs manually: pip install onnxruntime-gpu
-gpu = []
+cpu = ["onnxruntime>=1.16; sys_platform != 'emscripten'"]
+gpu = ["onnxruntime-gpu>=1.16; sys_platform != 'emscripten'"]
+fast = ["numba>=0.56; sys_platform != 'emscripten'"]
+gdrive = ["gdown>=4.4; sys_platform != 'emscripten'"]
+# Host page supplies ONNX Runtime Web; no native runtime in Pyodide.
+web = []
+trocr = ["tokenizers>=0.15,<1"]
+trocr-cuda = ["tokenizers>=0.15,<1", "torch>=2.0"]
 
 # Apple Silicon support (CoreML acceleration)
-# User installs manually: pip install onnxruntime-silicon
-silicon = []
+# Standard macOS onnxruntime wheels include CoreML; select device="coreml"
+silicon = ["onnxruntime>=1.16; sys_platform != 'emscripten'"]
 
 # Full development dependencies (includes PyTorch for training)
 dev = [
@@ -72,9 +74,13 @@ dev = [
     "onnx>=1.12",
     "onnxscript",
     "onnxsim>=0.4",
+    "transformers>=4.38,<6",
+    "tokenizers>=0.15,<1",
     
     # Training utilities
-    "Levenshtein",
+    "scikit-image>=0.19",
+    "numba>=0.56",
+    "gdown>=4.4",
     "torch-optimizer>=0.1",
     "evaluate>=0.4",
     "jiwer>=2.2",
@@ -100,12 +106,18 @@ dev = [
     
     # Build and publish tools
     "build>=0.8",
+    "setuptools>=61",
+    "wheel",
     "twine>=4",
 ]
 
 [tool.setuptools]
-include-package-data = true
+include-package-data = false
 package-dir = { "" = "src" }
 
 [tool.setuptools.packages.find]
 where = ["src"]
+
+[tool.setuptools.package-data]
+"manuscript.runtimes" = ["*.mjs"]
+"manuscript.recognizers._trba.configs" = ["config.json", "charset.txt"]

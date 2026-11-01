@@ -13,7 +13,6 @@ from torch.amp import autocast as _amp_autocast
 
 
 def _autocast():
-    """Совместимый autocast: использует torch.amp.autocast для подавления FutureWarning."""
     return _amp_autocast("cuda")
 import torch.nn as nn
 import torch.optim as optim
@@ -39,6 +38,7 @@ from ..data.transforms import (
 )
 from .metrics import compute_cer, compute_wer
 from ..model.model import TRBAModel
+from ..model.decoder_parseq import decoder_config
 from .utils import (
     load_checkpoint,
     save_checkpoint,
@@ -46,6 +46,22 @@ from .utils import (
     set_seed,
     load_pretrained_weights,
 )
+
+
+def _freeze_attention_decoder(decoder, policy):
+    """Freeze decoder weights while retaining gradients to its input encoder."""
+    if policy == "full":
+        for parameter in decoder.parameters():
+            parameter.requires_grad = False
+    elif policy == "partial":
+        if hasattr(decoder, "attention_cell"):
+            parameters = decoder.attention_cell.parameters()
+        else:
+            # PARSeq has no attention_cell; retain only its output classifier.
+            parameters = (parameter for name, parameter in decoder.named_parameters()
+                          if not name.startswith("generator."))
+        for parameter in parameters:
+            parameter.requires_grad = False
 
 
 # -------------------------
@@ -121,7 +137,7 @@ def get_ctc_weight_for_epoch(
         return initial_weight
 
     # Линейное затухание
-    progress = min(1.0, (epoch - 1) / decay_epochs)
+    progress = max(0.0, min(1.0, (epoch - 1) / decay_epochs))
     current_weight = initial_weight * (1 - progress) + min_weight * progress
 
     return max(min_weight, current_weight)
@@ -171,6 +187,9 @@ class Config:
             raise TypeError("Config source must be either a path to JSON or a dict.")
 
         merged = self._maybe_apply_resume(user_data)
+        from manuscript.api.recognizer import BaseRecognizer
+        merged["recognition_levels"] = list(BaseRecognizer._validate_levels(
+            merged.get("recognition_levels", ["word"])))
         for k, v in merged.items():
             setattr(self, k, v)
 
@@ -403,7 +422,7 @@ def visualize_predictions_tensorboard(
     # Настройка декодирования
     forward_kwargs = {
         "is_train": False,
-        "batch_max_length": max_len,
+        "batch_max_length": model.evaluation_steps(max_len) if hasattr(model, "evaluation_steps") else max_len,
     }
 
     # Обрабатываем примеры
@@ -564,10 +583,10 @@ def run_validation(
                 set_loss += float(batch_loss.item())
 
                 # Decode predictions (attention decoder only)
-                result_inf = model(imgs, is_train=False, batch_max_length=max_len)
+                decode_steps = model.evaluation_steps(max_len) if hasattr(model, "evaluation_steps") else max_len
+                result_inf = model(imgs, is_train=False, batch_max_length=decode_steps)
                 pred_ids = result_inf["attention_preds"].cpu()
                 tgt_ids = target_y.cpu()
-
                 for t_row, p_row in zip(tgt_ids, pred_ids):
                     refs.append(decode_tokens(t_row, itos, PAD, EOS, BLANK))
                     hyps.append(decode_tokens(p_row, itos, PAD, EOS, BLANK))
@@ -732,8 +751,8 @@ def log_augmentation_previews_tensorboard(
 def run_training(cfg: Config, device: str = "cuda"):
     seed = getattr(cfg, "seed", 42)
     set_seed(seed)
-    seed = getattr(cfg, "seed", 42)
-    set_seed(seed)
+    torch.backends.cudnn.benchmark = getattr(cfg, "cudnn_benchmark", True)
+    cfg.optimizer_foreach = getattr(cfg, "optimizer_foreach", False)
 
     # --- базовые настройки и пути ---
     exp_dir = getattr(cfg, "exp_dir", None)
@@ -794,22 +813,13 @@ def run_training(cfg: Config, device: str = "cuda"):
     # Resume checkpoint handling
     resume_from = getattr(cfg, "resume_from", None)
 
-    # Автоматический поиск последнего чекпоинта в exp_dir
     if not resume_from:
-        possible_checkpoints = []
-        if os.path.exists(exp_dir):
-            for fname in ["checkpoint_last.pth", "checkpoint_best.pth"]:
-                ckpt_path = os.path.join(exp_dir, fname)
-                if os.path.isfile(ckpt_path):
-                    possible_checkpoints.append(ckpt_path)
-
-        if possible_checkpoints:
-            # Предпочитаем checkpoint_last.pth для продолжения обучения
-            if os.path.join(exp_dir, "checkpoint_last.pth") in possible_checkpoints:
-                resume_from = os.path.join(exp_dir, "checkpoint_last.pth")
-            else:
-                resume_from = possible_checkpoints[0]
-            logger.info(f"Автоматически найден чекпоинт для продолжения: {resume_from}")
+        for filename in (*Config._RESUME_CKPT_CANDIDATES, "checkpoint_last.pth", "checkpoint_best.pth"):
+            candidate = os.path.join(exp_dir, filename)
+            if os.path.isfile(candidate):
+                resume_from = candidate
+                logger.info(f"Resuming from checkpoint: {resume_from}")
+                break
 
     # Validation interval
     val_interval = getattr(cfg, "val_interval", 1)
@@ -820,8 +830,10 @@ def run_training(cfg: Config, device: str = "cuda"):
     if val_interval < 1:
         raise ValueError("val_interval must be >= 1")
 
-    # Save interval (не используется, всегда сохраняем при валидации)
     save_interval = getattr(cfg, "save_interval", None)
+    if save_interval is not None and (
+            isinstance(save_interval, bool) or not isinstance(save_interval, int) or save_interval < 1):
+        raise ValueError("save_interval must be a positive integer or None")
 
     train_proportions = getattr(cfg, "train_proportions", None)
     val_size = getattr(cfg, "val_size", 3000)
@@ -892,6 +904,9 @@ def run_training(cfg: Config, device: str = "cuda"):
     cnn_in_channels = getattr(cfg, "cnn_in_channels", 3)
     cnn_out_channels = getattr(cfg, "cnn_out_channels", 512)
     cnn_backbone = getattr(cfg, "cnn_backbone", "seresnet31")
+    transformation = getattr(cfg, "transformation", "none")
+    tps_num_fiducial = getattr(cfg, "tps_num_fiducial", 20)
+    decoder_settings = decoder_config(cfg.__dict__)
 
     # CTC всегда используется при обучении для стабилизации
     use_ctc_head = True
@@ -905,6 +920,9 @@ def run_training(cfg: Config, device: str = "cuda"):
         cnn_in_channels=cnn_in_channels,
         cnn_out_channels=cnn_out_channels,
         cnn_backbone=cnn_backbone,
+        transformation=transformation,
+        tps_num_fiducial=tps_num_fiducial,
+        **decoder_settings,
         sos_id=SOS,
         eos_id=EOS,
         pad_id=PAD,
@@ -913,7 +931,6 @@ def run_training(cfg: Config, device: str = "cuda"):
     ).to(device)
 
     pretrain_src = getattr(cfg, "pretrain_weights", "default")
-
     if not resume_from:  # resume_from может быть найден автоматически
 
         def _normalize_pretrain(v) -> str:
@@ -926,18 +943,10 @@ def run_training(cfg: Config, device: str = "cuda"):
         pretrain_src = _normalize_pretrain(pretrain_src)
         if pretrain_src.lower() not in ("none", ""):
             if pretrain_src.lower() == "default":
-                pretrain_src = (
-                    "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/"
-                    "v0.1.0/trba_lite_g1.pth"
-                )
-                logger.info(
-                    "Using default pretrained weights: trba_lite_g1.pth (GitHub release)"
-                )
-                logger.info(
-                    "Default pretrain config: "
-                    "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/"
-                    "v0.1.0/trba_lite_g1.json"
-                )
+                from manuscript.models import resolve
+
+                pretrain_src = str(resolve('trba_lite_g1', 'TRBA', artifact='checkpoint')['checkpoint'])
+                logger.info('Using registry pretrained weights: %s', pretrain_src)
 
             stats = load_pretrained_weights(
                 model,
@@ -1042,16 +1051,11 @@ def run_training(cfg: Config, device: str = "cuda"):
         return "enc_rnn: NONE (no freezing)"
 
     def _apply_attention_policy(policy: str):
+        _freeze_attention_decoder(model.attention_decoder, policy)
         if policy == "full":
-            _freeze_module(model.attn)
-            _wrap_forward_no_grad(model.attn)
             return "attention: FULL (all layers frozen)"
         if policy == "partial":
-            # keep generator trainable (most beneficial for vocab adaptation), freeze attention_cell
-            if hasattr(model.attn, "attention_cell"):
-                _freeze_module(model.attn.attention_cell)
-                _wrap_forward_no_grad(model.attn.attention_cell)
-            return "attention: PARTIAL (unfrozen generator, frozen attention_cell)"
+            return "attention: PARTIAL (unfrozen generator)"
         return "attention: NONE (no freezing)"
 
     freeze_cnn = _normalize_policy(getattr(cfg, "freeze_cnn", "none"))
@@ -1084,16 +1088,18 @@ def run_training(cfg: Config, device: str = "cuda"):
 
     # --- optimizer ---
     trainable_params = [p for p in model.parameters() if p.requires_grad]
+    optimizer_foreach = getattr(cfg, "optimizer_foreach", False)
     if optimizer_name == "Adam":
-        optimizer = optim.Adam(trainable_params, lr=lr, weight_decay=weight_decay)
+        optimizer = optim.Adam(trainable_params, lr=lr, weight_decay=weight_decay, foreach=optimizer_foreach)
     elif optimizer_name == "AdamW":
-        optimizer = optim.AdamW(trainable_params, lr=lr, weight_decay=weight_decay)
+        optimizer = optim.AdamW(trainable_params, lr=lr, weight_decay=weight_decay, foreach=optimizer_foreach)
     elif optimizer_name == "SGD":
         optimizer = optim.SGD(
             trainable_params, lr=lr, momentum=momentum, weight_decay=weight_decay
         )
     else:
         raise ValueError(f"Unknown optimizer: {optimizer_name}")
+    logger.info(f"Optimizer: {optimizer_name}, foreach={optimizer_foreach}")
 
     # --- scheduler ---
     # Для OneCycleLR нужно знать total_steps, поэтому создадим scheduler после создания loader
@@ -1104,6 +1110,8 @@ def run_training(cfg: Config, device: str = "cuda"):
 
     # --- трансформации ---
     train_transform = get_train_transform(cfg.__dict__, img_h=img_h, img_w=img_w)
+    if hasattr(train_transform, "set_random_seed"):
+        train_transform.set_random_seed(seed)
     val_transform = get_val_transform(img_h, img_w)
 
     # --- датасеты и лоадеры ---
@@ -1235,6 +1243,8 @@ def run_training(cfg: Config, device: str = "cuda"):
             num_workers=num_workers,
             collate_fn=collate_train,
             pin_memory=pin_memory,
+            generator=torch.Generator().manual_seed(seed),
+            persistent_workers=num_workers > 0 and getattr(cfg, "persistent_workers", False),
         )
     else:
         train_loader = DataLoader(
@@ -1244,6 +1254,8 @@ def run_training(cfg: Config, device: str = "cuda"):
             num_workers=num_workers,
             collate_fn=collate_train,
             pin_memory=pin_memory,
+            generator=torch.Generator().manual_seed(seed),
+            persistent_workers=num_workers > 0 and getattr(cfg, "persistent_workers", False),
         )
 
     val_loaders_individual = [
@@ -1254,6 +1266,8 @@ def run_training(cfg: Config, device: str = "cuda"):
             num_workers=num_workers,
             collate_fn=collate_val,
             pin_memory=pin_memory,
+            generator=torch.Generator().manual_seed(seed + 1),
+            persistent_workers=num_workers > 0 and getattr(cfg, "persistent_workers", False),
         )
         for val_set in val_sets
     ]
@@ -1363,6 +1377,11 @@ def run_training(cfg: Config, device: str = "cuda"):
             f"Resumed from: {resume_from} (epoch={start_epoch-1}, step={global_step})"
         )
 
+    # Loading optimizer state can restore the old, memory-heavier foreach mode.
+    if optimizer_name in ("Adam", "AdamW"):
+        for group in optimizer.param_groups:
+            group["foreach"] = optimizer_foreach
+
     # ── Augmentation previews (logged once before training) ──────────────────
     if start_epoch == 1 and val_loaders_individual:
         try:
@@ -1406,17 +1425,19 @@ def run_training(cfg: Config, device: str = "cuda"):
             logger.warning(f"Epoch-0 baseline validation failed: {_e0}")
 
     # --- training loop ---
+    # Bounded diagnostics exercise the real validation -> optimizer transition.
+    # Kept separate from full experiments; they never save model checkpoints.
+    preflight_steps = int(getattr(cfg, "preflight_steps", 0))
+    preflight_updates = 0
+    preflight_attempts = 0
     for epoch in range(start_epoch, epochs + 1):
         # Вычисляем текущий CTC weight с затуханием
-        if epoch < ctc_weight_decay_epochs:
-            ctc_weight = get_ctc_weight_for_epoch(
-                epoch,
-                initial_weight=ctc_weight_initial,
-                decay_epochs=ctc_weight_decay_epochs,
-                min_weight=ctc_weight_min,
-            )
-        else:
-            ctc_weight = ctc_weight_initial  # Не используется, но для совместимости
+        ctc_weight = get_ctc_weight_for_epoch(
+            epoch,
+            initial_weight=ctc_weight_initial,
+            decay_epochs=ctc_weight_decay_epochs,
+            min_weight=ctc_weight_min,
+        )
 
         # train
         model.train()
@@ -1448,23 +1469,45 @@ def run_training(cfg: Config, device: str = "cuda"):
                 attn_logits = result["attention_logits"]
                 ctc_logits = result["ctc_logits"]
 
-                attn_loss_val = criterion(
-                    attn_logits.reshape(-1, attn_logits.size(-1)),
-                    target_y.reshape(-1),
-                )
+                if hasattr(model, "compute_attention_loss"):
+                    attn_loss_val = model.compute_attention_loss(result, target_y, criterion)
+                else:
+                    attn_loss_val = criterion(attn_logits.reshape(-1, attn_logits.size(-1)), target_y.reshape(-1))
                 ctc_loss_val = model.compute_ctc_loss(ctc_logits, target_y, lengths)
 
                 # Weighted combination
                 loss = (1.0 - ctc_weight) * attn_loss_val + ctc_weight * ctc_loss_val
-
             scaler.scale(loss).backward()
-
             # Gradient clipping для защиты от взрыва градиентов (NaN)
             scaler.unscale_(optimizer)
             torch.nn.utils.clip_grad_norm_(model.parameters(), max_grad_norm)
 
+            previous_scale = scaler.get_scale()
             scaler.step(optimizer)
             scaler.update()
+            optimizer_updated = scaler.get_scale() >= previous_scale
+
+            if preflight_steps:
+                if device.type == "cuda":
+                    torch.cuda.synchronize()
+                preflight_attempts += 1
+                if not torch.isfinite(loss):
+                    raise RuntimeError("Preflight produced a nonfinite loss")
+                if optimizer_updated:
+                    preflight_updates += 1
+                if preflight_updates >= preflight_steps:
+                    writer.close()
+                    logger.info(f"Preflight passed: {preflight_updates} optimizer updates after initial validation")
+                    return {
+                        "preflight_updates": preflight_updates,
+                        "preflight_attempts": preflight_attempts,
+                        "loss": float(loss.item()),
+                        "optimizer_foreach": optimizer.param_groups[0].get("foreach"),
+                        "peak_gpu_gib": torch.cuda.max_memory_allocated() / 1024**3 if device.type == "cuda" else 0,
+                        "exp_dir": exp_dir,
+                    }
+                if preflight_attempts >= max(20, preflight_steps * 4):
+                    raise RuntimeError("Preflight could not complete enough finite optimizer updates")
 
             loss_val = float(loss.item())
             attn_loss_scalar = float(attn_loss_val.item())
@@ -1485,7 +1528,7 @@ def run_training(cfg: Config, device: str = "cuda"):
             )
 
             # OneCycleLR требует step после каждого батча
-            if scheduler is not None and isinstance(
+            if optimizer_updated and scheduler is not None and isinstance(
                 scheduler, torch.optim.lr_scheduler.OneCycleLR
             ):
                 scheduler.step()
@@ -1504,7 +1547,6 @@ def run_training(cfg: Config, device: str = "cuda"):
         writer.add_scalar("Loss/train_epoch", avg_train_loss, epoch)
         writer.add_scalar("Loss/train_attn_epoch", avg_attn_loss, epoch)
         writer.add_scalar("Loss/train_ctc_epoch", avg_ctc_loss, epoch)
-
         if should_eval:
             val_metrics = run_validation(
                 model=model,
@@ -1593,135 +1635,7 @@ def run_training(cfg: Config, device: str = "cuda"):
         print(msg)
         logger.info(msg)
 
-        if should_eval:
-            save_checkpoint(
-                last_path,
-                model,
-                optimizer,
-                scheduler,
-                scaler,
-                epoch,
-                global_step,
-                avg_val_loss,
-                val_acc,
-                itos,
-                stoi,
-                {
-                    "batch_size": batch_size,
-                    "epochs": epochs,
-                    "lr": lr,
-                    "optimizer": optimizer_name,
-                    "scheduler": scheduler_name,
-                    "weight_decay": weight_decay,
-                    "momentum": momentum,
-                    "img_h": img_h,
-                    "img_w": img_w,
-                    "encoding": encoding,
-                    "max_len": max_len,
-                    "hidden_size": hidden_size,
-                    "num_encoder_layers": num_encoder_layers,
-                    "cnn_in_channels": cnn_in_channels,
-                    "cnn_out_channels": cnn_out_channels,
-                    "cnn_backbone": cnn_backbone,
-                    "ctc_weight": ctc_weight,
-                    "charset_path": charset_path,
-                    "train_csvs": train_csvs,
-                    "train_roots": train_roots,
-                    "val_csvs": val_csvs,
-                    "val_roots": val_roots,
-                },
-                log_dir,
-            )
-            save_weights(last_weights_path, model)
-
-            if avg_val_loss < best_val_loss:
-                best_val_loss = avg_val_loss
-                save_checkpoint(
-                    best_loss_path,
-                    model,
-                    optimizer,
-                    scheduler,
-                    scaler,
-                    epoch,
-                    global_step,
-                    best_val_loss,
-                    val_acc,
-                    itos,
-                    stoi,
-                    {
-                        "batch_size": batch_size,
-                        "epochs": epochs,
-                        "lr": lr,
-                        "optimizer": optimizer_name,
-                        "scheduler": scheduler_name,
-                        "weight_decay": weight_decay,
-                        "momentum": momentum,
-                        "img_h": img_h,
-                        "img_w": img_w,
-                        "encoding": encoding,
-                        "max_len": max_len,
-                        "hidden_size": hidden_size,
-                        "num_encoder_layers": num_encoder_layers,
-                        "cnn_in_channels": cnn_in_channels,
-                        "cnn_out_channels": cnn_out_channels,
-                        "cnn_backbone": cnn_backbone,
-                        "ctc_weight": ctc_weight,
-                        "charset_path": charset_path,
-                        "train_csvs": train_csvs,
-                        "train_roots": train_roots,
-                        "val_csvs": val_csvs,
-                        "val_roots": val_roots,
-                    },
-                    log_dir,
-                )
-                save_weights(best_loss_weights_path, model)
-                logger.info(f"New best val_loss: {best_val_loss:.4f} (epoch {epoch})")
-
-            if val_acc >= best_val_acc:
-                best_val_acc = val_acc
-                save_checkpoint(
-                    best_acc_path,
-                    model,
-                    optimizer,
-                    scheduler,
-                    scaler,
-                    epoch,
-                    global_step,
-                    best_val_loss,
-                    best_val_acc,
-                    itos,
-                    stoi,
-                    {
-                        "batch_size": batch_size,
-                        "epochs": epochs,
-                        "lr": lr,
-                        "optimizer": optimizer_name,
-                        "scheduler": scheduler_name,
-                        "weight_decay": weight_decay,
-                        "momentum": momentum,
-                        "img_h": img_h,
-                        "img_w": img_w,
-                        "encoding": encoding,
-                        "max_len": max_len,
-                        "hidden_size": hidden_size,
-                        "num_encoder_layers": num_encoder_layers,
-                        "cnn_in_channels": cnn_in_channels,
-                        "cnn_out_channels": cnn_out_channels,
-                        "cnn_backbone": cnn_backbone,
-                        "ctc_weight": ctc_weight,
-                        "charset_path": charset_path,
-                        "train_csvs": train_csvs,
-                        "train_roots": train_roots,
-                        "val_csvs": val_csvs,
-                        "val_roots": val_roots,
-                    },
-                    log_dir,
-                )
-                save_weights(best_acc_weights_path, model)
-                logger.info(f"New best acc: {best_val_acc:.4f} (epoch {epoch})")
-
         if scheduler is not None:
-            # OneCycleLR вызывается после каждого батча, не здесь
             if isinstance(scheduler, torch.optim.lr_scheduler.OneCycleLR):
                 pass
             elif isinstance(scheduler, ReduceLROnPlateau):
@@ -1729,6 +1643,56 @@ def run_training(cfg: Config, device: str = "cuda"):
                     scheduler.step(avg_val_loss)
             else:
                 scheduler.step()
+
+        improved_loss = should_eval and avg_val_loss < best_val_loss
+        improved_acc = should_eval and val_acc >= best_val_acc
+        if improved_loss:
+            best_val_loss = avg_val_loss
+        if improved_acc:
+            best_val_acc = val_acc
+        should_save = (should_eval if save_interval is None else epoch % save_interval == 0) or epoch == epochs
+        checkpoint_config = {
+            "batch_size": batch_size,
+            "epochs": epochs,
+            "lr": lr,
+            "optimizer": optimizer_name,
+            "scheduler": scheduler_name,
+            "weight_decay": weight_decay,
+            "momentum": momentum,
+            "img_h": img_h,
+            "img_w": img_w,
+            "encoding": encoding,
+            "max_len": max_len,
+            "hidden_size": hidden_size,
+            "num_encoder_layers": num_encoder_layers,
+            "cnn_in_channels": cnn_in_channels,
+            "cnn_out_channels": cnn_out_channels,
+            "cnn_backbone": cnn_backbone,
+            "transformation": transformation,
+            "tps_num_fiducial": tps_num_fiducial,
+            **decoder_settings,
+            "ctc_weight": ctc_weight,
+            "charset_path": charset_path,
+            "train_csvs": train_csvs,
+            "train_roots": train_roots,
+            "val_csvs": val_csvs,
+            "val_roots": val_roots,
+        }
+        checkpoint_args = (
+            model, optimizer, scheduler, scaler, epoch, global_step,
+            best_val_loss, best_val_acc, itos, stoi, checkpoint_config, log_dir,
+        )
+        if should_save:
+            save_checkpoint(last_path, *checkpoint_args)
+            save_weights(last_weights_path, model)
+        if improved_loss:
+            save_checkpoint(best_loss_path, *checkpoint_args)
+            save_weights(best_loss_weights_path, model)
+            logger.info(f"New best val_loss: {best_val_loss:.4f} (epoch {epoch})")
+        if improved_acc:
+            save_checkpoint(best_acc_path, *checkpoint_args)
+            save_weights(best_acc_weights_path, model)
+            logger.info(f"New best acc: {best_val_acc:.4f} (epoch {epoch})")
 
     writer.close()
     logger.info("Training finished.")
@@ -1746,7 +1710,7 @@ def run_training(cfg: Config, device: str = "cuda"):
             charset_path=charset_dest,
             output_path=onnx_path,
             opset_version=14,
-            simplify=True,
+            simplify=bool(getattr(cfg, "export_simplify", False)),
         )
         logger.info(f"ONNX model exported successfully: {onnx_path}")
     except Exception as e:

@@ -9,9 +9,18 @@
       "library_version_min": "0.1.10",
       "library_version_max": "0.1.13",
       "description": null,
-      "license": null,
+      "license": "MIT",
       "artifacts": {
-        "license": null,
+        "license": {
+          "filename": "east_50_g1.LICENSE.txt",
+          "format": "txt",
+          "size": 1281,
+          "sha256": "d7f56692901b11d568676d1e6d39b656a87b812942d3ff0264dea289430dfed2",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_g1.LICENSE.txt"
+          ],
+          "required": true
+        },
         "weights": {
           "filename": "east_50_g1.onnx",
           "format": "onnx",
@@ -52,9 +61,18 @@
       "library_version_min": "0.1.10",
       "library_version_max": "0.1.13",
       "description": null,
-      "license": null,
+      "license": "MIT",
       "artifacts": {
-        "license": null,
+        "license": {
+          "filename": "east_50_yenisei_gov_reports_g1.LICENSE.txt",
+          "format": "txt",
+          "size": 1301,
+          "sha256": "9250603d3bbf7088ea528265852c2aefeb4c7ce84b9616341d114c47bd51fbf7",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/east_50_yenisei_gov_reports_g1.LICENSE.txt"
+          ],
+          "required": true
+        },
         "weights": {
           "filename": "east_50_yenisei_gov_reports_g1.onnx",
           "format": "onnx",
@@ -95,9 +113,18 @@
       "library_version_min": "0.1.10",
       "library_version_max": "0.1.13",
       "description": "Mask2Former text-line instance segmentation detector",
-      "license": null,
+      "license": "CC-BY-NC-3.0",
       "artifacts": {
-        "license": null,
+        "license": {
+          "filename": "mask2former_line_v0_prev.LICENSE.txt",
+          "format": "txt",
+          "size": 21619,
+          "sha256": "8567a614b875bd084c52ac0604ca1725bc772fbc5877665e1e043ea20166120f",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/mask2former_line_v0_prev.LICENSE.txt"
+          ],
+          "required": true
+        },
         "weights": {
           "filename": "mask2former_line_v0_prev.onnx",
           "format": "onnx",
@@ -138,9 +165,18 @@
       "library_version_min": "0.1.10",
       "library_version_max": "0.1.13",
       "description": null,
-      "license": null,
+      "license": "MIT",
       "artifacts": {
-        "license": null,
+        "license": {
+          "filename": "modern_charlm_g1.LICENSE.txt",
+          "format": "txt",
+          "size": 1287,
+          "sha256": "4c01339effa0f2140d72c494a510ecd2cdb5164151f033984cd24de22601173c",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/modern_charlm_g1.LICENSE.txt"
+          ],
+          "required": true
+        },
         "vocab": {
           "filename": "modern_charlm_g1.json",
           "format": "json",
@@ -191,9 +227,18 @@
       "library_version_min": "0.1.10",
       "library_version_max": "0.1.13",
       "description": null,
-      "license": null,
+      "license": "MIT",
       "artifacts": {
-        "license": null,
+        "license": {
+          "filename": "prereform_charlm_g1.LICENSE.txt",
+          "format": "txt",
+          "size": 1290,
+          "sha256": "0454d16cacab8458a1c3c1d0433f2e148909ac4361f7e351dcf8f858456f186b",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/prereform_charlm_g1.LICENSE.txt"
+          ],
+          "required": true
+        },
         "vocab": {
           "filename": "prereform_charlm_g1.json",
           "format": "json",
@@ -244,9 +289,18 @@
       "library_version_min": "0.1.10",
       "library_version_max": "0.1.13",
       "description": null,
-      "license": null,
+      "license": "MIT",
       "artifacts": {
-        "license": null,
+        "license": {
+          "filename": "trba_base_g0.LICENSE.txt",
+          "format": "txt",
+          "size": 1283,
+          "sha256": "3372029d4bd209cd5187a07cae6175482a7737952293ce81c849dd568b6ddd7c",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g0.LICENSE.txt"
+          ],
+          "required": true
+        },
         "checkpoint": {
           "filename": "trba_base_g0.pth",
           "format": "pth",
@@ -267,9 +321,18 @@
       "library_version_min": "0.1.10",
       "library_version_max": "0.1.13",
       "description": null,
-      "license": null,
+      "license": "MIT",
       "artifacts": {
-        "license": null,
+        "license": {
+          "filename": "trba_base_g1.LICENSE.txt",
+          "format": "txt",
+          "size": 1283,
+          "sha256": "2d9038d93b795b68b1ef9850343a90e80f1d5ccb7429d08c8b0f4ac0ece034f5",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_base_g1.LICENSE.txt"
+          ],
+          "required": true
+        },
         "config": {
           "filename": "trba_base_g1.json",
           "format": "json",
@@ -320,9 +383,18 @@
       "library_version_min": "0.1.10",
       "library_version_max": "0.1.13",
       "description": null,
-      "license": null,
+      "license": "MIT",
       "artifacts": {
-        "license": null,
+        "license": {
+          "filename": "trba_lite_g1.LICENSE.txt",
+          "format": "txt",
+          "size": 1283,
+          "sha256": "03af35b519b8e1a96904140d452dd86ab32e665a280b4b951b69dfe0161f44ff",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g1.LICENSE.txt"
+          ],
+          "required": true
+        },
         "config": {
           "filename": "trba_lite_g1.json",
           "format": "json",
@@ -373,9 +445,18 @@
       "library_version_min": "0.1.10",
       "library_version_max": "0.1.13",
       "description": null,
-      "license": null,
+      "license": "MIT",
       "artifacts": {
-        "license": null,
+        "license": {
+          "filename": "trba_lite_g2.LICENSE.txt",
+          "format": "txt",
+          "size": 1283,
+          "sha256": "4ededdaee09cdf791f64d276f5c08ef2ecd3fc94aca6d408cb1b4529bffeddcf",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g2.LICENSE.txt"
+          ],
+          "required": true
+        },
         "config": {
           "filename": "trba_lite_g2.json",
           "format": "json",
@@ -426,9 +507,18 @@
       "library_version_min": "0.1.10",
       "library_version_max": "0.1.13",
       "description": "TRBA Lite recognizer fine-tuned for pre-reform Russian printed text",
-      "license": null,
+      "license": "MIT",
       "artifacts": {
-        "license": null,
+        "license": {
+          "filename": "trba_lite_g3_prt.LICENSE.txt",
+          "format": "txt",
+          "size": 1287,
+          "sha256": "ec80998dce951c284ebac16c15bac8bbea09fd389c36d5ef1f3a0b78e272385f",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/trba_lite_g3_prt.LICENSE.txt"
+          ],
+          "required": true
+        },
         "config": {
           "filename": "trba_lite_g3_prt.json",
           "format": "json",
@@ -479,9 +569,18 @@
       "library_version_min": "0.1.10",
       "library_version_max": "0.1.13",
       "description": null,
-      "license": null,
+      "license": "AGPL-3.0-only",
       "artifacts": {
-        "license": null,
+        "license": {
+          "filename": "yolo26s_obb_text_g1.LICENSE.txt",
+          "format": "txt",
+          "size": 34620,
+          "sha256": "a055ed620cca404e79dd0442a05b93d748871edaf2ed8956fe69fd2b905217a3",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26s_obb_text_g1.LICENSE.txt"
+          ],
+          "required": true
+        },
         "checkpoint": {
           "filename": "yolo26s_obb_text_g1.pt",
           "format": "pt",
@@ -522,9 +621,18 @@
       "library_version_min": "0.1.10",
       "library_version_max": "0.1.13",
       "description": null,
-      "license": null,
+      "license": "AGPL-3.0-only",
       "artifacts": {
-        "license": null,
+        "license": {
+          "filename": "yolo26x_obb_text_g1.LICENSE.txt",
+          "format": "txt",
+          "size": 34620,
+          "sha256": "839e34c4e24cbcbe11e976a8fd75dd32b174b5d132df7089e6605caf3345c38a",
+          "urls": [
+            "https://github.com/konstantinkozhin/manuscript-ocr/releases/download/v0.1.0/yolo26x_obb_text_g1.LICENSE.txt"
+          ],
+          "required": true
+        },
         "checkpoint": {
           "filename": "yolo26x_obb_text_g1.pt",
           "format": "pt",

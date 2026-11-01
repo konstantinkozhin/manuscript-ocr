@@ -1,17 +1,22 @@
 from abc import ABC, abstractmethod
 import contextlib
+import ctypes
 import io
+import hashlib
+import logging
 import os
 from pathlib import Path
 import sys
 from typing import Dict, Optional
 import shutil
 import tempfile
-import time
 import urllib.error
-import urllib.request
+from urllib.parse import urlsplit
 
-import onnxruntime as ort
+from functools import wraps
+
+from manuscript.runtimes import create_session, get_native_runtime
+from manuscript._internal import http
 
 try:
     from tqdm import tqdm
@@ -19,9 +24,22 @@ except ImportError:
     tqdm = None
 
 
+def managed_session_initialization(method):
+    """Release sessions created by a model initializer if validation fails."""
+    @wraps(method)
+    def initialize(self, *args, **kwargs):
+        previous = len(getattr(self, "_runtime_sessions", []))
+        try:
+            return method(self, *args, **kwargs)
+        except BaseException:
+            self._release_sessions(previous)
+            raise
+    return initialize
+
+
 class BaseArtifactModel(ABC):
     """
-    Shared infrastructure for artifact-backed OCR stages.
+    Base class for OCR stages loading model artifacts and using ONNX Runtime.
 
     The class provides the common mechanics used by detectors, recognizers,
     layouts, and correctors:
@@ -29,20 +47,30 @@ class BaseArtifactModel(ABC):
     - artifact loading from local files, URLs, GitHub releases, Google Drive,
       and preset registries
     - device selection and ONNX Runtime provider resolution
-    - unified ``predict`` / ``train`` / ``export`` surface
+
+    Subclasses define their predict, train and export behavior. This class does
+    not interpret Page elements or define detection and recognition semantics.
     """
 
     default_weights_name: Optional[str] = None
     pretrained_registry: Dict[str, str] = {}
+    registry_model_class: Optional[str] = None
 
     def __init__(
         self,
         weights: Optional[str] = None,
         device: Optional[str] = None,
         force_download: bool = False,
+        runtime="auto",
+        web_external_data=None,
         **kwargs,
     ):
-        self.device = self._resolve_device(device)
+        if runtime not in ("auto", "native", "web"):
+            raise ValueError("runtime must be 'auto', 'native' or 'web'")
+        self.runtime = ("web" if sys.platform == "emscripten" else "native") if runtime == "auto" else runtime
+        self.device = (device or "cpu") if self.runtime == "web" else self._resolve_device(device)
+        self.web_external_data = web_external_data
+        self._runtime_sessions = []
         self.force_download = bool(force_download)
         self.weights = self._resolve_weights(weights)
         self.extra_config = kwargs
@@ -50,6 +78,7 @@ class BaseArtifactModel(ABC):
         self._runtime_deps_preloaded = False
         self._runtime_preload_message: Optional[str] = None
         self._runtime_dll_dir_handles = []
+        self._runtime_dll_handles = []
 
     # -------------------------------------------------------------------------
     # DEVICE
@@ -59,7 +88,7 @@ class BaseArtifactModel(ABC):
             return device
 
         try:
-            if ort.get_device().upper() == "GPU":
+            if get_native_runtime().get_device().upper() == "GPU":
                 return "cuda"
         except Exception:
             pass
@@ -74,10 +103,6 @@ class BaseArtifactModel(ABC):
         - CUDA (NVIDIA GPU): CUDAExecutionProvider
         - CoreML (Apple Silicon): CoreMLExecutionProvider
         - CPU: CPUExecutionProvider
-        
-        Note: GPU/CoreML providers require separate installation:
-        - CUDA: pip install onnxruntime-gpu
-        - Apple Silicon: pip install onnxruntime-silicon
         """
         if self.device == "cuda":
             return ["CUDAExecutionProvider", "CPUExecutionProvider"]
@@ -100,7 +125,9 @@ class BaseArtifactModel(ABC):
                 "cudnn",
                 "cublas",
                 "cuda_runtime",
+                "cuda_nvrtc",
                 "cufft",
+                "curand",
                 "nvjitlink",
             ):
                 candidate = os.path.join(nvidia_root, package_name, "bin")
@@ -124,6 +151,19 @@ class BaseArtifactModel(ABC):
                 messages.append("Failed to add some Windows DLL directories:")
                 messages.extend(f"  {item}" for item in add_errors)
 
+            dll_load_errors = []
+            for dll_dir in added_dirs:
+                for dll_path in sorted(Path(dll_dir).glob("*.dll")):
+                    try:
+                        self._runtime_dll_handles.append(ctypes.WinDLL(str(dll_path)))
+                    except Exception as exc:
+                        dll_load_errors.append(f"{dll_path}: {exc}")
+
+            if dll_load_errors:
+                messages.append("Failed to preload some NVIDIA DLLs:")
+                messages.extend(f"  {item}" for item in dll_load_errors)
+
+        ort = get_native_runtime()
         if not hasattr(ort, "preload_dlls"):
             if messages:
                 self._runtime_preload_message = "\n".join(messages)
@@ -154,46 +194,14 @@ class BaseArtifactModel(ABC):
             self._runtime_preload_message = "\n".join(captured)
     
     def _log_device_info(self, session):
-        """
-        Log information about requested and actual execution providers.
-        
-        Parameters
-        ----------
-        session : onnxruntime.InferenceSession
-            The initialized ONNX Runtime session
-        """
-        requested_providers = self.runtime_providers()
-        actual_providers = session.get_providers()
-        
-        print(f"[{self.__class__.__name__}] Device configuration:")
-        print(f"  Requested device: {self.device}")
-        print(f"  Requested providers: {requested_providers}")
-        print(f"  Active providers: {actual_providers}")
-        
-        # Check if primary provider is available
-        if self.device == "cuda" and "CUDAExecutionProvider" not in actual_providers:
-            print(f"  Warning: CUDA requested but not available. Falling back to CPU.")
-            available_providers = set()
-            try:
-                available_providers = set(ort.get_available_providers())
-            except Exception:
-                pass
-
-            if "CUDAExecutionProvider" not in available_providers:
-                print(f"      Install onnxruntime-gpu for CUDA support: pip install onnxruntime-gpu")
-            else:
-                print("      CUDAExecutionProvider is installed, but its CUDA/cuDNN DLLs did not initialize.")
-                print("      Install CUDA 12 / cuDNN 9 runtime DLLs or let onnxruntime preload them.")
-                if self._runtime_preload_message:
-                    print("      preload_dlls output:")
-                    for line in self._runtime_preload_message.splitlines():
-                        print(f"        {line}")
-        elif self.device == "coreml" and "CoreMLExecutionProvider" not in actual_providers:
-            print(f"  Warning: CoreML requested but not available. Falling back to CPU.")
-            print(f"      Install onnxruntime-silicon for CoreML support: pip install onnxruntime-silicon")
-        else:
-            primary_provider = actual_providers[0] if actual_providers else "Unknown"
-            print(f"  Running on: {primary_provider}")
+        logger = logging.getLogger(__name__)
+        actual = session.get_providers()
+        logger.debug("%s: device=%s, requested providers=%s, active providers=%s",
+                     type(self).__name__, self.device, self.runtime_providers(), actual)
+        requested = {"cuda": "CUDAExecutionProvider", "coreml": "CoreMLExecutionProvider"}.get(self.device)
+        if requested and requested not in actual:
+            logger.warning("%s requested %s, but active providers are %s",
+                           type(self).__name__, requested, actual)
 
     # -------------------------------------------------------------------------
     # WEIGHT RESOLUTION (main artifact)
@@ -225,6 +233,17 @@ class BaseArtifactModel(ABC):
             return self._download_gdrive(w)
 
         # 5. Preset registry
+        if self.registry_model_class:
+            from manuscript.models import resolve
+
+            self._resolved_model_name = w
+            self._resolved_model_artifacts = resolve(
+                w, self.registry_model_class, force_download=self.force_download
+            )
+            if 'weights' not in self._resolved_model_artifacts:
+                raise ValueError(f'Model {w!r} has no inference weights')
+            return str(self._resolved_model_artifacts['weights'])
+
         if w in self.pretrained_registry:
             return self._resolve_weights(self.pretrained_registry[w])
 
@@ -282,7 +301,18 @@ class BaseArtifactModel(ABC):
         if v.startswith("gdrive:"):
             return self._download_gdrive(v)
 
+        # An explicit missing path must not be treated as a registry alias.
+        if isinstance(value, Path) or Path(v).is_absolute() or "/" in v or "\\" in v:
+            raise FileNotFoundError(f"{description} file not found: {v}")
+
         # 5) Preset
+        if self.registry_model_class:
+            from manuscript.models import resolve
+
+            role = 'config' if description == 'model config' else description
+            return str(resolve(v, self.registry_model_class, artifact=role,
+                               force_download=self.force_download)[role])
+
         if v in registry:
             return self._resolve_extra_artifact(
                 registry[v],
@@ -305,93 +335,60 @@ class BaseArtifactModel(ABC):
         d.mkdir(parents=True, exist_ok=True)
         return d
 
+    def _http_cache_path(self, url: str) -> Path:
+        filename = Path(urlsplit(url).path).name or "artifact"
+        digest = hashlib.sha256(url.encode("utf-8")).hexdigest()
+        directory = self._cache_dir / digest
+        directory.mkdir(parents=True, exist_ok=True)
+        return directory / filename
+
     def _download_http(self, url: str) -> str:
-        """Download file from HTTP/HTTPS URL"""
-        file = self._cache_dir / Path(url).name
+        """Cache an HTTP artifact atomically with shared native/browser behavior."""
+        file = self._http_cache_path(url)
         if file.exists() and not self.force_download:
             return str(file)
-
-        action = "Re-downloading" if file.exists() else "Downloading"
-        print(f"{action} {Path(url).name} from {url}")
-        max_attempts = 5
-        retry_statuses = {429, 500, 502, 503, 504}
-        base_backoff_seconds = 1.0
-        last_error = None
-
-        for attempt in range(1, max_attempts + 1):
-            tmp = tempfile.NamedTemporaryFile(delete=False).name
-
+        for attempt in range(5):
+            fd, temporary = tempfile.mkstemp(dir=file.parent, suffix=".part")
             try:
-                if tqdm is not None:
+                with os.fdopen(fd, "wb") as output, http.urlopen(url, timeout=60) as source:
+                    total = int(source.headers.get("content-length") or 0)
+                    progress = None
+                    if tqdm is not None:
+                        try:
+                            progress = tqdm(total=total or None, unit="B", unit_scale=True, desc=file.name)
+                        except Exception:
+                            pass
                     try:
-                        # Get file size
-                        with urllib.request.urlopen(url) as response:
-                            total_size = int(response.headers.get("content-length", 0))
-
-                        with tqdm(
-                            total=total_size,
-                            unit="B",
-                            unit_scale=True,
-                            unit_divisor=1024,
-                            desc=Path(url).name,
-                            ncols=80,
-                        ) as pbar:
-
-                            def reporthook(block_num, block_size, total_size):
-                                downloaded = block_num * block_size
-                                if downloaded < total_size:
-                                    pbar.update(block_size)
-                                else:
-                                    pbar.update(total_size - pbar.n)
-
-                            urllib.request.urlretrieve(url, tmp, reporthook=reporthook)
-                    except Exception as e:
-                        # Fallback to simple download if progress bar fails
-                        print(f"Progress bar error ({e}), downloading without progress...")
-                        urllib.request.urlretrieve(url, tmp)
-                else:
-                    # No tqdm available, simple download
-                    urllib.request.urlretrieve(url, tmp)
-
-                # Overwrite cached files only after a successful download.
-                if file.exists():
-                    shutil.copy2(tmp, file)
-                else:
-                    shutil.move(tmp, file)
-                print(f" Downloaded to {file}")
+                        while True:
+                            chunk = source.read(1024 * 1024)
+                            if not chunk:
+                                break
+                            output.write(chunk)
+                            if progress is not None:
+                                try:
+                                    progress.update(len(chunk))
+                                except Exception:
+                                    with contextlib.suppress(Exception):
+                                        progress.close()
+                                    progress = None
+                        if total and output.tell() != total:
+                            raise urllib.error.URLError("Downloaded artifact is truncated")
+                    finally:
+                        if progress is not None:
+                            with contextlib.suppress(Exception):
+                                progress.close()
+                os.replace(temporary, file)
                 return str(file)
-
-            except urllib.error.HTTPError as e:
-                last_error = e
-                if e.code not in retry_statuses or attempt == max_attempts:
+            except urllib.error.HTTPError as exc:
+                if exc.code not in {429, 500, 502, 503, 504} or attempt == 4:
                     raise
-                delay = base_backoff_seconds * (2 ** (attempt - 1))
-                print(
-                    f"Download failed with HTTP {e.code}. "
-                    f"Retrying in {delay:.1f}s ({attempt}/{max_attempts - 1})..."
-                )
-                time.sleep(delay)
-            except (urllib.error.URLError, TimeoutError, ConnectionError) as e:
-                last_error = e
-                if attempt == max_attempts:
+                http.sleep(2 ** attempt)
+            except (urllib.error.URLError, TimeoutError, ConnectionError):
+                if attempt == 4:
                     raise
-                delay = base_backoff_seconds * (2 ** (attempt - 1))
-                print(
-                    f"Download failed ({e}). "
-                    f"Retrying in {delay:.1f}s ({attempt}/{max_attempts - 1})..."
-                )
-                time.sleep(delay)
+                http.sleep(2 ** attempt)
             finally:
-                tmp_path = Path(tmp)
-                if tmp_path.exists():
-                    try:
-                        tmp_path.unlink()
-                    except OSError:
-                        pass
-
-        if last_error is not None:
-            raise last_error
-        raise RuntimeError(f"Failed to download: {url}")
+                Path(temporary).unlink(missing_ok=True)
 
     def _download_github(self, spec: str) -> str:
         payload = spec.replace("github://", "").strip()
@@ -454,6 +451,55 @@ class BaseArtifactModel(ABC):
                     downloaded_path.unlink()
                 except OSError:
                     pass
+
+    def _create_onnx_session(self, weights=None, *, log_severity_level=None, **options):
+        artifacts = getattr(self, "_resolved_model_artifacts", {})
+        external_data = self.web_external_data
+        if external_data is None and weights is None and artifacts.get("external_data"):
+            external_data = [artifacts["external_data"]]
+        if self.runtime == "native":
+            self._prepare_runtime_dependencies()
+        session = create_session(
+            self.weights if weights is None else weights,
+            runtime=self.runtime, device=self.device, providers=self.runtime_providers(),
+            log_severity_level=log_severity_level, external_data=external_data, **options,
+        )
+        self._runtime_sessions.append(session)
+        self._log_device_info(session)
+        return session
+
+    def _release_sessions(self, start=0):
+        sessions = getattr(self, "_runtime_sessions", [])[start:]
+        if not sessions:
+            return
+        errors, released = [], []
+        for session in reversed(sessions):
+            try:
+                close = getattr(session, "close", None)
+                if callable(close):
+                    close()
+                released.append(session)
+            except Exception as exc:
+                errors.append(exc)
+        for name, value in list(vars(self).items()):
+            if any(value is item for item in released):
+                setattr(self, name, None)
+        # Keep failed handles available so another close() can retry release.
+        self._runtime_sessions[start:] = [
+            session for session in sessions if not any(session is item for item in released)
+        ]
+        if errors:
+            logging.getLogger(__name__).warning("Failed to release runtime session: %s", errors[0])
+
+    def close(self):
+        """Release this model's sessions; a later prediction initializes them again."""
+        self._release_sessions()
+
+    def __enter__(self):
+        return self
+
+    def __exit__(self, *exc):
+        self.close()
 
     # -------------------------------------------------------------------------
     # BACKEND INITIALIZATION

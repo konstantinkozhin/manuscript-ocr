@@ -2,7 +2,7 @@ import json
 import random
 import csv
 import re
-import Levenshtein
+from manuscript._internal.edit_distance import levenshtein_distance
 import torch
 from datetime import datetime
 from statistics import mean
@@ -114,8 +114,10 @@ def evaluate_ocr_confidence(model, eval_pairs, c2i, device, max_len):
 def reconstruct_word(model, word, c2i, i2c, device, max_len, mask_threshold,
                      apply_threshold, max_edits, return_trace=False, return_p_cur=False, 
                      lexicon=None):
+    if len(word) > max_len:
+        return (word, [], []) if (return_trace or return_p_cur) else word
     model.eval()
-    original_chars = list(word[:max_len])
+    original_chars = list(word)
     chars = original_chars.copy()
     L = len(chars)
     if L == 0:
@@ -131,7 +133,8 @@ def reconstruct_word(model, word, c2i, i2c, device, max_len, mask_threshold,
     with torch.no_grad():
         probs = torch.softmax(model(torch.tensor(batch, device=device)), dim=-1)
 
-    confidences = [(i, probs[i, i, c2i.get(chars[i], unk)].item(), probs[i, i]) for i in range(L)]
+    confidences = [(i, probs[i, i, c2i[chars[i]]].item(), probs[i, i])
+                   for i in range(L) if chars[i] in c2i and c2i[chars[i]] < probs.shape[-1]]
     candidates = sorted([(i, p, v) for i, p, v in confidences if p < mask_threshold], key=lambda x: x[1])
 
     trace, edits = [], 0
@@ -183,7 +186,7 @@ def reconstruct_word(model, word, c2i, i2c, device, max_len, mask_threshold,
 
 
 def cer(pred, target):
-    return Levenshtein.distance(pred, target) / len(target) if target else 0.0
+    return levenshtein_distance(pred, target) / len(target) if target else 0.0
 
 
 def evaluate_ocr_with_cer(corrector, eval_pairs, csv_path=None):

@@ -16,7 +16,7 @@ Install the package and the Sphinx toolchain:
 
 ```bash
 python3 -m pip install -e .
-python3 -m pip install sphinx sphinx-rtd-theme numpydoc sphinx-autodoc-typehints sphinxcontrib-mermaid
+python3 -m pip install sphinx sphinx-rtd-theme numpydoc sphinx-autodoc-typehints sphinxcontrib-mermaid sphinx-intl
 ```
 
 Install `tectonic` for PDF generation.
@@ -27,14 +27,24 @@ On macOS:
 brew install tectonic
 ```
 
+## Update Russian Translations
+
+```bash
+python3 -m sphinx -b gettext docs/sphinx docs/sphinx/_build/gettext
+sphinx-intl update -p docs/sphinx/_build/gettext -l ru
+```
+
+Translate new or changed messages in `docs/sphinx/locale/ru/LC_MESSAGES/*.po`
+before building. An HTML build succeeding does not guarantee translation coverage.
+
 ## Build Versioned HTML
 
 ```bash
-VERSION=0.1.12
+VERSION=0.1.13
 
 mkdir -p docs/sphinx/_site/$VERSION/en docs/sphinx/_site/$VERSION/ru
 
-python3 -m sphinx -b html \
+python3 -m sphinx -W --keep-going -b html \
   -D language=en \
   -D release=$VERSION \
   -D version=$VERSION \
@@ -55,7 +65,7 @@ Result:
 ## Build Russian PDF
 
 ```bash
-VERSION=0.1.12
+VERSION=0.1.13
 
 python3 -m sphinx -b latex \
   -D language=ru \
@@ -64,8 +74,10 @@ python3 -m sphinx -b latex \
   -D latex_engine=xelatex \
   docs/sphinx docs/sphinx/_build/latex-ru-$VERSION
 
-cd docs/sphinx/_build/latex-ru-$VERSION
-tectonic --keep-logs --keep-intermediates manuscript-ocr.tex
+(
+  cd docs/sphinx/_build/latex-ru-$VERSION
+  tectonic --keep-logs --keep-intermediates manuscript-ocr.tex
+)
 ```
 
 Result:
@@ -81,9 +93,10 @@ cp docs/sphinx/_build/latex-ru-$VERSION/manuscript-ocr.pdf \
 
 ## Notes
 
-- In this environment Sphinx may print `RuntimeError: _ARRAY_API is not
-  PyCapsule object` before continuing. Treat the final exit code and final
-  `build succeeded` message as the source of truth.
+- If imports print `RuntimeError: _ARRAY_API is not PyCapsule object`, check
+  NumPy compatibility with the installed binary extensions. Even if Sphinx
+  completes, inspect the generated API pages for missing objects; a successful
+  build alone does not establish that all imports worked.
 - PDF generation may warn that `mmdc` is unavailable. The build still
   completes unless Mermaid output is required for a specific page.
 - The first `tectonic` run downloads TeX assets from the network, so PDF

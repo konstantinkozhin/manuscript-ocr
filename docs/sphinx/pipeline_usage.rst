@@ -1,61 +1,11 @@
 Pipeline Usage Guide
 ====================
 
-The pipeline is stage-based and passes one ``Page`` object through the stages:
+A pipeline passes a document-tree ``Page`` between detection, layout,
+recognition and optional correction. See :doc:`api/data` for the data model
+and :doc:`api/pipeline` for method signatures.
 
-``detector -> layout -> recognizer -> corrector``
-
-By default, ``Pipeline()`` creates:
-
-- detector: ``YOLO(weights="yolo26x_obb_text_g1")``
-- layout: ``SimpleSorting()``
-- recognizer: ``TRBA(weights="trba_lite_g2")``
-- corrector: ``None``
-
-Stage Contracts
----------------
-
-Detector
-~~~~~~~~
-
-Detector must implement:
-
-.. code-block:: python
-
-    def predict(self, image) -> Page:
-        ...
-
-Recognizer
-~~~~~~~~~~
-
-Recognizer must implement:
-
-.. code-block:: python
-
-    def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
-        ...
-
-Layout
-~~~~~~
-
-Layout model must implement:
-
-.. code-block:: python
-
-    def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
-        ...
-
-Corrector
-~~~~~~~~~
-
-Corrector must implement:
-
-.. code-block:: python
-
-    def predict(self, page: Page, image: Optional[np.ndarray] = None) -> Page:
-        ...
-
-Basic Usage
+Quick start
 -----------
 
 .. code-block:: python
@@ -64,51 +14,13 @@ Basic Usage
 
     pipeline = Pipeline()
     result = pipeline.predict("document.jpg")
-    text = pipeline.get_text(result["page"])
-    print(text)
+    print(result["page"].get_text())
 
-Disable Stages
---------------
+Choosing stages
+---------------
 
-You can disable optional stages via ``None``:
-
-.. code-block:: python
-
-    from manuscript import Pipeline
-
-    # Detection + layout only
-    pipeline = Pipeline(recognizer=None, corrector=None)
-
-    # Detection + recognition only
-    pipeline = Pipeline(layout=None, corrector=None)
-
-    # Detection + layout + recognition (no correction)
-    pipeline = Pipeline(corrector=None)
-
-Layout Placement
-----------------
-
-Use ``layout_after`` to choose where layout runs:
-
-- ``"detector"`` (default)
-- ``"recognizer"``
-- ``"corrector"``
-
-.. code-block:: python
-
-    from manuscript import Pipeline
-    from manuscript.layouts import SimpleSorting
-
-    pipeline = Pipeline(
-        layout=SimpleSorting(),
-        layout_after="recognizer",
-    )
-
-If the anchor stage is disabled (for example, ``recognizer=None`` with
-``layout_after="recognizer"``), layout still executes in that slot.
-
-Built-in Components
--------------------
+Supply initialized processors to replace the defaults. Set an optional stage
+to None to disable it; detection cannot be disabled.
 
 .. code-block:: python
 
@@ -116,131 +28,240 @@ Built-in Components
     from manuscript.layouts import SimpleSorting
     from manuscript.recognizers import TRBA
     from manuscript.correctors import CharLM
-    from manuscript import Pipeline
-
-    detector = EAST(weights="east_50_g1", score_thresh=0.8, iou_threshold=0.2)
-    layout = SimpleSorting(max_splits=10, use_columns=True)
-    recognizer = TRBA(weights="trba_lite_g1", device="cuda", min_text_size=5)
-    corrector = CharLM()
 
     pipeline = Pipeline(
-        detector=detector,
-        layout=layout,
-        recognizer=recognizer,
-        corrector=corrector,
-        layout_after="detector",
+        detector=EAST(weights="east_50_g1"),
+        layout=SimpleSorting(use_columns=False),
+        recognizer=TRBA(weights="trba_lite_g2", recognition_levels=["word"]),
+        corrector=CharLM(),
     )
 
-TRBA Region Preparation
------------------------
+For detection only, use ``Pipeline(layout=None, recognizer=None)``. For detection
+and recognition, use ``Pipeline(layout=None)``. Device and model parameters are
+configured on each processor rather than on Pipeline.
 
-``TRBA`` supports configurable crop preparation before recognition.
-
-Default settings:
-
-- ``region_preparer="bbox"`` extracts axis-aligned bounding boxes
-- ``rotate_threshold=1.5`` auto-rotates tall crops before recognition
-- ``min_text_size=5`` skips tiny detections
-
-Built-in preparer presets:
-
-- ``"bbox"``: axis-aligned crop
-- ``"polygon_mask"``: tight crop with pixels outside the polygon masked to white
-- ``"quad_warp"``: perspective rectification for 4-point polygons, with bbox fallback
+``layout_after`` selects the layout slot: detector (default), recognizer or
+corrector. The slot executes even if its anchor stage is disabled.
 
 .. code-block:: python
 
-    from manuscript.recognizers import TRBA
+    pipeline = Pipeline(layout_after="recognizer", corrector=None)
 
-    recognizer = TRBA(region_preparer="bbox")
-    recognizer = TRBA(region_preparer="polygon_mask")
-    recognizer = TRBA(region_preparer="quad_warp")
-    recognizer = TRBA(
-        region_preparer="bbox",
-        region_preparer_options={"pad": 2},
-    )
-
-``region_preparer_options`` is reserved for built-in preset configuration:
-
-- ``"bbox"`` / ``"polygon_mask"``: ``pad``
-- ``"polygon_mask"``: ``background``
-- ``"quad_warp"``: ``output_size=(width, height)``, ``fallback_to_bbox``
-
-For advanced cases, you can inject hooks into ``TRBA`` instead of writing a
-full custom recognizer:
-
-.. code-block:: python
-
-    import numpy as np
-
-    def my_preparer(page, image, recognizer=None, options=None):
-        regions = []
-        for block in page.blocks:
-            for line in block.lines:
-                for text_span in line.text_spans:
-                    poly = np.asarray(text_span.polygon, dtype=np.float32)
-                    crop = image[10:40, 10:80]
-                    regions.append(
-                        {"text_span": text_span, "image": crop, "polygon": poly}
-                    )
-        return regions
-
-    recognizer = TRBA(region_preparer=my_preparer)
-
-If you need complete control over recognition logic, the simplest route is
-still to provide your own recognizer class with ``predict(page, image) -> Page``.
-
-Collapsing Text Spans
----------------------
-
-Some recognizers work on whole lines or blocks rather than on individual
-text-span crops. Use ``collapse_page_text_spans`` to convert a narrow page
-structure into a wider one before recognition.
-
-.. code-block:: python
-
-    from manuscript.utils import collapse_page_text_spans
-
-    line_level_page = collapse_page_text_spans(
-        page,
-        level="line",
-        method="bbox",
-    )
-
-    block_level_page = collapse_page_text_spans(
-        page,
-        level="block",
-        method="convex_hull",
-    )
-
-``"line"`` keeps the same blocks and lines, but replaces each line with one
-merged ``TextSpan``. ``"block"`` replaces each block with one line
-containing one merged ``TextSpan``.
-
-Lower-level helpers are also available:
-
-- ``merge_text_spans(text_spans, method="bbox")``
-- ``collapse_line_text_spans(line, method="bbox")``
-- ``collapse_block_text_spans(block, method="bbox")``
-
-Visualization and Profiling
----------------------------
-
-.. code-block:: python
-
-    result, vis_img = pipeline.predict("document.jpg", vis=True)
-    vis_img.save("output_visualization.jpg")
-
-    result = pipeline.predict("document.jpg", profile=True)
-
-Intermediate Results
+Combining processors
 --------------------
 
-After each run, the pipeline keeps snapshots:
+Stack
+~~~~~
 
-- ``pipeline.last_detection_page``
-- ``pipeline.last_layout_page``
-- ``pipeline.last_recognition_page``
-- ``pipeline.last_correction_page``
+``Stack`` runs processors in list order. Detectors each receive the original
+image, and their regions are appended to a common Page. A layout can then infer
+containment. Duplicate regions are retained.
 
-Skipped stages keep corresponding ``last_*`` value as ``None``.
+.. code-block:: python
+
+    from manuscript import Stack
+    from manuscript.layouts import ReadingSorting
+
+    # block_detector and line_detector are initialized detector instances.
+    pipeline = Pipeline(
+        detector=Stack([block_detector, line_detector]),
+        layout=ReadingSorting(mode="containment", containment_overlap=0.5),
+        recognizer=None,
+    )
+
+Page processors receive the preceding Page. Later processors may overwrite text;
+built-in recognizers skip regions already containing text. Sequential behavior
+therefore depends on the participating processors.
+
+Recognizer voting
+~~~~~~~~~~~~~~~~~
+
+Use an ensemble when recognizers should independently read the same regions:
+
+.. code-block:: python
+
+    from manuscript.recognizers import MajorityVotingRecognizer, MedoidRecognizer
+
+    # model_a, model_b and model_c are initialized recognizers.
+    recognizer = MajorityVotingRecognizer([model_a, model_b, model_c])
+    pipeline = Pipeline(recognizer=recognizer)
+
+    medoid = MedoidRecognizer([model_a, model_b, model_c], parallel=False)
+
+Majority voting selects the most frequent normalized string; medoid selects
+an existing answer by summed character edit distance.
+Both compare text after NFC normalization, lowercasing and trimming outer
+whitespace. The returned text keeps the most frequent case-sensitive spelling
+among answers matching the winning normalized string; spelling ties prefer the
+first model. For example, ``Москва``, ``Москва``, ``москва`` produce ``Москва``.
+With ``return_raw=True``, ``winner`` contains this spelling, while
+``normalized_winner`` identifies its key in ``votes`` (and ``distance_sums``
+for medoid).
+
+Detector consensus
+~~~~~~~~~~~~~~~~~~
+
+Use ``ConsensusWBFDetector`` to retain detections supported by multiple models:
+
+.. code-block:: python
+
+    from manuscript.detectors import ConsensusWBFDetector
+
+    detector = ConsensusWBFDetector(
+        detectors=[detector_a, detector_b, detector_c],
+        weights=None,  # Equal coordinate weights; alternatively [1, 2, 1].
+        cluster_iou=0.5,
+        consensus_fraction=0.5,
+        minimum_votes=2,
+    )
+    pipeline = Pipeline(detector=detector)
+    raw = detector.predict("page.jpg", return_raw=True)
+    votes = [item["votes"] for item in raw["detections"]]
+
+Required votes are ``max(minimum_votes, ceil(len(detectors) * consensus_fraction))``.
+Empty answers count toward the total number of participants; inference errors
+propagate. Each participant contributes at most one vote per cluster. Regions
+are matched separately by ``(type, label)``; configure matching semantic labels
+on participants. Polygons become axis-aligned enclosing boxes. Participant Pages
+must already use original-image coordinates and dimensions, as built-in
+detectors do. No extra resize or NMS is performed by the ensemble.
+
+Participants run in supplied order. Greedy one-to-one matching uses representatives
+frozen before each participant; equal IoUs prefer higher object and cluster indices.
+The algorithm is order-dependent. The representative and final rectangle use
+arithmetic means by default, or weighted means with one finite positive weight
+per participant. Weights affect geometry and matching, never vote thresholds.
+Confidence scores are ignored, and fused ``detection_confidence`` is ``None``.
+
+The output is a flat Page; geometric descendants of participant Pages are
+treated as detections. Raw detections include ``votes`` and ``detector_indices``
+referencing the supplied order. Fusion does not produce masks or model tensors.
+``predict_batch(images)`` returns independent results in image order, including
+an empty list for an empty batch. It calls single-image prediction sequentially.
+Pickle preserves parameters and nested participants when those participants
+support pickling; no JSON configuration protocol for arbitrary models is assumed.
+
+Model memory
+------------
+
+Use ``memory_policy="sequential"`` to release each model's sessions after use
+and reload them when needed. The default, ``"keep"``, retains loaded sessions.
+
+.. code-block:: python
+
+    recognizer = MedoidRecognizer([model_a, model_b, model_c])
+    pipeline = Pipeline(recognizer=recognizer, memory_policy="sequential")
+
+The policy applies inside nested Stacks and ensembles. It can also be set on
+an individual Stack, MajorityVotingRecognizer or MedoidRecognizer. Sequential
+mode releases previously loaded participant sessions before starting and
+cleans up the active model even if prediction fails. ``close()`` releases all
+participants explicitly; the composition can be used again afterwards.
+
+This mode requires ``parallel=False`` throughout the controlled composition.
+Custom processors must implement an idempotent ``close()`` and support another
+prediction after closing; stateless processors can use a no-op. Participants
+must not be used concurrently by other pipelines
+or direct calls without external synchronization. Calls on the same sequential
+composition are serialized.
+
+Image data, voting results, dictionaries and runtime allocations can still
+occupy memory. Session release does not guarantee an immediate drop in process
+RSS or GPU memory reported by the driver. Repeated session initialization
+trades inference speed for lower model residency.
+
+.. _trocr-cuda-decoding:
+
+TrOCR CUDA decoding
+-------------------
+
+``TrOCR(device="cuda", cuda_decoding="auto")`` keeps encoder states, logits
+and KV caches on the GPU when supported. It requires dynamic-batch KV-cache
+graphs, CUDA-enabled PyTorch, CUDAExecutionProvider active in all three ONNX
+sessions, I/O binding and ONNX Runtime DLPack export support. Installing
+``[gpu,trocr-cuda]`` does not guarantee DLPack support in the runtime wheel.
+
+``cuda_decoding="auto"`` warns once and uses NumPy decoding when CUDA bridge
+requirements are unmet. ``"required"`` raises instead; ``"off"`` disables
+device-resident decoding. CPU, CoreML and Web use NumPy in auto mode. Errors
+during active CUDA inference propagate. Floating-point scores may differ
+slightly between host and CUDA decoding.
+
+Recognition crops and batch memory
+----------------------------------
+
+With ``region_preparer="bbox"``, use ``region_preparer_options`` to set
+``padding_x``, ``padding_y``, ``inset_x`` and ``inset_y`` as nonnegative
+fractions of the original bbox size per side. For example,
+``{"inset_y": 0.1}`` removes 10% from both top and bottom before orientation
+compensation. Insets must be below 0.5. Padding and inset on the same axis
+cannot be combined, nor can relative margins and nonzero pixel ``pad``.
+These options preserve Page geometry and are rejected by other crop presets.
+
+PPOCRRec supports ``sort_by_width=True`` to group similar crop widths and
+restore result order afterwards. It is opt-in because right padding may
+affect CTC predictions. ``max_batch_pixels`` limits padded batch input pixels
+(batch * height * width, excluding channels), without resizing crops. A single
+input, including fixed ONNX batch padding, must fit or prediction raises
+ValueError. This is not a total runtime memory limit; ``batch_size`` still
+limits dynamic batches. Recognition crops are prepared in batches to reduce
+peak image memory.
+
+``SimpleSorting`` now infers columns by default (``use_columns=True``).
+Set ``SimpleSorting(use_columns=False)`` to retain grouping without column
+inference.
+
+Custom stages
+-------------
+
+Custom components implement a compatible ``predict`` method; inheritance from
+Manuscript base classes is optional. The detector receives an image; other
+stages receive a ``Page``. Each stage returns a valid ``Page``; the detector may
+also return a dictionary containing it under ``page``.
+
+See :ref:`example-notebooks` for integration examples.
+
+Recognition and correction levels
+---------------------------------
+
+The document tree stores text in word, line and block regions. Recognizers and
+correctors process selected levels of this tree: ``recognition_levels`` selects
+regions to recognize, and ``correction_levels`` selects text to correct. Both
+accept ``word``, ``line`` and ``block``. For example, to select words and lines
+for recognition and words for correction:
+
+.. code-block:: python
+
+    from manuscript import Pipeline
+    from manuscript.recognizers import TRBA
+    from manuscript.correctors import CharLM
+
+    pipeline = Pipeline(
+        recognizer=TRBA(
+            weights="trba_lite_g2", recognition_levels=["word", "line"],
+        ),
+        corrector=CharLM(correction_levels=["word"]),
+    )
+
+The selected regions must already exist in the Page. When both a line and its
+words are selected, the words take precedence. Choose recognition levels that
+match the model's training task. See :doc:`api/recognizers` and
+:doc:`api/correctors` for details.
+
+Results, visualization and timing
+---------------------------------
+
+``predict()`` returns ``{"page": page}``. With ``vis=True``, it returns
+``(result, preview)``, where ``preview`` is a PIL image:
+
+.. code-block:: python
+
+    result, preview = pipeline.predict("document.jpg", vis=True, profile=True)
+    print(result["page"].get_text())
+    preview.save("preview.png")
+    print(pipeline.last_timings)
+
+``profile=True`` prints stage times; ``last_timings`` provides them in seconds.
+Intermediate Pages are available through ``last_detection_page``,
+``last_layout_page``, ``last_recognition_page`` and ``last_correction_page``.
+See :doc:`api/pipeline` for details.

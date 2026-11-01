@@ -17,11 +17,13 @@ computational efficiency under limited resources.
    :caption: Contents:
 
    getting_started
-   model_zoo
    pipeline_usage
+   model_zoo
    structure
    api/index
    related_work
+   migration_0_1_13
+   release_notes
    acknowledgements
 
 Indices and tables
