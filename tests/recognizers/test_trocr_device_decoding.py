@@ -69,6 +69,9 @@ def test_real_ort_binding_dlpack_outputs_outlive_binding(tmp_path, dtype, device
     from manuscript.recognizers._trocr.cuda import run_bound
     if device == 'cuda' and (not torch.cuda.is_available() or 'CUDAExecutionProvider' not in ort.get_available_providers()):
         pytest.skip('CUDA Torch and ONNX Runtime GPU are required')
+    probe = ort.OrtValue.ortvalue_from_numpy(np.zeros(1, np.float32))
+    if not (hasattr(probe, '__dlpack__') or hasattr(probe._ortvalue, 'to_dlpack')):
+        pytest.skip('ONNX Runtime DLPack export support is required')
     tensor_type = {np.float16: onnx.TensorProto.FLOAT16, np.float32: onnx.TensorProto.FLOAT,
                    np.int64: onnx.TensorProto.INT64}[dtype]
     graph = onnx.helper.make_graph([onnx.helper.make_node('Identity', ['x'], ['y'])], 'bridge',
@@ -185,14 +188,16 @@ def test_real_cuda_cached_decoder_matches_host_path(tmp_path):
 
 
 @pytest.mark.parametrize('case,match', [
-    ('ok', None), ('format', 'KV-cache'), ('provider', 'all three'),
+    ('ok', None), ('legacy_dlpack', None), ('format', 'KV-cache'), ('provider', 'all three'),
     ('static', 'dynamic-batch'), ('binding', 'I/O binding'), ('dlpack', 'DLPack'),
 ])
 def test_cuda_capability_checks_before_execution(monkeypatch, case, match):
     torch = pytest.importorskip('torch')
-    pytest.importorskip('onnxruntime')
     from manuscript.recognizers._trocr.cuda import unavailable_reason
     monkeypatch.setattr(torch.cuda, 'is_available', lambda: True)
+    probe = SimpleNamespace(__dlpack__=lambda: None)
+    fake = SimpleNamespace(OrtValue=SimpleNamespace(ortvalue_from_numpy=lambda value: probe))
+    monkeypatch.setattr('manuscript.runtimes._native.get_native_runtime', lambda: fake)
     def session():
         return SimpleNamespace(get_providers=lambda: ['CUDAExecutionProvider'],
                                get_inputs=lambda: [SimpleNamespace(shape=['N', 2])],
@@ -200,13 +205,13 @@ def test_cuda_capability_checks_before_execution(monkeypatch, case, match):
     model = SimpleNamespace(runtime='native', device='cuda', decoder_format='kv_cache',
                             onnx_session=session(), decoder_session=session(),
                             decoder_with_past_session=session())
-    if case == 'format': model.decoder_format = 'full_prefix'
+    if case == 'legacy_dlpack': probe = SimpleNamespace(_ortvalue=SimpleNamespace(to_dlpack=lambda: None))
+    elif case == 'format': model.decoder_format = 'full_prefix'
     elif case == 'provider': model.decoder_session.get_providers = lambda: ['CPUExecutionProvider']
     elif case == 'static': model.onnx_session.get_inputs = lambda: [SimpleNamespace(shape=[1, 2])]
     elif case == 'binding': model.decoder_with_past_session.io_binding = None
     elif case == 'dlpack':
-        fake = SimpleNamespace(OrtValue=SimpleNamespace(ortvalue_from_numpy=lambda value: SimpleNamespace(_ortvalue=object())))
-        monkeypatch.setattr('manuscript.runtimes._native.get_native_runtime', lambda: fake)
+        probe = SimpleNamespace(_ortvalue=object())
     reason = unavailable_reason(model)
     assert reason is None if match is None else match in reason
 

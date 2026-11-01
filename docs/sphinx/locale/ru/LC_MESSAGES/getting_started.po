@@ -276,3 +276,15 @@ msgstr ""
 
 #~ msgid "Reinstalling ``manuscript-ocr`` is not required."
 #~ msgstr "Переустанавливать ``manuscript-ocr`` не требуется."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/getting_started.rst:36
+#: 17c07ac5ef5d41e2bef557a8510ca08b:None
+msgid "For device-resident TrOCR decoding, install ``manuscript-ocr[gpu,trocr-cuda]`` and a CUDA-enabled PyTorch build. ONNX Runtime must support DLPack export; this capability is not present in every CPU or GPU wheel. See :ref:`trocr-cuda-decoding` for requirements and fallback behavior."
+msgstr "Для декодирования TrOCR на устройстве установите ``manuscript-ocr[gpu,trocr-cuda]`` и сборку PyTorch с CUDA. ONNX Runtime должен поддерживать экспорт DLPack; эта возможность есть не во всех CPU- и GPU-wheel. Требования и поведение при отсутствии поддержки описаны в :ref:`trocr-cuda-decoding`."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/getting_started.rst:41
+#: 0b2cdc3876e74eeca09cd3ff6175e87a:None
+msgid "Browser inference uses ``runtime=\"web\"`` and a host-provided ONNX Runtime Web bridge; installing ``[web]`` alone does not configure that bridge. See the repository's ``docs/WEB_RUNTIME.md`` and ``scripts/browser_probe/README.md`` for setup and the browser demonstration."
+msgstr "Браузерный инференс использует ``runtime=\"web\"`` и мост ONNX Runtime Web, предоставляемый страницей; установка ``[web]`` сама по себе не настраивает мост. Инструкции и браузерную демонстрацию см. в ``docs/WEB_RUNTIME.md`` и ``scripts/browser_probe/README.md`` репозитория."

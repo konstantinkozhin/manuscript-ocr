@@ -6,6 +6,14 @@ Release Notes
 
 For changes required in existing integrations, see :doc:`migration_0_1_13`.
 
+- Added ``ConsensusWBFDetector`` with per-detector votes and optional weighted box fusion.
+- Preserved the winning case-sensitive spelling in majority-voting and medoid ensembles.
+- Added optional device-resident TrOCR CUDA decoding with explicit capability checks and NumPy fallback.
+- Reduced inference memory through batched crop preparation and detector preprocessing; added PPOCRRec width sorting and pixel budgets.
+- Added relative bbox padding and insets; enabled column inference in ``SimpleSorting`` by default.
+- Added optional native and browser runtimes, a browser OCR demonstration and explicit runtime installation extras.
+- Removed RapidFuzz and Levenshtein dependencies and refreshed training examples.
+
 - Replaced fixed blocks, lines and text spans with an extensible document tree using ``Element``, ``Page`` and ``TextRegion``.
 - Added table, cell and image elements with grid validation and orientation metadata.
 - Added single-image COCO serialization with Manuscript extensions and plain-text output from the tree.

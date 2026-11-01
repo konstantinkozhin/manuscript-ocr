@@ -124,7 +124,7 @@ def data_class_signature(app, what, name, obj, options, signature, return_annota
     if what == "class" and name == "manuscript.Pipeline":
         return (
             "(detector=<default>, layout=<default>, recognizer=<default>, "
-            "corrector=None, layout_after='detector')", None,
+            "corrector=None, layout_after='detector', memory_policy='keep')", None,
         )
 
     if what == "class" and inspect.isclass(obj) and issubclass(obj, Element):

@@ -179,3 +179,111 @@ msgid ""
 msgstr ""
 "При голосовании выбирается самый частый ответ после нормализации. Метод медоида выбирает один из "
 "ответов с наименьшей суммой посимвольных расстояний редактирования до остальных."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:91
+#: 18807f9d70bf4811ae9d2bf8a06af6bc:None
+msgid "Majority voting selects the most frequent normalized string; medoid selects an existing answer by summed character edit distance. Both compare text after NFC normalization, lowercasing and trimming outer whitespace. The returned text keeps the most frequent case-sensitive spelling among answers matching the winning normalized string; spelling ties prefer the first model. For example, ``Москва``, ``Москва``, ``москва`` produce ``Москва``. With ``return_raw=True``, ``winner`` contains this spelling, while ``normalized_winner`` identifies its key in ``votes`` (and ``distance_sums`` for medoid)."
+msgstr "Голосование большинства выбирает наиболее частую нормализованную строку; медоид — существующий ответ с минимальной суммой посимвольных расстояний редактирования. Сравнение выполняется после нормализации NFC, приведения к нижнему регистру и удаления внешних пробелов. Результат сохраняет наиболее частое написание с учётом регистра среди ответов, соответствующих победившей строке; при равенстве выбирается первый участник. Например, ``Москва``, ``Москва``, ``москва`` дают ``Москва``. При ``return_raw=True`` поле ``winner`` содержит это написание, а ``normalized_winner`` — его ключ в ``votes`` (и ``distance_sums`` для медоида)."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:102
+#: 93b1e01aff164889a4aa71c7d6e1ce76:None
+msgid "Detector consensus"
+msgstr "Согласование детекторов"
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:104
+#: e72c62bd34d54914a7e78f1b7c8e9af0:None
+msgid "Use ``ConsensusWBFDetector`` to retain detections supported by multiple models:"
+msgstr "Используйте ``ConsensusWBFDetector``, чтобы сохранять объекты, подтверждённые несколькими моделями:"
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:121
+#: 415eaea92f6e49598bd13cd5605956a4:None
+msgid "Required votes are ``max(minimum_votes, ceil(len(detectors) * consensus_fraction))``. Empty answers count toward the total number of participants; inference errors propagate. Each participant contributes at most one vote per cluster. Regions are matched separately by ``(type, label)``; configure matching semantic labels on participants. Polygons become axis-aligned enclosing boxes. Participant Pages must already use original-image coordinates and dimensions, as built-in detectors do. No extra resize or NMS is performed by the ensemble."
+msgstr "Необходимое число голосов: ``max(minimum_votes, ceil(len(detectors) * consensus_fraction))``. Пустые ответы учитываются в общем числе участников; ошибки инференса передаются вызывающему коду. Каждый участник даёт не более одного голоса на кластер. Области сопоставляются отдельно по ``(type, label)``; настройте одинаковые семантические метки у участников. Полигоны преобразуются в охватывающие прямоугольники, параллельные осям. Page участников должны использовать координаты и размеры исходного изображения, как у встроенных детекторов. Ансамбль не выполняет дополнительное масштабирование или NMS."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:129
+#: 1ce29e2e1f864ad0afe52b6b4fef0d67:None
+msgid "Participants run in supplied order. Greedy one-to-one matching uses representatives frozen before each participant; equal IoUs prefer higher object and cluster indices. The algorithm is order-dependent. The representative and final rectangle use arithmetic means by default, or weighted means with one finite positive weight per participant. Weights affect geometry and matching, never vote thresholds. Confidence scores are ignored, and fused ``detection_confidence`` is ``None``."
+msgstr "Участники выполняются в заданном порядке. Жадное взаимно однозначное сопоставление использует представителей кластеров, зафиксированных перед каждым участником; при равном IoU предпочтение отдаётся большим индексам объектов и кластеров. Алгоритм зависит от порядка. Представитель и итоговый прямоугольник вычисляются как среднее арифметическое либо взвешенное среднее с одним конечным положительным весом на участника. Веса влияют на геометрию и сопоставление, но не на порог голосов. Уверенность игнорируется; итоговая ``detection_confidence`` равна ``None``."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:136
+#: 6ebfb0d8fe284b54b38dfd2564ec17d8:None
+msgid "The output is a flat Page; geometric descendants of participant Pages are treated as detections. Raw detections include ``votes`` and ``detector_indices`` referencing the supplied order. Fusion does not produce masks or model tensors. ``predict_batch(images)`` returns independent results in image order, including an empty list for an empty batch. It calls single-image prediction sequentially. Pickle preserves parameters and nested participants when those participants support pickling; no JSON configuration protocol for arbitrary models is assumed."
+msgstr "Результат — плоский Page; геометрические потомки Page участников рассматриваются как детекции. Необработанные детекции содержат ``votes`` и ``detector_indices`` с индексами в заданном порядке участников. Слияние не создаёт маски или тензоры моделей. ``predict_batch(images)`` возвращает независимые результаты в порядке изображений, включая пустой список для пустого пакета, последовательно вызывая обработку одного изображения. Pickle сохраняет параметры и вложенных участников, если те поддерживают сериализацию; протокол конфигурации JSON для произвольных моделей не предполагается."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:145
+#: 693757351548488fb7ea7dc199b1c7b9:None
+msgid "Model memory"
+msgstr "Память моделей"
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:147
+#: 6859cf42d191498fb605199f611d2c3b:None
+msgid "Use ``memory_policy=\"sequential\"`` to release each model's sessions after use and reload them when needed. The default, ``\"keep\"``, retains loaded sessions."
+msgstr "Используйте ``memory_policy=\"sequential\"``, чтобы освобождать сессии каждой модели после использования и загружать их заново при необходимости. Значение по умолчанию ``\"keep\"`` сохраняет загруженные сессии."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:155
+#: e78253eb9df343a190f54ba04570225d:None
+msgid "The policy applies inside nested Stacks and ensembles. It can also be set on an individual Stack, MajorityVotingRecognizer or MedoidRecognizer. Sequential mode releases previously loaded participant sessions before starting and cleans up the active model even if prediction fails. ``close()`` releases all participants explicitly; the composition can be used again afterwards."
+msgstr "Политика действует внутри вложенных Stack и ансамблей. Её можно задать отдельно для Stack, MajorityVotingRecognizer или MedoidRecognizer. Последовательный режим перед началом освобождает ранее загруженные сессии участников и очищает активную модель даже при ошибке предсказания. ``close()`` явно освобождает всех участников; после этого композицию можно использовать повторно."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:161
+#: 093236d0369d40e09bb418aa60cd6573:None
+msgid "This mode requires ``parallel=False`` throughout the controlled composition. Custom processors must implement an idempotent ``close()`` and support another prediction after closing; stateless processors can use a no-op. Participants must not be used concurrently by other pipelines or direct calls without external synchronization. Calls on the same sequential composition are serialized."
+msgstr "Этот режим требует ``parallel=False`` во всей управляемой композиции. Пользовательские процессоры должны реализовать идемпотентный ``close()`` и поддерживать предсказание после закрытия; для процессоров без состояния допустима пустая реализация. Участники не должны одновременно использоваться другими конвейерами или прямыми вызовами без внешней синхронизации. Вызовы одной последовательной композиции выполняются по очереди."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:168
+#: 31470466b669440b941d689b4db31cea:None
+msgid "Image data, voting results, dictionaries and runtime allocations can still occupy memory. Session release does not guarantee an immediate drop in process RSS or GPU memory reported by the driver. Repeated session initialization trades inference speed for lower model residency."
+msgstr "Изображения, результаты голосования, словари и выделенная средой выполнения память могут продолжать занимать память. Освобождение сессий не гарантирует немедленного снижения RSS процесса или объёма GPU-памяти, отображаемого драйвером. Повторная инициализация сессий уменьшает объём постоянно загруженных моделей ценой скорости инференса."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:176
+#: 606d4b548f02410a8b68b8a772935b20:None
+msgid "TrOCR CUDA decoding"
+msgstr "CUDA-декодирование TrOCR"
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:178
+#: cd4e6a52ff704dac82591f34b1ad6621:None
+msgid "``TrOCR(device=\"cuda\", cuda_decoding=\"auto\")`` keeps encoder states, logits and KV caches on the GPU when supported. It requires dynamic-batch KV-cache graphs, CUDA-enabled PyTorch, CUDAExecutionProvider active in all three ONNX sessions, I/O binding and ONNX Runtime DLPack export support. Installing ``[gpu,trocr-cuda]`` does not guarantee DLPack support in the runtime wheel."
+msgstr "``TrOCR(device=\"cuda\", cuda_decoding=\"auto\")`` при наличии поддержки сохраняет состояния энкодера, логиты и KV-кеши на GPU. Требуются графы KV-cache с динамическим размером пакета, PyTorch с CUDA, активный CUDAExecutionProvider во всех трёх ONNX-сессиях, привязка ввода-вывода и экспорт DLPack в ONNX Runtime. Установка ``[gpu,trocr-cuda]`` не гарантирует поддержку DLPack в wheel среды выполнения."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:184
+#: a541532d208040ac8182aa3e202c307f:None
+msgid "``cuda_decoding=\"auto\"`` warns once and uses NumPy decoding when CUDA bridge requirements are unmet. ``\"required\"`` raises instead; ``\"off\"`` disables device-resident decoding. CPU, CoreML and Web use NumPy in auto mode. Errors during active CUDA inference propagate. Floating-point scores may differ slightly between host and CUDA decoding."
+msgstr "``cuda_decoding=\"auto\"`` однократно предупреждает и использует NumPy-декодирование, если требования CUDA-моста не выполнены. ``\"required\"`` вместо этого вызывает исключение; ``\"off\"`` отключает декодирование на устройстве. В режиме auto CPU, CoreML и Web используют NumPy. Ошибки активного CUDA-инференса передаются вызывающему коду. Оценки с плавающей точкой могут немного различаться при декодировании на CPU и CUDA."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:191
+#: aaa7c122f035486daca32dd4a79efa1e:None
+msgid "Recognition crops and batch memory"
+msgstr "Области распознавания и память пакетов"
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:193
+#: d5f7e89a976f47a38392f15fc7d0044f:None
+msgid "With ``region_preparer=\"bbox\"``, use ``region_preparer_options`` to set ``padding_x``, ``padding_y``, ``inset_x`` and ``inset_y`` as nonnegative fractions of the original bbox size per side. For example, ``{\"inset_y\": 0.1}`` removes 10% from both top and bottom before orientation compensation. Insets must be below 0.5. Padding and inset on the same axis cannot be combined, nor can relative margins and nonzero pixel ``pad``. These options preserve Page geometry and are rejected by other crop presets."
+msgstr "При ``region_preparer=\"bbox\"`` задавайте ``padding_x``, ``padding_y``, ``inset_x`` и ``inset_y`` через ``region_preparer_options`` как неотрицательные доли исходного размера bbox с каждой стороны. Например, ``{\"inset_y\": 0.1}`` удаляет по 10% сверху и снизу до компенсации ориентации. Отступ внутрь должен быть меньше 0.5. Расширение и сужение по одной оси несовместимы, как и относительные отступы с ненулевым пиксельным ``pad``. Эти параметры сохраняют геометрию Page; другие встроенные способы вырезания их отклоняют."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:201
+#: 353abd4f4b6a477b9869f5bab58cf077:None
+msgid "PPOCRRec supports ``sort_by_width=True`` to group similar crop widths and restore result order afterwards. It is opt-in because right padding may affect CTC predictions. ``max_batch_pixels`` limits padded batch input pixels (batch * height * width, excluding channels), without resizing crops. A single input, including fixed ONNX batch padding, must fit or prediction raises ValueError. This is not a total runtime memory limit; ``batch_size`` still limits dynamic batches. Recognition crops are prepared in batches to reduce peak image memory."
+msgstr "PPOCRRec поддерживает ``sort_by_width=True`` для группировки областей близкой ширины с восстановлением исходного порядка результатов. Опция включается явно, поскольку заполнение справа может влиять на CTC-предсказания. ``max_batch_pixels`` ограничивает число входных пикселей пакета с учётом заполнения (batch * height * width, без каналов), не меняя размер областей. Один вход, включая заполнение фиксированного ONNX-пакета, должен укладываться в бюджет, иначе вызывается ValueError. Это не ограничение всей памяти среды выполнения; ``batch_size`` по-прежнему ограничивает динамические пакеты. Области распознавания подготавливаются пакетами для снижения пикового потребления памяти изображений."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/pipeline_usage.rst:210
+#: 0b88ce4571a644faa20ff3d690fde92d:None
+msgid "``SimpleSorting`` now infers columns by default (``use_columns=True``). Set ``SimpleSorting(use_columns=False)`` to retain grouping without column inference."
+msgstr "``SimpleSorting`` теперь по умолчанию определяет колонки (``use_columns=True``). Используйте ``SimpleSorting(use_columns=False)``, чтобы сохранить группировку без определения колонок."

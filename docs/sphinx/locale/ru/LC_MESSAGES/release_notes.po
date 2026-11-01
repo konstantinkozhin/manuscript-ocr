@@ -162,3 +162,255 @@ msgstr "Добавлены ноутбуки для пользовательск�
 #: ../../release_notes.rst:31 649a9358f25d4a708412e154a9e72d1d
 msgid "Expanded installation and test CI matrices through Python 3.14."
 msgstr "В CI добавлены проверки установки и тесты для версий Python до 3.14 включительно."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:9
+#: 66d5fb565ab643e08d4741ab3cbcbb37:None
+msgid "Added ``ConsensusWBFDetector`` with per-detector votes and optional weighted box fusion."
+msgstr "Добавлен ``ConsensusWBFDetector`` с голосами отдельных детекторов и необязательным взвешенным слиянием рамок."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:10
+#: 9e479786718e404696954cc26e490a69:None
+msgid "Preserved the winning case-sensitive spelling in majority-voting and medoid ensembles."
+msgstr "В ансамблях голосования большинства и медоида сохраняется регистр победившего написания."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:11
+#: 9f8814a62d654e31bc412a511db3a722:None
+msgid "Added optional device-resident TrOCR CUDA decoding with explicit capability checks and NumPy fallback."
+msgstr "Добавлено необязательное CUDA-декодирование TrOCR на устройстве с явной проверкой возможностей и резервным путём NumPy."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:12
+#: ac9f7df0467f437c824aa65106cf7ccf:None
+msgid "Reduced inference memory through batched crop preparation and detector preprocessing; added PPOCRRec width sorting and pixel budgets."
+msgstr "Снижено потребление памяти инференса благодаря пакетной подготовке областей и предобработке детекторов; добавлены сортировка PPOCRRec по ширине и бюджет пикселей."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:13
+#: 2037d92e205b44ce95d50dd6cd9fa780:None
+msgid "Added relative bbox padding and insets; enabled column inference in ``SimpleSorting`` by default."
+msgstr "Добавлены относительные отступы bbox наружу и внутрь; определение колонок в ``SimpleSorting`` включено по умолчанию."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:14
+#: a9c8c634799243db8b87184e9fad401c:None
+msgid "Added optional native and browser runtimes, a browser OCR demonstration and explicit runtime installation extras."
+msgstr "Добавлены необязательные нативная и браузерная среды выполнения, браузерная OCR-демонстрация и явные extras для установки сред."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:15
+#: 0bb86bbfcb534890911b160f2f02c2e1:None
+msgid "Removed RapidFuzz and Levenshtein dependencies and refreshed training examples."
+msgstr "Удалены зависимости RapidFuzz и Levenshtein, обновлены примеры обучения."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:42
+#: 92469fee30d24fea932247ea9910e3f7:None
+msgid "0.1.12"
+msgstr "0.1.12"
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:44
+#: 5e88406358834783b9cd4950eb9a9ac5:None
+msgid "Added configurable TRBA batch sizes with a default of 128 and per-call overrides."
+msgstr "Добавлен настраиваемый размер пакетов TRBA: по умолчанию 128, с переопределением на уровне вызова."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:45
+#: a25aa502947a48ec8d98f23b09829f81:None
+msgid "Updated Pipeline to respect the recognizer's configured batch size."
+msgstr "Pipeline учитывает размер пакета, заданный у распознавателя."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:46
+#: add6ff73b38b4458ad60263e61229d26:None
+msgid "Improved automatic CUDA DLL loading on Windows before ONNX session initialization."
+msgstr "Улучшена автоматическая загрузка CUDA DLL в Windows до инициализации ONNX-сессий."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:47
+#: c54f2ab798c34b238fadd0b906a1cb51:None
+msgid "Added ``create_page_from_image()`` for wrapping one or more images in a Page."
+msgstr "Добавлена ``create_page_from_image()`` для оборачивания одного или нескольких изображений в Page."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:48
+#: c50214024bea45fb9571ab4d0ecb9aa7:None
+msgid "Added automatic ONNX export attempts after CharLM training."
+msgstr "Добавлены автоматические попытки экспорта ONNX после обучения CharLM."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:49
+#: 0bb86bbfcb534890911b160f2f02c2e1:None
+msgid "Added ``onnxscript`` and ``Levenshtein`` to development dependencies and removed ``ultralytics``."
+msgstr "В зависимости разработки добавлены ``onnxscript`` и ``Levenshtein``, удалена ``ultralytics``."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:52
+#: 6d8cb0645a014002b020196fe86fddfb:None
+msgid "0.1.11"
+msgstr "0.1.11"
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:54
+#: 20860229b4e74916a2936d8adf909a7a:None
+msgid "Introduced a consistent ``Page -> Page`` stage contract and base classes and protocols for custom processors."
+msgstr "Введён единый контракт этапов ``Page -> Page``, базовые классы и протоколы пользовательских процессоров."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:55
+#: 1ca0464c32204e22822823907b939a24:None
+msgid "Refactored Pipeline around explicit stages and intermediate Page snapshots."
+msgstr "Pipeline переработан вокруг явных этапов и промежуточных снимков Page."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:56
+#: 66d5fb565ab643e08d4741ab3cbcbb37:None
+msgid "Added the YOLO ONNX detector with preset and custom weights and axis-aligned and rotated detections."
+msgstr "Добавлен ONNX-детектор YOLO с готовыми и пользовательскими весами, осевыми и повёрнутыми рамками."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:57
+#: 526afb90079a410fbf423d8939c71199:None
+msgid "Set the default pipeline to YOLO with ``yolo26x_obb_text_g1``, SimpleSorting and TRBA with ``trba_lite_g2``."
+msgstr "Конвейер по умолчанию использует YOLO с ``yolo26x_obb_text_g1``, SimpleSorting и TRBA с ``trba_lite_g2``."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:58
+#: e71b8347ee8c416d8b709cf86eb1ebe8:None
+msgid "Added the ``manuscript.layouts`` package and SimpleSorting, with configurable layout placement through ``layout_after``."
+msgstr "Добавлены пакет ``manuscript.layouts`` и SimpleSorting с настройкой положения этапа через ``layout_after``."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:59
+#: da7a9eb049024bb2ac24e22a6f57e917:None
+msgid "Updated the data model around ``TextSpan``, ``Line``, ``Block`` and ``Page``, retaining legacy ``Word`` aliases and versioned export schemas."
+msgstr "Модель данных обновлена вокруг ``TextSpan``, ``Line``, ``Block`` и ``Page`` с сохранением прежних псевдонимов ``Word`` и версионированных схем экспорта."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:60
+#: 75b7bda5806542fdaba6261d856b2f72:None
+msgid "Added support for polygons with more than four points and helpers for merging and collapsing text spans."
+msgstr "Добавлена поддержка полигонов с более чем четырьмя точками и функции объединения и свёртки текстовых областей."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:61
+#: c84faa5563234f019b8173e0ed573252:None
+msgid "Updated TRBA and CharLM to process Page objects with optional source-image context."
+msgstr "TRBA и CharLM обновлены для обработки Page с необязательным контекстом исходного изображения."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:62
+#: cb9d8638004244a9bf8a64fe7df01d56:None
+msgid "Added ``bbox``, ``polygon_mask`` and ``quad_warp`` recognition crop presets and moved rotation and size filtering into TRBA."
+msgstr "Добавлены способы вырезания ``bbox``, ``polygon_mask`` и ``quad_warp``; поворот и фильтрация размеров перенесены в TRBA."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:63
+#: 51d6a60fb8d5421e8eecc05fe21e16fb:None
+msgid "Improved TRBA training, export, validation, metrics and debug tools, and added the ``trba_lite_g2`` preset."
+msgstr "Улучшены обучение, экспорт, валидация, метрики и отладка TRBA; добавлен пресет ``trba_lite_g2``."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:64
+#: 387ef0a26262481aa60cb1ce04a872be:None
+msgid "Improved EAST polygon parsing, training augmentations, previews, checkpoint selection and resume behavior."
+msgstr "Улучшены разбор полигонов EAST, аугментации обучения, предпросмотры, выбор контрольных точек и возобновление обучения."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:65
+#: f4fd06feb61847438ad157439372910f:None
+msgid "Added HTTP model download retries with backoff."
+msgstr "Добавлены повторные HTTP-загрузки моделей с увеличением задержки."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:66
+#: 4028ecc75c8848b4a27eae6ae62df8ab:None
+msgid "Fixed Python 3.8 compatibility and training edge cases, including ``val_size=0`` and ``pretrain_weights=None``."
+msgstr "Исправлены совместимость с Python 3.8 и крайние случаи обучения, включая ``val_size=0`` и ``pretrain_weights=None``."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:67
+#: 7a7727d9797740ccb09cf6baa1a914be:None
+msgid "Updated API guides and example notebooks and introduced versioned documentation with archived 0.1.10 pages."
+msgstr "Обновлены руководства API и примеры в ноутбуках; введена версионированная документация с архивом страниц 0.1.10."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:70
+#: d2e86940816c4a84b5aa1e896118b023:None
+msgid "0.1.10"
+msgstr "0.1.10"
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:72
+#: b7ee83ad815747a4855038952f80b312:None
+msgid "Reconstructed from published source distributions and Git history, relative to 0.1.8, the previous release on PyPI."
+msgstr "Восстановлено по опубликованным исходным дистрибутивам и истории Git относительно 0.1.8 — предыдущего выпуска на PyPI."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:74
+#: 1318eaa9ac2c486eba4d2a8d33f37529:None
+msgid "Added TRBA recognition and an end-to-end Pipeline combining detection, recognition and optional text correction."
+msgstr "Добавлены распознаватель TRBA и сквозной Pipeline, объединяющий детекцию, распознавание и необязательную коррекцию текста."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:75
+#: 722e4053d9c543b48a8d9281af9a24f7:None
+msgid "Added the CharLM corrector with training, ONNX inference and export support."
+msgstr "Добавлен корректор CharLM с обучением, ONNX-инференсом и экспортом."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:76
+#: c590a9e5084a4c9eb06e6e973ec751cf:None
+msgid "Introduced structured OCR results using ``Word``, ``Line``, ``Block`` and ``Page``, with JSON serialization."
+msgstr "Введены структурированные OCR-результаты на основе ``Word``, ``Line``, ``Block`` и ``Page`` с сериализацией JSON."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:77
+#: 0d61348c5ea14a47a1a38c1afee34e79:None
+msgid "Added shared model loading and caching for presets, local files, HTTP URLs, GitHub releases and Google Drive."
+msgstr "Добавлены общие загрузка и кеширование моделей из пресетов, локальных файлов, HTTP URL, GitHub Releases и Google Drive."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:78
+#: db726b189e2646cfb586b3aa56a50ccf:None
+msgid "Reworked EAST inference around ONNX Runtime and added CPU, CUDA and CoreML provider selection for inference models."
+msgstr "Инференс EAST переработан для ONNX Runtime; добавлен выбор CPU, CUDA и CoreML для моделей инференса."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:79
+#: 79057002ebbe4e9b8fc63c6d1ef38001:None
+msgid "Separated inference dependencies from optional PyTorch training and development dependencies."
+msgstr "Зависимости инференса отделены от необязательных зависимостей обучения и разработки на PyTorch."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:80
+#: 72f858d833464640bdefd1abe5444e4f:None
+msgid "Added configurable automatic rotation of vertical text crops before recognition."
+msgstr "Добавлен настраиваемый автоматический поворот вертикальных текстовых областей перед распознаванием."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:81
+#: cf9fd18431504aaba662fffaa15c0673:None
+msgid "Added optional EAST inference augmentation, contained-box filtering and area-anomaly filtering."
+msgstr "Добавлены необязательные аугментация инференса EAST, фильтрация вложенных рамок и аномалий площади."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:82
+#: 1dcc465b6be745ababd961283190f3e3:None
+msgid "Improved EAST training resume and checkpoint recovery."
+msgstr "Улучшены возобновление обучения EAST и восстановление контрольных точек."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:83
+#: dcf5a634afbb43e188f5fd50417b285c:None
+msgid "Added document sorting, reading-order visualization, OCR metrics and text-to-Page utilities."
+msgstr "Добавлены сортировка документов, визуализация порядка чтения, OCR-метрики и преобразование текста в Page."
+
+
+#: ../../../Users/user/manuscript-ocr/docs/sphinx/release_notes.rst:84
+#: df17f7ed0f244b5d94c3fc9b703c6e5c:None
+msgid "Added a Gradio demonstration and expanded English and Russian API documentation."
+msgstr "Добавлена демонстрация Gradio и расширена документация API на английском и русском языках."

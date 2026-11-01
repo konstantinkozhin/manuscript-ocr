@@ -206,3 +206,26 @@ msgstr ""
 "По умолчанию возвращает Page. Флаги raw/mask/output включают словарь с итоговым Page и "
 "результатами детекторов, сгруппированными по моделям. Обработчики Page всегда запускаются в "
 "режиме Page. Stack не кеширует результаты предсказаний."
+
+
+#: of:None
+#: manuscript._pipeline.Pipeline:1
+#: manuscript._stack.Stack:1
+#: 7529ff60a56a4cc1a3180cc4e7cbc131:None
+#: c5befc4811ea417c879c5787e07abe91:None
+msgid "Bases: :py:class:`~manuscript._internal.model_lifecycle.ModelComposition`"
+msgstr "Базовые классы: :py:class:`~manuscript._internal.model_lifecycle.ModelComposition`"
+
+
+#: of:None
+#: manuscript._pipeline.Pipeline:51
+#: fd9a12cc7f7842109ad04b1c81ebb079:None
+msgid "Keep loaded model sessions by default. \"sequential\" releases sessions after each processor call, including on failure, and applies inside nested Stacks and ensembles. Participants require close(); nested parallel execution is incompatible. Shared models need external synchronization across pipelines and direct calls."
+msgstr "По умолчанию сохраняет загруженные сессии моделей. \"sequential\" освобождает сессии после каждого вызова процессора, включая ошибки, и действует внутри вложенных Stack и ансамблей. Участникам нужен close(); вложенное параллельное выполнение несовместимо. Общие модели требуют внешней синхронизации между конвейерами и прямыми вызовами."
+
+
+#: of:None
+#: manuscript._stack.Stack:14
+#: 05a375342e604d99bf6312e106d66cd1:None
+msgid "Keep sessions loaded by default. \"sequential\" releases each processor's sessions after its call, including on failure, and applies to nested compositions. Requires close() on every participant and disallows parallel=True. Participants must be exclusively owned or externally synchronized when shared with other callers."
+msgstr "По умолчанию сохраняет сессии. \"sequential\" освобождает сессии каждого процессора после вызова, включая ошибки, и действует во вложенных композициях. Требует close() у каждого участника и запрещает parallel=True. Участники должны принадлежать одному вызывающему коду либо использовать внешнюю синхронизацию при совместном доступе."

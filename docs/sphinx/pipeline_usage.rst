@@ -170,6 +170,47 @@ occupy memory. Session release does not guarantee an immediate drop in process
 RSS or GPU memory reported by the driver. Repeated session initialization
 trades inference speed for lower model residency.
 
+.. _trocr-cuda-decoding:
+
+TrOCR CUDA decoding
+-------------------
+
+``TrOCR(device="cuda", cuda_decoding="auto")`` keeps encoder states, logits
+and KV caches on the GPU when supported. It requires dynamic-batch KV-cache
+graphs, CUDA-enabled PyTorch, CUDAExecutionProvider active in all three ONNX
+sessions, I/O binding and ONNX Runtime DLPack export support. Installing
+``[gpu,trocr-cuda]`` does not guarantee DLPack support in the runtime wheel.
+
+``cuda_decoding="auto"`` warns once and uses NumPy decoding when CUDA bridge
+requirements are unmet. ``"required"`` raises instead; ``"off"`` disables
+device-resident decoding. CPU, CoreML and Web use NumPy in auto mode. Errors
+during active CUDA inference propagate. Floating-point scores may differ
+slightly between host and CUDA decoding.
+
+Recognition crops and batch memory
+----------------------------------
+
+With ``region_preparer="bbox"``, use ``region_preparer_options`` to set
+``padding_x``, ``padding_y``, ``inset_x`` and ``inset_y`` as nonnegative
+fractions of the original bbox size per side. For example,
+``{"inset_y": 0.1}`` removes 10% from both top and bottom before orientation
+compensation. Insets must be below 0.5. Padding and inset on the same axis
+cannot be combined, nor can relative margins and nonzero pixel ``pad``.
+These options preserve Page geometry and are rejected by other crop presets.
+
+PPOCRRec supports ``sort_by_width=True`` to group similar crop widths and
+restore result order afterwards. It is opt-in because right padding may
+affect CTC predictions. ``max_batch_pixels`` limits padded batch input pixels
+(batch * height * width, excluding channels), without resizing crops. A single
+input, including fixed ONNX batch padding, must fit or prediction raises
+ValueError. This is not a total runtime memory limit; ``batch_size`` still
+limits dynamic batches. Recognition crops are prepared in batches to reduce
+peak image memory.
+
+``SimpleSorting`` now infers columns by default (``use_columns=True``).
+Set ``SimpleSorting(use_columns=False)`` to retain grouping without column
+inference.
+
 Custom stages
 -------------
 

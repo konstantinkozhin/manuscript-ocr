@@ -33,6 +33,16 @@ If CUDA/cuDNN libraries are not installed, also run:
 
 In notebooks, restart the kernel after installation.
 
+For device-resident TrOCR decoding, install ``manuscript-ocr[gpu,trocr-cuda]``
+and a CUDA-enabled PyTorch build. ONNX Runtime must support DLPack export;
+this capability is not present in every CPU or GPU wheel. See
+:ref:`trocr-cuda-decoding` for requirements and fallback behavior.
+
+Browser inference uses ``runtime="web"`` and a host-provided ONNX Runtime Web
+bridge; installing ``[web]`` alone does not configure that bridge. See the
+repository's ``docs/WEB_RUNTIME.md`` and ``scripts/browser_probe/README.md``
+for setup and the browser demonstration.
+
 You can switch models and pipeline components explicitly with the ``device``
 parameter, for example ``device="cuda"`` for NVIDIA GPU or ``device="cpu"``
 for CPU:

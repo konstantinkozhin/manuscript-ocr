@@ -1034,3 +1034,60 @@ msgstr ":py:obj:`MajorityVotingRecognizer`"
 #: c025415df5c645aeb5cef1871bceef8b manuscript.recognizers._medoid.MedoidRecognizer:23 of
 msgid "Vote by exact whole-string agreement."
 msgstr "Выбирает самый частый текстовый ответ по точному совпадению."
+
+
+#: of:None
+#: manuscript.recognizers._trba.TRBA:51
+#: b9e7f4d82cf846959acf80dfd0e6c811:None
+msgid "Optional configuration for built-in region preparers. Defaults to ``None``. Typical options are ``pad`` for ``\"bbox\"`` and ``\"polygon_mask\"``, or ``output_size=(width, height)`` for ``\"quad_warp\"``. Non-quad polygons passed to ``\"quad_warp\"`` fall back to bbox crops by default. For ``\"bbox\"``, ``padding_x``, ``padding_y``, ``inset_x`` and ``inset_y`` are nonnegative fractions of the original bbox size per side (default 0). Insets must be below 0.5. Padding and inset on the same axis cannot be combined; relative margins cannot be combined with nonzero pixel ``pad``. For example, ``{\"inset_y\": 0.1}`` removes 10% from the top and bottom before orientation compensation, without changing the Page geometry. Other presets reject these options."
+msgstr "Необязательная конфигурация встроенных способов подготовки областей. По умолчанию ``None``. Типичные параметры: ``pad`` для ``\"bbox\"`` и ``\"polygon_mask\"`` или ``output_size=(width, height)`` для ``\"quad_warp\"``. Полигоны не из четырёх точек при ``\"quad_warp\"`` по умолчанию вырезаются по bbox. Для ``\"bbox\"`` параметры ``padding_x``, ``padding_y``, ``inset_x`` и ``inset_y`` — неотрицательные доли исходного размера bbox с каждой стороны (по умолчанию 0). Отступы внутрь должны быть меньше 0.5. Расширение и сужение по одной оси несовместимы; относительные отступы несовместимы с ненулевым пиксельным ``pad``. Например, ``{\"inset_y\": 0.1}`` удаляет по 10% сверху и снизу до компенсации ориентации, не меняя геометрию Page. Другие способы подготовки отклоняют эти параметры."
+
+
+#: of:None
+#: manuscript.recognizers._ppocr_rec.PPOCRRec:4
+#: 001ac26294234add967b50ed261d8697:None
+msgid "With ``region_preparer=\"bbox\"``, ``region_preparer_options`` accepts ``padding_x``, ``padding_y``, ``inset_x`` and ``inset_y`` as fractions of the original bbox size per side. For example, ``{\"inset_y\": 0.1}`` removes 10% from the top and bottom before orientation compensation. Insets must be below 0.5. Padding and inset on the same axis, or relative margins and nonzero pixel ``pad``, cannot be combined. Page geometry is preserved; other built-in crop presets reject relative margins."
+msgstr "При ``region_preparer=\"bbox\"`` параметр ``region_preparer_options`` принимает ``padding_x``, ``padding_y``, ``inset_x`` и ``inset_y`` как доли исходного размера bbox с каждой стороны. Например, ``{\"inset_y\": 0.1}`` удаляет по 10% сверху и снизу до компенсации ориентации. Отступы внутрь должны быть меньше 0.5. Расширение и сужение по одной оси, а также относительные отступы и ненулевой пиксельный ``pad`` несовместимы. Геометрия Page сохраняется; другие встроенные способы вырезания отклоняют относительные отступы."
+
+
+#: of:None
+#: manuscript.recognizers._ppocr_rec.PPOCRRec:12
+#: 27b1fb47824440d9b6c4a5a9b0361aea:None
+msgid "``sort_by_width=True`` batches crops of similar widths and restores the original result order. It is opt-in because changing right padding can affect CTC predictions. ``max_batch_pixels`` optionally limits padded input pixels (batch * height * width, excluding channels), without resizing crops. A single input, including required fixed ONNX batch padding, must fit the budget; otherwise prediction raises ValueError. This is not a limit on total runtime memory. ``batch_size`` remains the maximum dynamic batch size."
+msgstr "``sort_by_width=True`` объединяет области близкой ширины в пакеты и восстанавливает исходный порядок результатов. Опция включается явно, поскольку изменение заполнения справа может влиять на CTC-предсказания. ``max_batch_pixels`` необязательно ограничивает число входных пикселей с учётом заполнения (batch * height * width, без каналов), не меняя размер областей. Один вход, включая необходимое заполнение фиксированного ONNX-пакета, должен укладываться в бюджет, иначе вызывается ValueError. Это не ограничение всей памяти среды выполнения. ``batch_size`` остаётся максимальным размером динамического пакета."
+
+
+#: of:None
+#: manuscript.recognizers._trocr.TrOCR:54
+#: a87c18feb8784b12ae4cb5cdb69cae99:None
+msgid "Keep encoder states, logits and KV caches on CUDA using optional Torch buffers and ONNX I/O binding. Requires dynamic-batch KV-cache graphs, CUDA-enabled Torch and ORT DLPack support. Install ``manuscript-ocr[gpu,trocr-cuda]``. Auto falls back with a warning on CUDA when unavailable; required raises instead. CPU, CoreML and Web use NumPy. CUDA floating-point kernels may produce small differences in scores."
+msgstr "Сохраняет состояния энкодера, логиты и KV-кеши на CUDA с помощью необязательных буферов Torch и привязки ввода-вывода ONNX. Требует графы KV-cache с динамическим пакетом, Torch с CUDA и поддержку DLPack в ORT. Установите ``manuscript-ocr[gpu,trocr-cuda]``. При отсутствии поддержки auto на CUDA выдаёт предупреждение и использует обычный путь; required вызывает исключение. CPU, CoreML и Web используют NumPy. Вычисления CUDA с плавающей точкой могут давать небольшие различия в оценках."
+
+
+#: of:None
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer:1
+#: 0db80c78ad3d45589a1297596e95e19c:None
+msgid "Bases: :py:class:`~manuscript._internal.model_lifecycle.ModelComposition`"
+msgstr "Базовые классы: :py:class:`~manuscript._internal.model_lifecycle.ModelComposition`"
+
+
+#: of:None
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer:16
+#: 91bb0ce58e5049c3838bdba83dc0dbfa:None
+msgid "Keep sessions loaded by default. \"sequential\" releases each member's sessions after its call, including on failure. Nested compositions inherit this policy. Requires close() on every participant and disallows parallel=True. Shared participants need external locking."
+msgstr "По умолчанию сохраняет сессии. \"sequential\" освобождает сессии каждого участника после вызова, включая ошибки. Вложенные композиции наследуют политику. Требует close() у каждого участника и запрещает parallel=True. Общим участникам нужна внешняя блокировка."
+
+
+#: of:None
+#: manuscript.recognizers._majority_voting.MajorityVotingRecognizer.predict:32
+#: 8b787084f4db4d248db32ac252790699:None
+#: 87d163bd4b274a1f8a1c5ab53f210726:None
+msgid "Participant exceptions abort aggregation. Models may target different levels; parent and descendant texts are aggregated independently. Comparison uses NFC, lowercase and stripped outer whitespace. Output preserves the most frequent case-sensitive spelling among candidates matching the winning normalized text (NFC and stripped). Ties prefer the first model. Raw votes use normalized keys; normalized_winner identifies the key corresponding to the case-preserving winner."
+msgstr "Исключения участников прерывают агрегацию. Модели могут работать с разными уровнями; тексты родителей и потомков агрегируются независимо. Сравнение использует NFC, нижний регистр и удаление внешних пробелов. Результат сохраняет наиболее частое написание с учётом регистра среди кандидатов, соответствующих победившему нормализованному тексту (NFC и удаление внешних пробелов). При равенстве выбирается первая модель. Необработанные голоса используют нормализованные ключи; normalized_winner указывает ключ, соответствующий winner с сохранённым регистром."
+
+
+#: of:None
+#: manuscript.recognizers._medoid.MedoidRecognizer:14
+#: aba29b5172b041c3bb6c4a3ccb73f5b5:None
+msgid "Keep sessions loaded by default. \"sequential\" releases participant sessions after each call, including on failure, and applies to nested compositions. Requires close() and parallel=False; shared participants need external synchronization."
+msgstr "По умолчанию сохраняет сессии. \"sequential\" освобождает сессии участников после каждого вызова, включая ошибки, и действует во вложенных композициях. Требует close() и parallel=False; общим участникам нужна внешняя синхронизация."
