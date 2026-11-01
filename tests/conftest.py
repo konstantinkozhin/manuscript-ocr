@@ -37,6 +37,13 @@ def pytest_sessionfinish(session, exitstatus):
             report.nodeid
             for report in reporter.stats.get("skipped", [])
             if "CUDA" not in str(report.longrepr)
+            # Native ORT wheels need not expose the optional DLPack bridge,
+            # even when every integration dependency is installed.
+            and not (
+                isinstance(report.longrepr, tuple)
+                and report.longrepr[2]
+                == "Skipped: ONNX Runtime DLPack export support is required"
+            )
         ]
         if unexpected:
             reporter.write_sep(
